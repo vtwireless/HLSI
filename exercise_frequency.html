@@ -1,61 +1,26 @@
 <!DOCTYPE html>
-<!-- Line chart example
-Line Chart Checklist
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Frequency</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
 
-  1.  Add an SVG to draw our line chart on
-  2.  Use the D3 standard margin convetion
-  3.  Create an x axis
-  4.  Create a y axis
-  5.  Create an x scale
-  6.  Create a y scale
-  7.  Create a line generator
-  8.  Create a random dataset
-  9.  Create a path object for the line
-  10. Bind the data to the path object
-  11. Call the line generator on the data-bound path object
-  12. Add circles to show each datapoint
-  13. Add some basic styling to the chart so its easier on the eyes
-
-Read through the code below to see where each part of the checklist is completed.
-
-    from: https://bl.ocks.org/pstuffa/26363646c478b2028d36e7274cedefa6
-see also: https://bl.ocks.org/gordlea/27370d1eea8464b04538e6d8ced39e89
--->
-
-<meta charset="utf-8">
-
-<style type="text/css">
-/* 13. Basic Styling with CSS */
-
-/* TODO: only apply to axis labels? */
-* { font: 12px Arial; }
-
-/* Style the lines by removing the fill and applying a stroke */
-.line {
-    fill: none;
-    stroke: #ffab00;
-    stroke-width: 3;
-}
-
-.grid line { stroke: #cccccc; }
-
-/* Style the dots by assigning a fill and stroke */
-.dot {
-    fill: #ffab00;
-    stroke: #fff;
-}
-
-</style>
-<!-- Body tag is where we will append our SVG and SVG objects-->
-  <p>
-  <label for="frequency">Frequency</label>
-  <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value)">
-  <output for="frequency" id="fc">0.1</output>
-  </p>
 <body>
+  <h2>Exercise - Frequency</h2>
+  <p><a href="index.html">[back]</a></p>
+  <p>
+    <label for="frequency">Frequency</label>
+    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value)">
+    <output for="frequency" id="fc">0.1</output>
+  </p>
 </body>
 
-<!-- Load in the d3 library -->
+<!-- Load in the javascript libraries -->
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="fft.js"></script>
 <script src="support.js"></script>
@@ -200,5 +165,5 @@ function update_plot(v) {
 }
 
 </script>
-
+</html>
 
