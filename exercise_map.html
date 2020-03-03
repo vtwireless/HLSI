@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Frequency</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>Map test</h2>
+  <p><a href="index.html">[back]</a></p>
+  <div class="svg-container">
+  <svg id="click" xmlns="http://www.w3.org/2000/svg" width="600" height="600">
+    <defs>
+      <g id="pointer" transform="scale(0.8)">
+       <path d="M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z"></path>
+       <path d="M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z"></path>
+      </g>
+    </defs>
+    <path>
+  </svg>
+  </div>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var svg = d3.select("#click");
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+  , width  = svg.node().getBoundingClientRect().width - margin.left - margin.right  // Use the window's width
+  , height = svg.node().getBoundingClientRect().height- margin.top - margin.bottom; // Use the window's height
+console.log(width);
+console.log(height);
+
+// add pointer element
+var user0 = svg.append("use")
+    .attr("href","#pointer")
+    .attr("x","50")
+    .attr("y","50")
+    .attr("fill","#039be5")
+    .attr("stroke","#004080")
+    .attr("stroke-width","1px");
+
+var user1 = svg.append("use")
+    .attr("href","#pointer")
+    .attr("x",width/2)
+    .attr("y",height/2)
+    .attr("fill","#03e59b")
+    .attr("stroke","#008040")
+    .attr("stroke-width","1px");
+
+var dx, dy;
+var dragHandler = d3.drag()
+    .on("start", function() {
+        let current = d3.select(this);
+        dx = current.attr("x") - d3.event.x;
+        dy = current.attr("y") - d3.event.y;
+    })
+    .on("drag", function() {
+        d3.select(this)
+            .attr("x", d3.event.x + dx)
+            .attr("y", d3.event.y + dy);
+    });
+
+dragHandler(svg.selectAll("use"));
+
+</script>
+</html>
+
