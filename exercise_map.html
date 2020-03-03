@@ -37,37 +37,26 @@ var svg = d3.select("#click");
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = svg.node().getBoundingClientRect().width - margin.left - margin.right  // Use the window's width
   , height = svg.node().getBoundingClientRect().height- margin.top - margin.bottom; // Use the window's height
-console.log(width);
-console.log(height);
 
-// add pointer element
-var user0 = svg.append("use")
-    .attr("href","#pointer")
-    .attr("x","50")
-    .attr("y","50")
-    .attr("fill","#039be5")
-    .attr("stroke","#004080")
-    .attr("stroke-width","1px");
+svg.selectAll("use")
+    .data([
+        {x:50,      y:50,       c:"#039be5", b:"#004080"},
+        {x:width/2, y:height/2, c:"#03e539", b:"#008040"},
+        ])
+    .enter()
+    .append("use")
+        .attr("href","#pointer")
+        .attr("x",      function(d) { return (d.x) })
+        .attr("y",      function(d) { return (d.y) })
+        .attr("fill",   function(d) { return (d.c) })
+        .attr("stroke", function(d) { return (d.b) })
+        .attr("stroke-width","1px");
 
-var user1 = svg.append("use")
-    .attr("href","#pointer")
-    .attr("x",width/2)
-    .attr("y",height/2)
-    .attr("fill","#03e59b")
-    .attr("stroke","#008040")
-    .attr("stroke-width","1px");
-
-var dx, dy;
 var dragHandler = d3.drag()
-    .on("start", function() {
-        let current = d3.select(this);
-        dx = current.attr("x") - d3.event.x;
-        dy = current.attr("y") - d3.event.y;
-    })
-    .on("drag", function() {
+    .on("drag", function(d) {
         d3.select(this)
-            .attr("x", d3.event.x + dx)
-            .attr("y", d3.event.y + dy);
+            .attr("x", d.x = d3.event.x)
+            .attr("y", d.y = d3.event.y);
     });
 
 dragHandler(svg.selectAll("use"));
