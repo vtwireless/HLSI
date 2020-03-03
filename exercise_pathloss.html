@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h2>Map test</h2>
+  <h2>Exercise - Path Loss</h2>
   <p><a href="index.html">[back]</a></p>
   <div class="svg-container">
   <svg id="click" xmlns="http://www.w3.org/2000/svg" width="600" height="600">
@@ -37,6 +37,14 @@ var svg = d3.select("#click");
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = svg.node().getBoundingClientRect().width - margin.left - margin.right  // Use the window's width
   , height = svg.node().getBoundingClientRect().height- margin.top - margin.bottom; // Use the window's height
+
+// scale
+var xscale = d3.scaleLinear().domain([ -1000, 1000]).range([0, width]);
+var yscale = d3.scaleLinear().domain([ -1000, 1000]).range([height, 0]);
+
+// create grid lines
+svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize( height));
+svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(- width));
 
 svg.selectAll("use")
     .data([
