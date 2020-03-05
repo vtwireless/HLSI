@@ -46,6 +46,7 @@ var yscale = d3.scaleLinear().domain([ -1000, 1000]).range([height, 0]);
 svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize( height));
 svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(- width));
 
+var xmin=50, xmax=width-50, ymin=50, ymax=height-50;
 svg.selectAll("use")
     .data([
         {x:50,      y:50,       c:"#039be5", b:"#004080"},
@@ -63,8 +64,8 @@ svg.selectAll("use")
 var dragHandler = d3.drag()
     .on("drag", function(d) {
         d3.select(this)
-            .attr("x", d.x = d3.event.x)
-            .attr("y", d.y = d3.event.y);
+            .attr("x", d.x = Math.max(Math.min(d3.event.x,xmax),xmin))
+            .attr("y", d.y = Math.max(Math.min(d3.event.y,ymax),ymin));
     });
 
 dragHandler(svg.selectAll("use"));

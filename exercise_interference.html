@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Interference</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>Exercise - Interference</h2>
+  <p><a href="index.html">[back]</a></p>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="p5.min.js"></script>
+<script src="p5.dom.min.js"></script>
+<script src="fft.js"></script>
+<script>
+
+// plot dimensions
+let width  = 960;
+let height = 800;
+
+// transform
+let nfft= 256;
+let fft = new FFTNayuki(nfft)
+var xi  = new Array(nfft);
+var xq  = new Array(nfft);
+let f   = new Array(nfft);
+let psd = new Array(nfft);
+
+let fmin = 700; // MHz
+let fmax = 800; // MHz
+let pmin = -100;
+let pmax =   20;
+let plot_spectrum; // = new Plot(fmin, fmax, -120, 20);
+let fc = 0;
+let bw = 0.1;
+let noise_floor = -80;
+
+//
+let plot_rate;  // data rate over time
+let history = 800;
+let time = new Array(history);
+let rate = new Array(history);
+
+// ui elements
+let slider;
+
+// derived values
+let nstd = Math.pow(10, noise_floor/20) / Math.sqrt(2) / Math.sqrt(nfft);
+
+function Plotter(xmin, xmax, ymin, ymax, _width, _height, _xpos, _ypos)
+{
+    // graphics renderer for plotter object
+    this.width  = _width;
+    this.height = _height;
+    this.xpos   = _xpos;
+    this.ypos   = _ypos;
+    this.pg = createGraphics(this.width, this.height);
+    this.pg.background(51);
+
+    // range limits
+    this.xmin = xmin;
+    this.xmax = xmax;
+    this.ymin = ymin;
+    this.ymax = ymax;
+
+    // padding
+    this.xpad = 40.0;
+    this.ypad = 20.0;
+
+    // display
+    this.nx = 11; // number of tic marks
+    this.dx = (this.width - 2.0*this.xpad) / (this.nx - 1.0);
+
+    // display
+    this.ny = 13; // number of tic marks
+    this.dy = (this.height - 2.0*this.ypad) / (this.ny - 1.0);
+
+    this.xscale = (this.xmax - this.xmin) / (this.width  - 2*this.xpad);
+    this.yscale = (this.ymax - this.ymin) / (this.height - 2*this.ypad);
+
+    this.reset = function() {
+        this.pg.background(255);
+        this.pg.strokeWeight(1);
+        this.pg.textSize(14);
+    }
+
+    // draw the grid
+    this.draw_grid = function() {
+        //ellipse(width/2, height/2, 10, 10);
+        let y0 =               this.ypad;
+        let y1 = this.height - this.ypad;
+        let x0 =               this.xpad;
+        let x1 = this.width  - this.xpad;
+        this.pg.textAlign(CENTER, BOTTOM);
+        for (var i=0; i<this.nx; i++) {
+            this.pg.stroke(230);
+            let x  = this.xpad + i*this.dx;
+            this.pg.line(x, y0, x, y1);
+            this.pg.stroke(0);
+            let s = str(map(i, 0, this.nx-1, this.xmin, this.xmax));
+            this.pg.text(s, x, this.height);
+        }
+        this.pg.textAlign(RIGHT, CENTER);
+        for (var i=0; i<this.ny; i++) {
+            this.pg.stroke(230);
+            let y = this.ypad + i*this.dy;
+            this.pg.line(x0, y, x1, y);
+            this.pg.stroke(0);
+            let s = str(map(i, 0, this.ny-1, this.ymin, this.ymax));
+            this.pg.text(s, this.xpad-2, this.height-y);
+        }
+    }
+
+    // draw the plot
+    this.plot = function(x,y) {
+        this.reset();
+        this.draw_grid();
+        this.pg.noFill();
+        this.pg.beginShape();
+        this.pg.strokeWeight(4);
+        this.pg.stroke('#008040');
+        this.pg.smooth();
+        //strokeCap(ROUND);
+        // draw ellipse at 0.2,-80
+        //ellipse(this.translatex(0.2), this.translatey(-80), 10, 10);
+        for (var i=0; i<x.length; i++) {
+            this.pg.curveVertex(this.translatex(x[i]),this.translatey(y[i]));
+        }
+        this.pg.endShape();
+        image(this.pg, this.xpos, this.ypos);
+    }
+
+    this.translatex = function(x) { return this.xpad + (x - this.xmin) / this.xscale; }
+    this.translatey = function(y) { return this.ypad - (y - this.ymax) / this.yscale; }
+}
+
+function update_psd()
+{
+    let alpha = 0.3;
+    for (var i=0; i<nfft; i++) {
+        psd[i] = (1-alpha)*psd[i] + alpha*randomGaussian(-100,3)
+    }
+    f0 = fc - 0.5*bw; // lower band edge
+    f1 = fc + 0.5*bw; // upper band edge
+    i0 = int(max(0,min(nfft,(f0 - fmin)*nfft / (fmax-fmin))));
+    i1 = int(max(0,min(nfft,(f1 - fmin)*nfft / (fmax-fmin))));
+    for (var i=i0; i<i1; i++) {
+        psd[i] = -80;
+    }
+}
+
+// clear time-domain buffer
+function buf_clear()
+    { for (var i=0; i<nfft; i++) { xi[i] = 0; xq[i] = 0; } }
+
+// add signal into time-domain buffer
+function add_signal(_fc, _bw, _gain)
+{
+    // generate signals in the time-domain buffer
+    let gain = _bw * Math.pow(10,_gain/20);
+    let m    = Math.floor(0.4*nfft);
+    for (var i=0; i<2*m+1; i++) {
+        let v = max(0.0001,abs(Math.PI*_bw*(i-m)));
+        let w = Math.cos(0.5*Math.PI*(i-m)/m)**4;
+        let h = Math.sin(v) / v * w;
+        xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * h;
+        xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * h;
+    }
+}
+
+function update()
+{
+    // generate signals in the time-domain buffer
+    fc = slider.value();
+    buf_clear();
+    add_signal(-0.3, 0.03, -30); // interference
+    add_signal( fc ,  bw , -20);
+    // add noise...
+    for (var i=0; i<nfft; i++) {
+        xi[i] += randomGaussian(0,nstd);
+        xq[i] += randomGaussian(0,nstd);
+    }
+    // compute transform in place
+    fft.forward(xi,xq);
+    // convert to dB
+    for (var i=0; i<nfft; i++) {
+        psd[(i+nfft/2)%nfft] = 20*Math.log10(1e-6 + Math.sqrt(xi[i]**2 + xq[i]**2));
+    }
+
+    // adjust rate (drop if overlap)
+    let alpha = 0.2;
+    let f_offset = abs(fc+0.3);
+    let new_rate = f_offset < bw/2 + 0.03 ? 40*f_offset : 10.0; // hard coded
+    new_rate += randomGaussian(0,0.25)
+    for (var i=0; i<history-1; i++) {
+        rate[i] = rate[i+1];
+    }
+    rate[history-1] = (1-alpha)*rate[history-1] + alpha*new_rate;
+}
+
+function myloop() {
+    // put drawing code here
+    update();
+    plot_spectrum.plot(f,psd);
+    plot_rate.plot(time,rate);
+}
+
+function setup() {
+    // put setup code here
+    createCanvas(width, height);
+    frameRate(30);
+
+    // slider for adjusting signal center frequency
+    slider = createSlider(-0.43, 0.43, 0, 0.01);
+    slider.position(40, 10);
+    slider.style('width', width-80+'px');
+
+    // setup spectrum
+    plot_spectrum = new Plotter(fmin, fmax, pmin, pmax, width, height/2, 0, 0);
+    // initialize buffers
+    for (var i=0; i<nfft; i++) {
+        f[i] = fmin + i*(fmax-fmin)/nfft;
+        psd[i] = randomGaussian(-100,3)
+    }
+
+    plot_rate = new Plotter(0, history, 0, 12, width, height/2, 0, height/2);
+    for (var i=0; i<history; i++) {
+        time[i] = i;
+        rate[i] = 0.0;
+    }
+}
+
+function draw() {
+    // put drawing code here
+    myloop();
+    //noLoop();
+}
+
+</script>
+</html>
+
