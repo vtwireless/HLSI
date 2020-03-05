@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title>HLSI Exercise - Noise</title>
+  <title>HLSI Exercise - Capacity #1</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <meta name="author" content=""/>
@@ -11,25 +11,36 @@
 </head>
 
 <body>
-  <h2>HLSI Exercise - Noise</h2>
+  <h2>HLSI Exercise - Bandwidth, Frequency, and Gain</h2>
   <p><a href="index.html">[back]</a></p>
   <p>
-    <label for="gain">Signal Amplitude</label>
-    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(null,null,value,null)">
-    <output for="gain" id="gn">0.2</output>
+    <label for="frequency">Frequency</label>
+    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value,null,null)">
+    <output for="frequency" id="fc">0.1</output>
   </p>
-
+  <p>
+    <label for="bandwidth">Bandwidth</label>
+    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01" oninput="update_plot(null,value,null)">
+    <output for="bandwidth" id="bw">0.1</output>
+  </p>
+  <p>
+    <label for="gain">Amplitude</label>
+    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(null,null,value)">
+    <output for="gain" id="gn">0.1</output>
+  </p>
   <p>
     <label for="noise">Noise</label>
     <input type="range" min="0.000001" max="0.01" value="0.000001" id="noise" step="0.000001" oninput="update_plot(null,null,null,value)">
     <output for="noise" id="np">0.2</output>
   </p>
- 
   <p>
-    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio, SNR = </label>
+    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio:  SNR = </label>
     <output for="signal_to_noise_ratio" id="snr">0.2</output> dB
   </p>
-  
+  <p>
+    <label for="information_capacity">Information Capacity:  C = </label>
+    <output for="information_capacity" id="cap">0.2</output>
+  </p>
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -38,15 +49,7 @@
 <script src="support.js"></script>
 <script>
 
-// document.getElementByld("insert).innerHTML = gn;
-
-function update_bandwidth(val) { document.querySelector('#bw').value = val; }
-
 function update_frequency(val) { document.querySelector('#fc').value = val; }
-
-function update_gain(val) { document.querySelector('#gn').value = val; }
-
-function update_snr(val) { document.querySelector('#snr').value = val; }
 
 function sinc(t) {
     let r = Math.PI * t;
@@ -66,7 +69,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // The number of datapoints
 var m = 40, k=8, n = 2*k*m+1;
-var bw = 0.1, fc = 0.0, gn = 1.0, np = 0.001, snr = 0;
+var bw = 0.1, fc = 0.0, gn = 1.0, np = 0.001, snr = 0, cap = 10;
 var nfft = 2048, fft = new FFTNayuki(nfft);
 var xi  = new Array(nfft), xq  = new Array(nfft), psd = new Array(nfft);
 
@@ -178,22 +181,27 @@ function generate_psd(w,f,g,n1) {
 
 function update_plot(freq,band,gain,noise) {
     bw = 0.1;
-	if (freq!=null) { fc = freq; }
+    if (freq!=null) { fc = freq; }
     if (band!=null) { bw = band; }
     if (gain!=null) { gn = gain; }
     if (noise!=null) { np = noise; }
 
+    document.querySelector('#fc').value = fc;
+    document.querySelector('#frequency').value = fc;
+
+    document.querySelector('#bw').value = bw;
+    document.querySelector('#bandwidth').value = bw;
+
     document.querySelector('#gn').value = gn;
     document.querySelector('#gain').value = gn;
-	
+
 	document.querySelector('#np').value = np;
     document.querySelector('#noise').value = np;
 	
 	document.querySelector('#snr').value = Math.round(10 * Math.log10(gn**2 / (np * bw))); // signal will be bandpass filtered to reduce noise
-	
-// The following command caused problems with the time and frequency domain plots:
-//    document.querySelector('#signal_to_noise_ratio').value = Math.round(10 *Math.log10(gn**2/np));
-	
+
+	document.querySelector('#cap').value = bw * Math.log(1+(gn**2 / (np * bw)))/Math.log(2);
+
     // generate up-sampled time series
     datat = generate_sinc(bw,fc,gn,np);
     patht.datum(datat) // 10. Binds data to the line
