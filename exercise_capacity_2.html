@@ -171,13 +171,12 @@ function generate_psd(w,f,g,n) {
         xi[i] = gain * p * Math.cos(2*Math.PI*f*t);
         xq[i] = gain * p * Math.sin(2*Math.PI*f*t);
     }
-    // add impulse to emulate noise floor
-    xi[m] += Math.pow(10.,n/10.);
     // compute transform in place
     fft.forward(xi,xq);
-    // convert to dB
+    // convert to dB, adding noise floor as appropriate
+    let noise_floor = Math.max(1e-12,Math.pow(10.,n/10));
     for (var i=0; i<nfft; i++) {
-        psd[(i+nfft/2)%nfft] = 10*Math.log10(1e-6 + Math.sqrt(xi[i]**2 + xq[i]**2));
+        psd[(i+nfft/2)%nfft] = 10*Math.log10(noise_floor + Math.sqrt(xi[i]**2 + xq[i]**2));
     }
     //console.log(psd);
     return d3.range(0,nfft-1).map(function(i) { return {"y": psd[i] } })
