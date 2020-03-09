@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h2>HLSI Exercise - Capacity #1</h2>
+  <h2>Exercise - Capacity</h2>
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency</label>
@@ -29,7 +29,7 @@
     <output for="gain" id="gn">0.1</output>
   </p>
   <p>
-    <label for="noise">Noise</label>
+    <label for="noise">Noise Power</label>
     <input type="range" min="0.000001" max="0.01" value="0.000001" id="noise" step="0.000001" oninput="update_plot(null,null,null,value)">
     <output for="noise" id="np">0.2</output>
   </p>
@@ -74,40 +74,40 @@ var nfft = 2048, fft = new FFTNayuki(nfft);
 var xi  = new Array(nfft), xq  = new Array(nfft), psd = new Array(nfft);
 
 // 5. X scale will use the index of our data
-var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
+// var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
 var fScale = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
-var yScale = d3.scaleLinear().domain([ -1.1,  1.1]).range([height, 0]);
+// var yScale = d3.scaleLinear().domain([ -1.1,  1.1]).range([height, 0]);
 var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
 
 // 7. d3's line generator
-var linet = d3.line()
-    .x(function(d, i) { return xScale((i-k*m)/k); })  // set the x values for the line generator
-    .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
+// var linet = d3.line()
+//    .x(function(d, i) { return xScale((i-k*m)/k); })  // set the x values for the line generator
+//    .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
     //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
 var linef = d3.line()
     .x(function(d, i) { return fScale(i/nfft-0.5); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-var datat = generate_sinc(0,0,1,0);
+<!-- var datat = generate_sinc(0,0,1,0); -->
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
-var svgt = svg_create(margin, width, height, xScale, yScale);
+// var svgt = svg_create(margin, width, height, xScale, yScale);
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgt, margin, width, height, "Time (sample index)", "Signal");
+// svg_add_labels(svgt, margin, width, height, "Time (sample index)", "Signal");
 svg_add_labels(svgf, margin, width, height, "Normalized Frequency", "Power Spectra Density (dB)");
 
 // clip paths
-svgt.append("clipPath")
-     .attr("id","clipt")
-   .append("rect")
-     .attr("width",width)
-     .attr("height",height);
+//svgt.append("clipPath")
+//     .attr("id","clipt")
+//   .append("rect")
+//     .attr("width",width)
+//     .attr("height",height);
 svgf.append("clipPath")
      .attr("id","clipf")
    .append("rect")
@@ -115,11 +115,11 @@ svgf.append("clipPath")
      .attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
-var patht = svgt.append("path")
-    .attr("clip-path","url(#clipt)")
-    .datum(datat) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
-    .attr("d", linet);  // 11. Calls the line generator
+<!-- var patht = svgt.append("path") -->
+    <!-- .attr("clip-path","url(#clipt)") -->
+    <!-- .datum(datat) // 10. Binds data to the line -->
+    <!-- .attr("class", "line") // Assign a class for styling -->
+    <!-- .attr("d", linet);  // 11. Calls the line generator -->
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
@@ -202,10 +202,10 @@ function update_plot(freq,band,gain,noise) {
 	document.querySelector('#cap').value = bw * Math.log(1+(gn**2 / (np * bw)))/Math.log(2);
 
     // generate up-sampled time series
-    datat = generate_sinc(bw,fc,gn,np);
-    patht.datum(datat) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linet); // 11. Calls the line generator
+    <!-- datat = generate_sinc(bw,fc,gn,np); -->
+    <!-- patht.datum(datat) // 10. Binds data to the line -->
+        <!-- .attr("class", "line") // Assign a class for styling -->
+        <!-- .attr("d", linet); // 11. Calls the line generator -->
 
     // generate power spectral density
     dataf = generate_psd(bw,fc,gn,np);
