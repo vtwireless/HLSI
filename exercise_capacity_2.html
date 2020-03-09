@@ -164,7 +164,7 @@ function generate_psd(w,f,g,n) {
         xq[i] = 0;
     }
     // generate sinc pulse (not up-sampled), TODO: add frequency offset
-    let gain = Math.pow(10.,g/10.); // amplitude
+    let gain = Math.pow(10.,g/20.); // amplitude
     for (var i=0; i<2*m+1; i++) {
         let t = i-m;
         let p = pulse(1,m,w,i);
@@ -176,7 +176,7 @@ function generate_psd(w,f,g,n) {
     // convert to dB, adding noise floor as appropriate
     let noise_floor = Math.max(1e-12,Math.pow(10.,n/10));
     for (var i=0; i<nfft; i++) {
-        psd[(i+nfft/2)%nfft] = 10*Math.log10(noise_floor + Math.sqrt(xi[i]**2 + xq[i]**2));
+        psd[(i+nfft/2)%nfft] = 10*Math.log10(noise_floor + xi[i]**2 + xq[i]**2);
     }
     //console.log(psd);
     return d3.range(0,nfft-1).map(function(i) { return {"y": psd[i] } })
