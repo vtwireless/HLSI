@@ -47,6 +47,12 @@ function randn()
     return Math.sqrt(-2*Math.log(u1)) * Math.sin(2*Math.PI*u2);
 }
 
+// sinc(x) = sin(pi x) / (pi x)
+function sinc(x) {
+    let r = Math.max(1e-6,Math.abs(Math.PI * x));
+    return Math.sin(r) / r;
+}
+
 // function class to generate signals, power spectral density
 function siggen(nfft)
 {
@@ -69,9 +75,8 @@ function siggen(nfft)
     this.add_signal = function(_fc, _bw, _gain) {
         let gain = Math.pow(10,_gain/20);
         for (var i=0; i<2*this.m+1; i++) {
-            let v = Math.max(0.0001,Math.abs(Math.PI*_bw*(i-this.m)));
-            let w = Math.cos(0.5*Math.PI*(i-this.m)/this.m)**4;
-            let h = Math.sin(v) / v * w;
+            let w = Math.cos(0.5*Math.PI*(i-this.m)/this.m)**2;
+            let h = sinc(_bw*(i-this.m)) * w;
             this.xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * h;
             this.xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * h;
         }
@@ -92,7 +97,7 @@ function siggen(nfft)
         // compute noise floor (minimum prevents possibility of log of zero)
         if (noise_floor_dB==null)
             { noise_floor_dB = -120; }
-        let noise_floor = Math.min(1e-12, Math.pow(10.,noise_floor_dB/10));
+        let noise_floor = Math.max(1e-12, Math.pow(10.,noise_floor_dB/10));
 
         // compute transform in place
         this.fft.forward(this.xi,this.xq);

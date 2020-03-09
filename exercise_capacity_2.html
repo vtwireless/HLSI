@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title>HLSI Exercise - Capacity #1</title>
+  <title>HLSI Exercise - Capacity #2</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <meta name="author" content=""/>
@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h2>HLSI Exercise - Capacity #2</h2>
+  <h2>Exercise - Capacity #2</h2>
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency / Fs</label>
@@ -49,65 +49,35 @@
 <script src="support.js"></script>
 <script>
 
-function update_frequency(val) { document.querySelector('#fc').value = val; }
-
-function sinc(t) {
-    let r = Math.PI * t;
-    return Math.abs(r) < 0.000001 ? 1 : Math.sin(r) / r;
-}
-
-function pulse(K,M,W,i) {
-    let t = W * (i-K*M)/K;
-    let wind = Math.cos(0.5*Math.PI*(i-K*M)/(K*M))**2;
-    return sinc(t) * wind;
-}
-
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // The number of datapoints
-var m = 40, k=8, n = 2*k*m+1;
 var bw = 0.1, fc = 0.0, gn = 0.0, n0 = -40, snr = 0, cap = 10;
-var nfft = 2048, fft = new FFTNayuki(nfft);
-var xi  = new Array(nfft), xq  = new Array(nfft), psd = new Array(nfft);
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = 50; // set filter semi-length
 
-// 5. X scale will use the index of our data
-var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
+// set frequency/psd scales
 var fScale = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
-
-// 6. Y scale will use the randomly generate number
-var yScale = d3.scaleLinear().domain([ -1.1,  1.1]).range([height, 0]);
 var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
 
-// 7. d3's line generator
-var linet = d3.line()
-    .x(function(d, i) { return xScale((i-k*m)/k); })  // set the x values for the line generator
-    .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
-    //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
+// d3's line generator
 var linef = d3.line()
     .x(function(d, i) { return fScale(i/nfft-0.5); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-var datat = generate_sinc(0.1,0,0,0);
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
-var svgt = svg_create(margin, width, height, xScale, yScale);
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgt, margin, width, height, "Time (sample index)", "Signal");
 svg_add_labels(svgf, margin, width, height, "Normalized Frequency", "Power Spectra Density (dB)");
 
 // clip paths
-svgt.append("clipPath")
-     .attr("id","clipt")
-   .append("rect")
-     .attr("width",width)
-     .attr("height",height);
 svgf.append("clipPath")
      .attr("id","clipf")
    .append("rect")
@@ -115,71 +85,24 @@ svgf.append("clipPath")
      .attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
-var patht = svgt.append("path")
-    .attr("clip-path","url(#clipt)")
-    .datum(datat) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
-    .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
     .attr("class", "line")
     .attr("d", linef);
 
-// 12. Appends a circle for each datapoint
-/*
-var dots = svgt.selectAll(".dot")
-    .data(datat)
-  .enter().append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
-    .attr("cx", function(d, i) { return xScale(i-m) })
-    .attr("cy", function(d) { return yScale(d.y) })
-    .attr("r", 5);
-*/
-
 // set initial value
 update_plot(0.0, 0.1);
 
-// Standard Normal variate using Box-Muller transform. 
-// from https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve
-function randn_bm() {
-    var u = 0, v = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-}
-
-// generate sinc pulse
-function generate_sinc(w,f,g,n0) {
-    //return d3.range(-k*m,k*m).map(function(t) { return {"y": sinc(w*t/k) } })
-    let gain = Math.pow(10.,g/10.); // amplitude
-    return d3.range(0,2*k*m+1).map(function(t) { return {"y": gain*pulse(k,m,w,t)*Math.cos(2*Math.PI*f*(t-k*m)/k)} })
-}
-
 // generate power spectral density
-function generate_psd(w,f,g,n) {
-    // clear buffers
-    for (var i=0; i<nfft; i++) {
-        xi[i] = 0;
-        xq[i] = 0;
-    }
-    // generate sinc pulse (not up-sampled), TODO: add frequency offset
-    let gain = Math.pow(10.,g/20.); // amplitude
-    for (var i=0; i<2*m+1; i++) {
-        let t = i-m;
-        let p = pulse(1,m,w,i);
-        xi[i] = gain * p * Math.cos(2*Math.PI*f*t);
-        xq[i] = gain * p * Math.sin(2*Math.PI*f*t);
-    }
-    // compute transform in place
-    fft.forward(xi,xq);
-    // convert to dB, adding noise floor as appropriate
-    let noise_floor = Math.max(1e-12,Math.pow(10.,n/10));
-    for (var i=0; i<nfft; i++) {
-        psd[(i+nfft/2)%nfft] = 10*Math.log10(noise_floor + xi[i]**2 + xq[i]**2);
-    }
+function generate_psd(f,w,g,n) {
+    // update generator
+    generator.clear();
+    generator.add_signal(f,w,g);
+    //generator.add_noise(n); // add random noise samples
+    generator.generate(n); // generate with specific noise floor
     //console.log(psd);
-    return d3.range(0,nfft-1).map(function(i) { return {"y": psd[i] } })
+    return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
 }
 
 function update_plot(freq,band,gain,noise) {
@@ -206,14 +129,8 @@ function update_plot(freq,band,gain,noise) {
     document.querySelector('#snr').value = SNRdB;
     document.querySelector('#cap').value = C;
 
-    // generate up-sampled time series
-    datat = generate_sinc(bw,fc,gn,n0);
-    patht.datum(datat) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linet); // 11. Calls the line generator
-
     // generate power spectral density
-    dataf = generate_psd(bw,fc,gn,n0);
+    dataf = generate_psd(fc,bw,gn,n0);
     pathf.datum(dataf) // 10. Binds data to the line
         .attr("class", "line") // Assign a class for styling
         .attr("d", linef); // 11. Calls the line generator
