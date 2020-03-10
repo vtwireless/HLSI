@@ -84,17 +84,17 @@ svgf.append("clipPath")
 var pathi = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(datai) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
+    .attr("class", "timei") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathq = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(dataq) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
+    .attr("class", "timeq") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "line")
+    .attr("class", "psd")
     .attr("d", linef);
 
 // set initial value
@@ -110,17 +110,15 @@ function update_plot(f) {
     add_pulse(k*m, f/k, bw/k, 0, xi, xq);
     datai = d3.range(0,2*k*m+1).map(function(i) { return {"y":xi[i]} })
     dataq = d3.range(0,2*k*m+1).map(function(i) { return {"y":xq[i]} })
-    pathi.datum(datai).attr("class", "line").attr("d", linet);
-    pathq.datum(dataq).attr("class", "line").attr("d", linet);
+    pathi.datum(datai).attr("d", linet);
+    pathq.datum(dataq).attr("d", linet);
 
     // generate power spectral density
     generator.clear();
     generator.add_signal(f,bw,0); // generate signal, no gain
     generator.generate();
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
-    pathf.datum(dataf) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linef); // 11. Calls the line generator
+    pathf.datum(dataf).attr("d", linef);
 }
 
 </script>

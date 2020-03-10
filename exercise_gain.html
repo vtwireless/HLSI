@@ -82,12 +82,12 @@ svgf.append("clipPath")
 var patht = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(datat) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
+    .attr("class", "timei") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "line")
+    .attr("class", "psd")
     .attr("d", linef);
 
 // set initial value
@@ -99,18 +99,14 @@ function update_plot(g) {
 
     // generate up-sampled time series
     datat = d3.range(0,2*k*m+1).map(function(i) { return {"y": g*pulse(i,k*m,bw/k) } })
-    patht.datum(datat) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linet); // 11. Calls the line generator
+    patht.datum(datat).attr("d", linet);
 
     // generate power spectral density
     generator.clear();
     generator.add_signal(0,bw,20*Math.log10(g)); // generate signal at baseband
     generator.generate();
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
-    pathf.datum(dataf) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linef); // 11. Calls the line generator
+    pathf.datum(dataf).attr("d", linef);
 }
 
 </script>

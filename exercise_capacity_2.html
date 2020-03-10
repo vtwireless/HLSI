@@ -88,7 +88,7 @@ svgf.append("clipPath")
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "line")
+    .attr("class", "psd")
     .attr("d", linef);
 
 // set initial value
@@ -131,9 +131,7 @@ function update_plot(freq,band,gain,noise) {
 
     // generate power spectral density
     dataf = generate_psd(fc,bw,gn,n0);
-    pathf.datum(dataf) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linef); // 11. Calls the line generator
+    pathf.datum(dataf).attr("d", linef);
 }
 
 </script>

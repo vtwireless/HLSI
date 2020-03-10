@@ -2,24 +2,21 @@
 svg * { font: 12px Arial; }
 
 /* Style the lines by removing the fill and applying a stroke */
-.line {
+path {
     fill: none;
     stroke: #ffab00;
     stroke-width: 3;
 }
-/*
-.timei { stroke: #008040; }
-.timeq { stroke: #004080; }
-*/
+
+/* bounding box */
+.domain { display: none; }
 
 .grid line { stroke: #cccccc; }
 
-/* Style the dots by assigning a fill and stroke */
-.dot {
-    fill: #ffab00;
-    stroke: #fff;
-}
+.timei { stroke: #004080; }
+.timeq { stroke: #008040; }
+.psd   { stroke: #804000; }
 
 .slider {
-    width: 640px;
+    width: 720px;
 }

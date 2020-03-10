@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title>HLSI Exercise - Bandwidth, Frequency, and Gain</title>
+  <title>HLSI Exercise - Frequency</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <meta name="author" content=""/>
@@ -15,7 +15,7 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency</label>
-    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value,null,null)">
+    <input class="slider" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001" oninput="update_plot(value,null,null)">
     <output for="frequency" id="fc">0.1</output>
   </p>
   <p>
@@ -24,9 +24,9 @@
     <output for="bandwidth" id="bw">0.1</output>
   </p>
   <p>
-    <label for="gain">Signal Amplitude</label>
-    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(null,null,value)">
-    <output for="gain" id="gn">0.1</output>
+    <label for="gain">Signal Gain (dB)</label>
+    <input type="range" min="-20" max="0" value="0" id="gain" step="0.01" oninput="update_plot(null,null,value)">
+    <output for="gain" id="gn">0</output>
   </p>
 </body>
 
@@ -36,29 +36,17 @@
 <script src="support.js"></script>
 <script>
 
-function update_frequency(val) { document.querySelector('#fc').value = val; }
-
-function sinc(t) {
-    let r = Math.PI * t;
-    return Math.abs(r) < 0.000001 ? 1 : Math.sin(r) / r;
-}
-
-function pulse(K,M,W,i) {
-    let t = W * (i-K*M)/K;
-    let wind = Math.cos(0.5*Math.PI*(i-K*M)/(K*M))**2;
-    return sinc(t) * wind;
-}
-
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // The number of datapoints
-var m = 40, k=8, n = 2*k*m+1;
-var bw = 0.2, fc = 0.0, gn = 1.0;
-var nfft = 2048, fft = new FFTNayuki(nfft);
-var xi  = new Array(nfft), xq  = new Array(nfft), psd = new Array(nfft);
+var m = 40, k=20, n = 2*k*m+1;
+var fc = 0.0, bw = 0.2, gn = 0.0;
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = m;
+var xi = new Array(n), xq = new Array(n);
 
 // 5. X scale will use the index of our data
 var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
@@ -78,7 +66,8 @@ var linef = d3.line()
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-var datat = generate_sinc(0,0,1);
+var datai = {};
+var dataq = {};
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
@@ -102,60 +91,24 @@ svgf.append("clipPath")
      .attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
-var patht = svgt.append("path")
+var pathi = svgt.append("path")
     .attr("clip-path","url(#clipt)")
-    .datum(datat) // 10. Binds data to the line
-    .attr("class", "line") // Assign a class for styling
+    .datum(datai) // 10. Binds data to the line
+    .attr("class", "timei") // Assign a class for styling
+    .attr("d", linet);  // 11. Calls the line generator
+var pathq = svgt.append("path")
+    .attr("clip-path","url(#clipt)")
+    .datum(dataq) // 10. Binds data to the line
+    .attr("class", "timeq") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "line")
+    .attr("class", "psd")
     .attr("d", linef);
 
-// 12. Appends a circle for each datapoint
-/*
-var dots = svgt.selectAll(".dot")
-    .data(datat)
-  .enter().append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
-    .attr("cx", function(d, i) { return xScale(i-m) })
-    .attr("cy", function(d) { return yScale(d.y) })
-    .attr("r", 5);
-*/
-
 // set initial value
-update_plot(0.0, 0.4);
-
-// generate sinc pulse
-function generate_sinc(w,f,g) {
-    //return d3.range(-k*m,k*m).map(function(t) { return {"y": sinc(w*t/k) } })
-    return d3.range(0,2*k*m+1).map(function(t) { return {"y": g*pulse(k,m,w,t)*Math.cos(2*Math.PI*f*(t-k*m)/k) } })
-}
-
-// generate power spectral density
-function generate_psd(w,f,g) {
-    // clear buffers
-    for (var i=0; i<nfft; i++) {
-        xi[i] = 0;
-        xq[i] = 0;
-    }
-    // generate sinc pulse (not up-sampled), TODO: add frequency offset
-    for (var i=0; i<2*m+1; i++) {
-        let t = i-m;
-        let p = pulse(1,m,w,i);
-        xi[i] = g * p * Math.cos(2*Math.PI*f*t);
-        xq[i] = g * p * Math.sin(2*Math.PI*f*t);
-    }
-    // compute transform in place
-    fft.forward(xi,xq);
-    // convert to dB
-    for (var i=0; i<nfft; i++) {
-        psd[(i+nfft/2)%nfft] = 20*Math.log10(1e-6 + Math.sqrt(xi[i]**2 + xq[i]**2));
-    }
-    //console.log(psd);
-    return d3.range(0,nfft-1).map(function(i) { return {"y": psd[i] } })
-}
+update_plot();
 
 function update_plot(freq,band,gain) {
     if (freq!=null) { fc = freq; }
@@ -171,19 +124,22 @@ function update_plot(freq,band,gain) {
     document.querySelector('#gn').value = gn;
     document.querySelector('#gain').value = gn;
 
-    // generate up-sampled time series
-    datat = generate_sinc(bw,fc,gn);
-    patht.datum(datat) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linet); // 11. Calls the line generator
+    // clear time-domain buffer and generate up-sampled time series
+    clear_buffer(xi,n);
+    clear_buffer(xq,n);
+    add_pulse(k*m, fc/k, bw/k, gn, xi, xq);
+    datai = d3.range(0,2*k*m+1).map(function(i) { return {"y":xi[i]} })
+    dataq = d3.range(0,2*k*m+1).map(function(i) { return {"y":xq[i]} })
+    pathi.datum(datai).attr("d", linet);
+    pathq.datum(dataq).attr("d", linet);
 
     // generate power spectral density
-    dataf = generate_psd(bw,fc,gn);
-    pathf.datum(dataf) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linef); // 11. Calls the line generator
+    generator.clear();
+    generator.add_signal(fc,bw,gn); // generate signal, no gain
+    generator.generate();
+    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+    pathf.datum(dataf).attr("d", linef);
 }
 
 </script>
-</html>
 
