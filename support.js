@@ -53,6 +53,26 @@ function sinc(x) {
     return Math.sin(r) / r;
 }
 
+// generate sample i of windowed pulse, length 2*_m+1 with bandwidth _bw
+function pulse(_i, _m, _bw)
+{
+    if (_i < 0 || _i > 2*_m) {
+        throw "invalid index for pulse, i=" + _i + ", m=" + _m;
+    }
+    let w = Math.cos(0.5*Math.PI*(_i-_m)/_m)**2;
+    return sinc(_bw*(_i-_m)) * w;
+}
+
+// generate pulse into buffer (adding on top of existing signals)
+function add_pulse(_m, _fc, _bw, _gain, _xi, _xq) {
+    let gain = Math.pow(10,_gain/20);
+    for (var i=0; i<2*_m+1; i++) {
+        let p = pulse(i, _m, _bw);
+        _xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * p;
+        _xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * p;
+    }
+}
+
 // function class to generate signals, power spectral density
 function siggen(nfft)
 {
@@ -73,13 +93,7 @@ function siggen(nfft)
 
     // generate signals in the time-domain buffer
     this.add_signal = function(_fc, _bw, _gain) {
-        let gain = Math.pow(10,_gain/20);
-        for (var i=0; i<2*this.m+1; i++) {
-            let w = Math.cos(0.5*Math.PI*(i-this.m)/this.m)**2;
-            let h = sinc(_bw*(i-this.m)) * w;
-            this.xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * h;
-            this.xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * h;
-        }
+        add_pulse(this.m, _fc, _bw, _gain, this.xi, this.xq);
     }
 
     // add noise to time-domain buffer
