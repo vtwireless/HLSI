@@ -73,6 +73,11 @@ function add_pulse(_m, _fc, _bw, _gain, _xi, _xq) {
     }
 }
 
+// clear sample buffer
+function clear_buffer(buf,n) {
+    for (let i=0; i<n; i++) { buf[i] = 0; }
+}
+
 // function class to generate signals, power spectral density
 function siggen(nfft)
 {
@@ -85,10 +90,8 @@ function siggen(nfft)
 
     // clear internal buffer
     this.clear = function() {
-        for (var i=0; i<this.nfft; i++) {
-            this.xi[i] = 0;
-            this.xq[i] = 0;
-        }
+        clear_buffer(this.xi, this.nfft);
+        clear_buffer(this.xq, this.nfft);
     }
 
     // generate signals in the time-domain buffer
