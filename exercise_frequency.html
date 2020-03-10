@@ -15,7 +15,7 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency</label>
-    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value,null,null)">
+    <input class="slider" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001" oninput="update_plot(value,null,null)">
     <output for="frequency" id="fc">0.1</output>
   </p>
 </body>
@@ -32,7 +32,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // The number of datapoints
-var m = 40, k=8, n = 2*k*m+1;
+var m = 40, k=20, n = 2*k*m+1;
 var bw = 0.2;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
@@ -56,7 +56,8 @@ var linef = d3.line()
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
-var datat = {};
+var datai = {};
+var dataq = {};
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
@@ -80,9 +81,14 @@ svgf.append("clipPath")
      .attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
-var patht = svgt.append("path")
+var pathi = svgt.append("path")
     .attr("clip-path","url(#clipt)")
-    .datum(datat) // 10. Binds data to the line
+    .datum(datai) // 10. Binds data to the line
+    .attr("class", "line") // Assign a class for styling
+    .attr("d", linet);  // 11. Calls the line generator
+var pathq = svgt.append("path")
+    .attr("clip-path","url(#clipt)")
+    .datum(dataq) // 10. Binds data to the line
     .attr("class", "line") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
@@ -102,10 +108,10 @@ function update_plot(f) {
     clear_buffer(xi,n);
     clear_buffer(xq,n);
     add_pulse(k*m, f/k, bw/k, 0, xi, xq);
-    datat = d3.range(0,2*k*m+1).map(function(i) { return {"y":xi[i]} })
-    patht.datum(datat) // 10. Binds data to the line
-        .attr("class", "line") // Assign a class for styling
-        .attr("d", linet); // 11. Calls the line generator
+    datai = d3.range(0,2*k*m+1).map(function(i) { return {"y":xi[i]} })
+    dataq = d3.range(0,2*k*m+1).map(function(i) { return {"y":xq[i]} })
+    pathi.datum(datai).attr("class", "line").attr("d", linet);
+    pathq.datum(dataq).attr("class", "line").attr("d", linet);
 
     // generate power spectral density
     generator.clear();

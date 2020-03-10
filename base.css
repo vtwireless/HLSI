@@ -7,6 +7,10 @@ svg * { font: 12px Arial; }
     stroke: #ffab00;
     stroke-width: 3;
 }
+/*
+.timei { stroke: #008040; }
+.timeq { stroke: #004080; }
+*/
 
 .grid line { stroke: #cccccc; }
 
@@ -16,3 +20,6 @@ svg * { font: 12px Arial; }
     stroke: #fff;
 }
 
+.slider {
+    width: 640px;
+}
