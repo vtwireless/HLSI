@@ -15,7 +15,8 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="bandwidth">Bandwidth</label>
-    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01" oninput="update_plot(value)">
+    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01"
+        oninput="update_plot(parseFloat(value))">
     <output for="bandwidth" id="bw">0.1</output>
   </p>
 </body>
@@ -91,19 +92,21 @@ var pathf = svgf.append("path")
     .attr("d", linef);
 
 // set initial value
-update_plot(0.40);
+update_plot();
 
-function update_plot(w) {
-    document.querySelector('#bw').value = w;
-    document.querySelector('#bandwidth').value = w;
+function update_plot(band) {
+    if (band!=null) { bw = band; }
+
+    document.querySelector('#bw').value = bw;
+    document.querySelector('#bandwidth').value = bw;
 
     // generate up-sampled time series
-    datat = d3.range(0,2*k*m+1).map(function(t) { return {"y": pulse(t,k*m,w/k) } })
+    datat = d3.range(0,2*k*m+1).map(function(t) { return {"y": pulse(t,k*m,bw/k) } })
     patht.datum(datat).attr("d", linet);
 
     // generate power spectral density
     generator.clear();
-    generator.add_signal(0,w,0); // generate signal at baseband, no gain
+    generator.add_signal(0,bw,10*Math.log10(bw)); // generate signal at baseband, compensate gain for bw
     generator.generate();
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
     pathf.datum(dataf).attr("d", linef);

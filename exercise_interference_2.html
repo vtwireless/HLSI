@@ -15,17 +15,20 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency / Fs</label>
-    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01" oninput="update_plot(value,null,null)">
+    <input type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.01"
+        oninput="update_plot(parseFloat(value),null,null,null)">
     <output for="frequency" id="fc">0.1</output>
   </p>
   <p>
     <label for="bandwidth">Bandwidth / Fs</label>
-    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01" oninput="update_plot(null,value,null)">
+    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01"
+        oninput="update_plot(null,parseFloat(value),null,null)">
     <output for="bandwidth" id="bw">0.1</output>
   </p>
   <p>
     <label for="gain">Signal Gain (dB)</label>
-    <input type="range" min="-20" max="0" value="0" id="gain" step="0.01" oninput="update_plot(null,null,value)">
+    <input type="range" min="-20" max="0" value="0" id="gain" step="0.01"
+        oninput="update_plot(null,null,parseFloat(value),null)">
     <output for="gain" id="gn">0</output>
   </p>
   <!--
@@ -54,7 +57,7 @@
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 320 - margin.top - margin.bottom; // Use the window's height
+  , height = 480 - margin.top - margin.bottom; // Use the window's height
 
 // The number of datapoints
 var bw = 0.3, fc = 0.0, gn = -10.0, n0 = -40, sinr = 0, cap = 10;
@@ -64,7 +67,7 @@ generator.m = 80; // set filter semi-length
 
 // set frequency/psd scales
 var fScale = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
-var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-50, 40]).range([height, 0]);
 
 // d3's line generator
 var linef = d3.line()
@@ -125,10 +128,10 @@ function compute_interference()
 }
 
 function update_plot(freq,band,gain,noise) {
-    if (freq!=null) { fc = parseFloat(freq ); }
-    if (band!=null) { bw = parseFloat(band ); }
-    if (gain!=null) { gn = parseFloat(gain ); }
-    if (noise!=null){ n0 = parseFloat(noise); }
+    if (freq !=null) { fc = freq;  }
+    if (band !=null) { bw = band;  }
+    if (gain !=null) { gn = gain;  }
+    if (noise!=null) { n0 = noise; }
 
     // limit values to restrict signal to be within band edges
     let f_limit = 0.49, f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
@@ -154,8 +157,8 @@ function update_plot(freq,band,gain,noise) {
     document.querySelector('#sinr').value = SINRdB;
     document.querySelector('#cap').value = C;
 
-    // generate power spectral density
-    dataf = generate_psd(fc,bw,gn,n0);
+    // generate power spectral density, compensating gain for bandwidth
+    dataf = generate_psd(fc,bw,gn+10*Math.log10(bw),n0);
     pathf.datum(dataf).attr("d", linef);
 }
 

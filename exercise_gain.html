@@ -15,8 +15,9 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="gain">Signal Amplitude</label>
-    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(value)">
-    <output for="gain" id="gn">0.1</output>
+    <input type="range" min="0.1" max="1.0" value="0.1" id="ampl" step="0.01"
+        oninput="update_plot(parseFloat(value))">
+    <output for="gain" id="ac"></output>
   </p>
 </body>
 
@@ -33,7 +34,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // The number of datapoints
 var m = 40, k=8, n = 2*k*m+1;
-var bw = 0.4;
+var fc = 0, bw = 0.4, ac = 1;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 
@@ -91,19 +92,21 @@ var pathf = svgf.append("path")
     .attr("d", linef);
 
 // set initial value
-update_plot(1);
+update_plot();
 
-function update_plot(g) {
-    document.querySelector('#gn').value = g;
-    document.querySelector('#gain').value = g;
+function update_plot(ampl) {
+    if (ampl!=null) { ac = ampl; }
+
+    document.querySelector('#ac').value = ac;
+    document.querySelector('#ampl').value = ac;
 
     // generate up-sampled time series
-    datat = d3.range(0,2*k*m+1).map(function(i) { return {"y": g*pulse(i,k*m,bw/k) } })
+    datat = d3.range(0,2*k*m+1).map(function(i) { return {"y": ac*pulse(i,k*m,bw/k) } })
     patht.datum(datat).attr("d", linet);
 
     // generate power spectral density
     generator.clear();
-    generator.add_signal(0,bw,20*Math.log10(g)); // generate signal at baseband
+    generator.add_signal(0,bw,20*Math.log10(bw*ac)); // generate signal at baseband
     generator.generate();
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
     pathf.datum(dataf).attr("d", linef);

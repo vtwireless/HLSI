@@ -15,13 +15,13 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="gain">Signal Amplitude</label>
-    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(null,null,value,null)">
+    <input type="range" min="0.1" max="1.0" value="0.1" id="gain" step="0.01" oninput="update_plot(null,null,parseFloat(value),null)">
     <output for="gain" id="gn">0.2</output>
   </p>
 
   <p>
     <label for="noise">Noise Power</label>
-    <input type="range" min="0.000001" max="0.01" value="0.000001" id="noise" step="0.000001" oninput="update_plot(null,null,null,value)">
+    <input type="range" min="0.000001" max="0.01" value="0.000001" id="noise" step="0.000001" oninput="update_plot(null,null,null,parseFloat(value))">
     <output for="noise" id="np">0.2</output>
   </p>
  

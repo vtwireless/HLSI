@@ -15,7 +15,8 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="frequency">Frequency</label>
-    <input class="slider" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001" oninput="update_plot(value,null,null)">
+    <input class="slider" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001"
+        oninput="update_plot(parseFloat(value))">
     <output for="frequency" id="fc">0.1</output>
   </p>
 </body>
@@ -33,7 +34,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // The number of datapoints
 var m = 40, k=20, n = 2*k*m+1;
-var bw = 0.2;
+var fc = 0, bw = 0.2;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 var xi = new Array(n), xq = new Array(n);
@@ -98,16 +99,18 @@ var pathf = svgf.append("path")
     .attr("d", linef);
 
 // set initial value
-update_plot(0);
+update_plot();
 
-function update_plot(f) {
-    document.querySelector('#fc').value = f;
-    document.querySelector('#frequency').value = f;
+function update_plot(freq) {
+    if (freq!=null) { fc = freq; }
+
+    document.querySelector('#fc').value = fc;
+    document.querySelector('#frequency').value = fc;
 
     // clear time-domain buffer and generate up-sampled time series
     clear_buffer(xi,n);
     clear_buffer(xq,n);
-    add_pulse(k*m, f/k, bw/k, 0, xi, xq);
+    add_pulse(k*m, fc/k, bw/k, 0, xi, xq);
     datai = d3.range(0,2*k*m+1).map(function(i) { return {"y":xi[i]} })
     dataq = d3.range(0,2*k*m+1).map(function(i) { return {"y":xq[i]} })
     pathi.datum(datai).attr("d", linet);
@@ -115,7 +118,7 @@ function update_plot(f) {
 
     // generate power spectral density
     generator.clear();
-    generator.add_signal(f,bw,0); // generate signal, no gain
+    generator.add_signal(fc,bw,20*Math.log10(bw)); // generate signal, no gain
     generator.generate();
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
     pathf.datum(dataf).attr("d", linef);
