@@ -102,7 +102,8 @@ update_plot(0.0, 0.1);
 function generate_psd(f,w,g,n) {
     // update generator
     generator.clear();
-    generator.add_signal(f,w,g);
+    // add signal with gain compensating for energy spectran density
+    generator.add_signal(f,w,g + 10*Math.log10(w));
     //generator.add_noise(n); // add random noise samples
     generator.generate(n); // generate with specific noise floor
     //console.log(psd);

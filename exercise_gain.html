@@ -14,10 +14,16 @@
   <h2>Exercise - Gain</h2>
   <p><a href="index.html">[back]</a></p>
   <p>
-    <label for="gain">Signal Amplitude</label>
-    <input type="range" min="0.1" max="1.0" value="0.1" id="ampl" step="0.01"
-        oninput="update_plot(parseFloat(value))">
-    <output for="gain" id="ac"></output>
+    <label for="ampl">Amplitude (linear)</label>
+    <input type="range" class="slider" min="0.1" max="1.0" value="0.1" id="ampl" step="0.01"
+        oninput="update_plot(parseFloat(value),null)">
+    <output for="ampl" id="ac"></output>
+  </p>
+  <p>
+    <label for="gain">Gain (dB)</label>
+    <input type="range" class="slider" min="-20" max="0" value="0.1" id="gain" step="0.01"
+        oninput="update_plot(null,parseFloat(value))">
+    <output for="gain" id="gn"></output>
   </p>
 </body>
 
@@ -34,7 +40,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // The number of datapoints
 var m = 40, k=8, n = 2*k*m+1;
-var fc = 0, bw = 0.4, ac = 1;
+var fc = 0, bw = 0.4, gn = 0, ac = 1;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 
@@ -94,11 +100,17 @@ var pathf = svgf.append("path")
 // set initial value
 update_plot();
 
-function update_plot(ampl) {
-    if (ampl!=null) { ac = ampl; }
+function update_plot(ampl,gain) {
+    // set values accordingly
+    if (ampl==null && gain==null) { ac = 1; gn = 20*Math.log10(ac); }
+    if (ampl!=null) { ac = ampl; gn = 20*Math.log10(ac); }
+    if (gain!=null) { gn = gain; ac = Math.pow(10.,gn/20.); }
 
     document.querySelector('#ac').value = ac;
     document.querySelector('#ampl').value = ac;
+
+    document.querySelector('#gn').value = gn;
+    document.querySelector('#gain').value = gn;
 
     // generate up-sampled time series
     datat = d3.range(0,2*k*m+1).map(function(i) { return {"y": ac*pulse(i,k*m,bw/k) } })
