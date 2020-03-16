@@ -102,10 +102,10 @@ update_plot();
 
 // generate power spectral density
 function generate_psd(f,w,g,n) {
-    // update generator
+    // update generator, compensating for bandwidth
     generator.clear();
-    generator.add_signal(f,w,g); // user signal
-    generator.add_signal(fc_int,bw_int,gn_int); // interference
+    generator.add_signal(f,     w,     g+     10*Math.log10(bw)    ); // user signal
+    generator.add_signal(fc_int,bw_int,gn_int+10*Math.log10(bw_int)); // interference
     //generator.add_noise(n); // add random noise samples
     generator.generate(n); // generate with specific noise floor
     return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
@@ -121,10 +121,10 @@ function compute_interference()
     // check for no overlap
     if (f_lower > i_upper || f_upper < i_lower) { return 0; }
 
-    // partial or full overlap
+    // partial or full overlap, compensating gain for interference bandwidth
     let f0 = Math.max(i_lower, f_lower);
     let f1 = Math.min(i_upper, f_upper);
-    return (f1-f0)*Math.pow(10.,gn_int/10.);
+    return (f1-f0)*Math.pow(10.,gn_int/10.)/bw_int;
 }
 
 function update_plot(freq,band,gain,noise) {
@@ -149,16 +149,16 @@ function update_plot(freq,band,gain,noise) {
 
     //document.querySelector('#n0').value = n0;
     //document.querySelector('#noise').value = n0;
-    
+
     let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
     let I     = compute_interference();     // interference power (linear)
-    let SINRdB = gn - 10*Math.log10(N+I);
+    let SINRdB= gn - 10*Math.log10(N+I);
     let C     = bw * Math.log2(1+Math.pow(10.,SINRdB/10.));
     document.querySelector('#sinr').value = SINRdB;
     document.querySelector('#cap').value = C;
 
-    // generate power spectral density, compensating gain for bandwidth
-    dataf = generate_psd(fc,bw,gn+10*Math.log10(bw),n0);
+    // generate power spectral density (compensating gain for bandwidth internally)
+    dataf = generate_psd(fc,bw,gn,n0);
     pathf.datum(dataf).attr("d", linef);
 }
 
