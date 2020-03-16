@@ -14,7 +14,7 @@ path {
 .grid line { stroke: #cccccc; }
 
 .timei { stroke: #004080; }
-.timeq { stroke: #008040; }
+.timeq { stroke: #008040; stroke-dasharray: 4,4; }
 .psd   { stroke: #804000; }
 
 .slider {
