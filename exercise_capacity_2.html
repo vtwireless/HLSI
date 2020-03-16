@@ -102,7 +102,7 @@ update_plot(0.0, 0.1);
 function generate_psd(f,w,g,n) {
     // update generator
     generator.clear();
-    // add signal with gain compensating for energy spectran density
+    // add signal with gain compensating for signal bandwidth
     generator.add_signal(f,w,g + 10*Math.log10(w));
     //generator.add_noise(n); // add random noise samples
     generator.generate(n); // generate with specific noise floor
@@ -128,14 +128,14 @@ function update_plot(freq,band,gain,noise) {
     document.querySelector('#n0').value = n0;
     document.querySelector('#noise').value = n0;
     
-    //document.querySelector('#snr').value = Math.round(10 * Math.log10(gn**2 / (np * bw))); // signal will be bandpass filtered to reduce noise
+    // compute SNR
     let SNRdB = gn - n0 - 10*Math.log10(bw);
     let C     = bw * Math.log2(1+Math.pow(10.,SNRdB/10.));
     document.querySelector('#snr').value = SNRdB;
     document.querySelector('#cap').value = C;
 
     // generate power spectral density, compensating for bandwidth
-    dataf = generate_psd(fc,bw,gn+10*Math.log10(bw),n0);
+    dataf = generate_psd(fc,bw,gn,n0);
     pathf.datum(dataf).attr("d", linef);
 }
 
