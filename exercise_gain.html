@@ -89,12 +89,12 @@ svgf.append("clipPath")
 var patht = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(datat) // 10. Binds data to the line
-    .attr("class", "timei") // Assign a class for styling
+    .attr("class", "stroke-med no-fill stroke-blue") // Assign a class for styling
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "psd")
+    .attr("class", "stroke-med no-fill stroke-red")
     .attr("d", linef);
 
 // set initial value
