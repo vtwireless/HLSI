@@ -15,13 +15,13 @@
   <p><a href="index.html">[back]</a></p>
   <p>
     <label for="ampl">Amplitude (linear)</label>
-    <input type="range" class="slider" min="0.1" max="1.0" value="0.1" id="ampl" step="0.01"
+    <input type="range" class="width-4" min="0.1" max="1.0" value="0.1" id="ampl" step="0.001"
         oninput="update_plot(parseFloat(value),null)">
     <output for="ampl" id="ac"></output>
   </p>
   <p>
     <label for="gain">Gain (dB)</label>
-    <input type="range" class="slider" min="-20" max="0" value="0.1" id="gain" step="0.01"
+    <input type="range" class="width-4" min="-20" max="0" value="0.1" id="gain" step="0.001"
         oninput="update_plot(null,parseFloat(value))">
     <output for="gain" id="gn"></output>
   </p>

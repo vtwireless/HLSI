@@ -16,5 +16,9 @@ svg * { font: 12px Arial; }
 
 .grid line { stroke: #cccccc; }
 
-.slider { width: 640px; }
+.width-1 { width: 240px; }
+.width-2 { width: 320px; }
+.width-3 { width: 480px; }
+.width-4 { width: 640px; }
+.width-5 { width: 960px; }
 
