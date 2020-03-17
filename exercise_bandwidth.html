@@ -32,15 +32,22 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
-// The number of datapoints
+// options
+var fs = 40e6, fc = 0; // sample rate, center frequency
 var m = 40, k=8, n = 2*k*m+1;
 var bw = 0.2;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 
+//let s, u; s, u = scale(1);
+var [scale_freq,units_freq] = scale_units(  fs); // freq scale (+fc)
+var [scale_time,units_time] = scale_units(m/fs); // time scale
+console.log('freq: ' + scale_freq + ', ' + units_freq);
+console.log('time: ' + scale_time + ', ' + units_time);
+
 // 5. X scale will use the index of our data
-var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
-var fScale = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
+var xScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
+var fScale = d3.scaleLinear().domain([-0.5*fs*scale_freq, 0.5*fs*scale_freq]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
 var yScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
@@ -48,11 +55,11 @@ var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
 
 // 7. d3's line generator
 var linet = d3.line()
-    .x(function(d, i) { return xScale((i-k*m)/k); })  // set the x values for the line generator
+    .x(function(d, i) { return xScale((i-k*m)/k*scale_time/fs); })  // set the x values for the line generator
     .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
     //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
 var linef = d3.line()
-    .x(function(d, i) { return fScale(i/nfft-0.5); })  // map frequency
+    .x(function(d, i) { return fScale((i/nfft-0.5)*fs*scale_freq); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
@@ -64,8 +71,8 @@ var svgt = svg_create(margin, width, height, xScale, yScale);
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgt, margin, width, height, "Time (sample index)", "Signal");
-svg_add_labels(svgf, margin, width, height, "Normalized Frequency", "Power Spectra Density (dB)");
+svg_add_labels(svgt, margin, width, height, "Time ("+units_time+"s)", "Signal");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
 
 // clip paths
 svgt.append("clipPath")
@@ -97,7 +104,7 @@ update_plot();
 function update_plot(band) {
     if (band!=null) { bw = band; }
 
-    document.querySelector('#bw').value = bw;
+    document.querySelector('#bw').value        = bw*fs*scale_freq + " " + units_freq + "Hz";
     document.querySelector('#bandwidth').value = bw;
 
     // generate up-sampled time series

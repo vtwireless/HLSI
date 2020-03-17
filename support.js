@@ -39,6 +39,24 @@ function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
        .text(_ylabel)
 }
 
+// scale
+function scale_units(v,p)
+{
+    if (p == null) { p = 12; }
+
+    let r = v * p;
+    if      (r > 1e+12) { return [1e-12, 'T']; }
+    else if (r > 1e+09) { return [1e-09, 'G']; }
+    else if (r > 1e+06) { return [1e-06, 'M']; }
+    else if (r > 1e+03) { return [1e-03, 'k']; }
+    else if (r > 1e+00) { return [1e+00, '' ]; }
+    else if (r > 1e-03) { return [1e+03, 'm']; }
+    else if (r > 1e-06) { return [1e+06, 'u']; }
+    else if (r > 1e-09) { return [1e+09, 'n']; }
+    else if (r > 1e-12) { return [1e+12, 'p']; }
+    else                { return [1e+16, 'f']; }
+}
+
 // normal random number
 function randn()
 {
@@ -48,7 +66,8 @@ function randn()
 }
 
 // sinc(x) = sin(pi x) / (pi x)
-function sinc(x) {
+function sinc(x)
+{
     let r = Math.max(1e-6,Math.abs(Math.PI * x));
     return Math.sin(r) / r;
 }
