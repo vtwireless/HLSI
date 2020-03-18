@@ -79,16 +79,8 @@ svg_add_labels(svgt, margin, width, height, "Time ("+units_time+"s)", "Signal");
 svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
 
 // clip paths
-svgt.append("clipPath")
-     .attr("id","clipt")
-   .append("rect")
-     .attr("width",width)
-     .attr("height",height);
-svgf.append("clipPath")
-     .attr("id","clipf")
-   .append("rect")
-     .attr("width",width)
-     .attr("height",height);
+svgt.append("clipPath").attr("id","clipt").append("rect").attr("width",width).attr("height",height);
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
 var patht = svgt.append("path")
