@@ -33,21 +33,21 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
-var fs = 40e6, fc = 0; // sample rate, center frequency
+var fs = 40e6, fc = 1800e6; // sample rate, center frequency
 var m = 40, k=8, n = 2*k*m+1;
 var bw = 0.2;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 
 //let s, u; s, u = scale(1);
-var [scale_freq,units_freq] = scale_units(  fs); // freq scale (+fc)
-var [scale_time,units_time] = scale_units(m/fs); // time scale
+var [scale_freq,units_freq] = scale_units(fc+fs/2,0.1); // freq scale
+var [scale_time,units_time] = scale_units(m/fs);        // time scale
 //console.log('freq: ' + scale_freq + ', ' + units_freq);
 //console.log('time: ' + scale_time + ', ' + units_time);
 
 // 5. X scale will use the index of our data
 var xScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
-var fScale = d3.scaleLinear().domain([-0.5*fs*scale_freq, 0.5*fs*scale_freq]).range([0, width]);
+var fScale = d3.scaleLinear().domain([(fc-0.5*fs)*scale_freq, (fc+0.5*fs)*scale_freq]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
 var yScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
@@ -59,7 +59,7 @@ var linet = d3.line()
     .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
     //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
 var linef = d3.line()
-    .x(function(d, i) { return fScale((i/nfft-0.5)*fs*scale_freq); })  // map frequency
+    .x(function(d, i) { return fScale((fc+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number

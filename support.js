@@ -39,12 +39,10 @@ function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
        .text(_ylabel)
 }
 
-// scale
+// determine scale and units for sample value v; use p to adjust cut-off threshold
 function scale_units(v,p)
 {
-    if (p == null) { p = 12; }
-
-    let r = v * p;
+    let r = v * (p==null ? 1 : p);
     if      (r > 1e+12) { return [1e-12, 'T']; }
     else if (r > 1e+09) { return [1e-09, 'G']; }
     else if (r > 1e+06) { return [1e-06, 'M']; }
