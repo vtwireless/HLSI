@@ -104,7 +104,7 @@ update_plot();
 function update_plot(band) {
     if (band!=null) { bw = band; }
 
-    document.querySelector('#bw').value        = bw*fs*scale_freq + " " + units_freq + "Hz";
+    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
     document.querySelector('#bandwidth').value = bw;
 
     // generate up-sampled time series
