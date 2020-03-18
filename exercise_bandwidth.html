@@ -33,33 +33,31 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
-var fs = 40e6, fc = 1800e6; // sample rate, center frequency
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
 var m = 40, k=20, n = 2*k*m+1;  // filter semi-length, over-sampling rate, total length
 var bw = 0.2; // filter bandwidth
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 
-//let s, u; s, u = scale(1);
-var [scale_freq,units_freq] = scale_units(fc+fs/2,0.1); // freq scale
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
 var [scale_time,units_time] = scale_units(m/fs);        // time scale
-//console.log('freq: ' + scale_freq + ', ' + units_freq);
-//console.log('time: ' + scale_time + ', ' + units_time);
 
 // 5. X scale will use the index of our data
-var xScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
-var fScale = d3.scaleLinear().domain([(fc-0.5*fs)*scale_freq, (fc+0.5*fs)*scale_freq]).range([0, width]);
+var tScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
-var yScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
+var vScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
 var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
 
 // 7. d3's line generator
 var linet = d3.line()
-    .x(function(d, i) { return xScale((i-k*m)/k*scale_time/fs); })  // set the x values for the line generator
-    .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
+    .x(function(d, i) { return tScale((i-k*m)/k*scale_time/fs); })  // set the x values for the line generator
+    .y(function(d)    { return vScale(d.y);       }); // set the y values for the line generator
     //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
 var linef = d3.line()
-    .x(function(d, i) { return fScale((fc+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
@@ -67,7 +65,7 @@ var datat = {};
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
-var svgt = svg_create(margin, width, height, xScale, yScale);
+var svgt = svg_create(margin, width, height, tScale, vScale);
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
