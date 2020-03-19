@@ -21,13 +21,13 @@
   </p>
   <p>
     <label for="bandwidth">Bandwidth / Fs</label>
-    <input type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.01"
+    <input type="range" min="0.01" max="0.9" value="0.1" id="bandwidth" step="0.01"
         oninput="update_plot(null,parseFloat(value),null,null)">
     <output for="bandwidth" id="bw">0.1</output>
   </p>
   <p>
     <label for="gain">Signal Gain (dB)</label>
-    <input type="range" min="-20" max="0" value="0" id="gain" step="0.01"
+    <input type="range" min="-20" max="10" value="0" id="gain" step="0.01"
         oninput="update_plot(null,null,parseFloat(value),null)">
     <output for="gain" id="gn">0</output>
   </p>
