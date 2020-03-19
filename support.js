@@ -71,20 +71,20 @@ function sinc(x)
 }
 
 // generate sample i of windowed pulse, length 2*_m+1 with bandwidth _bw
-function pulse(_i, _m, _bw)
+function pulse(_i, _m, _bw, _beta)
 {
     if (_i < 0 || _i > 2*_m) {
         throw "invalid index for pulse, i=" + _i + ", m=" + _m;
     }
-    let w = Math.cos(0.5*Math.PI*(_i-_m)/_m)**2;
+    let w = Math.cos(0.5*Math.PI*(_i-_m)/_m)**(_beta==null ? 2 : _beta);
     return sinc(_bw*(_i-_m)) * w;
 }
 
 // generate pulse into buffer (adding on top of existing signals)
-function add_pulse(_m, _fc, _bw, _gain, _xi, _xq) {
+function add_pulse(_m, _fc, _bw, _gain, _xi, _xq, _beta) {
     let gain = Math.pow(10,_gain/20);
     for (var i=0; i<2*_m+1; i++) {
-        let p = pulse(i, _m, _bw);
+        let p = pulse(i, _m, _bw, _beta);
         _xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * p;
         _xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * p;
     }
@@ -104,6 +104,7 @@ function siggen(nfft)
     this.xq   = new Array(nfft);
     this.psd  = new Array(nfft);
     this.m    = Math.min(120,Math.floor(0.4*nfft)); // filter semi-length
+    this.beta = 2; // filter window exponent parameter
 
     // clear internal buffer
     this.clear = function() {
@@ -113,7 +114,7 @@ function siggen(nfft)
 
     // generate signals in the time-domain buffer
     this.add_signal = function(_fc, _bw, _gain) {
-        add_pulse(this.m, _fc, _bw, _gain, this.xi, this.xq);
+        add_pulse(this.m, _fc, _bw, _gain, this.xi, this.xq, this.beta);
     }
 
     // add noise to time-domain buffer

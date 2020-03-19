@@ -62,7 +62,8 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
 var bw = 0.1, fc = 0.0, gn = -10, n0 = -30, snr = 0, cap = 10;
 var nfft = 2048, generator = new siggen(nfft);
-generator.m = 40; // set filter semi-length
+generator.m    = 40;  // set filter semi-length
+generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
 
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
@@ -94,7 +95,7 @@ var pathf = svgf.append("path")
     .attr("d", linef);
 
 // set initial value
-update_plot(0.0, 0.1);
+update_plot();
 
 // generate power spectral density
 function generate_psd(f,w,g,n) {
