@@ -57,7 +57,7 @@ var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
 var bw = 0.3, fc = 0.0, gn = -10.0, n0 = -40, sinr = 0, cap = 10;
 var bw_int = 0.04231945, fc_int = -0.07221980, gn_int = 0; // interference values
 var nfft = 2048, generator = new siggen(nfft);
-generator.m = 80; // set filter semi-length
+generator.m = 60; // set filter semi-length
 
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);

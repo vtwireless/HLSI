@@ -60,10 +60,9 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var m = 40, k=20, n = 2*k*m+1;  // filter semi-length, over-sampling rate, total length
 var bw = 0.1, fc = 0.0, gn = -10, n0 = -30, snr = 0, cap = 10;
 var nfft = 2048, generator = new siggen(nfft);
-generator.m = 50; // set filter semi-length
+generator.m = 40; // set filter semi-length
 
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
