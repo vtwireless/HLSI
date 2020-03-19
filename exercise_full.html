@@ -15,21 +15,21 @@
   <p><a href="index.html">[exercises]</a></p>
   <p>
     <label for="frequency">Frequency</label>
-    <input class="width-4" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001"
-        oninput="update_plot(parseFloat(value),null,null)">
-    <output for="frequency" id="fc">0.1</output>
+    <input class="width-3" type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.001" 
+        oninput="update_plot(parseFloat(value),null,null,null)">
+    <output for="frequency" id="fc"></output>
   </p>
   <p>
     <label for="bandwidth">Bandwidth</label>
-    <input class="width-4" type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.001"
-        oninput="update_plot(null,parseFloat(value),null)">
-    <output for="bandwidth" id="bw">0.1</output>
+    <input class="width-3" type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.001"
+        oninput="update_plot(null,parseFloat(value),null,null)">
+    <output for="bandwidth" id="bw"></output>
   </p>
   <p>
-    <label for="gain">Signal Gain (dB)</label>
-    <input class="width-4" type="range" min="-20" max="0" value="0" id="gain" step="0.001"
-        oninput="update_plot(null,null,parseFloat(value))">
-    <output for="gain" id="gn">0</output>
+    <label for="gain">Signal Gain</label>
+    <input class="width-3" type="range" min="-30" max="0" value="0" id="gain" step="0.01"
+        oninput="update_plot(null,null,parseFloat(value),null)">
+    <output for="gain" id="gn"></output>
   </p>
 </body>
 
@@ -44,28 +44,33 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
-// The number of datapoints
-var m = 40, k=20, n = 2*k*m+1;
+// options
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
+var m = 40, k=20, n = 2*k*m+1;  // filter semi-length, over-sampling rate, total length
 var fc = 0.0, bw = 0.2, gn = 0.0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = m;
 var xi = new Array(n), xq = new Array(n);
 
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
+var [scale_time,units_time] = scale_units(m/fs);        // time scale
+
 // 5. X scale will use the index of our data
-var xScale = d3.scaleLinear().domain([  -m,   m]).range([0, width]);
-var fScale = d3.scaleLinear().domain([-0.5, 0.5]).range([0, width]);
+var tScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
-var yScale = d3.scaleLinear().domain([ -1.1,  1.1]).range([height, 0]);
-var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
+var vScale = d3.scaleLinear().domain([ -1.1,  1.1]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-60, 20]).range([height, 0]);
 
 // 7. d3's line generator
 var linet = d3.line()
-    .x(function(d, i) { return xScale((i-k*m)/k); })  // set the x values for the line generator
-    .y(function(d)    { return yScale(d.y);       }); // set the y values for the line generator
+    .x(function(d, i) { return tScale((i-k*m)/k*scale_time/fs); })  // set the x values for the line generator
+    .y(function(d)    { return vScale(d.y);       }); // set the y values for the line generator
     //.curve(d3.curveMonotoneX) // apply smoothing to the line (comment out to remove smoothing)
 var linef = d3.line()
-    .x(function(d, i) { return fScale(i/nfft-0.5); })  // map frequency
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
     .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
@@ -74,12 +79,12 @@ var dataq = {};
 var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // create SVG objects
-var svgt = svg_create(margin, width, height, xScale, yScale);
+var svgt = svg_create(margin, width, height, tScale, vScale);
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgt, margin, width, height, "Time (sample index)", "Signal");
-svg_add_labels(svgf, margin, width, height, "Normalized Frequency", "Power Spectra Density (dB)");
+svg_add_labels(svgt, margin, width, height, "Time ("+units_time+"s)", "Signal");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
 
 // clip paths
 svgt.append("clipPath").attr("id","clipt").append("rect").attr("width",width).attr("height",height);
@@ -110,13 +115,13 @@ function update_plot(freq,band,gain) {
     if (band!=null) { bw = band; }
     if (gain!=null) { gn = gain; }
 
-    document.querySelector('#fc').value = fc;
+    document.querySelector('#fc').value = d3.format(".2f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
     document.querySelector('#frequency').value = fc;
 
-    document.querySelector('#bw').value = bw;
+    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
     document.querySelector('#bandwidth').value = bw;
 
-    document.querySelector('#gn').value = gn;
+    document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
     document.querySelector('#gain').value = gn;
 
     // clear time-domain buffer and generate up-sampled time series
