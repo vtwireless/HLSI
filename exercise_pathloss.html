@@ -13,17 +13,6 @@
 <body>
   <h2>Exercise - Path Loss (work in progress)</h2>
   <p><a href="index.html">[exercises]</a></p>
-  <div class="svg-container">
-  <svg id="click" xmlns="http://www.w3.org/2000/svg" width="600" height="600">
-    <defs>
-      <g id="pointer" transform="scale(0.8)">
-       <path d="M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z"></path>
-       <path d="M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z"></path>
-      </g>
-    </defs>
-    <path>
-  </svg>
-  </div>
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -33,24 +22,38 @@
 <script>
 
 // 2. Use the margin convention practice
-var svg = d3.select("#click");
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
-  , width  = svg.node().getBoundingClientRect().width - margin.left - margin.right  // Use the window's width
-  , height = svg.node().getBoundingClientRect().height- margin.top - margin.bottom; // Use the window's height
+  , width  = 920 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var xrange=600, yrange=300; // range in meters
+var xmin=-500, xmax=500, ymin=-250, ymax=250;
+
+// 2. Use the margin convention practice
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+  , width  = 920 - margin.left - margin.right  // Use the window's width
+  , height = 640 - margin.top - margin.bottom; // Use the window's height
 
 // scale
-var xscale = d3.scaleLinear().domain([ -1000, 1000]).range([0, width]);
-var yscale = d3.scaleLinear().domain([ -1000, 1000]).range([height, 0]);
+var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
+var yScale = d3.scaleLinear().domain([-yrange, yrange]).range([height, 0]);
 
-// create grid lines
-svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize( height));
-svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(- width));
+// create SVG object
+var svg = svg_create(margin, width, height, xScale, yScale);
 
-var xmin=50, xmax=width-50, ymin=50, ymax=height-50;
+// add pointer definition
+var pointer = svg.append("defs").append("g")
+        .attr("id","pointer")
+        .attr("transform","scale(0.8)");
+pointer.append("path").attr("d","M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z");
+pointer.append("path").attr("d","M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z");
+
+// add markers with 
 svg.selectAll("use")
     .data([
-        {x:50,      y:50,       c:"#039be5", b:"#004080"},
-        {x:width/2, y:height/2, c:"#03e539", b:"#008040"},
+        {x:xScale(xmin), y:yScale(ymax), c:"#039be5", b:"#004080"},
+        {x:xScale(   0), y:yScale(   0), c:"#03e539", b:"#008040"},
         ])
     .enter()
     .append("use")
@@ -61,11 +64,13 @@ svg.selectAll("use")
         .attr("stroke", function(d) { return (d.b) })
         .attr("class","pin");
 
+console.log(xmin, xmax, ymin, ymax);
+console.log(xScale(xmin), xScale(xmax), yScale(ymin), yScale(ymax));
 var dragHandler = d3.drag()
     .on("drag", function(d) {
         d3.select(this)
-            .attr("x", d.x = Math.max(Math.min(d3.event.x,xmax),xmin))
-            .attr("y", d.y = Math.max(Math.min(d3.event.y,ymax),ymin));
+            .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(xmin)))
+            .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(ymin))); // min/max flipped for y-axis
     });
 
 dragHandler(svg.selectAll("use"));
