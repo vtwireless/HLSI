@@ -32,17 +32,12 @@
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 320 - margin.top - margin.bottom; // Use the window's height
+  , height = 640 - margin.top - margin.bottom; // Use the window's height
 
 // options
 var f0 = 1800e6;     // center frequency
 var xrange=1200, yrange=600; // range in meters
 var xmax  =1000, ymax  =500; // maximum values
-
-// 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 50}
-  , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 640 - margin.top - margin.bottom; // Use the window's height
 
 // scale
 var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
