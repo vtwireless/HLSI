@@ -39,8 +39,9 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
 var yScale = d3.scaleLinear().domain([-yrange, yrange]).range([height, 0]);
 
-// create SVG object
+// create SVG object and add labels
 var svg = svg_create(margin, width, height, xScale, yScale);
+svg_add_labels(svg, margin, width, height, "Horizonal Position (m)", "Vertical Position (m)");
 
 // add pointer definition
 var pointer = svg.append("defs").append("g")
