@@ -28,7 +28,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
 
 // options
 var xrange=600, yrange=300; // range in meters
-var xmin=-500, xmax=500, ymin=-250, ymax=250;
+var xmax  =500, ymax  =250; // maximum values
 
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
@@ -52,8 +52,8 @@ pointer.append("path").attr("d","M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-1
 // add markers with 
 svg.selectAll("use")
     .data([
-        {x:xScale(xmin), y:yScale(ymax), c:"#039be5", b:"#004080"},
-        {x:xScale(   0), y:yScale(   0), c:"#03e539", b:"#008040"},
+        {x:xScale(-xmax), y:yScale(ymax), c:"#039be5", b:"#004080"},
+        {x:xScale(    0), y:yScale(   0), c:"#03e539", b:"#008040"},
         ])
     .enter()
     .append("use")
@@ -64,13 +64,11 @@ svg.selectAll("use")
         .attr("stroke", function(d) { return (d.b) })
         .attr("class","pin");
 
-console.log(xmin, xmax, ymin, ymax);
-console.log(xScale(xmin), xScale(xmax), yScale(ymin), yScale(ymax));
 var dragHandler = d3.drag()
     .on("drag", function(d) {
         d3.select(this)
-            .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(xmin)))
-            .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(ymin))); // min/max flipped for y-axis
+            .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(-xmax)))
+            .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(-ymax))); // min/max flipped for y-axis
     });
 
 dragHandler(svg.selectAll("use"));
