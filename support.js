@@ -70,14 +70,22 @@ function sinc(x)
     return Math.sin(r) / r;
 }
 
+// generate sample i of cosine window, length 2*_m+1 with exponent _beta
+function cwindow(_i, _m, _beta)
+{
+    if (_i < 0 || _i > 2*_m) {
+        throw "invalid index for cosine window, i=" + _i + ", m=" + _m;
+    }
+    return Math.cos(0.5*Math.PI*(_i-_m)/_m)**(_beta==null ? 2 : _beta);
+}
+
 // generate sample i of windowed pulse, length 2*_m+1 with bandwidth _bw
 function pulse(_i, _m, _bw, _beta)
 {
     if (_i < 0 || _i > 2*_m) {
         throw "invalid index for pulse, i=" + _i + ", m=" + _m;
     }
-    let w = Math.cos(0.5*Math.PI*(_i-_m)/_m)**(_beta==null ? 2 : _beta);
-    return sinc(_bw*(_i-_m)) * w;
+    return sinc(_bw*(_i-_m)) * cwindow(_i, _m, _beta);
 }
 
 // generate pulse into buffer (adding on top of existing signals)
