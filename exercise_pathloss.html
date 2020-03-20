@@ -14,6 +14,16 @@
   <h2>Exercise - Path Loss</h2>
   <p><a href="index.html">[exercises]</a></p>
   <p>
+    <label for="frequency">Frequency</label>
+    <input class="width-4" type="range" min="-0.45" max="0.45" value="0.0" id="frequency" step="0.001"
+        oninput="update_display(parseFloat(value))">
+    <output for="frequency" id="fc">0.1</output>
+  </p>
+  <p>
+    <label for="wavelength">Wavelength = </label>
+    <output for="wavelength" id="wl"></output>
+  </p>
+  <p>
     <label for="distance">Distance = </label>
     <output for="distance" id="ds"></output>
   </p>
@@ -32,12 +42,15 @@
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 640 - margin.top - margin.bottom; // Use the window's height
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
-var f0 = 1800e6;     // center frequency
+var fs=1000e6, f0=1500e6;    // sample rate, center frequency
+var fc = 0.0;
 var xrange=1200, yrange=600; // range in meters
 var xmax  =1000, ymax  =500; // maximum values
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = 100;  // set filter semi-length
 
 // scale
 var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
@@ -47,12 +60,24 @@ var yScale = d3.scaleLinear().domain([-yrange, yrange]).range([height, 0]);
 var xInvScale = d3.scaleLinear().range([-xrange, xrange]).domain([0, width]);
 var yInvScale = d3.scaleLinear().range([-yrange, yrange]).domain([height, 0]);
 
-// create SVG object and add labels
-var svg = svg_create(margin, width, height, xScale, yScale);
-svg_add_labels(svg, margin, width, height, "Horizonal Position (m)", "Vertical Position (m)");
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-70, 10]).range([height, 0]);
+
+// create SVG objects (map and frequency plot)
+var svgm = svg_create(margin, width, height, xScale, yScale);
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgm, margin, width, height, "Horizonal Position (m)", "Vertical Position (m)");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
 // add pointer definition
-var pointer = svg.append("defs").append("g")
+var pointer = svgm.append("defs").append("g")
         .attr("id","pointer")
         .attr("transform","scale(0.8)");
 pointer.append("path").attr("d","M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z");
@@ -62,20 +87,30 @@ pointer.append("path").attr("d","M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-1
 var markers = [
     {x:xScale(-xmax), y:yScale(ymax), c:"#039be5", b:"#004080"},
     {x:xScale(    0), y:yScale(   0), c:"#03e539", b:"#008040"},];
+// spectrum data
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 
 // d3's line generator
 var line = d3.line()
     .x(function(d) { return d.x; })
     .y(function(d) { return d.y; });
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
 
 // Append the path, bind the data, and call the line generator
-var path = svg.append("path")
+var path = svgm.append("path")
     .datum(markers)
     .attr("class", "stroke-light no-fill dashed stroke-gray-0")
     .attr("d", line);
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("d", linef);
 
 // add markers with associated data
-svg.selectAll("use")
+svgm.selectAll("use")
     .data(markers)
     .enter()
     .append("use")
@@ -94,14 +129,29 @@ var dragHandler = d3.drag()
         update_display();
     });
 
-dragHandler(svg.selectAll("use"));
+dragHandler(svgm.selectAll("use"));
 
 // run initial update
 update_display();
 
-function update_pathloss() {
+function update_display(freq) {
+    if (freq!=null) { fc = freq; }
+
+    document.querySelector('#fc').value = d3.format(".2f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
+    document.querySelector('#frequency').value = fc;
+
+    // update generator
+    generator.clear();
+    generator.add_tone(fc);
+    generator.generate(-60);
+    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+    pathf.datum(dataf).attr("d", linef);
+
+    // draw line between markers
+    path.datum(markers).attr("d", line);
+
     // compute wavelength in meters
-    let lambda = 299.792458e6 / f0;
+    let lambda = 299.792458e6 / (fc*fs + f0);
 
     // compute distance and appropriate path loss
     let dx = xInvScale(markers[0].x) - xInvScale(markers[1].x);
@@ -110,13 +160,9 @@ function update_pathloss() {
     let L  = 20*Math.log10(4*Math.PI*d/lambda);
 
     // update output numbers
+    document.querySelector('#wl').value = d3.format(".2f")(lambda) + " m";
     document.querySelector('#ds').value = d3.format(".3f")(d) + " m";
     document.querySelector('#pl').value = d3.format(".3f")(L) + " dB";
-}
-
-function update_display() {
-    path.datum(markers).attr("d", line);
-    update_pathloss();
 }
 
 </script>
