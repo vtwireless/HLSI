@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h2>Exercise - Path Loss (work in progress)</h2>
+  <h2>Exercise - Path Loss</h2>
   <p><a href="index.html">[exercises]</a></p>
   <p>
     <label for="distance">Distance = </label>
@@ -35,8 +35,8 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
-var xrange=600, yrange=300; // range in meters
-var xmax  =500, ymax  =250; // maximum values
+var xrange=1200, yrange=600; // range in meters
+var xmax  =1000, ymax  =500; // maximum values
 
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
@@ -67,6 +67,17 @@ var markers = [
     {x:xScale(-xmax), y:yScale(ymax), c:"#039be5", b:"#004080"},
     {x:xScale(    0), y:yScale(   0), c:"#03e539", b:"#008040"},];
 
+// d3's line generator
+var line = d3.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; });
+
+// Append the path, bind the data, and call the line generator
+var path = svg.append("path")
+    .datum(markers)
+    .attr("class", "stroke-light no-fill dashed stroke-gray-0")
+    .attr("d", line);
+
 // add markers with associated data
 svg.selectAll("use")
     .data(markers)
@@ -84,13 +95,13 @@ var dragHandler = d3.drag()
         d3.select(this)
             .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(-xmax)))
             .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(-ymax))); // min/max flipped for y-axis
-        update_pathloss();
+        update_display();
     });
 
 dragHandler(svg.selectAll("use"));
 
 // run initial update
-update_pathloss();
+update_display();
 
 function update_pathloss() {
     // compute distance and appropriate path loss
@@ -102,6 +113,11 @@ function update_pathloss() {
     // update output numbers
     document.querySelector('#ds').value = d3.format(".3f")(d) + " m";
     document.querySelector('#pl').value = d3.format(".3f")(L) + " dB";
+}
+
+function update_display() {
+    path.datum(markers).attr("d", line);
+    update_pathloss();
 }
 
 </script>

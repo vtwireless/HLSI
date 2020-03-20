@@ -4,6 +4,7 @@ svg * { font: 12px Arial; }
 /* Style the lines by removing the fill and applying a stroke */
 .no-fill        { fill: none; }
 .no-display     { display: none; }
+.stroke-light   { stroke-width: 2; }
 .stroke-med     { stroke-width: 3; }
 .dashed         { stroke-dasharray: 4,4; }
 .stroke-blue    { stroke: #004080; }
