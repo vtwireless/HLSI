@@ -35,6 +35,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
+var f0 = 1800e6;     // center frequency
 var xrange=1200, yrange=600; // range in meters
 var xmax  =1000, ymax  =500; // maximum values
 
@@ -104,11 +105,14 @@ dragHandler(svg.selectAll("use"));
 update_display();
 
 function update_pathloss() {
+    // compute wavelength in meters
+    let lambda = 299.792458e6 / f0;
+
     // compute distance and appropriate path loss
     let dx = xInvScale(markers[0].x) - xInvScale(markers[1].x);
     let dy = yInvScale(markers[0].y) - yInvScale(markers[1].y);
-    let d  = Math.sqrt(dx**2 + dy**2);
-    let L  = 20*Math.log10(Math.max(d,1));
+    let d  = Math.max(1,Math.sqrt(dx**2 + dy**2));
+    let L  = 20*Math.log10(4*Math.PI*d/lambda);
 
     // update output numbers
     document.querySelector('#ds').value = d3.format(".3f")(d) + " m";
