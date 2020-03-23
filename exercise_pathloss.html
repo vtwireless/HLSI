@@ -160,7 +160,7 @@ function update_display(freq) {
     let L  = 20*Math.log10(4*Math.PI*d/lambda);
 
     // update output numbers
-    document.querySelector('#wl').value = d3.format(".2f")(lambda*1e3) + " cm";
+    document.querySelector('#wl').value = d3.format(".2f")(lambda*1e2) + " cm";
     document.querySelector('#ds').value = d3.format(".3f")(d) + " m";
     document.querySelector('#pl').value = d3.format(".3f")(L) + " dB";
 }
