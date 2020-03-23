@@ -50,7 +50,8 @@ var fc = 0.0;
 var xrange=1200, yrange=600; // range in meters
 var xmax  =1000, ymax  =500; // maximum values
 var nfft = 2048, generator = new siggen(nfft);
-generator.m = 100;  // set filter semi-length
+generator.m = 120;  // set filter semi-length
+generator.beta = 4;
 
 // scale
 var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
@@ -63,7 +64,7 @@ var yInvScale = d3.scaleLinear().range([-yrange, yrange]).domain([height, 0]);
 // determine time and frequency scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
-var pScale = d3.scaleLinear().domain([-70, 10]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-110, 10]).range([height, 0]);
 
 // create SVG objects (map and frequency plot)
 var svgm = svg_create(margin, width, height, xScale, yScale);
@@ -140,16 +141,6 @@ function update_display(freq) {
     document.querySelector('#fc').value = d3.format(".2f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
     document.querySelector('#frequency').value = fc;
 
-    // update generator
-    generator.clear();
-    generator.add_tone(fc);
-    generator.generate(-60);
-    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
-    pathf.datum(dataf).attr("d", linef);
-
-    // draw line between markers
-    path.datum(markers).attr("d", line);
-
     // compute wavelength in meters
     let lambda = 299.792458e6 / (fc*fs + f0);
 
@@ -158,6 +149,17 @@ function update_display(freq) {
     let dy = yInvScale(markers[0].y) - yInvScale(markers[1].y);
     let d  = Math.max(1,Math.sqrt(dx**2 + dy**2));
     let L  = 20*Math.log10(4*Math.PI*d/lambda);
+    let g  = 16-L;
+
+    // update generator
+    generator.clear();
+    generator.add_tone(fc,g);
+    generator.generate(-100);
+    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+    pathf.datum(dataf).attr("d", linef);
+
+    // draw line between markers
+    path.datum(markers).attr("d", line);
 
     // update output numbers
     document.querySelector('#wl').value = d3.format(".2f")(lambda*1e2) + " cm";

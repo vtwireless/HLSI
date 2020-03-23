@@ -99,10 +99,10 @@ function add_pulse(_m, _fc, _bw, _gain, _xi, _xq, _beta) {
 }
 
 // generate tone into buffer (adding on top of existing signals)
-function add_tone(_m, _fc, _gain, _xi, _xq) {
+function add_tone(_m, _fc, _gain, _xi, _xq, _beta) {
     let gain = (_gain==null ? 1 : Math.pow(10,_gain/20)) / _m;
     for (var i=0; i<2*_m+1; i++) {
-        let p = cwindow(i, _m, 2.0);
+        let p = cwindow(i, _m, _beta);
         _xi[i] += gain * Math.cos(2*Math.PI*_fc*i) * p;
         _xq[i] += gain * Math.sin(2*Math.PI*_fc*i) * p;
     }
