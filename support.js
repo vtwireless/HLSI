@@ -108,6 +108,15 @@ function add_tone(_m, _fc, _gain, _xi, _xq, _beta) {
     }
 }
 
+// mu-law compression
+function compress_mulaw(_x, _mu) {
+    if      (_mu == null || _mu == 0) { return _x; }
+    else if (_mu < 0) { throw "invalid mu value for compression: " + _mu; }
+
+    let x_abs = Math.abs(_x);
+    return Math.sign(_x) * Math.log(1 + _mu*x_abs) / Math.log(1 + _mu);
+}
+
 // clear sample buffer
 function clear_buffer(buf,n) {
     for (let i=0; i<n; i++) { buf[i] = 0; }
@@ -122,7 +131,8 @@ function siggen(nfft)
     this.xq   = new Array(nfft);
     this.psd  = new Array(nfft);
     this.m    = Math.min(120,Math.floor(0.4*nfft)); // filter semi-length
-    this.beta = 2; // filter window exponent parameter
+    this.beta = 2;    // filter window exponent parameter
+    this.mu   = null; // mu-law compression (set to 'null' to disable)
 
     // clear internal buffer
     this.clear = function() {
@@ -156,6 +166,14 @@ function siggen(nfft)
         if (noise_floor_dB==null)
             { noise_floor_dB = -120; }
         let noise_floor = Math.max(1e-12, Math.pow(10.,noise_floor_dB/10));
+
+        // apply compression
+        if (this.mu != null) {
+            for (var i=0; i<nfft; i++) {
+                this.xi[i] = compress_mulaw(this.xi[i], this.mu);
+                this.xq[i] = compress_mulaw(this.xq[i], this.mu);
+            }
+        }
 
         // compute transform in place
         this.fft.forward(this.xi,this.xq);
