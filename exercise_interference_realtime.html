@@ -189,22 +189,26 @@ var line = d3.line()
     .x(function(d, i) { return x(i); })
     .y(function(d, i) { return y(d); });
 
-g.append("defs").append("clipPath")
+svg.append("defs").append("clipPath")
     .attr("id", "clip")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
 
-g.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + y(0) + ")")
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
 
 g.append("g")
     .attr("class", "axis axis--y")
     .call(d3.axisLeft(y));
 
-g.append("g")
+// grid lines
+svg.append("g").attr("class","grid").call(d3.axisBottom(x).tickFormat("").tickSize(height));
+//svg.append("g").attr("class","grid").call(d3.axisLeft  (y).tickFormat("").tickSize(-svg.attr("width" )));
+
+svg.append("g")
     .attr("clip-path", "url(#clip)")
   .append("path")
     .datum(data)
@@ -214,6 +218,22 @@ g.append("g")
     .ease(d3.easeLinear)
     .on("start", tick);
 
+// create x-axis axis label
+svg.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+   .text("Time")
+
+// create y-axis label
+svg.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 100 - margin.left)
+   .attr("x",  60 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+   .text("Capacity (bits/second)")
+
 function tick() {
 
   // Push a new data point onto the back.
@@ -221,7 +241,7 @@ function tick() {
   data.push(cap);
 
   // update the domains
-  //y.domain([0, d3.max(data)]);
+  //y.domain([d3.min(data)/2, d3.max(data)*2]);
 
   // Redraw the line.
   d3.select(this)
