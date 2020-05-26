@@ -250,7 +250,8 @@ function tick() {
   // Redraw the line.
   d3.select(this)
       .attr("d", line)
-      .attr("transform", null);
+      .attr("transform", null)
+      .attr("class", "stroke-med no-fill stroke-blue")
 
   // Slide it to the left.
   d3.active(this)
