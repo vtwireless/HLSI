@@ -55,7 +55,7 @@
 <script>
 
 // 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 50}
+var margin = {top: 50, right: 50, bottom: 50, left: 70}
   , width  = 920 - margin.left - margin.right  // Use the window's width
   , height = 400 - margin.top - margin.bottom; // Use the window's height
 
@@ -198,13 +198,19 @@ svg.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(xscale));
 
+var yTickValues = [100e3,200e3,400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
 svg.append("g")
     .attr("class", "y axis")
-    .call(d3.axisLeft(yscale));
+    .call(d3.axisLeft(yscale)
+      .tickValues(yTickValues)
+      .tickFormat(function(d, i) {
+ 	let [s,u] = scale_units(d);
+        return d*s + u;
+      }))
 
 // grid lines
 svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize(height));
-//svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(-width));
+svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
 
 svg.append("g")
     .attr("clip-path", "url(#clip)")

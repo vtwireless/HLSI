@@ -43,16 +43,16 @@ function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
 function scale_units(v,p)
 {
     let r = v * (p==null ? 1 : p);
-    if      (r > 1e+12) { return [1e-12, 'T']; }
-    else if (r > 1e+09) { return [1e-09, 'G']; }
-    else if (r > 1e+06) { return [1e-06, 'M']; }
-    else if (r > 1e+03) { return [1e-03, 'k']; }
-    else if (r > 1e+00) { return [1e+00, '' ]; }
-    else if (r > 1e-03) { return [1e+03, 'm']; }
-    else if (r > 1e-06) { return [1e+06, 'u']; }
-    else if (r > 1e-09) { return [1e+09, 'n']; }
-    else if (r > 1e-12) { return [1e+12, 'p']; }
-    else                { return [1e+16, 'f']; }
+    if      (r >= 1e+12) { return [1e-12, 'T']; }
+    else if (r >= 1e+09) { return [1e-09, 'G']; }
+    else if (r >= 1e+06) { return [1e-06, 'M']; }
+    else if (r >= 1e+03) { return [1e-03, 'k']; }
+    else if (r >= 1e+00) { return [1e+00, '' ]; }
+    else if (r >= 1e-03) { return [1e+03, 'm']; }
+    else if (r >= 1e-06) { return [1e+06, 'u']; }
+    else if (r >= 1e-09) { return [1e+09, 'n']; }
+    else if (r >= 1e-12) { return [1e+12, 'p']; }
+    else                 { return [1e+16, 'f']; }
 }
 
 // normal random number
