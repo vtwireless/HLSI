@@ -165,7 +165,9 @@ function update_plot(freq,band,gain,noise) {
 }
 
 // real-time plot
-var n = 60,
+var hist = 30,      // amount of history (seconds) to keep
+    dur  = 200,     // duration between transisions (ms)
+    n    = Math.round(hist*1000/dur), // number of samples to buffer
     data = d3.range(n).map(function(){ return 1; });
 
 var svg = d3.select("body").append("svg")
@@ -204,7 +206,7 @@ svg.append("g")
     .call(d3.axisLeft(yscale)
       .tickValues(yTickValues)
       .tickFormat(function(d, i) {
- 	let [s,u] = scale_units(d);
+        let [s,u] = scale_units(d);
         return d*s + u;
       }))
 
@@ -218,7 +220,7 @@ svg.append("g")
     .datum(data)
     .attr("class", "line")
   .transition()
-    .duration(500)
+    .duration(dur)
     .ease(d3.easeLinear)
     .on("start", tick);
 
@@ -241,11 +243,7 @@ svg.append("text")
 function tick() {
 
   // Push a new data point onto the back.
-  //console.log(cap);
   data.push(cap);
-
-  // update the domains
-  //y.domain([d3.min(data)/2, d3.max(data)*2]);
 
   // Redraw the line.
   d3.select(this)
@@ -261,7 +259,6 @@ function tick() {
 
   // Pop the old data point off the front.
   data.shift();
-
 }
 
 </script>
