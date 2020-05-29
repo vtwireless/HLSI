@@ -68,7 +68,7 @@ generator.beta = 1.5; // set filter window exponent (smaller shows more side-lob
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
-var pScale = d3.scaleLinear().domain([-50, 40]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-45, 15]).range([height, 0]);
 
 // d3's line generator
 var linef = d3.line()
@@ -114,6 +114,11 @@ function update_plot(freq,band,gain,noise) {
     if (band!=null) { bw = band; }
     if (gain!=null) { gn = gain; }
     if (noise!=null){ n0 = noise;}
+
+    // limit values to restrict signal to be within band edges
+    let f_limit = 0.46, f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
+    if (f_lower < -f_limit) { fc -= f_lower+f_limit; }
+    if (f_upper >  f_limit) { fc -= f_upper-f_limit; }
 
     document.querySelector('#fc').value = d3.format(".1f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
     document.querySelector('#frequency').value = fc;
