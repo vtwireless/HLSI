@@ -14,15 +14,9 @@
   <h2>Exercise - Gain</h2>
   <p><a href="index.html">[exercises]</a></p>
   <p>
-    <label for="ampl">Amplitude (linear)</label>
-    <input type="range" class="width-4" min="0.1" max="1.0" value="0.1" id="ampl" step="0.001"
-        oninput="update_plot(parseFloat(value),null)">
-    <output for="ampl" id="ac"></output>
-  </p>
-  <p>
     <label for="gain">Gain (dB)</label>
     <input type="range" class="width-4" min="-20" max="0" value="0.1" id="gain" step="0.001"
-        oninput="update_plot(null,parseFloat(value))">
+        oninput="update_plot(parseFloat(value))">
     <output for="gain" id="gn"></output>
   </p>
 </body>
@@ -55,7 +49,7 @@ var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_
 
 // 6. Y scale will use the randomly generate number
 var vScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
-var pScale = d3.scaleLinear().domain([-80, 30]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-80, 10]).range([height, 0]);
 
 // 7. d3's line generator
 var linet = d3.line()
@@ -97,14 +91,9 @@ var pathf = svgf.append("path")
 // set initial value
 update_plot();
 
-function update_plot(ampl,gain) {
+function update_plot(gain) {
     // set values accordingly
-    if (ampl==null && gain==null) { ac = 1; gn = 20*Math.log10(ac); }
-    if (ampl!=null) { ac = ampl; gn = 20*Math.log10(ac); }
     if (gain!=null) { gn = gain; ac = Math.pow(10.,gn/20.); }
-
-    document.querySelector('#ac').value = d3.format(".3f")(ac);
-    document.querySelector('#ampl').value = ac;
 
     document.querySelector('#gn').value = d3.format(".3f")(gn) + " dB";
     document.querySelector('#gain').value = gn;
