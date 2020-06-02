@@ -28,7 +28,7 @@
   </p>
   <p>
     <label for="bandwidth">Bandwidth</label>
-    <input class="width-3" type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.001"
+    <input class="width-3" type="range" min="0.05" max="0.9" value="0.1" id="bandwidth" step="0.001"
         oninput="update_plot(null,parseFloat(value),null,null)">
     <output for="bandwidth" id="bw">0.1</output>
   </p>
@@ -61,7 +61,8 @@ var margin = {top: 50, right: 50, bottom: 50, left: 70}
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var bw = 0.3, fc = 0.0, gn = -10.0, n0 = -40, sinr = 0, cap = 10;
+var bw = 0.10, fc = 0.0, gn = -10.0, n0 = -40, sinr = 0, cap = 10;
+var cap_avg = 0, cap_num = 0;
 var bw_int = 0.04231945, fc_int = -0.07221980, gn_int = 0; // interference values
 var nfft = 2048, generator = new siggen(nfft);
 generator.m = 60; // set filter semi-length
@@ -158,6 +159,8 @@ function update_plot(freq,band,gain,noise) {
 
     // compute and display capacity
     cap = fs * bw * Math.log2(1+Math.pow(10.,SINRdB/10.));
+    cap_num += 1;
+    cap_avg += cap;
     var [scale_cap,units_cap] = scale_units(cap,0.1);
     document.querySelector('#cap').value = d3.format(".1f")(cap*scale_cap) + " " + units_cap + "bps";
 
@@ -245,7 +248,9 @@ svg.append("text")
 function tick() {
 
   // Push a new data point onto the back.
-  data.push(cap);
+  data.push(cap_num == 0 ? cap : cap_avg / cap_num);
+  cap_num = 0;
+  cap_avg = 0;
 
   // Redraw the line.
   d3.select(this)
