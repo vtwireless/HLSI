@@ -126,6 +126,10 @@ function compute_interference()
     return (f1-f0)*Math.pow(10.,gn_int/10.)/bw_int;
 }
 
+// 'hop' interference around
+function hop() { fc_int = 0.97*(Math.random()-0.5)*(1-bw_int); update_plot(); }
+setInterval(hop, 100);
+
 function update_plot(freq,band,gain,noise) {
     if (freq !=null) { fc = freq;  }
     if (band !=null) { bw = band;  }
