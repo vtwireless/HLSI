@@ -150,8 +150,6 @@ function update_plot(freq,band,gain,noise) {
     var [scale_cap,units_cap] = scale_units(C,0.1);
     document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
 
-    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
-
     // generate power spectral density (compensating gain for bandwidth internally)
     dataf = generate_psd(fc,bw,gn,n0);
     pathf.datum(dataf).attr("d", linef);
