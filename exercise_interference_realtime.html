@@ -39,6 +39,12 @@
     <output for="gain" id="gn"></output>
   </p>
   <p>
+    <label for="hop_rate">Hop Rate</label>
+    <input class="width-3" type="range" min="0.5" max="20" value="0" id="hop_rate" step="0.01"
+        oninput="update_hop_rate(parseFloat(value))">
+    <output for="hop_rate" id="hr"></output>
+  </p>
+  <p>
     <label for="signal_to_int_noise_ratio">Signal to Interference &amp; Noise Ratio:  SINR = </label>
     <output for="signal_to_int_noise_ratio" id="sinr">0.2</output> dB
   </p>
@@ -62,6 +68,7 @@ var margin = {top: 50, right: 50, bottom: 50, left: 70}
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
 var bw = 0.10, fc = 0.0, gn = -10.0, n0 = -40, sinr = 0, cap = 10;
+var hop_dwell_time = 200;
 var cap_avg = 0, cap_num = 0;
 var bw_int = 0.04231945, fc_int = -0.07221980, gn_int = 0; // interference values
 var nfft = 2048, generator = new siggen(nfft);
@@ -128,8 +135,19 @@ function compute_interference()
 }
 
 // 'hop' interference around
+function update_hop_rate(rate)
+{
+    hop_dwell_time = 1000. / rate;
+    document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
+}
+update_hop_rate(0.5)
 function hop() { fc_int = 0.97*(Math.random()-0.5)*(1-bw_int); update_plot(); }
-setInterval(hop, 100);
+async function hop_interval() {
+  await new Promise((res, req) => { setTimeout(res, hop_dwell_time) })
+  hop()
+  hop_interval()
+}
+hop_interval();
 
 function update_plot(freq,band,gain,noise) {
     if (freq !=null) { fc = freq;  }
