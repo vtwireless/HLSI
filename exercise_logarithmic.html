@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Logarithmic Scale</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>HLSI Exercise - Logarithmic Scale</h2>
+  <p><a href="index.html">[exercises]</a></p>
+<!--
+  <p>
+  <input type="radio" id="linear" name="scale" value="linear">
+  <label for="linear">Linear</label><br>
+  <input type="radio" id="logarithmic" name="scale" value="logarithmic">
+  <label for="logarithmic">Logarithmic</label><br>
+  </p>
+-->
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+  , width  = 920 - margin.left - margin.right  // Use the window's width
+  , height = 400 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
+var m = 60, k=20, n = 2*k*m+1;  // filter semi-length, over-sampling rate, total length
+var signals = [
+    {'fc':-0.375, 'bw':0.1, 'gain':-60.0},
+    {'fc':-0.125, 'bw':0.1, 'gain':-40.0},
+    {'fc': 0.125, 'bw':0.1, 'gain':-20.0},
+    {'fc': 0.375, 'bw':0.1, 'gain':  0.0},]
+var nfft = 2048, generator = new siggen(nfft);
+generator.beta = 3;
+generator.m = m;
+
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
+var [scale_time,units_time] = scale_units(m/fs);        // time scale
+
+// 5. X scale will use the index of our data
+var tScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+
+// 6. Y scale will use the randomly generate number
+var vScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-90, 10]).range([height, 0]);
+
+// 7. d3's line generator
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+var datat = {};
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+
+// create SVG objects
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// 9. Append the path, bind the data, and call the line generator
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("d", linef);
+
+// set initial value
+update_plot();
+
+function update_plot() {
+    // generate power spectral density
+    generator.clear();
+    signals.forEach(function(s,i) { generator.add_signal(s.fc,s.bw,20*Math.log10(s.bw) + s.gain); })
+    generator.generate(-80);
+    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+    pathf.datum(dataf).attr("d", linef);
+}
+
+</script>
+
