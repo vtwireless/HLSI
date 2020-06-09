@@ -13,6 +13,7 @@
 <body>
   <h2>HLSI Exercise - Logarithmic Scale</h2>
   <p><a href="index.html">[exercises]</a></p>
+  <p><input id="toggle_button" type="button" value="" onclick="toggle()"></p>
 <!--
   <p>
   <input type="radio" id="linear" name="scale" value="linear">
@@ -51,12 +52,10 @@ var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
 var [scale_time,units_time] = scale_units(m/fs);        // time scale
 
 // 5. X scale will use the index of our data
-var tScale = d3.scaleLinear().domain([-scale_time*m/fs,scale_time*m/fs]).range([0, width]);
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
 
 // 6. Y scale will use the randomly generate number
-var vScale = d3.scaleLinear().domain([ -0.25,  1.1]).range([height, 0]);
-var pScale = d3.scaleLinear().domain([-90, 10]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([0, 1.2]).range([height, 0]);
 
 // 7. d3's line generator
 var linef = d3.line()
@@ -71,7 +70,7 @@ var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density");
 
 // clip paths
 svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
@@ -83,17 +82,45 @@ var pathf = svgf.append("path")
     .attr("class", "stroke-med no-fill stroke-red")
     .attr("d", linef);
 
-// set initial value
-update_plot();
+var linear = true;
+function toggle() {
+    if (linear) { show_logarithmic() }
+    else        { show_linear()      }
+}
+
+function show_linear() {
+    linear = true;
+    document.querySelector('#toggle_button').value = 'Show Logarithmic Scale';
+    update_plot();
+}
+
+function show_logarithmic() {
+    linear = false;
+    document.querySelector('#toggle_button').value = 'Show Linear Scale';
+    update_plot();
+}
 
 function update_plot() {
     // generate power spectral density
     generator.clear();
     signals.forEach(function(s,i) { generator.add_signal(s.fc,s.bw,20*Math.log10(s.bw) + s.gain); })
     generator.generate(-80);
-    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+
+    if (linear) {
+        dataf = d3.range(0,nfft-1).map(function(i) { return {"y": Math.pow(10,generator.psd[i]/10) } })
+		pScale.domain([0, 1.2]).range([height, 0]);
+    } else {
+        dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+		pScale.domain([-90, 10]).range([height, 0]);
+    }
     pathf.datum(dataf).attr("d", linef);
+
+	svgf.select(".y")
+        .transition(d3.transition().duration(500))
+        .call(d3.axisLeft(pScale));
 }
+
+show_linear();
 
 </script>
 
