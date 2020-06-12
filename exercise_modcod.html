@@ -32,20 +32,10 @@
     <output for="modcod" id="mc"></output>
   </p>
   <p>
-    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio:  SNR = </label>
-    <output for="signal_to_noise_ratio" id="snr"></output>
-  </p>
-  <p>
-    <label for="information_capacity">Information Capacity:  C = </label>
-    <output for="information_capacity" id="cap"></output>
-  </p>
-  <p>
-    <label for="link_margin">Link Margin = </label>
-    <output for="link_margin" id="margin"></output>
-  </p>
-  <p>
-    <label for="actual_rate">Actual Rate: R = </label>
-    <output for="actual_rate" id="rate"></output>
+    <label for="signal_to_noise_ratio">SNR:                 </label><output for="signal_to_noise_ratio" id="snr"></output>,
+    <label for="information_capacity">Information Capacity: </label><output for="information_capacity" id="cap"></output>,
+    <label for="link_margin">         Link Margin:          </label><output for="link_margin" id="margin"></output>,
+    <label for="actual_rate">         Actual Rate:          </label><output for="actual_rate" id="rate"></output>
   </p>
 </body>
 
@@ -58,11 +48,11 @@
 // 2. Use the margin convention practice
 var margin = {top: 50, right: 50, bottom: 50, left: 50}
   , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 480 - margin.top - margin.bottom; // Use the window's height
+  , height = 380 - margin.top - margin.bottom; // Use the window's height
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var bw = 0.1, fc = 0.0, gn = -10, mc = 3, n0 = -40, snr = 0, cap = 10;
+var bw = 0.15, fc = 0.0, gn = -3, mc = 8, n0 = -25, snr = 0, cap = 10;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
@@ -83,7 +73,7 @@ var schemes = [
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
-var pScale = d3.scaleLinear().domain([-45, 15]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-30, 15]).range([height, 0]);
 
 // d3's line generator
 var linef = d3.line()
@@ -156,9 +146,13 @@ function update_plot(band,gain,modcod) {
     if (margin_dB >= 0) {
         let rate = schemes[mc].rate * bw * fs;
         var [scale_rate,units_rate] = scale_units(rate,0.1);
-        document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps";
+        let percent_capacity = 100 * rate / C;
+        document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
+                                                d3.format(".1f")(percent_capacity) + "% capacity)";
+        document.querySelector('#rate').style.color = "black";
     } else {
         document.querySelector('#rate').value = "0 bps";
+        document.querySelector('#rate').style.color = "red";
     }
 
     // generate power spectral density, compensating for bandwidth
