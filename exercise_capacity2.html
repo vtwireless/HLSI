@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Information Capacity (2)</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>Exercise - Information Capacity (2)</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  <p>
+    <label for="bandwidth">Bandwidth</label>
+    <input class="width-3" type="range" min="0.1" max="0.95" value="0.1" id="bandwidth" step="0.001"
+        oninput="update_plot(null,parseFloat(value),null,null)">
+    <output for="bandwidth" id="bw">0.1</output>
+  </p>
+  <p>
+    <label for="gain">Signal Gain</label>
+    <input class="width-3" type="range" min="-40" max="0" value="0" id="gain" step="0.01"
+        oninput="update_plot(null,null,parseFloat(value),null)">
+    <output for="gain" id="gn"></output>
+  </p>
+  <p>
+    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio:  SNR = </label>
+    <output for="signal_to_noise_ratio" id="snr"></output>
+  </p>
+  <p>
+    <label for="information_capacity">Information Capacity:  C = </label>
+    <output for="information_capacity" id="cap"></output>
+  </p>
+  <ol>
+    <li>What combination of parameters (frequency, bandwidth, gain, noise level) maximize the SNR?</li>
+    <li>What combination of parameters maximize information capacity? Do these correspond to the maximum SNR?</li>
+    <li>What effect does center frequency have on SNR and capacity?</li>
+  </ol>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
+var bw = 0.2, fc = 0.0, gn = -20, n0 = -30, snr = 0, cap = 10;
+var nfft = 2048, generator = new siggen(nfft);
+generator.m    = 40;  // set filter semi-length
+generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
+
+// determine scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-35, 15]).range([height, 0]);
+
+// d3's line generator
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+
+// create SVG objects
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// 9. Append the path, bind the data, and call the line generator
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("d", linef);
+
+// set initial value
+update_plot();
+
+// generate power spectral density
+function generate_psd(f,w,g,n) {
+    // update generator
+    generator.clear();
+    // add signal with gain compensating for signal bandwidth
+    generator.add_signal(f,w,g + 10*Math.log10(w));
+    //generator.add_noise(n); // add random noise samples
+    generator.generate(n); // generate with specific noise floor
+    //console.log(psd);
+    return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+}
+
+function update_plot(freq,band,gain,noise) {
+    if (band!=null) { bw = band; }
+    if (gain!=null) { gn = gain; }
+
+    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
+    document.querySelector('#bandwidth').value = bw;
+
+    document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
+    document.querySelector('#gain').value = gn;
+
+    // compute and display SNR
+    let SNRdB = gn - n0 - 10*Math.log10(bw);
+    document.querySelector('#snr').value = d3.format(".2f")(SNRdB) + " dB";
+
+    // compute and display capacity
+    let C = fs * bw * Math.log2(1+Math.pow(10.,SNRdB/10.));
+    var [scale_cap,units_cap] = scale_units(C,0.1);
+    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
+
+    // generate power spectral density, compensating for bandwidth
+    dataf = generate_psd(fc,bw,gn,n0);
+    pathf.datum(dataf).attr("d", linef);
+}
+
+// channel capacity (b/s/Hz) given SNR in dB
+function capacity(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
+
+// capacity plot
+// (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
+// (-10, 400e3),  (40 dB, 400e6)    full range
+var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":capacity(d)} })
+console.log(datac);
+
+var svgc = d3.select("body").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top +  margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// create scale
+var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
+var cscale = d3.scaleLog   ().domain([0.1, 20]).range([height, 0]); // capacity (b/s/Hz)
+
+svgc.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svgc.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(sscale));
+
+var yTickValues = [0.1,0.2,0.5,1,2,5,10,20]
+svgc.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(cscale)
+      .tickValues(yTickValues)
+      .tickFormat(function(d, i) {
+        let [s,u] = scale_units(d);
+        s = 1e-6; u = 'M';
+        s = 1; u = '';
+        return d*s + u;
+      }))
+
+// grid lines
+svgc.append("g").attr("class","grid").call(d3.axisBottom(sscale).tickFormat("").tickSize(height));
+svgc.append("g").attr("class","grid").call(d3.axisLeft  (cscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
+
+// create x-axis axis label
+svgc.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+   .text("SNR (dB)")
+
+// create y-axis label
+svgc.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 0 - margin.left)
+   .attr("x", 0 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+   .text("Capacity (bits/second/Hz)")
+
+// clip paths
+svgc.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// line generator
+var linec = d3.line()
+    .x(function(d, i) { return sscale(d.x); })  // map SNR
+    .y(function(d)    { return cscale(d.y); }); // map capacity
+
+// 9. Append the path, bind the data, and call the line generator
+var pathc = svgc.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(datac)
+    .attr("class", "stroke-med no-fill stroke-green")
+    .attr("d", linec);
+
+</script>
+</html>
+
