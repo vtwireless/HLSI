@@ -1,6 +1,7 @@
 /* TODO: only apply to axis labels? */
 svg * { font: 12px Arial; }
 
+/* #69b3a2 : light green */
 /* Style the lines by removing the fill and applying a stroke */
 .no-fill        { fill: none; }
 .no-display     { display: none; }

@@ -47,7 +47,7 @@
 <script>
 
 // 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 50}
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
   , width  = 720 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
@@ -87,9 +87,6 @@ var pathf = svgf.append("path")
     .attr("class", "stroke-med no-fill stroke-red")
     .attr("d", linef);
 
-// set initial value
-update_plot();
-
 // generate power spectral density
 function generate_psd(f,w,g,n) {
     // update generator
@@ -102,42 +99,17 @@ function generate_psd(f,w,g,n) {
     return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
 }
 
-function update_plot(freq,band,gain,noise) {
-    if (band!=null) { bw = band; }
-    if (gain!=null) { gn = gain; }
-
-    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
-    document.querySelector('#bandwidth').value = bw;
-
-    document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
-    document.querySelector('#gain').value = gn;
-
-    // compute and display SNR
-    let SNRdB = gn - n0 - 10*Math.log10(bw);
-    document.querySelector('#snr').value = d3.format(".2f")(SNRdB) + " dB";
-
-    // compute and display capacity
-    let C = fs * bw * Math.log2(1+Math.pow(10.,SNRdB/10.));
-    var [scale_cap,units_cap] = scale_units(C,0.1);
-    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
-
-    // generate power spectral density, compensating for bandwidth
-    dataf = generate_psd(fc,bw,gn,n0);
-    pathf.datum(dataf).attr("d", linef);
-}
-
 // channel capacity (b/s/Hz) given SNR in dB
-function capacity(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
+function efficiency(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
 
-// capacity plot
+// capacity curve
 // (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
-// (-10, 400e3),  (40 dB, 400e6)    full range
-var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":capacity(d)} })
-console.log(datac);
+var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} })
 
 var svgc = d3.select("body").append("svg")
     .attr("width",  width  + margin.left + margin.right)
     .attr("height", height + margin.top +  margin.bottom)
+    .attr("id", "svg-capacity")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -191,7 +163,7 @@ svgc.append("text")
 // clip paths
 svgc.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
-// line generator
+// line generator for capacity curve
 var linec = d3.line()
     .x(function(d, i) { return sscale(d.x); })  // map SNR
     .y(function(d)    { return cscale(d.y); }); // map capacity
@@ -200,8 +172,54 @@ var linec = d3.line()
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
-    .attr("class", "stroke-med no-fill stroke-green")
+    .attr("class", "stroke-light no-fill stroke-green")
     .attr("d", linec);
+
+// add operating ponit
+svgc.append('g')
+    .selectAll("dot")
+    .data( [{"x":0, "y":efficiency(0)}] )
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return sscale(d.x); } )
+      .attr("cy", function (d) { return cscale(d.y); } )
+      .attr("r", 5)
+      .attr("class", "stroke-light stroke-green")
+      .style("fill", "#cccccc");
+
+function update_plot(freq,band,gain,noise) {
+    if (band!=null) { bw = band; }
+    if (gain!=null) { gn = gain; }
+
+    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
+    document.querySelector('#bandwidth').value = bw;
+
+    document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
+    document.querySelector('#gain').value = gn;
+
+    // compute and display SNR
+    let SNRdB = gn - n0 - 10*Math.log10(bw);
+    document.querySelector('#snr').value = d3.format(".2f")(SNRdB) + " dB";
+
+    // compute and display capacity
+    let R = efficiency(SNRdB);  // spectral efficiency (b/s/Hz)
+    let C = fs * bw * R;        // capacity (b/s)
+    var [scale_cap,units_cap] = scale_units(C,0.1);
+    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
+
+    // generate power spectral density, compensating for bandwidth
+    dataf = generate_psd(fc,bw,gn,n0);
+    pathf.datum(dataf).attr("d", linef);
+
+    // update capacity value
+    d3.selectAll("#svg-capacity circle")
+      .data( [{"x":SNRdB, "y":R}] )
+      .attr("cx", function(d) { return sscale(d.x); })
+      .attr("cy", function(d) { return cscale(d.y); });
+}
+
+// set initial value
+update_plot();
 
 </script>
 </html>
