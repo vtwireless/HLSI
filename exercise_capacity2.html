@@ -26,17 +26,13 @@
     <output for="gain" id="gn"></output>
   </p>
   <p>
-    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio:  SNR = </label>
-    <output for="signal_to_noise_ratio" id="snr"></output>
-  </p>
-  <p>
-    <label for="information_capacity">Information Capacity:  C = </label>
-    <output for="information_capacity" id="cap"></output>
+    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio: </label><output for="signal_to_noise_ratio" id="snr" class="text-bold"></output>,
+    <label for="information_capacity">Information Capacity:   </label><output for="information_capacity"  id="cap" class="text-bold"></output>,
+    <label for="spectral_efficiency">Spectral Efficiency:     </label><output for="spectral_efficiency"   id="eta" class="text-bold"></output>
   </p>
   <ol>
-    <li>What combination of parameters (frequency, bandwidth, gain, noise level) maximize the SNR?</li>
+    <li>What combination of parameters (bandwidth, gain) maximize the SNR?</li>
     <li>What combination of parameters maximize information capacity? Do these correspond to the maximum SNR?</li>
-    <li>What effect does center frequency have on SNR and capacity?</li>
   </ol>
 </body>
 
@@ -201,11 +197,12 @@ function update_plot(freq,band,gain,noise) {
     let SNRdB = gn - n0 - 10*Math.log10(bw);
     document.querySelector('#snr').value = d3.format(".2f")(SNRdB) + " dB";
 
-    // compute and display capacity
+    // compute and display spectral efficiency, capacity
     let R = efficiency(SNRdB);  // spectral efficiency (b/s/Hz)
     let C = fs * bw * R;        // capacity (b/s)
     var [scale_cap,units_cap] = scale_units(C,0.1);
-    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
+    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "b/s";
+    document.querySelector('#eta').value = d3.format(".3f")(R) + " " + "b/s/Hz";
 
     // generate power spectral density, compensating for bandwidth
     dataf = generate_psd(fc,bw,gn,n0);
