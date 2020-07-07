@@ -132,7 +132,8 @@ var svgc = d3.select("body").append("svg")
 
 // create scale
 var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
-var cscale = d3.scaleLog   ().domain([0.1, 20]).range([height, 0]); // capacity (b/s/Hz)
+var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
+//.domain([schemes[0].rate, schemes[schemes.length-1].rate])
 
 svgc.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -145,17 +146,15 @@ svgc.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(sscale));
 
-var yTickValues = [0.1,0.2,0.5,1,2,5,10,20]
+//var yTickValues = [0.1,0.2,0.5,1,2,5,10,20]
+var yTickValues = [];
+schemes.forEach(function(d,i) { yTickValues.push(d.rate); });
+
 svgc.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(cscale)
       .tickValues(yTickValues)
-      .tickFormat(function(d, i) {
-        let [s,u] = scale_units(d);
-        s = 1e-6; u = 'M';
-        s = 1; u = '';
-        return d*s + u;
-      }))
+        .tickFormat(function(d) { return d3.format(".2f")(d); } ))
 
 // grid lines
 svgc.append("g").attr("class","grid").call(d3.axisBottom(sscale).tickFormat("").tickSize(height));
