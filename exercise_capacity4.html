@@ -179,16 +179,25 @@ svgc.append("text")
 // clip paths
 svgc.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
-// line generator for capacity curve
+// line generator for capacity, mod/cod curves
 var linec = d3.line()
-    .x(function(d, i) { return sscale(d.x); })  // map SNR
-    .y(function(d)    { return cscale(d.y); }); // map capacity
+    .x(function(d) { return sscale(d.x); })  // map SNR
+    .y(function(d) { return cscale(d.y); }); // map capacity
 
 // 9. Append the path, bind the data, and call the line generator
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
     .attr("class", "stroke-light no-fill stroke-green")
+    .attr("d", linec);
+
+// 9. Append the path, bind the data, and call the line generator
+var datam = d3.range(schemes.length)
+              .map(function(d,i) { return {"x":schemes[i].SNR, "y":schemes[i].rate} });
+var pathc = svgc.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(datam)
+    .attr("class", "stroke-light no-fill stroke-green dashed")
     .attr("d", linec);
 
 // add operating ponit
