@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title>HLSI Exercise - Information Capacity (3)</title>
+  <title>HLSI Exercise - Information Capacity (6)</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <meta name="author" content=""/>
@@ -11,29 +11,28 @@
 </head>
 
 <body>
-  <h2>Exercise - Information Capacity (2)</h2>
+  <h2>Exercise - Information Capacity (6)</h2>
   <p><a href="index.html">[exercises]</a></p>
-  <p>
-    <label for="bandwidth">Bandwidth</label>
-    <input class="width-3" type="range" min="0.1" max="0.95" value="0.1" id="bandwidth" step="0.001"
-        oninput="update_plot(null,parseFloat(value),null,null)">
-    <output for="bandwidth" id="bw">0.1</output>
-  </p>
+  <p>Move the sliders to trace out the empirical capacity boundary.</p>
   <p>
     <label for="gain">Signal Gain</label>
     <input class="width-3" type="range" min="-40" max="0" value="0" id="gain" step="0.01"
-        oninput="update_plot(null,null,parseFloat(value),null)">
+        oninput="update_plot(parseFloat(value),null)">
     <output for="gain" id="gn"></output>
   </p>
   <p>
-    <label for="signal_to_noise_ratio">Signal-to-Noise Ratio: </label><output for="signal_to_noise_ratio" id="snr" class="text-bold"></output>,
-    <label for="information_capacity">Information Capacity:   </label><output for="information_capacity"  id="cap" class="text-bold"></output>,
-    <label for="spectral_efficiency">Spectral Efficiency:     </label><output for="spectral_efficiency"   id="eta" class="text-bold"></output>
+    <label for="modcod">Mod./Coding</label>
+    <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
+        oninput="update_plot(null,parseInt(value))">
+    <output for="modcod" id="mc"></output>
   </p>
-  <ol>
-    <li>What combination of parameters (bandwidth, gain) maximize the SNR?</li>
-    <li>What combination of parameters maximize information capacity? Do these correspond to the maximum SNR?</li>
-  </ol>
+  <p>
+    <label for="signal_to_noise_ratio">SNR:       </label><output for="signal_to_noise_ratio" id="snr"    class="text-bold"></output>,
+    <label for="information_capacity">Capacity:   </label><output for="information_capacity"  id="cap"    class="text-bold"></output>,
+    <label for="spectral_efficiency">Spect. Eff.: </label><output for="spectral_efficiency"   id="eta"    class="text-bold"></output>
+    <label for="link_margin">Margin:              </label><output for="link_margin"           id="margin" class="text-bold"></output>,
+    <label for="actual_rate">Actual Rate:         </label><output for="actual_rate"           id="rate"   class="text-bold"></output>
+  </p>
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -49,10 +48,23 @@ var margin = {top: 10, right: 50, bottom: 50, left: 50}
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var bw = 0.2, fc = 0.0, gn = -20, n0 = -30, snr = 0, cap = 10;
+var bw = 0.25, fc = 0.0, gn = -10, mc = 6, n0 = -30, snr = 0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
+var schemes = [
+    {'rate':0.50000, 'SNR': 3.979, 'name':'r1/2 BPSK'},
+    {'rate':0.66667, 'SNR': 5.703, 'name':'r2/3 BPSK'},
+    {'rate':1.00000, 'SNR': 7.109, 'name':'r1/2 QPSK'},
+    {'rate':1.33333, 'SNR': 8.782, 'name':'r2/3 QPSK'},
+    {'rate':1.77778, 'SNR':10.202, 'name':'r8/9 QPSK'},
+    {'rate':2.66667, 'SNR':15.036, 'name':'r2/3 16-QAM'},
+    {'rate':3.55556, 'SNR':16.747, 'name':'r8/9 16-QAM'},
+    {'rate':4.44444, 'SNR':20.970, 'name':'r8/9 32-QAM'},
+    {'rate':5.33333, 'SNR':22.920, 'name':'r8/9 64-QAM'},
+    {'rate':6.22222, 'SNR':26.797, 'name':'r8/9 128-QAM'},
+    {'rate':7.11111, 'SNR':28.570, 'name':'r8/9 256-QAM'},
+    {'rate':8.00000, 'SNR':31.050, 'name':'uncoded 256-QAM'}]
 
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
@@ -100,8 +112,7 @@ function efficiency(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
 
 // capacity curve
 // (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
-var num_cap = 200;
-var datac = [] //d3.range(num_cap).map(function(d,i) { return {"x":Math.random()*10, "y":Math.random()*1e6} })
+var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} })
 
 var svgc = d3.select("body").append("svg")
     .attr("width",  width  + margin.left + margin.right)
@@ -112,7 +123,8 @@ var svgc = d3.select("body").append("svg")
 
 // create scale
 var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
-var cscale = d3.scaleLog   ().domain([400e3, 400e6]).range([height, 0]); // capacity (b/s)
+var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
+//.domain([schemes[0].rate, schemes[schemes.length-1].rate])
 
 svgc.append("defs").append("clipPath")
     .attr("id", "clip")
@@ -125,15 +137,15 @@ svgc.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(sscale));
 
-var yTickValues = [400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+//var yTickValues = [0.1,0.2,0.5,1,2,5,10,20]
+var yTickValues = [];
+schemes.forEach(function(d,i) { yTickValues.push(d.rate); });
+
 svgc.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(cscale)
       .tickValues(yTickValues)
-      .tickFormat(function(d, i) {
-        let [s,u] = scale_units(d);
-        return d*s + u;
-      }))
+        .tickFormat(function(d) { return d3.format(".2f")(d); } ))
 
 // grid lines
 svgc.append("g").attr("class","grid").call(d3.axisBottom(sscale).tickFormat("").tickSize(height));
@@ -153,12 +165,12 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
-   .text("Capacity (bits/second)")
+   .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths
 svgc.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
-// line generator for capacity curve
+// line generator for capacity, mod/cod curves
 var linec = d3.line()
     .x(function(d) { return sscale(d.x); })  // map SNR
     .y(function(d) { return cscale(d.y); }); // map capacity
@@ -170,27 +182,49 @@ var pathc = svgc.append("path")
     .attr("class", "stroke-light no-fill stroke-green")
     .attr("d", linec);
 
+// 9. Append the path, bind the data, and call the line generator
+var datam = d3.range(schemes.length)
+              .map(function(d,i) { return {"x":schemes[i].SNR, "y":schemes[i].rate} });
+var pathc = svgc.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(datam)
+    .attr("class", "stroke-light no-fill stroke-green dashed")
+    .attr("d", linec);
+
+// empirical capacity curve
+var datae = []
+svgc.append('g')
+    .selectAll("dot")
+      .data([{"x":10, "y":5}])
+    .enter().append("ellipse")
+      .attr("cx", function (d) { return sscale(d.x); } )
+      .attr("cy", function (d) { return cscale(d.y); } )
+      .attr("rx", 4)
+      .attr("ry", 4)
+      .attr("class", "stroke-light stroke-blue")
+      .style("fill", "#cccccc");
+
 // add operating point
 svgc.append('g')
     .selectAll("dot")
-    .data( [{"x":0, "y":1e6}] )
-    .enter()
-    .append("circle")
+      .data( [{"x":0, "y":efficiency(0)}] )
+    .enter().append("circle")
       .attr("cx", function (d) { return sscale(d.x); } )
       .attr("cy", function (d) { return cscale(d.y); } )
       .attr("r", 5)
       .attr("class", "stroke-light stroke-green")
       .style("fill", "#cccccc");
 
-function update_plot(freq,band,gain,noise) {
-    if (band!=null) { bw = band; }
-    if (gain!=null) { gn = gain; }
-
-    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
-    document.querySelector('#bandwidth').value = bw;
+var counter=0;
+function update_plot(gain,modcod) {
+    if (gain !=null) { gn = gain;  }
+    if (modcod!=null){ mc = modcod;}
 
     document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
     document.querySelector('#gain').value = gn;
+
+    document.querySelector('#mc').value = schemes[mc].name + " (" + d3.format(".3f")(schemes[mc].rate) + " b/s/Hz)"
+    document.querySelector('#modcod').value = mc;
 
     // compute and display SNR
     let SNRdB = gn - n0 - 10*Math.log10(bw);
@@ -203,21 +237,55 @@ function update_plot(freq,band,gain,noise) {
     document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "b/s";
     document.querySelector('#eta').value = d3.format(".3f")(R) + " " + "b/s/Hz";
 
+    // compute and display link margin
+    let margin_dB = SNRdB - schemes[mc].SNR;
+    document.querySelector('#margin').value = d3.format(".2f")(margin_dB) + " dB";
+    document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "black";
+
+    // compute and display actual data rate
+    let valid = margin_dB >= 0;
+    if (valid) {
+        rate = schemes[mc].rate * bw * fs;
+        var [scale_rate,units_rate] = scale_units(rate,0.1);
+        let percent_capacity = 100 * rate / C;
+        document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
+                                                d3.format(".1f")(percent_capacity) + "% capacity)";
+        document.querySelector('#rate').style.color = "black";
+    } else {
+        rate = 0;
+        document.querySelector('#rate').value = "0 bps";
+        document.querySelector('#rate').style.color = "red";
+    }
+
     // generate power spectral density, compensating for bandwidth
     dataf = generate_psd(fc,bw,gn,n0);
     pathf.datum(dataf).attr("d", linef);
 
-    datac.pop();
-    while (datac.length < num_cap) {
-        datac.unshift( {"x":SNRdB, "y":C} );
-    }
-    pathc.datum(datac).attr("d", linec);
-
     // update capacity value
     d3.selectAll("#svg-capacity circle")
-      .data( [{"x":SNRdB, "y":C}] )
+      .data( [{"x":SNRdB, "y":R}] )
       .attr("cx", function(d) { return sscale(d.x); })
-      .attr("cy", function(d) { return cscale(d.y); });
+      .attr("cy", function(d) { return cscale(schemes[mc].rate); })
+      .attr("class", valid ? "stroke-med stroke-green" : "stroke-med stroke-red")
+
+    if (gain !=null) {
+        counter += 1;
+        if (counter==50) {
+            counter = 0;
+            // update capacity value
+            datae.push({"x":SNRdB, "y":R})
+            console.log(datae)
+            console.log(d3.selectAll("ellipse"))
+            d3.selectAll("ellipse")
+              .data(datae)
+            .enter().append("ellipse")
+              .attr("cx", function(d) { return sscale(d.x); })
+              .attr("cy", function(d) { return cscale(d.y); })
+              .attr("rx", 2)
+              .attr("ry", 2)
+              .attr("class", "stroke-med stroke-green")
+        }
+    }
 }
 
 // set initial value
