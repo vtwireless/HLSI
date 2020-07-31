@@ -28,8 +28,9 @@
     <label for="actual_rate">Actual Rate:         </label><output for="actual_rate"           id="rate"   class="text-bold"></output>
   </p>
   <p>
-    <label for="time_left">Time Left:   </label><output for="time_left"  id="timer" class="text-bold"></output>,
-    <label for="total_bits">Total Bits: </label><output for="total_bits" id="bits"  class="text-bold"></output>
+    <label for="time_left"> Time Left:  </label><output for="time_left"  id="timer"   class="text-bold"></output>,
+    <label for="outages">   Outages:    </label><output for="outages"    id="outages" class="text-bold"></output>,
+    <label for="total_bits">Total Bits: </label><output for="total_bits" id="bits"    class="text-bold"></output>
   </p>
 </body>
 
@@ -46,7 +47,7 @@ var margin = {top: 10, right: 50, bottom: 50, left: 50}
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var bw = 0.2, fc = 0.0, gn = -20, mc = 0, n0 = -30, snr = 0;
+var bw = 0.2, fc = 0.0, gn = -20, mc = 0, n0 = -30, snr = 0, rate = 0, valid = false;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
@@ -226,7 +227,7 @@ function update_plot(band,gain,modcod) {
     document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "black";
 
     // compute and display actual data rate
-    let valid = margin_dB >= 0;
+    valid = margin_dB >= 0;
     if (valid) {
         rate = schemes[mc].rate * bw * fs;
         var [scale_rate,units_rate] = scale_units(rate,0.1);
@@ -253,13 +254,17 @@ function update_plot(band,gain,modcod) {
 }
 
 // restart simulation
-var counter=0, bits=0, runtime=30, step_dwell_time=50;
+var counter=0, bits=0, outages=0, runtime=30, step_dwell_time=50;
 var num_steps = Math.round(runtime * 1000 / step_dwell_time);
 function reset() {
-    mc = schemes.length - 1;
+    mc = Math.max(0,schemes.length - 3);
     [gn,bw] = gn_bw_profile(0);
     counter = num_steps;
     bits  = 0;
+    outages = 0;
+    document.querySelector('#bits').value    = d3.format(",")(bits);
+    document.querySelector('#outages').value = d3.format(",")(outages);
+    document.querySelector('#timer').value   = d3.format(",")(counter);
 }
 
 function restart() {
@@ -294,12 +299,15 @@ function step() {
 
     update_plot();
     bits += Math.round(rate * step_dwell_time * 1e-3);
-    document.querySelector('#bits').value  = d3.format(",")(bits);
-    document.querySelector('#timer').value = d3.format(",")(counter);
+    outages += valid ? 0 : 1;
+    document.querySelector('#bits').value    = d3.format(",")(bits);
+    document.querySelector('#outages').value = d3.format(",")(outages);
+    document.querySelector('#timer').value   = d3.format(",")(counter);
 }
 
 function finished() {
     document.querySelector('#bits').style.color = "#008040";
+    document.querySelector('#outages').style.color = outages > 0 ? "#800000" : "#008040";
 }
 
 // set initial values and replot
