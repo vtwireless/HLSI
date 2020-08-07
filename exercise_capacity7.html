@@ -69,6 +69,11 @@ var schemes = [
     {'rate':6.22222, 'SNR':26.797, 'name':'r8/9 128-QAM'},
     {'rate':7.11111, 'SNR':28.570, 'name':'r8/9 256-QAM'},
     {'rate':8.00000, 'SNR':31.050, 'name':'uncoded 256-QAM'}]
+// simulation properties
+var counter=0, bits=0, outages=0, runtime=30, step_dwell_time=50;
+var num_steps = Math.round(runtime * 1000 / step_dwell_time);
+
+var running = false;
 
 // determine scale/units
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
@@ -110,6 +115,84 @@ function generate_psd(f,w,g,n) {
     //console.log(psd);
     return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
 }
+
+//
+// historical rate plot
+//
+var datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} })
+var svgr = d3.select("body").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top +  margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
+var rscale = d3.scaleLog   ().domain([40e3, 400e6]).range([height, 0]);
+var liner = d3.line()
+    .x(function(d, i) { return tscale(i);   })
+    .y(function(d, i) { return rscale(d.y); });
+
+svgr.append("defs").append("clipPath")
+    .attr("id", "clipr")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svgr.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(tscale));
+
+var rtickvalues = [100e3,200e3,400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+svgr.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(rscale)
+      .tickValues(rtickvalues)
+      .tickFormat(function(d, i) {
+        let [s,u] = scale_units(d);
+        return d*s + u;
+      }))
+
+// grid lines
+svgr.append("g").attr("class","grid").call(d3.axisBottom(tscale).tickFormat("").tickSize(height));
+svgr.append("g").attr("class","grid").call(d3.axisLeft  (rscale).tickFormat("").tickSize(-width).tickValues(rtickvalues));
+
+/*
+svgr.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+  .transition()
+    .duration(dur)
+    .ease(d3.easeLinear)
+    .on("start", tick);
+*/
+
+// create x-axis axis label
+svgr.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+   .text("Time Step")
+
+// create y-axis label
+svgr.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 0 - margin.left)
+   .attr("x", 0 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+   .text("Capacity (bits/second)")
+
+// 9. Append the path, bind the data, and call the line generator
+var pathr = svgr.append("path")
+    .attr("clip-path","url(#clipr)")
+    .datum(datar)
+    .attr("class", "stroke-med no-fill stroke-blue")
+    .attr("d", liner);
+
+//
+// capacity plot
+//
 
 // channel capacity (b/s/Hz) given SNR in dB
 function efficiency(SNRdB) { return Math.log2(1.0 + Math.pow(10,SNRdB/10)); }
@@ -180,7 +263,7 @@ var linec = d3.line()
     .y(function(d) { return cscale(d.y); }); // map capacity
 
 // 9. Append the path, bind the data, and call the line generator
-var pathc = svgc.append("path")
+svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
     .attr("class", "stroke-light no-fill stroke-green")
@@ -189,7 +272,7 @@ var pathc = svgc.append("path")
 // 9. Append the path, bind the data, and call the line generator
 var datam = d3.range(schemes.length)
               .map(function(d,i) { return {"x":schemes[i].SNR, "y":schemes[i].rate} });
-var pathc = svgc.append("path")
+svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datam)
     .attr("class", "stroke-light no-fill stroke-green dashed")
@@ -255,11 +338,6 @@ function update_plot(band,gain,modcod) {
       .attr("class", valid ? "stroke-med stroke-green" : "stroke-med stroke-red")
 }
 
-// restart simulation
-var counter=0, bits=0, outages=0, runtime=30, step_dwell_time=50;
-var num_steps = Math.round(runtime * 1000 / step_dwell_time);
-
-var running = false;
 function toggle() {
     if (running) { stop()    }
     else         { restart() }
@@ -285,6 +363,7 @@ function stop() {
 }
 
 function reset() {
+    datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} });
     mc = Math.max(0,schemes.length - 3);
     [gn,bw] = gn_bw_profile(0);
     counter = num_steps;
@@ -330,6 +409,13 @@ function step() {
     counter -= 1;
 
     update_plot();
+
+    // update historical plot
+    datar.push({"y":Math.max(rate,1)});
+    datar.shift();
+    pathr.datum(datar).attr("d", liner);
+
+    // update counters
     bits += Math.round(rate * step_dwell_time * 1e-3);
     outages += valid ? 0 : 1;
     document.querySelector('#bits').value    = d3.format(",")(bits);
