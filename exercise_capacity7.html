@@ -14,16 +14,26 @@
   <h2>Exercise - Information Capacity (5)</h2>
   <p><a href="index.html">[exercises]</a></p>
   <p><label for="userfunction">
-      Write a function to return the index of modulation/coding scheme
+      Fill out a function to return the index of modulation/coding scheme
       selection based on SNR, link margin, etc. here
       (valid return values are integers in the range 0 through 11):
   </label></p>
   <p><tt>function callback(timer,modcod,current,SNR,lmargin,closed) {</tt></p>
-  <p><textarea id="userfunction" name="userfunction" rows="12" cols="48"
+  <p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
       maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
       placeholder="return 0;">return 0;</textarea></p>
   <p><tt>}</tt></p>
-  <p><input type="submit" id="toggle" value="Go!" onclick="toggle()"></p>
+  <p><input type="submit" id="toggle" value="Go!" onclick="toggle()">&nbsp;
+  <label for="strategy" hidden>Select pre-configured strategy:</label>
+  <select id="strategy" onchange="populateCallback()">
+    <option value="" selected disabled hidden>Select pre-configured strategy...</option>
+    <option value="a0">Fixed modulation/coding scheme</option>
+    <option value="a1">Random selection</option>
+    <option value="a2">Check if link is closed</option>
+    <option value="a3">Check link margin</option>
+    <option value="a4">Find best scheme</option>
+  </select>
+  </p>
   <p>
     <label for="signal_to_noise_ratio">SNR:       </label><output for="signal_to_noise_ratio" id="snr"    class="text-bold"></output>,
     <label for="information_capacity">Capacity:   </label><output for="information_capacity"  id="cap"    class="text-bold"></output>,
@@ -341,6 +351,32 @@ function update_plot(band,gain,modcod) {
 function toggle() {
     if (running) { stop()    }
     else         { restart() }
+}
+
+function populateCallback() {
+    let selection = document.getElementById("strategy").value;
+    let u = 'return 0;'
+    switch (selection) {
+    case 'a0': u = 'return 4;'; break;
+    case 'a1': u = 'return 11*Math.random();'; break;
+    case 'a2': u = 'return closed ? current+1 : current-1;'; break;
+    case 'a3':
+        u  = '// check current link margin and adjust scheme appropriately\n';
+        u += 'if      (lmargin > 4) { return current+1; }\n';
+        u += 'else if (lmargin > 1) { return current;   }\n';
+        u += 'else                  { return current-1; }\n';
+        break;
+    case 'a4':
+        u  = '// find highest scheme that will close for given SNR\n';
+        u += 'for (let i=modcod.length-1; i>=0; i--) {\n';
+        u += '  if (modcod[i].SNR <= SNR) { return i; }\n';
+        u += '}\n';
+        u += 'return 0;';
+        break;
+    default:
+        return;
+    }
+    document.querySelector('#userfunction').value = u;
 }
 
 function restart() {
