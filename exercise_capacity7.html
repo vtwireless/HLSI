@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <h2>Exercise - Information Capacity (5)</h2>
+  <h2>Exercise - Information Capacity (7)</h2>
   <p><a href="index.html">[exercises]</a></p>
   <p><label for="userfunction">
       Fill out a function to return the index of modulation/coding scheme
@@ -137,7 +137,7 @@ var svgr = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
-var rscale = d3.scaleLog   ().domain([40e3, 400e6]).range([height, 0]);
+var rscale = d3.scaleLog   ().domain([400e3, 400e6]).range([height, 0]);
 var liner = d3.line()
     .x(function(d, i) { return tscale(i);   })
     .y(function(d, i) { return rscale(d.y); });
@@ -153,7 +153,7 @@ svgr.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(tscale));
 
-var rtickvalues = [100e3,200e3,400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+var rtickvalues = [400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
 svgr.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(rscale)
@@ -191,7 +191,7 @@ svgr.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
-   .text("Capacity (bits/second)")
+   .text("Data Rate (bits/second)")
 
 // 9. Append the path, bind the data, and call the line generator
 var pathr = svgr.append("path")
