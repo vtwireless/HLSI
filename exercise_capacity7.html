@@ -400,7 +400,7 @@ function stop() {
 
 function reset() {
     datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} });
-    mc = Math.max(0,schemes.length - 3);
+    mc = 0;
     [gn,bw] = gn_bw_profile(0);
     counter = num_steps;
     bits  = 0;
