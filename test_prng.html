@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>PRNG Example</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+</head>
+
+<body>
+<p>Console should look like:</p>
+<pre>
+0.03515625
+0.31640625
+0.62890625
+0.25390625
+0.171875
+0.515625
+0.51171875
+0.20703125
+0.30078125
+0.91796875
+resetting...
+0.03515625
+0.31640625
+0.62890625
+<pre>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="support.js"></script>
+<script>
+
+gen = new prng_bbs();
+
+for (let i=0; i<10; i++) {
+    console.log(gen.step());
+}
+console.log('resetting...')
+gen.reset();
+for (let i=0; i<10; i++) {
+    console.log(gen.step());
+}
+
+</script>
+</html>
+

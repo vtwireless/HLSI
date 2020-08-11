@@ -186,3 +186,22 @@ function siggen(nfft)
     }
 }
 
+// basic pseudo-random number generator based on Blum Blum Shub algorithm
+function prng_bbs()
+{
+    this.p   = (1<<17)-1;
+    this.q   = (1<<19)-1;
+    this.M   = this.p * this.q;
+    this.res = 1<<8; // small number of unique values
+    this.v   = 3;
+
+    this.reset = function(seed) {
+        this.v = seed==null ? 3 : seed;
+    }
+
+    this.step = function() {
+        this.v = (this.v * this.v) % this.M;
+        return (this.v & (this.res-1)) / this.res;
+    }
+}
+
