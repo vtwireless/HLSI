@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Link Budjet</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>Exercise - Link Budjet</h2>
+  <p><a href="index.html">[exercises]</a></p>
+
+
+    <p>
+    <label for="static_label">Static Parameters For Examples </label>
+	</p>
+	
+    <p>
+    <label for="noise_density">Noise Spectral Density = </label>
+    <output for="noise_density" id="nsd"></output>
+  </p>
+
+    <p>
+    <label for="bit_rate">Bit Rate = </label>
+    <output for="bit_rate" id="rb"></output>
+  </p>
+
+    <p>
+    <label for="required_ebno">Required EbNo = </label>
+    <output for="required_ebno" id="rebno"></output>
+  </p>  
+  <p>
+    <label for="dynamic_label">Dynamic Parameters For Examples </label>
+	</p>
+ 
+ <p>
+    <label for="frequency">Frequency</label>
+    <input class="width-4" type="range" min="100" max="700" value="200" id="frequency" step="100"
+        oninput="update_display(parseFloat(value) , null, null, null)">
+    <output for="frequency" id="fc">2000</output>
+  </p>
+  
+    <p>
+    <label for="tx_power">Tx Power</label>
+    <input class="width-4" type="range" min="0.5" max="4.0" value="0.0" id="tx_power" step="0.1"
+        oninput="update_display(null,parseFloat(value), null, null)">
+    <output for="tx_power" id="tx_pow">0.1</output>
+  </p>
+
+    <p>
+    <label for="tx_gain">Tx Power Gain</label>
+    <input class="width-4" type="range" min="0" max="4.0" value="0.0" id="tx_gain" step="0.1"
+        oninput="update_display(null,null,parseFloat(value), null)">
+    <output for="tx_gain" id="tx_g">0.1</output>
+  </p>
+
+    <p>
+    <label for="rx_gain">Rx Power Gain</label>
+    <input class="width-4" type="range" min="0" max="4.0" value="1.0" id="rx_gain" step="0.1"
+        oninput="update_display(null,null,null, parseFloat(value))">
+    <output for="rx_gain" id="rx_g">0.1</output>
+  </p>
+  
+  <p>
+    <label for="wavelength">Wavelength = </label>
+    <output for="wavelength" id="wl"></output>
+  </p>
+  <p>
+    <label for="distance">Distance = </label>
+    <output for="distance" id="ds"></output>
+  </p>
+  <p>
+    <label for="pathloss">Path Loss = </label>
+    <output for="pathloss" id="pl"></output>
+  </p>
+  
+    <p>
+    <label for="rx_power">Received Signal Power = </label>
+    <output for="rx_power" id="rp"></output>
+  </p>
+
+    <p>
+    <label for="energy_per_bit">Energy Per Bit = </label>
+    <output for="energy_per_bit" id="eb"></output>
+  </p>
+
+    <p>
+    <label for="energy_per_bit_noise">EbNo = </label>
+    <output for="energy_per_bit_noise" id="ebno"></output>
+  </p>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 50, right: 50, bottom: 50, left: 50}
+  , width  = 920 - margin.left
+  - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var fs=1000e6, f0=1500e6;    // sample rate, center frequency
+var fc = 100;
+
+fc_min = 100e9;
+fc_max = 700e9;
+fs_epi = 100e9;
+// Don
+var tx_pow = 0;
+var tx_g = 0;
+var rx_g = 0;
+var NSD = -204;
+var RB = 10;
+var REBNO  =  10;
+
+var lambda_ = 299.792458e6 / (fc);
+var dx_ = 0;
+var dy_ = 0;
+var d_  = 0;
+var L_  = 0;
+
+var RP_ = 0;
+var	EB_ = 0;
+var EBNO_ = 0;
+var FEBNO_ 
+var g_ =0;
+	
+// Don
+
+var xrange=1200, yrange=200; // range in meters
+var xmax  =1150, ymax  =180; // maximum values
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = 120;  // set filter semi-length
+generator.beta = 4;
+
+// scale
+var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
+var yScale = d3.scaleLinear().domain([-yrange, yrange]).range([height, 0]);
+
+// inverted scale
+var xInvScale = d3.scaleLinear().range([-xrange, xrange]).domain([0, width]);
+var yInvScale = d3.scaleLinear().range([-yrange, yrange]).domain([height, 0]);
+
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(fc_max,0.1); // freq scale
+var [scale_tx_pow,units_tx_pow] = scale_units(tx_pow,0.1); // freq scale
+
+//var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+var fScale = d3.scaleLinear().domain([fc_min*scale_freq, fc_max*scale_freq]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-30, 0]).range([height, 0]);
+
+
+
+// create SVG objects (map and frequency plot)
+var svgm = svg_create(margin, width, height, xScale, yScale);
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgm, margin, width, height, "Horizonal Position (m)", "Vertical Position (m)");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Fade Margin (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// add pointer definition
+var pointer = svgm.append("defs").append("g")
+        .attr("id","pointer")
+        .attr("transform","scale(0.8)");
+pointer.append("path").attr("d","M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z");
+pointer.append("path").attr("d","M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z");
+
+// create markers with default positions
+var markers = [
+    {x:xScale(-xmax), y:yScale(ymax), c:"#039be5", b:"#004080"},
+    {x:xScale(    0), y:yScale(   0), c:"#03e539", b:"#008040"},];
+// spectrum data
+
+//var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+var dataf = {};
+
+// d3's line generator
+var line = d3.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; });
+//var linef = d3.line()
+//    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+//    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+
+var linef = d3.line()
+    .x(function(d, i) { return fScale(i+100); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// Append the path, bind the data, and call the line generator
+var path = svgm.append("path")
+    .datum(markers)
+    .attr("class", "stroke-light no-fill dashed stroke-gray-0")
+    .attr("d", line);
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("d", linef);
+
+// add markers with associated data
+svgm.selectAll("use")
+    .data(markers)
+    .enter()
+    .append("use")
+        .attr("href","#pointer")
+        .attr("x",      function(d) { return (d.x) })
+        .attr("y",      function(d) { return (d.y) })
+        .attr("fill",   function(d) { return (d.c) })
+        .attr("stroke", function(d) { return (d.b) })
+        .attr("class","pin");
+
+var dragHandler = d3.drag()
+    .on("drag", function(d) {
+        d3.select(this)
+            .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(-xmax)))
+            .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(-ymax))); // min/max flipped for y-axis
+        update_display();
+    });
+
+dragHandler(svgm.selectAll("use"));
+
+// run initial update
+
+	function calculate_fade(fc){
+	
+	console.log(fc)
+	lambda_ = 299.792458e6 / ((fc+1)*(1/scale_freq));
+    // compute distance and appropriate path loss
+    dx_ = xInvScale(markers[0].x) - xInvScale(markers[1].x);
+    dy_ = yInvScale(markers[0].y) - yInvScale(markers[1].y);
+    d_  = Math.max(1,Math.sqrt(dx_**2 + dy_**2));
+    L_  = 20*Math.log10(4*Math.PI*d_/lambda_);
+	//L_  = 78 + (10*3.5) *Math.log(d_/100)
+    //let g  = 16-L;
+	// Don
+	RP_ = tx_pow + tx_g + rx_g - L_;
+	EB_ = RP_  - 10 * Math.log10(Math.pow(RB,7));
+    EBNO_ = EB_ - NSD;
+	
+	FEBNO_ =EBNO_- REBNO ;
+	g_ =FEBNO_;
+	
+	return g_
+	}
+
+
+function update_display(freq, txPower, txGain, rxGain) {
+    if (freq!=null) { fc = freq; }
+	if (txPower!=null) { tx_pow = txPower; } 
+	if (txGain!=null) { tx_g = txGain; } 
+	if (rxGain!=null) { rx_g = rxGain; } 
+	
+	//console.log(fc)
+    document.querySelector('#fc').value = d3.format(".1f")((fc)) + " " + units_freq + "Hz";
+	//document.querySelector('#fc').value = d3.format(".2f")(fc) + " " + units_freq + "Hz";
+    document.querySelector('#frequency').value = fc;
+	
+    document.querySelector('#tx_pow').value = d3.format(".2f")(tx_pow) + " "  + "dBW";
+    document.querySelector('#tx_power').value = tx_pow;
+
+    document.querySelector('#tx_g').value = d3.format(".2f")(tx_g) + " "  + "dBW";
+    document.querySelector('#tx_gain').value = tx_g;
+
+    document.querySelector('#rx_g').value = d3.format(".2f")(rx_g) + " "  + "dBW";
+    document.querySelector('#rx_gain').value = rx_g;	
+    // compute wavelength in meters
+	//calculate_fade(fc)
+    let lambda = 299.792458e6 / ((fc+1)*(1/scale_freq));
+	lambda_ =lambda;
+    // compute distance and appropriate path loss
+    let dx = xInvScale(markers[0].x) - xInvScale(markers[1].x);
+	//dx_ = dx;
+    let dy = yInvScale(markers[0].y) - yInvScale(markers[1].y);
+	dy_ = dy;
+    let d  = Math.max(1,Math.sqrt(dx**2 + dy**2));
+	d_ = d;
+    let L  = 20*Math.log10(4*Math.PI*d/lambda);
+	//let L =78 + (10*3.5) *Math.log(d/100);
+	L_ = L;
+    //let g  = 16-L;
+	// Don
+	let RP = tx_pow + tx_g + rx_g - L;
+	RP_ = RP;
+	let EB = RP  - 10 * Math.log10(Math.pow(RB,7));
+	EB_ = EB;
+    let EBNO = EB - NSD;
+	EBNO_ = EBNO;
+	
+
+	let g =EBNO;
+	
+	g_ =g;
+
+
+	// update generator
+    //generator.clear();
+    //generator.add_tone(fc,g);
+    //generator.generate(-100);
+    dataf = d3.range(fc_min*scale_freq,(fc_max)*scale_freq).map(function(d) { return {"y": calculate_fade(d)} })
+    pathf.datum(dataf).attr("d", linef);
+
+	
+    // draw line between markers
+    path.datum(markers).attr("d", line);
+
+    // update output numbers
+    document.querySelector('#wl').value = d3.format(".2f")(lambda*1e2) + " cm";
+    document.querySelector('#ds').value = d3.format(".3f")(d) + " m";
+    document.querySelector('#pl').value = d3.format(".3f")(L) + " dB";
+	document.querySelector('#rp').value = d3.format(".3f")(RP) + " dB";
+	document.querySelector('#nsd').value = d3.format(".3f")(NSD) + " W/Hz";
+	document.querySelector('#rb').value = d3.format(".0f")(RB) + " Mb/s";
+	document.querySelector('#eb').value = d3.format(".0f")(EB) + " dB J";
+	document.querySelector('#ebno').value = d3.format(".0f")(EBNO) + " dB";
+	document.querySelector('#rebno').value = d3.format(".0f")(REBNO) + " dB";
+	//.querySelector('#rebno').value = d3.format(".0f")(scale_freq) + " dB";
+
+}
+update_display();
+</script>
+</html>
+
