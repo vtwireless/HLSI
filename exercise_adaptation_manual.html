@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>HLSI Exercise - Adaptation</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+<style>
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+</style>
+
+<body>
+  <h2>Exercise - Adaptation</h2>
+  <p><a href="index.html">[exercises]</a></p>
+    <p>
+    <label for="frequency">Frequency</label>
+    <input class="width-3" type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.001" oninput="update_plot(parseFloat(value),null,null,null)">
+    <output for="frequency" id="fc">1800.0 MHz</output>
+  </p>
+  <p>
+    <label for="bandwidth">Bandwidth</label>
+    <input class="width-3" type="range" min="0.1" max="0.9" value="0.1" id="bandwidth" step="0.001"
+        oninput="update_plot(null,parseFloat(value),null,null)">
+    <output for="bandwidth" id="bw">0.1</output>
+  </p>
+  <p>
+    <label for="gain">Signal Gain</label>
+    <input class="width-3" type="range" min="-20" max="0" value="0" id="gain" step="0.01"
+        oninput="update_plot(null,null,parseFloat(value),null)">
+    <output for="gain" id="gn"></output>
+  </p>
+  <p>
+    <label for="modcod">Mod./Coding</label>
+    <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
+        oninput="update_plot(null,null,null,parseInt(value))">
+    <output for="modcod" id="mc"></output>
+  </p>
+  <p>
+    <label for="hop_rate">Hop Rate</label>
+    <input class="width-3" type="range" min="0.01" max="5" value="0" id="hop_rate" step="0.01"
+        oninput="update_hop_rate(parseFloat(value))">
+    <output for="hop_rate" id="hr"></output>
+  </p>
+  <p>
+    <label for="signal_to_noise_ratio">SINR:                </label><output for="signal_to_noise_ratio" id="sinr"></output>,
+    <label for="information_capacity">Information Capacity: </label><output for="information_capacity" id="cap"></output>,
+    <label for="link_margin">         Link Margin:          </label><output for="link_margin" id="margin"></output>,
+    <label for="actual_rate">         Actual Rate:          </label><output for="actual_rate" id="rate"></output>
+  </p>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 50, right: 50, bottom: 50, left: 70}
+  , width  = 920 - margin.left - margin.right  // Use the window's width
+  , height = 400 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
+var bw = 0.20, fc = 0.0, gn = -10.0, mc = 8, n0 = -40, sinr = 0, cap = 0, rate = 0;
+var hop_dwell_time = 200;
+var cap_avg = 0, rate_avg = 0, update_count = 0;
+var bw_int = 0.05, fc_int = 0.35, gn_int = -13; // interference values
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = 60; // set filter semi-length
+var schemes = [
+    {'rate':0.50000, 'SNR': 3.979, 'name':'r1/2 BPSK'},
+    {'rate':0.66667, 'SNR': 5.703, 'name':'r2/3 BPSK'},
+    {'rate':1.00000, 'SNR': 7.109, 'name':'r1/2 QPSK'},
+    {'rate':1.33333, 'SNR': 8.782, 'name':'r2/3 QPSK'},
+    {'rate':1.77778, 'SNR':10.202, 'name':'r8/9 QPSK'},
+    {'rate':2.66667, 'SNR':15.036, 'name':'r2/3 16-QAM'},
+    {'rate':3.55556, 'SNR':16.747, 'name':'r8/9 16-QAM'},
+    {'rate':4.44444, 'SNR':20.970, 'name':'r8/9 32-QAM'},
+    {'rate':5.33333, 'SNR':22.920, 'name':'r8/9 64-QAM'},
+    {'rate':6.22222, 'SNR':26.797, 'name':'r8/9 128-QAM'},
+    {'rate':7.11111, 'SNR':28.570, 'name':'r8/9 256-QAM'},
+    {'rate':8.00000, 'SNR':31.050, 'name':'uncoded 256-QAM'}]
+
+// determine scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-50, 40]).range([height, 0]);
+
+// d3's line generator
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+
+// create SVG objects
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgf, margin, width, height, "Frequency (MHz)", "Power Spectra Density (dB)");
+
+// clip paths
+//svgt.append("clipPath").attr("id","clipt").append("rect").attr("width",width).attr("height",height);
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// 9. Append the path, bind the data, and call the line generator
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("d", linef);
+
+// set initial value
+update_plot();
+
+// generate power spectral density
+function generate_psd(f,w,g,n) {
+    // update generator, compensating for bandwidth
+    generator.clear();
+    generator.add_signal(f,     w,     g+     10*Math.log10(bw)    ); // user signal
+    generator.add_signal(fc_int,bw_int,gn_int+10*Math.log10(bw_int)); // interference
+    //generator.add_noise(n); // add random noise samples
+    generator.generate(n); // generate with specific noise floor
+    return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+}
+
+// compute amount of interference in signal
+function compute_interference()
+{
+    // compute boundaires
+    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
+    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+
+    // check for no overlap
+    if (f_lower > i_upper || f_upper < i_lower) { return 0; }
+
+    // partial or full overlap, compensating gain for interference bandwidth
+    let f0 = Math.max(i_lower, f_lower);
+    let f1 = Math.min(i_upper, f_upper);
+    return (f1-f0)*Math.pow(10.,gn_int/10.)/bw_int;
+}
+
+// 'hop' interference around
+function update_hop_rate(rate)
+{
+    hop_dwell_time = 1000. / rate;
+    document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
+}
+update_hop_rate(0.1)
+function hop() { fc_int = 0.97*(Math.random()-0.5)*(1-bw_int); update_plot(); }
+async function hop_interval() {
+  await new Promise((res, req) => { setTimeout(res, hop_dwell_time) })
+  hop()
+  hop_interval()
+}
+hop_interval();
+
+// integrate
+function accumulate_rate() { rate_avg += rate; cap_avg += cap; update_count += 1; }
+async function accumulate_interval() {
+  await new Promise((res, req) => { setTimeout(res, 50) })
+  accumulate_rate()
+  accumulate_interval()
+}
+accumulate_interval();
+
+// update display and value calculation
+function update_plot(freq,band,gain,modcod) {
+    if (freq!=null) { fc = freq; }
+    if (band !=null) { bw = band;  }
+    if (gain !=null) { gn = gain;  }
+    if (modcod!=null){ mc = modcod;}
+	
+	let f_limit = 0.46, f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
+    if (f_lower < -f_limit) { fc -= f_lower+f_limit; }
+    if (f_upper >  f_limit) { fc -= f_upper-f_limit; }
+
+    document.querySelector('#fc').value = d3.format(".1f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
+    document.querySelector('#frequency').value = fc;
+
+    document.querySelector('#bw').value = d3.format(".2f")(bw*fs*scale_freq) + " " + units_freq + "Hz";
+    document.querySelector('#bandwidth').value = bw;
+
+    document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
+    document.querySelector('#gain').value = gn;
+
+    document.querySelector('#mc').value = schemes[mc].name + " (" + d3.format(".3f")(schemes[mc].rate) + " b/s/Hz)"
+    document.querySelector('#modcod').value = mc;
+
+    // compute and display SINR
+    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+    let I     = compute_interference();     // interference power (linear)
+    let SINRdB= gn - 10*Math.log10(N+I);
+    document.querySelector('#sinr').value = d3.format(".2f")(SINRdB) + " dB";
+
+    // compute and display capacity
+    cap = fs * bw * Math.log2(1+Math.pow(10.,SINRdB/10.));
+    var [scale_cap,units_cap] = scale_units(cap,0.1);
+    document.querySelector('#cap').value = d3.format(".1f")(cap*scale_cap) + " " + units_cap + "bps";
+
+    // compute and display link margin
+    let margin_dB = SINRdB - schemes[mc].SNR;
+    document.querySelector('#margin').value = d3.format(".2f")(margin_dB) + " dB";
+    document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "black";
+
+    // compute and display actual data rate
+    if (margin_dB >= 0) {
+        rate = schemes[mc].rate * bw * fs;
+        var [scale_rate,units_rate] = scale_units(rate,0.1);
+        let percent_capacity = 100 * rate / cap;
+        document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
+                                                d3.format(".1f")(percent_capacity) + "% capacity)";
+        document.querySelector('#rate').style.color = "black";
+    } else {
+        rate = 0;
+        document.querySelector('#rate').value = "0 bps";
+        document.querySelector('#rate').style.color = "red";
+    }
+
+    // generate power spectral density, compensating for bandwidth
+    dataf = generate_psd(fc,bw,gn,n0);
+    pathf.datum(dataf).attr("d", linef);
+}
+
+// real-time plot
+var hist = 30,      // amount of history (seconds) to keep
+    dur  = 200,     // duration between transisions (ms)
+    n    = Math.round(hist*1000/dur), // number of samples to buffer
+    data = d3.range(n).map(function(){ return 1; });
+
+var svg = d3.select("body").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top +  margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var xscale = d3.scaleLinear()
+    .domain([1, n - 2])
+    .range([0, width]);
+
+var yscale = d3.scaleLog()
+    .domain([40e3, 400e6])
+    .range([height, 0]);
+
+var line = d3.line()
+    .curve(d3.curveBasis)
+    .x(function(d, i) { return xscale(i); })
+    .y(function(d, i) { return yscale(d); });
+
+svg.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xscale));
+
+var yTickValues = [100e3,200e3,400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(yscale)
+      .tickValues(yTickValues)
+      .tickFormat(function(d, i) {
+        let [s,u] = scale_units(d);
+        return d*s + u;
+      }))
+
+// grid lines
+svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize(height));
+svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
+
+svg.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+    .datum(data)
+    .attr("class", "line")
+  .transition()
+    .duration(dur)
+    .ease(d3.easeLinear)
+    .on("start", tick);
+
+// create x-axis axis label
+svg.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+   .text("Time")
+
+// create y-axis label
+svg.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 0 - margin.left)
+   .attr("x", 0 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+   .text("Capacity (bits/second)")
+
+function tick() {
+  // Push a new data point onto the back.
+  //data.push(update_count == 0 ? cap : cap_avg / update_count);
+  data.push(update_count == 0 ? 1 : Math.max(1,rate_avg / update_count));
+  update_count = 0;
+  cap_avg = 0;
+  rate_avg = 0;
+
+  // Redraw the line.
+  d3.select(this)
+      .attr("d", line)
+      .attr("transform", null)
+      .attr("class", "stroke-med no-fill stroke-blue")
+
+  // Slide it to the left.
+  d3.active(this)
+      .attr("transform", "translate(" + xscale(0) + ",0)")
+    .transition()
+      .on("start", tick);
+
+  // Pop the old data point off the front.
+  data.shift();
+}
+
+</script>
+</html>
+
