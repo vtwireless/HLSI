@@ -13,7 +13,18 @@
 <body>
   <h2>Exercise - Frequency Rule Based Adaptation</h2>
   <p><a href="index.html">[exercises]</a></p>
-  <p><input id="restart" type="button" value="Start" onclick="restart()"></p>
+  <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
+
+    <p><input id="restart" type="button" value="Start" onclick="restart()">&nbsp;
+  <label for="strategy" hidden>Select pre-configured strategy:</label>
+  <select id="strategy" onchange="populateCallback()">
+    <option value="" selected disabled hidden>Select pre-configured strategy...</option>
+    <option value="a1">Frequency and Bandwidth Based Adaptation</option>
+    <option value="a0">Frequency Based Adaptation</option>
+    <option value="a2">Random Frequency Adaptation</option>
+  </select>
+  </p>
+  
   <p>
     <label for="frequency">Frequency</label>
     <input class="width-3" type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.001" oninput="update_plot(parseFloat(value),null,null, null)">
@@ -62,6 +73,8 @@
     <label for="outages_survived">   Outages avoided by sensing:    </label><output for="outages_survived"    id="outages_survived" class="text-bold"></output>,
     <label for="total_bits">Total Bits: </label><output for="total_bits" id="bits"    class="text-bold"></output>
   </p>
+  
+
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -78,6 +91,7 @@ var margin = {top: 10, right: 50, bottom: 50, left: 50}
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
 var f_limit = 0.44;
+var uIndex = -1;
 
 var bw = 0.19, fc = 0.0, gn = 2, mc = 0, n0 = -30, snr = 0, rate = 0, valid = false, valid2= false;
 var nfft = 2048, generator = new siggen(nfft);
@@ -171,9 +185,93 @@ function compute_interference()
     return (f1-f0)*Math.pow(10.,gn_int/10.)/bw_int;
 }
 
+function adapt_freq_bw(){
+    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
+	delta = 0.1;
+    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
+
+    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+	
+	
+    if (!(f_lower > i_upper || f_upper < i_lower)) 
+	{		alpha = 2;
+		
+		let ch1 = f_lower -i_lower;
+		let ch2 = f_upper -i_upper;
+		let ch3 = Math.abs(i_upper -f_lower);
+		let ch4 = Math.abs(i_lower -f_upper);
+		
+		if ((ch2 > 0) && (ch1 >0)){
+			if (f_lower < -f_limit) { fc =0; }
+			if (f_upper >  f_limit) { fc = 0; }
+			
+			coin = (Math.floor(Math.random() * 2) == 0);
+			if (coin){
+				fc = fc  + ch3 + delta
+				bw = bw_int
+			}else{
+				fc = fc  - ch3 - delta
+				bw = bw_int
+			}
+			return 0
+		}
+		
+		if ((ch2 > 0) && (ch1 <0)){
+			if (f_lower < -f_limit) { fc =0; }
+			if (f_upper >  f_limit) { fc = 0; }
+			Math.max(Math.abs(ch3), Math.abs(ch4))
+			ch5 = Math.abs(ch3) +  Math.abs(ch4);
+			coin = (Math.floor(Math.random() * 2) == 0);
+			if (coin){
+				fc = fc  + ch5 + delta
+				bw = bw_int
+
+			}else{
+				fc = fc  - ch5 - delta
+				bw = bw_int
+
+			}
+ 			return 0
+
+		}
+		if ((ch2 < 0) && (ch1 < 0)){
+			if (f_lower < -f_limit) { fc =0; }
+			if (f_upper >  f_limit) { fc = 0; }
+			//fc = fc + ch4+ delta
+			coin = (Math.floor(Math.random() * 2) == 0);
+			if (coin){
+				fc = fc  + ch4 + delta
+				bw = bw_int
+
+			}else{
+				fc = fc  - ch4 - delta
+				bw = bw_int
+
+			}
+			return 0
+
+		}
+		
+		fc = 0;
+		return 0;		
+		//if (!((i_upper > f_lower)  || (i_lower > f_upper) ))
+		//{
+			//fc = 0;
+		//}
+		
+		//bw = bw_int;
+	}
+	else
+	{
+	//alpha = 0.5
+	}
+	return 0; 
+}
+
 function adapt(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
 	delta = 0.1;
+	bw = 0.19;
     let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
 
     let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
@@ -244,6 +342,29 @@ function adapt(){
 	return 0; 
 }
 
+
+function adapt_random(){
+    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
+	delta = 0.1;
+	bw = 0.19;
+    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
+
+    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+	
+	
+	fc = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();    
+	
+    // compute and display SNR
+	let I     = compute_interference();     // interference power (linear)
+    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+ 
+	let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
+    let SINRdB= gn - 10*Math.log10(N+I);
+    let SINRdB1= gn - 10*Math.log10(N);
+
+	SNRdB = SINRdB;
+	return 0; 
+}
 
 //
 // historical rate plot
@@ -538,6 +659,7 @@ function reset() {
 
 function restart() {
 
+		if (!(uIndex == -1)){
 		reset();
 		//datar = [];
     //for (index = 0; index < datar.length; index++) { 
@@ -548,6 +670,7 @@ function restart() {
 		adapt_interval();
 		document.querySelector('#restart').value = "Sim will restart if pressed"
 		document.querySelector('#slow').checked = true;
+	}
 }
 
 async function step_interval() {
@@ -617,7 +740,16 @@ async function hop_interval() {
 
 async function adapt_interval() {
   await new Promise((res, req) => { setTimeout(res, hop_dwell_time/adjust_dwell_time) })
-  adapt()
+  
+  if (uIndex == 0){
+	adapt()
+	}
+	else if (uIndex == 1) {
+        adapt_freq_bw();
+    }
+	else if (uIndex == 2) {
+        adapt_random();
+    }
   update_plot()
   adapt_interval() 
 }
@@ -678,6 +810,20 @@ function step() {
     document.querySelector('#outages').value = d3.format(",")(outages);
 	document.querySelector('#outages_survived').value = d3.format(",")(outages_survived);
     document.querySelector('#timer').value   = d3.format(",")(counter);
+}
+
+function populateCallback() {
+    let selection = document.getElementById("strategy").value;
+    //let u = -1;
+    switch (selection) {
+    case 'a0': uIndex = 0; break;
+    case 'a1': uIndex = 1; break;
+    case 'a2': uIndex = 2; break;
+
+    default:
+        return;
+    }
+    //document.querySelector('#userfunction').value = u;
 }
 
 function finished() {
