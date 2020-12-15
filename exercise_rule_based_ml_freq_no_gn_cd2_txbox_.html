@@ -16,9 +16,9 @@
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
   <p><label for="userfunction">
-      Fill out a function to change the bandwidth (min="0.19" max="0.9"):
+      Fill out a function to change the gain, bandwidth, and Modulation and Coding, this variables must be changed in order:
   </label></p>
-  <p><tt>function callback(current) {</tt></p>
+  <p><tt>function callback( gain, bandWidth, Modulation and Coding  ) {</tt></p>
   <p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
       maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
       placeholder="return {'gn':2, 'bw':0.1, 'mc':0};">return {'gn':2, 'bw':0.1, 'mc':0};</textarea></p>

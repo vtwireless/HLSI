@@ -19,12 +19,12 @@
   <label for="strategy" hidden >Select pre-configured strategy:</label>
   <select id="strategy" onchange="populateCallback()">
     <option value="default" selected >Select pre-configured strategy...</option>
-	<option value="a0">Narrow Bandwidth, Maximum Modulation and Coding</option>
-    <option value="a1">Maximum Bandwidth, Minimum Modulation and Coding</option>
+	<option value="a0">Fixed Frequency, Narrow Bandwidth, Maximum Modulation and Coding</option>
+    <option value="a1">Fixed Frequency, Maximum Bandwidth, Minimum Modulation and Coding</option>
     <option value="a2">Random Frequency Adaptation</option>
     <option value="a3">Frequency based Adaptation, Narrow-band</option>
-	<option value="a4">Frequency-based Adaptation, Approx. Half-band</option>
-    <option value="a5">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option>
+	<option value="a4">Frequency based Adaptation, Approx. Half-band</option>
+    <option value="a5">Frequency and Bandwidth based Adaptation (Maximum Contiguous Bandwidth)</option>
   </select>
   </p>
   <p>
@@ -384,7 +384,7 @@ function adapt_freq_bw(){
 function adapt(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
 	delta = 0.1;
-	bw = 0.19;
+	bw = 0.1;
 	mc = 11;
 	
     let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
