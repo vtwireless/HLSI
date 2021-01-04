@@ -31,6 +31,8 @@
    <!-- <option value="a0">Maximum Bandwidth, Minimum Modulation and Coding</option> -->
     <option value="a1">Random Frequency Adaptation</option>
     <option value="a2">Frequency-based Adaptation, Narrow-band</option>
+    <option value="a3">Gain Adaptation</option>
+
 	<!-- <option value="a3">Frequency-based Adaptation, Approx. Half-band</option> -->
     <!--<option value="a4">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option> -->
   </select>
@@ -91,6 +93,9 @@
     <label for="spectral_efficiency">Spect. Eff.: </label><output for="spectral_efficiency"   id="eta"    class="text-bold"></output>
     <label for="link_margin">Margin:              </label><output for="link_margin"           id="margin" class="text-bold"></output>,
     <label for="actual_rate">Actual Rate:         </label><output for="actual_rate"           id="rate"   class="text-bold"></output>
+    <label for="Gain">Gain:         </label><output for="gn"           id="gain"   class="text-bold"></output>
+
+	
   </p>
   <p>
     <label for="time_left"> Time Left:  </label><output for="time_left"  id="timer"   class="text-bold"></output>,
@@ -135,6 +140,7 @@ var outages_check =0;
 var num_steps = Math.round(runtime * 1000 / step_dwell_time);
 hop_dwell_time = step_dwell_time;
 var adjust_dwell_time = 1.5;
+var margin_dB = 0;
 var schemes = [
     {'rate':0.50000, 'SNR': 3.979, 'name':'r1/2 BPSK'},
     {'rate':0.66667, 'SNR': 5.703, 'name':'r2/3 BPSK'},
@@ -155,7 +161,7 @@ var fs_ = 400e6;
 var [scale_freq_,units_freq_] = scale_units(f0+fs_/2,0.01);
 
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs_)*scale_freq_, (f0+0.5*fs_)*scale_freq_]).range([0, width]);
-var pScale = d3.scaleLinear().domain([-35, 15]).range([height, 0]);
+var pScale = d3.scaleLinear().domain([-35, 25]).range([height, 0]);
 
 // d3's line generator
 var linef = d3.line()
@@ -285,6 +291,26 @@ function fixed_bw_modcod(){
 	return 0; 
 }
 
+function adapt_gain(){
+    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
+	delta = 0.1;
+	//bw = 0.19;
+	//mc = 11;
+	
+    //let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
+
+    //let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;	
+	
+    if (margin_dB > 0) 
+	{
+		gn = 2;
+		mc = 9;
+	}		
+	
+
+	return 0; 
+}
+
 function adapt_freq_bw(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
 	delta = 0.1;
@@ -374,7 +400,7 @@ function adapt(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
 	delta = 0.1;
 	//bw = 0.19;
-	mc = 11;
+	//mc = 11;
 	
     let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
 
@@ -451,16 +477,16 @@ function adapt_random(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
 	delta = 0.1;
 	//bw = 0.19;
-	mc = 11;
+	//mc = 11;
 	
     let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
 
     let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;	
 	
-    if (!(f_lower > i_upper || f_upper < i_lower)) 
-	{
+    //if (!(f_lower > i_upper || f_upper < i_lower)) 
+	//{
 		fc = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();  
-	}		
+	//}		
 	
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
@@ -730,7 +756,7 @@ function update_plot(freq,band,gain,modcod) {
     document.querySelector('#eta').value = d3.format(".3f")(R) + " " + "b/s/Hz";
 
     // compute and display link margin
-    let margin_dB = SNRdB - schemes[mc].SNR;
+    margin_dB = SNRdB - schemes[mc].SNR;
     document.querySelector('#margin').value = d3.format(".2f")(margin_dB) + " dB";
     document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "black";
 
@@ -774,10 +800,13 @@ function reset() {
     bits  = 0;
     outages = 0;
 	outages_survived = 0;
+	gn = 2;
     document.querySelector('#bits').value    = d3.format(",")(bits);
     document.querySelector('#outages').value = d3.format(",")(outages);
 	document.querySelector('#outages_survived').value = d3.format(",")(outages_survived);
     document.querySelector('#timer').value   = d3.format(",")(counter);
+	document.querySelector('#gain').value   = d3.format(",")(gn);
+
 	//hop_interval();
 	finished();
 	//adapt_interval();
@@ -806,11 +835,56 @@ function restart() {
 		running = true;
 
 		//step();
+        let current = {'gn':gn, 'bw':bw, 'mc':mc};
+
+		callback = new Function(document.querySelector('#userfunction').value);
+
+
+		let uservals = callback(current);
+
+		gn = uservals.gn;
+
+		// validate modulation/coding scheme
+        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mc)));
+        if (typeof mc != "number" || isNaN(mc)) { mc = 0; }
+
+        // validate center frequency
+
+        // validate bandwidth
+        bw = Math.max(0.05, Math.min(0.95, uservals.bw));
+        if (typeof bw != "number" || isNaN(bw)) { bw = 0.1; }
+
+        gn = Math.max(-2, Math.min(5, uservals.gn));
+        if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
+		
+		
+		//string1 = gn.toString();
+		//string2 = bw.toString();
+		//string3 = mc.toString();
+
+		//u_ = string.concat("return {'gn':", string1, ", 'bw':", string2, ", 'mc':",  string3, "};")
+		var dictU_ = {
+		  'gn': gn,
+		  'bw': bw,
+		  'mc': mc
+		};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		u_ = "return " + JSON.stringify(dictU_);
+		if (uIndex == 3){
+			document.querySelector('#userfunction').value = u_a3; 
+		}
+		else{
+			document.querySelector('#userfunction').value = u_;
+		}
+		console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		
 		step_interval();
 		hop_interval();
 		adapt_interval();
 		running = true;
-		callback = new Function("current",document.querySelector('#userfunction').value);
 		
 		document.querySelector('#restart').value = "stop"
 		document.querySelector('#userfunction').disabled = true;
@@ -834,7 +908,11 @@ async function step_interval() {
     await new Promise((res, req) => { setTimeout(res, step_dwell_time) });
     if ((counter > 0) && (running == true)) {
 	    step();
+		//step();
         let current = {'gn':gn, 'bw':bw, 'mc':mc};
+
+		callback = new Function(document.querySelector('#userfunction').value);
+
 
 		let uservals = callback(current);
 
@@ -849,8 +927,12 @@ async function step_interval() {
         // validate bandwidth
         bw = Math.max(0.05, Math.min(0.95, uservals.bw));
         if (typeof bw != "number" || isNaN(bw)) { bw = 0.1; }
+
+        gn = Math.max(-2, Math.min(5, uservals.gn));
+        if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
 		
-        step_interval();
+		
+		step_interval();
     } else {
 
         finished() ;
@@ -924,7 +1006,10 @@ async function adapt_interval() {
  		adapt();
     }
 	else if (uIndex == 3) {
-        adapt_freq_approx_half_band();
+        //adapt_freq_approx_half_band();
+		//adapt_random();
+		///bw = 0.35;
+		adapt_gain();
 	}
 	else if (uIndex == 4) {
 		adapt_freq_max_contiguous_bw();
@@ -989,6 +1074,8 @@ function step() {
     document.querySelector('#outages').value = d3.format(",")(outages);
 	document.querySelector('#outages_survived').value = d3.format(",")(outages_survived);
     document.querySelector('#timer').value   = d3.format(",")(counter);
+	document.querySelector('#gain').value   = d3.format(",")(gn);
+
 }
 
 function populateCallback() {
@@ -1010,7 +1097,27 @@ function populateCallback() {
 	uIndex = 2;
 	u = "return {'gn':2, 'bw':0.1, 'mc':11};";
 	break;
-    case 'a3': uIndex = 3; break;	
+    case 'a3': 
+		uIndex = 3; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = '// check current link margin and adjust scheme appropriately\n';
+		u += 'gn_offset = 0.5;\n'
+		u += 'mc_offset = 1;\n\n'
+        u += "if (margin_dB > 0) \n{ return {'gn':gn, 'bw':0.4, 'mc':mc}; }\n";
+        u += "else \n{ return {'gn':gn + gn_offset, 'bw':0.4, 'mc':mc - mc_offset}; }\n";
+		u_a3 = u;
+		break;	
 	case 'a4': uIndex = 4; break;
     default:
 		//u  = 'bw = 0.19\n';

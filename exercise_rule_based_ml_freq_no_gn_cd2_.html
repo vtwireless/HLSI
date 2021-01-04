@@ -21,10 +21,10 @@
     <option value="default" selected >Select pre-configured strategy...</option>
 	<option value="a0">Fixed Frequency, Narrow Bandwidth, Maximum Modulation and Coding</option>
     <option value="a1">Fixed Frequency, Maximum Bandwidth, Minimum Modulation and Coding</option>
-    <option value="a2">Random Frequency Adaptation</option>
-    <option value="a3">Frequency based Adaptation, Narrow-band</option>
-	<option value="a4">Frequency based Adaptation, Approx. Half-band</option>
-    <option value="a5">Frequency and Bandwidth based Adaptation (Maximum Contiguous Bandwidth)</option>
+    <option value="a2">Random Frequency Hopping</option>
+    <option value="a3">Frequency Adaptation, Narrow-band</option>
+	<option value="a4">Frequency Adaptation, Approx. Half-band</option>
+    <option value="a5">Frequency and Bandwidth Adaptation (Maximum Contiguous Bandwidth)</option>
   </select>
   </p>
   <p>
@@ -259,12 +259,12 @@ function narrow_bw_max_modcod(){
 	let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
 
 		if (i_lower + f_limit < f_limit - i_upper){  					// if interferer is closer to lower frequency limit then upper unoccupied sub-band is larger
-		fc = f_limit - (f_limit - i_upper) / 2;							// hop to center of upper unocuppied sub-band
+		//fc = f_limit - (f_limit - i_upper) / 2;							// hop to center of upper unocuppied sub-band
 		//bw = f_limit - i_upper - 0.5 * bw_int -delta;							// set bandwidth to use entire upper unoccupied sub-band
 		bw = 0.1;
 	
 	} else {															// in this case the lower unoccupied sub-band is larger
-		fc = -f_limit + (i_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
+		//fc = -f_limit + (i_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
 		//bw = i_lower + f_limit - 0.5 * bw_int -delta; 							// set bandwidth to use entire lower unoccupied sub-band
 		bw = 0.1;
 	}
@@ -468,10 +468,10 @@ function adapt_random(){
 
     let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;	
 	
-    if (!(f_lower > i_upper || f_upper < i_lower)) 
-	{
+    //if (!(f_lower > i_upper || f_upper < i_lower)) 
+	//{
 		fc = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();  
-	}		
+	//}		
 	
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
