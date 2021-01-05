@@ -1015,8 +1015,10 @@ async function adapt_interval() {
 	else if (uIndex == 4) {
 		adapt_freq_max_contiguous_bw();
     }
-  update_plot()
-  adapt_interval() 
+	if ((counter > 0) && (running == true)) {
+		update_plot()
+		adapt_interval() 
+	}
 }
 
 
