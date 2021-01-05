@@ -141,6 +141,7 @@ var num_steps = Math.round(runtime * 1000 / step_dwell_time);
 hop_dwell_time = step_dwell_time;
 var adjust_dwell_time = 1.5;
 var margin_dB = 0;
+var gn_offset = 1;
 var schemes = [
     {'rate':0.50000, 'SNR': 3.979, 'name':'r1/2 BPSK'},
     {'rate':0.66667, 'SNR': 5.703, 'name':'r2/3 BPSK'},
@@ -837,13 +838,13 @@ function restart() {
 		//step();
         let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
 
-		callback = new Function(document.querySelector('#userfunction').value);
+		callback = new Function('gn_offset',document.querySelector('#userfunction').value);
 
 
 		let uservals = callback(current);
 
 		gn = uservals.gain;
-
+		//gn_offset = uservals.gn_offset;
 		// validate modulation/coding scheme
         mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.modulation_index)));
         if (typeof mc != "number" || isNaN(mc)) { mc = 0; }
@@ -912,12 +913,14 @@ async function step_interval() {
 		//step();
         let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
 
-		callback = new Function(document.querySelector('#userfunction').value);
+		callback = new Function('gn_offset',document.querySelector('#userfunction').value);
 
 
 		let uservals = callback(current);
 
 		gn = uservals.gain;
+		gn_offset = uservals.gn_offset;
+		console.log(gn_offset);
 
 		// validate modulation/coding scheme
         mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.modulation_index)));
@@ -1114,11 +1117,13 @@ function populateCallback() {
 		//u_ = string.concat("return ", u_)
 
 		//document.querySelector('#userfunction').value = u_;
-        u  = '// check current link margin and adjust scheme appropriately\n';
-		u += 'gn_offset = 0.5;\n'
-		u += 'mc_offset = 1;\n\n'
+        u  = "// check current link margin and adjust scheme appropriately\n";
+		u += "//gn_offset = "
+		u +=  JSON.stringify(gn_offset)
+		u += ";\n"
+		u += "//mc_offset = 1;\n\n"
         u += "if (margin_dB > 0) \n{ return {'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'gain':gn + gn_offset, 'bandwidth':bw, 'modulation_index':mc - mc_offset}; }\n";
+        u += "else \n{ return {'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
 		u_a3 = u;
 		break;	
 	case 'a4': uIndex = 4; break;
