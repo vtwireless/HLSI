@@ -1115,8 +1115,8 @@ function populateCallback() {
         u  = '// check current link margin and adjust scheme appropriately\n';
 		u += 'gn_offset = 0.5;\n'
 		u += 'mc_offset = 1;\n\n'
-        u += "if (margin_dB > 0) \n{ return {'gain':gn, 'bandwidth':0.4, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'gain':gn + gn_offset, 'bandwidth':0.4, 'modulation_index':mc - mc_offset}; }\n";
+        u += "if (margin_dB > 0) \n{ return {'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
+        u += "else \n{ return {'gain':gn + gn_offset, 'bandwidth':bw, 'modulation_index':mc - mc_offset}; }\n";
 		u_a3 = u;
 		break;	
 	case 'a4': uIndex = 4; break;
