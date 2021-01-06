@@ -836,11 +836,13 @@ function restart() {
 		running = true;
 
 		//step();
-        let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
+		console.log(uIndex)
+
 
 		callback = new Function(document.querySelector('#userfunction').value);
-
-
+		
+		let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
 		let uservals = callback(current);
 
 		gn = uservals.gain;
@@ -857,7 +859,11 @@ function restart() {
 
         gn = Math.max(-2, Math.min(5, uservals.gain));
         if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
-		
+
+		if (uIndex == 3){
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }		
+		}
 		
 		//string1 = gn.toString();
 		//string2 = bw.toString();
@@ -1143,8 +1149,8 @@ function populateCallback() {
 		u +=  JSON.stringify(gn_offset)
 		u += ";\n"
 		u += "//mc_offset = 1;\n\n"
-        u += "if (margin_dB > 0) \n{ return {'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+        u += "if (margin_dB > 0) \n{ return {'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
+        u += "else \n{ return {'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
 		u_a3 = u;
 		break;	
 	case 'a4': uIndex = 4; break;
