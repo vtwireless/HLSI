@@ -32,6 +32,7 @@
     <option value="a1">Random Frequency Adaptation</option>
     <option value="a2">Frequency-based Adaptation, Narrow-band</option>
     <option value="a3">Gain Adaptation</option>
+    <option value="a4">Gain Adaptation with Controllable Interference</option>
 
 	<!-- <option value="a3">Frequency-based Adaptation, Approx. Half-band</option> -->
     <!--<option value="a4">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option> -->
@@ -841,8 +842,14 @@ function restart() {
 
 		callback = new Function(document.querySelector('#userfunction').value);
 		
-		let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		//let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		 //{'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+
+
+		let current = (uIndex == 4) ? {'frequency':fc, 'interfererfrequency':fc_int, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		{'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
 		let uservals = callback(current);
 
 		gn = uservals.gain;
@@ -864,7 +871,11 @@ function restart() {
 			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }		
 		}
-		
+
+		if (uIndex == 4){
+			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
+			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
+		}		
 		//string1 = gn.toString();
 		//string2 = bw.toString();
 		//string3 = mc.toString();
@@ -941,8 +952,13 @@ async function step_interval() {
         //let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
 		
 
-		let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		//let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		// {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
+ 		let current = (uIndex == 4) ? {'frequency':fc, 'interfererfrequency':fc_int, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
 		 
 		callback = new Function(document.querySelector('#userfunction').value);
 
@@ -970,6 +986,11 @@ async function step_interval() {
 			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }		
 		}
+
+		if (uIndex == 4){
+			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
+			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
+		}	
 		
 		step_interval();
     } else {
@@ -1000,8 +1021,9 @@ function hop() {
 //    if (!((f_lower > i_upper || f_upper < i_lower))) 
 //		{fc_int = fc_int; return 0; }
 	
-	fc_int = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();    
-	
+	if (!(uIndex == 4)){
+		fc_int = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();    
+	}
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
     let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
@@ -1051,7 +1073,8 @@ async function adapt_interval() {
 		adapt_gain();
 	}
 	else if (uIndex == 4) {
-		adapt_freq_max_contiguous_bw();
+		adapt_gain();		
+		//adapt_freq_max_contiguous_bw();
     }
 	if ((counter > 0) && (running == true)) {
 		update_plot()
@@ -1161,8 +1184,30 @@ function populateCallback() {
         u += "else \n{ return {'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
 		u_a3 = u;
 		break;	
-	case 'a4': uIndex = 4; break;
-    default:
+	case 'a4':
+		uIndex = 4; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately\n";
+		u += "//gn_offset = "
+		u +=  JSON.stringify(gn_offset)
+		u += ";\n"
+		u += "//mc_offset = 1;\n\n"
+        u += "if (margin_dB > 0) \n{ return {'frequency': fc, 'interfererfrequency': fc_int,'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
+        u += "else \n{ return {'frequency': fc,'interfererfrequency': fc_int, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+		u_a3 = u;
+		break;
+		default:
 		//u  = 'bw = 0.19\n';
         //u += 'return bw';
         return;
