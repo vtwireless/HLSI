@@ -33,6 +33,7 @@
     <option value="a2">Frequency-based Adaptation, Narrow-band</option>
     <option value="a3">Gain Adaptation</option>
     <option value="a4">Gain Adaptation with Controllable Interference</option>
+    <option value="a5">Gain Adaptation  Sensing and  Controllable Interference</option>
 
 	<!-- <option value="a3">Frequency-based Adaptation, Approx. Half-band</option> -->
     <!--<option value="a4">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option> -->
@@ -1105,13 +1106,38 @@ async function adapt_interval() {
 		adapt_gain();		
 		//adapt_freq_max_contiguous_bw();
     }
+	else if (uIndex == 5) {
+		adapt_gain();		
+		//adapt_freq_max_contiguous_bw();
+    }
 	if ((counter > 0) && (running == true)) {
 		update_plot()
 		adapt_interval() 
 	}
 }
 
+function adapt_freq_max_contiguous_bw(){
 
+    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
+	//delta = 0.1;
+	//bw = 0.19;
+	//fc = 0;
+	mc = 11;
+	delta = 0.08;
+
+	let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
+
+	let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+
+		if (i_lower + f_limit < f_limit - i_upper){  					// if interferer is closer to lower frequency limit then upper unoccupied sub-band is larger
+		fc = f_limit - (f_limit - i_upper) / 2;							// hop to center of upper unocuppied sub-band
+		bw = f_limit - i_upper - 0.5 * bw_int -delta;							// set bandwidth to use entire upper unoccupied sub-band
+	} else {															// in this case the lower unoccupied sub-band is larger
+		fc = -f_limit + (i_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
+		bw = i_lower + f_limit - 0.5 * bw_int -delta; 							// set bandwidth to use entire lower unoccupied sub-band
+	}
+	return 0
+}
 // integrate
 function accumulate_rate() { bits += rate; rate_avg += rate; cap_avg += cap; update_count += 1; }
 //async function accumulate_interval() {
@@ -1233,12 +1259,42 @@ function populateCallback() {
 
 		//document.querySelector('#userfunction').value = u_;
         u  = "// check current link margin and adjust scheme appropriately\n";
-		u += "//gn_offset = "
-		u +=  JSON.stringify(gn_offset)
+		u += "gn_temp = 0.0"
 		u += ";\n"
 		u += "//mc_offset = 1;\n\n"
-        u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
+        u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn , 'bandwidth':bw + gn_temp, 'modulation_index':mc}; }\n";
         u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+		u_a3 = u;
+		break;
+		
+	case 'a5':
+		uIndex = 5; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately;\n"
+		u += "let delta = 0.04; \n"
+		u += "let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw; \n"
+		u += "let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int; \n;"
+		u += "if (i_lower + f_limit < f_limit - i_upper){  \n"
+		u += "fc = f_limit - (f_limit - i_upper) / 2;	 \n"
+		u += "bw = f_limit - i_upper - 0.5 * bw_int -delta\n;"
+		u += "} \n"
+		u += "else {\n"
+		u += "fc = -f_limit + (i_lower + f_limit) / 2;\n"
+		u += "bw =  i_lower + f_limit - 0.5 * bw_int- delta;"
+		u += "}\n\n\n"
+		u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
+        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
 		u_a3 = u;
 		break;
 		default:
