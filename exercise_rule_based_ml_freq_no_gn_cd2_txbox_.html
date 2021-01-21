@@ -19,7 +19,7 @@
       Fill out a function to change the gain, the bandwidth, the modulation and coding, this variables must be changed in order:
   </label></p>
   <p><tt>function callback( gain, bandWidth, Modulation and Coding  ) {</tt></p>
-  <p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120"
       maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
       placeholder="return {'gain':2, 'bandwidth':0.1, 'modulation_index':0};">return {'gain':2, 'bandwidth':0.1, 'modulation_index':0};</textarea></p>
   <p><tt>}</tt></p>
@@ -1287,8 +1287,8 @@ function populateCallback() {
 		u += "let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int; \n;"
 		u += "if (i_lower + f_limit < f_limit - i_upper){  \n"
 		u += "fc = f_limit - (f_limit - i_upper) / 2;	 \n"
-		u += "bw = f_limit - i_upper - 0.5 * bw_int -delta\n;"
-		u += "} \n"
+		u += "bw = f_limit - i_upper - 0.5 * bw_int -delta;}\n"
+		u += " \n"
 		u += "else {\n"
 		u += "fc = -f_limit + (i_lower + f_limit) / 2;\n"
 		u += "bw =  i_lower + f_limit - 0.5 * bw_int- delta;"
