@@ -890,6 +890,9 @@ function restart() {
 		}
 
 		if (uIndex == 4){
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }	
+			
 			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
 			
@@ -1008,6 +1011,9 @@ async function step_interval() {
 		}
 
 		if (uIndex == 4){
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }	
+			
 			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
 			
