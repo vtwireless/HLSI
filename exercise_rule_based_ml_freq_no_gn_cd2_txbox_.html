@@ -1232,7 +1232,7 @@ function populateCallback() {
 		u += ";\n"
 		u += "//mc_offset = 1;\n\n"
         u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'frequency': fc,'interfererfrequency': fc_int, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
 		u_a3 = u;
 		break;
 		default:
