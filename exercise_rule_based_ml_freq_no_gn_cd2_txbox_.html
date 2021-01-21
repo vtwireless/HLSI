@@ -938,8 +938,12 @@ async function step_interval() {
     if ((counter > 0) && (running == true)) {
 	    step();
 		//step();
-        let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
+        //let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
+		
 
+		let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
 		callback = new Function(document.querySelector('#userfunction').value);
 
 
@@ -962,6 +966,10 @@ async function step_interval() {
         gn = Math.max(-2, Math.min(5, uservals.gain));
         if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
 		
+		if (uIndex == 3){
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }		
+		}
 		
 		step_interval();
     } else {
