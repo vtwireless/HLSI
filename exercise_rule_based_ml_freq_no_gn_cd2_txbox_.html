@@ -33,7 +33,7 @@
     <option value="a2">Frequency-based Adaptation, Narrow-band</option>
     <option value="a3">Gain Adaptation</option>
     <option value="a4">Gain Adaptation with Controllable Interference</option>
-    <option value="a5">Gain Adaptation  Sensing and  Controllable Interference</option>
+    <option value="a5">Gain Adaptation,  Sensing and  Controllable Interference</option>
 
 	<!-- <option value="a3">Frequency-based Adaptation, Approx. Half-band</option> -->
     <!--<option value="a4">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option> -->
@@ -117,6 +117,15 @@
 	  <label for="interferer_bandwidth">Interference Bandwidth:         </label><output for="signal_bandwidth"           id="bw_int"   class="text-bold"></output>.
 
   </p>
+  
+      <p>
+       <label for="temporary1">Temporary 1:         </label><output for="temporary1"           id="temp1"   class="text-bold"></output>,
+       <label for="temporary2">Temporary 2:         </label><output for="temporary2"           id="temp2"   class="text-bold"></output>,
+       <label for="temporary3">Temporary 3:         </label><output for="temporary3"           id="temp3"   class="text-bold"></output>,
+       <label for="temporary4">Temporary 4:         </label><output for="temporary4"           id="temp4"   class="text-bold"></output>,
+       <label for="temporary5">Temporary 5:         </label><output for="temporary5"           id="temp5"   class="text-bold"></output>,
+
+  </p>
 
 </body>
 
@@ -130,6 +139,8 @@
 var margin = {top: 10, right: 50, bottom: 50, left: 50}
   , width  = 720 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+var temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0, temp5 = 0;
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
@@ -828,6 +839,13 @@ function reset() {
 
 	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
 	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	
+	document.querySelector('#temp1').value   = temp1;
+	document.querySelector('#temp2').value   = temp2;
+	document.querySelector('#temp3').value   = temp3;
+	document.querySelector('#temp4').value   = temp4;
+	document.querySelector('#temp5').value   = temp5;
+
 	finished();
 	//adapt_interval();
 
@@ -864,9 +882,12 @@ function restart() {
 		 //{'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
 
 
- 		let current = (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+ 		let current = (uIndex == 5) ?  {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc, 'temporary1':temp1,
+		'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5
+		}:  (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
 		 
 		let uservals = callback(current);
 
@@ -899,7 +920,35 @@ function restart() {
 			
 			bw_int = Math.max(-0.5, Math.min(0.5, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0; }		
-		}		
+		}	
+
+
+		if (uIndex == 5){
+			temp1 = Math.max(-0.5, Math.min(0.5, uservals.temporary1));
+			if (typeof temp1 != "number" || isNaN(temp1)) { temp1 = 0; }	
+
+			temp2 = Math.max(-0.5, Math.min(0.5, uservals.temporary2));
+			if (typeof temp2 != "number" || isNaN(temp2)) { temp2 = 0; }
+
+			temp3 = Math.max(-0.5, Math.min(0.5, uservals.temporary3));
+			if (typeof temp3 != "number" || isNaN(temp3)) { temp3 = 0; }
+			
+			temp4 = Math.max(-0.5, Math.min(0.5, uservals.temporary4));
+			if (typeof temp4 != "number" || isNaN(temp4)) { temp4 = 0; }
+			
+			temp5 = Math.max(-0.5, Math.min(0.5, uservals.temporary5));
+			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
+			
+
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }	
+			
+			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
+			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
+			
+			bw_int = Math.max(-0.5, Math.min(0.5, uservals.interfererbandwidth));
+			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0; }		
+		}	
 		//string1 = gn.toString();
 		//string2 = bw.toString();
 		//string3 = mc.toString();
@@ -979,9 +1028,12 @@ async function step_interval() {
 		//let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		// {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
 		 
- 		let current = (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
+ 		let current = (uIndex == 5) ?  {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc, 'temporary1':temp1,
+		'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5
+		}:  (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
 		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		 
 		 
 		 
 		callback = new Function(document.querySelector('#userfunction').value);
@@ -1012,6 +1064,33 @@ async function step_interval() {
 		}
 
 		if (uIndex == 4){
+			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
+			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }	
+			
+			fc_int = Math.max(-0.5, Math.min(0.5, uservals.interfererfrequency));
+			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = 0; }		
+			
+			bw_int = Math.max(-0.5, Math.min(0.5, uservals.interfererbandwidth));
+			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0; }		
+		}
+
+		if (uIndex == 5){
+			temp1 = Math.max(-0.5, Math.min(0.5, uservals.temporary1));
+			if (typeof temp1 != "number" || isNaN(temp1)) { temp1 = 0; }	
+
+			temp2 = Math.max(-0.5, Math.min(0.5, uservals.temporary2));
+			if (typeof temp2 != "number" || isNaN(temp2)) { temp2 = 0; }
+
+			temp3 = Math.max(-0.5, Math.min(0.5, uservals.temporary3));
+			if (typeof temp3 != "number" || isNaN(temp3)) { temp3 = 0; }
+			
+			temp4 = Math.max(-0.5, Math.min(0.5, uservals.temporary4));
+			if (typeof temp4 != "number" || isNaN(temp4)) { temp4 = 0; }
+			
+			temp5 = Math.max(-0.5, Math.min(0.5, uservals.temporary5));
+			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
+			
+
 			fc = Math.max(-0.5, Math.min(0.5, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = 0; }	
 			
@@ -1200,6 +1279,12 @@ function step() {
 
 	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
 	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	
+	document.querySelector('#temp1').value   = temp1;
+	document.querySelector('#temp2').value   = temp2;
+	document.querySelector('#temp3').value   = temp3;
+	document.querySelector('#temp4').value   = temp4;
+	document.querySelector('#temp5').value   = temp5;
 }
 
 function populateCallback() {
@@ -1293,8 +1378,12 @@ function populateCallback() {
 		u += "fc = -f_limit + (i_lower + f_limit) / 2;\n"
 		u += "bw =  i_lower + f_limit - 0.5 * bw_int- delta;"
 		u += "}\n\n\n"
-		u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+		u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc , "
+		u += " 'temporary1':temp1,'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5"
+		u += "}; }\n";
+        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1,"
+		u += "'temporary1':temp1,'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5"
+		u += "}; }\n";
 		u_a3 = u;
 		break;
 		default:
