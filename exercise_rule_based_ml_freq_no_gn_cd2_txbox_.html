@@ -840,7 +840,7 @@ function reset() {
 	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
 	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 	
-	document.querySelector('#temp1').value   = temp1a;
+	document.querySelector('#temp1').value   = temp1;
 	document.querySelector('#temp2').value   = temp2;
 	document.querySelector('#temp3').value   = temp3;
 	document.querySelector('#temp4').value   = temp4;
@@ -1110,7 +1110,7 @@ async function step_interval() {
 			bw_int = Math.max(-0.5, Math.min(0.5, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0; }		
 		}	
-		document.querySelector('#temp1').value   = temp1a;
+		document.querySelector('#temp1').value   = temp1;
 		document.querySelector('#temp2').value   = temp2;
 		document.querySelector('#temp3').value   = temp3;
 		document.querySelector('#temp4').value   = temp4;
@@ -1294,7 +1294,7 @@ function step() {
 	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
 	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 	
-	document.querySelector('#temp1').value   = temp1a;
+	document.querySelector('#temp1').value   = temp1;
 	document.querySelector('#temp2').value   = temp2;
 	document.querySelector('#temp3').value   = temp3;
 	document.querySelector('#temp4').value   = temp4;
