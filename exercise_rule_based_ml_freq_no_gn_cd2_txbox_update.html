@@ -144,7 +144,8 @@ var temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0, temp5 = 0, temp1a = 0;
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
-var f_limit = 0.44;
+var fs_ = 400e6; 
+
 var uIndex = -1;
 var uIndexHop = -1;
 var checkSensing = 1;
@@ -186,6 +187,9 @@ var schemes = [
 var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
 var fs_ = 400e6; 
 var [scale_freq_,units_freq_] = scale_units(f0+fs_/2,0.01);
+var f_limit_1 = (f0-0.44*fs_)*scale_freq_;
+var f_limit_2 = (f0+0.44*fs_)*scale_freq_;
+var f_limit = (f0+0.44*fs_)*scale_freq_;
 
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs_)*scale_freq_, (f0+0.5*fs_)*scale_freq_]).range([0, width]);
 var pScale = d3.scaleLinear().domain([-35, 25]).range([height, 0]);
@@ -250,73 +254,6 @@ function compute_interference()
     return (f1-f0)*Math.pow(10.,gn_int/10.)/bw_int;
 }
 
-function adapt_freq_approx_half_band(){
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	delta = 0.1;
-	mc = 11;
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
-	
-		bw = f_limit - bw_int;	  		// Set signal bandwidth to maximum value that guarantees no overlap with interferer if the interferer hops to f = 0
-										// Assuming that the interferer bandwidth is constant
-		if (fc_int < 0) {				// If interferer is closer to the lower frequency limit then hop to the upper end of the band
-			fc = f_limit - bw / 2;		// Hop to the upper end of the band
-		}
-		else {							// In this case the interferer is closer to the upper frequency limit
-			fc = -f_limit + bw / 2;		// Hop to the lower end of the band
-		}
-	return 0
-}
-
-function adapt_freq_max_contiguous_bw(){
-
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	//delta = 0.1;
-	//bw = 0.19;
-	//fc = 0;
-	mc = 11;
-	delta = 0.08;
-
-	let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-	let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
-
-		if (i_lower + f_limit < f_limit - i_upper){  					// if interferer is closer to lower frequency limit then upper unoccupied sub-band is larger
-		fc = f_limit - (f_limit - i_upper) / 2;							// hop to center of upper unocuppied sub-band
-		bw = f_limit - i_upper - 0.5 * bw_int -delta;							// set bandwidth to use entire upper unoccupied sub-band
-	} else {															// in this case the lower unoccupied sub-band is larger
-		fc = -f_limit + (i_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
-		bw = i_lower + f_limit - 0.5 * bw_int -delta; 							// set bandwidth to use entire lower unoccupied sub-band
-	}
-	return 0
-}
-
-
-function fixed_bw_modcod(){
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	delta = 0.1;
-	//bw = 0.19;
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
-	
-	
-	fc = 0;				// Set center frequency to center of band
-	bw = 2 * f_limit;	// Occupy entire band
-	mc = 0;			// Select most robust (and slowest) modulation and coding rate combination
-	
-    // compute and display SNR
-	//let I     = compute_interference();     // interference power (linear)
-    //let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
- 
-	//let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
-    //let SINRdB= gn - 10*Math.log10(N+I);
-    //let SINRdB1= gn - 10*Math.log10(N);
-
-	//SNRdB = SINRdB;
-	return 0; 
-}
 
 function adapt_gain(){
     //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
@@ -335,195 +272,6 @@ function adapt_gain(){
 	}		
 	
 
-	return 0; 
-}
-
-function adapt_freq_bw(){
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	delta = 0.1;
-	mc = 11;
-	
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
-	
-	
-    if (!(f_lower > i_upper || f_upper < i_lower)) 
-	{		alpha = 2;
-		
-		let ch1 = f_lower -i_lower;
-		let ch2 = f_upper -i_upper;
-		let ch3 = Math.abs(i_upper -f_lower);
-		let ch4 = Math.abs(i_lower -f_upper);
-		
-		if ((ch2 > 0) && (ch1 >0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch3 + delta
-				bw = bw_int
-			}else{
-				fc = fc  - ch3 - delta
-				bw = bw_int
-			}
-			return 0
-		}
-		
-		if ((ch2 > 0) && (ch1 <0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			Math.max(Math.abs(ch3), Math.abs(ch4))
-			ch5 = Math.abs(ch3) +  Math.abs(ch4);
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch5 + delta
-				bw = bw_int
-
-			}else{
-				fc = fc  - ch5 - delta
-				bw = bw_int
-
-			}
- 			return 0
-
-		}
-		if ((ch2 < 0) && (ch1 < 0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			//fc = fc + ch4+ delta
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch4 + delta
-				bw = bw_int
-
-			}else{
-				fc = fc  - ch4 - delta
-				bw = bw_int
-
-			}
-			return 0
-
-		}
-		
-		fc = 0;
-		return 0;		
-		//if (!((i_upper > f_lower)  || (i_lower > f_upper) ))
-		//{
-			//fc = 0;
-		//}
-		
-		//bw = bw_int;
-	}
-	else
-	{
-	//alpha = 0.5
-	}
-	return 0; 
-}
-
-function adapt(){
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	delta = 0.1;
-	//bw = 0.19;
-	//mc = 11;
-	
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
-	
-	
-    if (!(f_lower > i_upper || f_upper < i_lower)) 
-	{		alpha = 2;
-		
-		let ch1 = f_lower -i_lower;
-		let ch2 = f_upper -i_upper;
-		let ch3 = Math.abs(i_upper -f_lower);
-		let ch4 = Math.abs(i_lower -f_upper);
-		
-		if ((ch2 > 0) && (ch1 >0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch3 + delta
-			}else{
-				fc = fc  - ch3 - delta
-			}
-			return 0
-		}
-		
-		if ((ch2 > 0) && (ch1 <0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			Math.max(Math.abs(ch3), Math.abs(ch4))
-			ch5 = Math.abs(ch3) +  Math.abs(ch4);
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch5 + delta
-			}else{
-				fc = fc  - ch5 - delta
-			}
- 			return 0
-
-		}
-		if ((ch2 < 0) && (ch1 < 0)){
-			if (f_lower < -f_limit) { fc =0; }
-			if (f_upper >  f_limit) { fc = 0; }
-			//fc = fc + ch4+ delta
-			coin = (Math.floor(Math.random() * 2) == 0);
-			if (coin){
-				fc = fc  + ch4 + delta
-			}else{
-				fc = fc  - ch4 - delta
-			}
-			return 0
-
-		}
-		
-		fc = 0;
-		return 0;		
-		//if (!((i_upper > f_lower)  || (i_lower > f_upper) ))
-		//{
-			//fc = 0;
-		//}
-		
-		//bw = bw_int;
-	}
-	else
-	{
-	//alpha = 0.5
-	}
-	return 0; 
-}
-
-
-function adapt_random(){
-    //let f_lower = fc     - alpha*bw,     f_upper = fc     + alpha*bw;
-	delta = 0.1;
-	//bw = 0.19;
-	//mc = 11;
-	
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;	
-	
-    //if (!(f_lower > i_upper || f_upper < i_lower)) 
-	//{
-		fc = 0.97*(Math.random()-0.5)*(1-bw_int);update_plot();  
-	//}		
-	
-    // compute and display SNR
-	let I     = compute_interference();     // interference power (linear)
-    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
- 
-	let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
-    let SINRdB= gn - 10*Math.log10(N+I);
-    let SINRdB1= gn - 10*Math.log10(N);
-
-	SNRdB = SINRdB;
 	return 0; 
 }
 
@@ -740,9 +488,16 @@ function update_plot(freq,band,gain,modcod) {
 
 	//adapt()
 
-	let  f_lower = fcTemp - 0.5*bwTemp, f_upper = fcTemp + 0.5*bwTemp;
-    if (f_lower < -f_limit) { fcTemp -= f_lower+f_limit; }
-    if (f_upper >  f_limit) { fcTemp -= f_upper-f_limit; }
+	fc = (f0+(fcTemp*fs_))*scale_freq_
+	//fc_int = (f0+(fc_intTemp*fs_))*scale_freq_
+	bw = bwTemp*fs_*scale_freq_
+	//bw_int = bw_intTemp*fs_*scale_freq_
+	console.log("New" + bw)
+
+
+	let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
+    if (f_lower < f_limit_1) { fc += f_limit_1 - f_lower +10; }
+    if (f_upper >  f_limit_2) { fc -= f_upper-f_limit_2-10; }
 
 	//console.log("fc Update_1" +fc)
 
@@ -753,10 +508,7 @@ function update_plot(freq,band,gain,modcod) {
     document.querySelector('#bw').value = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
     document.querySelector('#bandwidth').value = bwTemp;
 	
-	fc = (f0+(fcTemp*fs_))*scale_freq_
-	fc_int = (f0+(fc_intTemp*fs_))*scale_freq_
-	bw = bwTemp*fs_*scale_freq_
-	bw_int = bw_intTemp*fs_*scale_freq_
+
 
     //document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
    // document.querySelector('#gain').value = gn;
@@ -1465,16 +1217,16 @@ function populateCallback() {
 
 		//document.querySelector('#userfunction').value = u_;
         u  = "// check current link margin and adjust scheme appropriately;\n"
-		u += "let delta = 0.04; \n"
+		u += "let delta = 40; \n"
 		u += "let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw; \n"
 		u += "let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int; \n;"
-		u += "if (i_lower + f_limit < f_limit - i_upper){  \n"
-		u += "fc = f_limit - (f_limit - i_upper) / 2;	 \n"
-		u += "bw = f_limit - i_upper - 0.5 * bw_int -delta;}\n"
+		u += "if (i_lower - f_limit_1 < f_limit_2 - i_upper){  \n"
+		u += "fc = i_upper + (f_limit_2 - i_upper) / 2;	 \n"
+		u += "bw = f_limit_2 - i_upper  -delta;}\n"
 		u += " \n"
 		u += "else {\n"
-		u += "fc = -f_limit + (i_lower + f_limit) / 2;\n"
-		u += "bw =  i_lower + f_limit - 0.5 * bw_int- delta;"
+		u += "fc = f_limit_1 + (i_lower - f_limit_1) / 2;\n"
+		u += "bw =  i_lower - f_limit_1   -delta;;"
 		u += "}\n\n\n"
 		u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc , "
 		u += " 'temporary1':temp1,'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5"
