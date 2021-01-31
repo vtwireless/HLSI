@@ -16,9 +16,9 @@
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
   <p><label for="userfunction">
-      Fill out a function to change the gain, the bandwidth, the modulation and coding, this variables must be changed in order:
+      Fill out a function to change the Interfer Frequency,Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables, this variables must be changed in order:
   </label></p>
-  <p><tt>function callback( gain, bandWidth, Modulation and Coding  ) {</tt></p>
+  <p><tt>function callback( Interfer Frequency, Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables  ) {</tt></p>
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="120"
       maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
       placeholder="return {'gain':2, 'bandwidth':120, 'modulation_index':0};">return {'gain':2, 'bandwidth':120, 'modulation_index':0};</textarea></p>
@@ -29,9 +29,9 @@
   <select id="strategy" onchange="populateCallback()">
     <option value="default" selected >Select pre-configured strategy...</option>
    <!-- <option value="a0">Maximum Bandwidth, Minimum Modulation and Coding</option> -->
-    <option value="a1">Random Frequency Adaptation</option>
-    <option value="a2">Frequency-based Adaptation, Narrow-band</option>
-    <option value="a3">Gain Adaptation</option>
+   <!--  <option value="a1">Random Frequency Adaptation</option> -->
+    <!-- <option value="a2">Frequency-based Adaptation, Narrow-band</option> -->
+    <!-- <option value="a3">Gain Adaptation</option> -->
     <option value="a4">Gain Adaptation with Controllable Interference</option>
     <option value="a5">Gain Adaptation,  Sensing and  Controllable Interference</option>
 
@@ -149,11 +149,13 @@ var uIndex = -1;
 var uIndexHop = -1;
 var checkSensing = 1;
 var running = true;
-var bw = 0.19, fc = 0.0, gn = 2, mc = 0, n0 = -30, snr = 0, rate = 0, valid = false, valid2= false;
+var bw = 20, fc = 1800, gn = 2, mc = 0, n0 = -30, snr = 0, rate = 0, valid = false, valid2= false;
+var bwTemp = 0.19, fcTemp = 0.0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
-var bw_int = 0.05, fc_int = 0.35, gn_int = -2; // interference values
+var bw_int = 20, fc_int = 1750, gn_int = -2; // interference values
+var bw_intTemp = 0.05, fc_intTemp = 0.25;
 var hop_dwell_time = 200;
 var alpha = 0.5;
 var counter=0, bits=0, outages=0, outages_survived=0, runtime=60, step_dwell_time=50;
@@ -218,7 +220,7 @@ function generate_psd(f,w,g,n) {
     generator.clear();
     // add signal with gain compensating for signal bandwidth
     generator.add_signal(f,w,g + 10*Math.log10(w));
-	generator.add_signal(fc_int,bw_int,gn_int+10*Math.log10(bw_int)); // interference
+	generator.add_signal(fc_intTemp,bw_intTemp,gn_int+10*Math.log10(bw_intTemp)); // interference
 
     //generator.add_noise(n); // add random noise samples
     generator.generate(n); // generate with specific noise floor
@@ -515,7 +517,7 @@ function adapt_random(){
 	
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
-    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
  
 	let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
     let SINRdB= gn - 10*Math.log10(N+I);
@@ -730,23 +732,31 @@ function update_hop_rate(slow_, fast_)
 }
 
 function update_plot(freq,band,gain,modcod) {
-    if (freq !=null) { fc = freq;  }
-    if (band !=null) { bw = band;  }
+    if (freq !=null) { fcTemp = freq;  }
+    if (band !=null) { bwTemp = band;  }
     if (gain !=null) { gn = gain;  }
     if (modcod!=null){ mc = modcod;}
     //if (hop_rate!=null){ hr = hop_rate;}
 
 	//adapt()
 
-	let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
-    if (f_lower < -f_limit) { fc -= f_lower+f_limit; }
-    if (f_upper >  f_limit) { fc -= f_upper-f_limit; }
+	let  f_lower = fcTemp - 0.5*bwTemp, f_upper = fcTemp + 0.5*bwTemp;
+    if (f_lower < -f_limit) { fcTemp -= f_lower+f_limit; }
+    if (f_upper >  f_limit) { fcTemp -= f_upper-f_limit; }
 
-    document.querySelector('#fc').value = d3.format(".1f")((f0+fc*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
-    document.querySelector('#frequency').value = fc;
+	//console.log("fc Update_1" +fc)
 
-    document.querySelector('#bw').value = d3.format(".2f")(bw*fs_*scale_freq_) + " " + units_freq_ + "Hz";
-    document.querySelector('#bandwidth').value = bw;
+    document.querySelector('#fc').value = d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+    document.querySelector('#frequency').value = fcTemp;
+	//console.log("fc Update_2" +fc)
+
+    document.querySelector('#bw').value = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+    document.querySelector('#bandwidth').value = bwTemp;
+	
+	fc = (f0+(fcTemp*fs_))*scale_freq_
+	fc_int = (f0+(fc_intTemp*fs_))*scale_freq_
+	bw = bwTemp*fs_*scale_freq_
+	bw_int = bw_intTemp*fs_*scale_freq_
 
     //document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
    // document.querySelector('#gain').value = gn;
@@ -765,7 +775,7 @@ function update_plot(freq,band,gain,modcod) {
 	
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
-    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
  
 	let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
     let SINRdB= gn - 10*Math.log10(N+I);
@@ -775,7 +785,7 @@ function update_plot(freq,band,gain,modcod) {
 
     // compute and display spectral efficiency, capacity
     let R = efficiency(SNRdB);  // spectral efficiency (b/s/Hz)
-    let C = fs * bw * R;        // capacity (b/s)
+    let C = fs * bwTemp * R;        // capacity (b/s)
     var [scale_cap,units_cap] = scale_units(C,0.1);
     document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "b/s";
     document.querySelector('#eta').value = d3.format(".3f")(R) + " " + "b/s/Hz";
@@ -788,7 +798,7 @@ function update_plot(freq,band,gain,modcod) {
     // compute and display actual data rate
     valid = margin_dB >= 0;
     if (valid) {
-        rate = schemes[mc].rate * bw * fs;
+        rate = schemes[mc].rate * bwTemp * fs;
         var [scale_rate,units_rate] = scale_units(rate,0.1);
         let percent_capacity = 100 * rate / C;
         document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
@@ -801,7 +811,7 @@ function update_plot(freq,band,gain,modcod) {
     }
 
     // generate power spectral density, compensating for bandwidth
-    dataf = generate_psd(fc,bw,gn,n0);
+    dataf = generate_psd(fcTemp,bwTemp,gn,n0);
 	
     pathf.datum(dataf).attr("d", linef);
 
@@ -820,7 +830,9 @@ hop_dwell_time = step_dwell_time;
 
 function reset() {
     mc = Math.max(0,schemes.length - 3);
-    [gn,bw] = gn_bw_profile(0);
+    [gn,bwTemp] = gn_bw_profile(0);
+	bw = bwTemp * (fs_ * scale_freq_)	
+
     counter = num_steps;
     bits  = 0;
     outages = 0;
@@ -833,12 +845,12 @@ function reset() {
 	document.querySelector('#gain').value   = d3.format(".2f")(gn) + " dB";
 
 
-	document.querySelector('#frequency_').value   =d3.format(".1f")((f0+fc*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
-	document.querySelector('#bw_').value  = d3.format(".2f")(bw*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#frequency_').value   =d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_').value  = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 	//hop_interval();
 
-	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
-	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_intTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_intTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 	
 	document.querySelector('#temp1').value   = temp1;
 	document.querySelector('#temp2').value   = temp2;
@@ -873,7 +885,7 @@ function restart() {
 		running = true;
 
 		//step();
-		console.log(uIndex)
+		//console.log(uIndex)
 
 
 		callback = new Function(document.querySelector('#userfunction').value);
@@ -900,11 +912,11 @@ function restart() {
         // validate center frequency
 
         // validate bandwidth
-		bw = bw*fs_*scale_freq_
+		//bw = bw*fs_*scale_freq_
 
-		bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
-		if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
-		bw = bw / (fs_ * scale_freq_)
+		//bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+		//if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
+		//bw = bw / (fs_ * scale_freq_)
 
         gn = Math.max(-2, Math.min(5, uservals.gain));
         if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
@@ -922,26 +934,26 @@ function restart() {
 		}
 
 		if (uIndex == 4){
-			fc = (f0+(fc*fs_))*scale_freq_
-			fc_int = (f0+(fc_int*fs_))*scale_freq_
-			bw = bw*fs_*scale_freq_
-			bw_int = bw_int*fs_*scale_freq_
+			//fc = (f0+(fc*fs_))*scale_freq_
+			//fc_int = (f0+(fc_int*fs_))*scale_freq_
+			//bw = bw*fs_*scale_freq_
+			//bw_int = bw_int*fs_*scale_freq_
 
 			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
-			fc = ((fc / scale_freq_) - f0 )/ fs_
+			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
 			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
-			fc_int = ((fc_int / scale_freq_) - f0 )/ fs_
+			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
 			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
-			bw_int = bw_int / (fs_ * scale_freq_)
+			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
 			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
-			bw = bw / (fs_ * scale_freq_)	
+			bwTemp = bw / (fs_ * scale_freq_)
 		}
 
 		if (uIndex == 5){
@@ -966,33 +978,35 @@ function restart() {
 			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
 			
 
-			fc = (f0+(fc*fs_))*scale_freq_
-			fc_int = (f0+(fc_int*fs_))*scale_freq_
-			bw = bw*fs_*scale_freq_
-			bw_int = bw_int*fs_*scale_freq_
+			//fc = (f0+(fc*fs_))*scale_freq_
+			//fc_int = (f0+(fc_int*fs_))*scale_freq_
+			//bw = bw*fs_*scale_freq_
+			//bw_int = bw_int*fs_*scale_freq_
+
+			//console.log(fc)
 
 			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
-			fc = ((fc / scale_freq_) - f0 )/ fs_
+			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
 			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
-			fc_int = ((fc_int / scale_freq_) - f0 )/ fs_
+			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
 			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
-			bw_int = bw_int / (fs_ * scale_freq_)
+			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
 			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
-			bw = bw / (fs_ * scale_freq_)	
+			bwTemp = bw / (fs_ * scale_freq_)
 		}		
 		//string1 = gn.toString();
 		//string2 = bw.toString();
 		//string3 = mc.toString();
 
 		//u_ = string.concat("return {'gn':", string1, ", 'bw':", string2, ", 'mc':",  string3, "};")
-		// Error de
+		// Error de  
 		var dictU_ = {
 		  'gain': gn,
 		  'bandwidth': bw,
@@ -1028,7 +1042,7 @@ function restart() {
 		else{
 		//	document.querySelector('#userfunction').value = u_;
 		}
-		console.log(u_)
+		//console.log(u_)
 		//u_ = string.concat("return ", u_)
 
 		
@@ -1049,7 +1063,7 @@ function restart() {
 }
 
 function stop() {
-    console.log("stop!");
+    //console.log("stop!");
     running = false;
     document.querySelector('#restart').value = 'start';
     document.querySelector('#userfunction').disabled = false;
@@ -1081,7 +1095,7 @@ async function step_interval() {
 
 		gn = uservals.gain;
 		gn_offset = uservals.gn_offset;
-		console.log(gn_offset);
+		//console.log(gn_offset);
 
 		// validate modulation/coding scheme
         mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.modulation_index)));
@@ -1090,7 +1104,7 @@ async function step_interval() {
         // validate center frequency
 
         // validate bandwidth
-		bw = bw*fs_*scale_freq_
+		//bw = bw*fs_*scale_freq_
 
 		bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
 		if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
@@ -1112,26 +1126,26 @@ async function step_interval() {
 		}
 
 		if (uIndex == 4){
-			fc = (f0+(fc*fs_))*scale_freq_
-			fc_int = (f0+(fc_int*fs_))*scale_freq_
-			bw = bw*fs_*scale_freq_
-			bw_int = bw_int*fs_*scale_freq_
+			//fc = (f0+(fc*fs_))*scale_freq_
+			//fc_int = (f0+(fc_int*fs_))*scale_freq_
+			//bw = bw*fs_*scale_freq_
+			//bw_int = bw_int*fs_*scale_freq_
 
 			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
-			fc = ((fc / scale_freq_) - f0 )/ fs_
+			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
 			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
-			fc_int = ((fc_int / scale_freq_) - f0 )/ fs_
+			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
 			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
-			bw_int = bw_int / (fs_ * scale_freq_)
+			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
 			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
-			bw = bw / (fs_ * scale_freq_)	
+			bwTemp = bw / (fs_ * scale_freq_)
 		}
 
 		if (uIndex == 5){
@@ -1156,26 +1170,28 @@ async function step_interval() {
 			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
 			
 
-			fc = (f0+(fc*fs_))*scale_freq_
-			fc_int = (f0+(fc_int*fs_))*scale_freq_
-			bw = bw*fs_*scale_freq_
-			bw_int = bw_int*fs_*scale_freq_
+			//fc = (f0+(fc*fs_))*scale_freq_
+			//fc_int = (f0+(fc_int*fs_))*scale_freq_
+			//bw = bw*fs_*scale_freq_
+			//bw_int = bw_int*fs_*scale_freq_
+
+			//console.log(fc)
 
 			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
-			fc = ((fc / scale_freq_) - f0 )/ fs_
+			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
 			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
-			fc_int = ((fc_int / scale_freq_) - f0 )/ fs_
+			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
 			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
-			bw_int = bw_int / (fs_ * scale_freq_)
+			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
 			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
-			bw = bw / (fs_ * scale_freq_)	
+			bwTemp = bw / (fs_ * scale_freq_)	
 		}	
 		document.querySelector('#temp1').value   = temp1;
 		document.querySelector('#temp2').value   = temp2;
@@ -1204,8 +1220,8 @@ function hop() {
 	{ return 0;}
 	
 	
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+    let f_lower = fcTemp     - 0.5*bwTemp,     f_upper = fcTemp     + 0.5*bwTemp;
+    let i_lower = fc_intTemp - 0.5*bw_intTemp, i_upper = fc_intTemp + 0.5*bw_intTemp;
 
     // check for no overlap
 //    if (!((f_lower > i_upper || f_upper < i_lower))) 
@@ -1216,7 +1232,7 @@ function hop() {
 	}
     // compute and display SNR
 	let I     = compute_interference();     // interference power (linear)
-    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
  
 	let SNRdB = 0;// gn - n0 - 10*Math.log10(bw);
     let SINRdB= gn - 10*Math.log10(N+I);
@@ -1315,12 +1331,13 @@ function gn_bw_profile(i) {
            Math.exp(-0.05*t);
     let bandwidth = (0.1 + 0.8*(0.5 + 0.5*Math.cos(2*Math.PI*0.07*t + 1.5))) *
             Math.exp(-0.015*t);
-    return [gn,bw];
+    return [gn,bwTemp];
 }
 
 function step() {
     // gain and bandwidth profiles
-    [gn,bw] = gn_bw_profile(num_steps - counter);
+    [gn,bwTemp] = gn_bw_profile(num_steps - counter);
+	bw = bwTemp * (fs_ * scale_freq_)	
 	if (counter>0){
     counter -= 1;
 	}
@@ -1333,19 +1350,19 @@ function step() {
     bits += Math.round(rate * step_dwell_time * 1e-3);
     outages += valid ? 0 : 1;
 	
-    let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw;
-    let i_lower = fc_int - 0.5*bw_int, i_upper = fc_int + 0.5*bw_int;
+    let f_lower = fcTemp     - 0.5*bwTemp,     f_upper = fcTemp     + 0.5*bwTemp;
+    let i_lower = fc_intTemp - 0.5*bw_intTemp, i_upper = fc_intTemp + 0.5*bw_intTemp;
 
     // check for  overlap
     if (((f_lower > i_upper || f_upper < i_lower))) 
-		{fc_saved = fc_int }
+		{fc_saved = fc_intTemp }
 
 	
 	if (valid2){
 		outages_survived += 0;
 	}
 	else{
-		if ((fc_saved == fc_int)&& (hop_check == 1)){
+		if ((fc_saved == fc_intTemp)&& (hop_check == 1)){
 			outages_survived += 1;
 		}
 	}
@@ -1355,11 +1372,11 @@ function step() {
     document.querySelector('#timer').value   = d3.format(",")(counter);
 	document.querySelector('#gain').value   = d3.format(".2f")(gn) + " dB";
 
-	document.querySelector('#frequency_').value   = d3.format(".1f")((f0+fc*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
-	document.querySelector('#bw_').value  = d3.format(".2f")(bw*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#frequency_').value   = d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_').value  = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 
-	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_int*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
-	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_int*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_intTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_int').value  = d3.format(".2f")(bw_intTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
 	
 	document.querySelector('#temp1').value   = temp1;
 	document.querySelector('#temp2').value   = temp2;
