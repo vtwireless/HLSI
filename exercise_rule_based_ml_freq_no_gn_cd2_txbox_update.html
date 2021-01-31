@@ -189,7 +189,7 @@ var fs_ = 400e6;
 var [scale_freq_,units_freq_] = scale_units(f0+fs_/2,0.01);
 var f_limit_1 = (f0-0.44*fs_)*scale_freq_;
 var f_limit_2 = (f0+0.44*fs_)*scale_freq_;
-var f_limit = (f0+0.44*fs_)*scale_freq_;
+var f_limit = 0.44;
 
 var fScale = d3.scaleLinear().domain([(f0-0.5*fs_)*scale_freq_, (f0+0.5*fs_)*scale_freq_]).range([0, width]);
 var pScale = d3.scaleLinear().domain([-35, 25]).range([height, 0]);
@@ -488,6 +488,10 @@ function update_plot(freq,band,gain,modcod) {
 
 	//adapt()
 
+	let  f_lower = fcTemp - 0.5*bwTemp, f_upper = fcTemp + 0.5*bwTemp;
+    if (f_lower < -f_limit) { fcTemp -= f_lower+f_limit; }
+    if (f_upper >  f_limit) { fcTemp -= f_upper-f_limit; }
+	
 	fc = (f0+(fcTemp*fs_))*scale_freq_
 	//fc_int = (f0+(fc_intTemp*fs_))*scale_freq_
 	bw = bwTemp*fs_*scale_freq_
@@ -495,9 +499,12 @@ function update_plot(freq,band,gain,modcod) {
 	console.log("New" + bw)
 
 
-	let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
-    if (f_lower < f_limit_1) { fc += f_limit_1 - f_lower +10; }
-    if (f_upper >  f_limit_2) { fc -= f_upper-f_limit_2-10; }
+	//let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
+    //if (f_lower < f_limit_1) { fc += f_limit_1 - f_lower +10; fc =1800;
+	//fcTemp = ((fc / scale_freq_) - f0 )/ fs_;}
+    //if (f_upper >  f_limit_2) { fc -= f_upper-f_limit_2-10; fc = 1800;
+	//fcTemp = ((fc / scale_freq_) - f0 )/ fs_;}
+
 
 	//console.log("fc Update_1" +fc)
 

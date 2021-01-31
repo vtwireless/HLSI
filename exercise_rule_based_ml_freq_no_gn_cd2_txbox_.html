@@ -739,8 +739,8 @@ function update_plot(freq,band,gain,modcod) {
 	//adapt()
 
 	let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
-    if (f_lower < -f_limit) { fc -= f_lower+f_limit; }
-    if (f_upper >  f_limit) { fc -= f_upper-f_limit; }
+    //if (f_lower < -f_limit) { fc -= f_lower+f_limit; }
+    //if (f_upper >  f_limit) { fc -= f_upper-f_limit; }
 
     document.querySelector('#fc').value = d3.format(".1f")((f0+fc*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
     document.querySelector('#frequency').value = fc;
