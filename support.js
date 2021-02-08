@@ -5,6 +5,7 @@ function svg_create(_margin, _width, _height, _xscale, _yscale)
         .attr("width",  _width  + _margin.left + _margin.right)
         .attr("height", _height + _margin.top +  _margin.bottom)
       .append("g")
+	  .attr("class", "graph-svg-component")
         .attr("transform", "translate(" + _margin.left + "," + _margin.top + ")");
 
     // create axes
@@ -14,6 +15,10 @@ function svg_create(_margin, _width, _height, _xscale, _yscale)
     svg.append("g").attr("class", "y axis")
         .call(d3.axisLeft(_yscale));
 
+	svg.append("rect")
+		.attr("width", "86.5%")
+		.attr("height", "81%")
+		.attr("fill", "black");
     // create grid lines
     svg.append("g").attr("class","grid").call(d3.axisBottom(_xscale).tickFormat("").tickSize( _height));
     svg.append("g").attr("class","grid").call(d3.axisLeft  (_yscale).tickFormat("").tickSize(- _width));
@@ -27,7 +32,9 @@ function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
        .attr("transform","translate("+(_width/2)+","+(_height + 0.75*_margin.bottom)+")")
        .attr("dy","-0.3em")
        .style("text-anchor","middle")
+		.attr("fill", "white")
        .text(_xlabel)
+
 
     // create y-axis label
     _svg.append("text")
@@ -36,7 +43,9 @@ function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
        .attr("x", 0 - (_height/2))
        .attr("dy", "1em")
        .style("text-anchor","middle")
+		.attr("fill", "white")
        .text(_ylabel)
+
 }
 
 // determine scale and units for sample value v; use p to adjust cut-off threshold

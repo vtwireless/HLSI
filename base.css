@@ -1,5 +1,9 @@
 /* TODO: only apply to axis labels? */
-svg * { font: 12px Arial; }
+svg * { font: 12px Arial;
+  color: white;
+  line : white
+ }
+		
 
 /* font styles */
 .text-bold { font-weight: bold; }
@@ -13,8 +17,12 @@ svg * { font: 12px Arial; }
 .dashed         { stroke-dasharray: 4,4; }
 .stroke-blue    { stroke: #004080; }
 .stroke-green   { stroke: #008040; }
+.stroke-green-o  { stroke: #66ff00;}
 .stroke-red     { stroke: #804000; }
 .stroke-gray-0  { stroke: #cccccc; }
+.stroke-yellow  { stroke: #FFFF00;}
+.stroke-orange  { stroke: #ffa500;}
+
 
 /* bounding box */
 .domain { display: none; }
@@ -23,7 +31,18 @@ svg * { font: 12px Arial; }
 
 .width-1 { width: 240px; }
 .width-2 { width: 320px; }
-.width-3 { width: 480px; }
+
 .width-4 { width: 640px; }
 .width-5 { width: 960px; }
 
+.width-3 {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 480px; /* Full-width */
+  height: 5px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+}
