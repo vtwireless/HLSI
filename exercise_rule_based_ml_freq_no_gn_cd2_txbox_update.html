@@ -155,7 +155,7 @@ var bwTemp = 0.19, fcTemp = 0.0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
-var bw_int = 20, fc_int = 1750, gn_int = -2; // interference values
+var bw_int = 20, fc_int = 1900, gn_int = -2; // interference values
 var bw_intTemp = 0.05, fc_intTemp = 0.25;
 var hop_dwell_time = 200;
 var alpha = 0.5;
@@ -286,7 +286,7 @@ var svgr = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	svgr.append("rect")
-		.attr("width", "86.5%")
+		.attr("width", "86.2%")
 		.attr("height", "81%")
 		.attr("fill", "black");
 		
@@ -378,7 +378,7 @@ var svgc = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	svgc.append("rect")
-		.attr("width", "86.5%")
+		.attr("width", "86.2%")
 		.attr("height", "81%")
 		.attr("fill", "black");
 		

@@ -16,7 +16,7 @@ function svg_create(_margin, _width, _height, _xscale, _yscale)
         .call(d3.axisLeft(_yscale));
 
 	svg.append("rect")
-		.attr("width", "86.5%")
+		.attr("width", "86.2%")
 		.attr("height", "81%")
 		.attr("fill", "black");
     // create grid lines
