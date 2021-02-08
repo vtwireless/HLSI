@@ -46,3 +46,32 @@ svg * { font: 12px Arial;
   -webkit-transition: .2s; /* 0.2 seconds transition on hover */
   transition: opacity .2s;
 }
+.text-bold {
+	color: white
+}
+
+label {
+	color: white
+
+}
+
+output {
+	color: white
+}
+
+callback_description {
+	color: white
+}
+
+
+.callback_description1 {
+	color: white
+}
+
+strategy {
+  background: #d3d3d3; /* Grey background */
+}
+
+.title {
+	color: white
+}

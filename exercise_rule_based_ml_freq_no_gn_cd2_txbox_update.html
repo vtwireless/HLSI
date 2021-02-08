@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-  <title>HLSI Exercise - Frequency Rule Based Adaptation </title>
+  <title class="title">HLSI Exercise - Frequency Rule Based Adaptation </title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <meta name="author" content=""/>
@@ -11,18 +11,18 @@
 </head>
 
 <body style="background-color:rgb(72,72,72);" >
-  <h2>Exercise - Frequency Rule Based Adaptation</h2>
-  <p><a href="index.html">[exercises]</a></p>
+  <h2 class="title">Exercise - Frequency Rule Based Adaptation</h2>
+  <p class="title" ><a href="index.html">[exercises]</a></p>
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
-  <p><label for="userfunction">
+  <p><label for="userfunction" class="callback_description">
       Fill out a function to change the Interfer Frequency,Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables, this variables must be changed in order:
   </label></p>
-  <p><tt>function callback( Interfer Frequency, Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables  ) {</tt></p>
-  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" style="background-color:grey;"
+  <p ><tt class="callback_description1">function callback( Interfer Frequency, Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables  ) {</tt> </p>
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" style="background-color:#F2F2F2;"
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return {'gain':2, 'bandwidth':120, 'modulation_index':0};">return {'gain':2, 'bandwidth':120, 'modulation_index':0};</textarea></p>
-  <p><tt>}</tt></p>
+  <p><tt class="callback_description1">}</tt></p>
 
     <p><input id="restart" type="button" value="Start" onclick="toggle()">&nbsp;
   <label for="strategy" hidden >Select pre-configured strategy:</label>
@@ -44,19 +44,19 @@
   <p>
     <label for="frequency">Frequency</label>
     <input class="width-3" type="range" min="-0.5" max="0.5" value="0.0" id="frequency" step="0.001" oninput="update_plot(parseFloat(value),null,null, null)">
-    <output for="frequency" id="fc">1800.0 MHz</output>
+    <output for="frequency" id="fc" class="slider-text">1800.0 MHz</output>
   </p>
   <p>
     <label for="bandwidth">Bandwidth</label>
     <input class="width-3" type="range" min="0.19" max="0.9" value="0.19" id="bandwidth" step="0.001"
         oninput="update_plot(null,parseFloat(value),null, null)">
-    <output for="bandwidth" id="bw">0.1</output>
+    <output for="bandwidth" id="bw" class="slider-text">0.1</output>
   </p>
   <p>
     <label for="modcod">Mod./Coding</label>
     <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
         oninput="update_plot(null,null,null,parseInt(value))">
-    <output for="modcod" id="mc"></output>
+    <output for="modcod" id="mc" class="slider-text"></output>
   </p>
   <!--
     <p>
@@ -1271,6 +1271,9 @@ function finished() {
     document.querySelector('#restart').value = "start" ;
     document.querySelector('#bits').style.color = "#008040";
     document.querySelector('#outages').style.color = outages > 0 ? "#800000" : "#008040";
+    document.querySelector('#outages_survived').style.color = outages_survived > 0 ? "#800000" : "#008040";
+	
+	
 }
 
 // set initial values and replot
