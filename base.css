@@ -98,3 +98,14 @@ table, th, td {
 output {
   display: inline;
 }
+ .topcorner{
+   position:absolute;
+   top:180px;
+   right:50px;
+  }
+
+textarea {
+		background-color:#686868;
+		font-color:white
+		border-width: 5px;
+}

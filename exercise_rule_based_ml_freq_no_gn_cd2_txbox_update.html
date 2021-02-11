@@ -19,7 +19,7 @@
       Fill out a function to change the fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables, this variables must be changed in order:
   </label></p>
   <p ><tt class="callback_description1">function callback( fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables  ) {</tt> </p>
-  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" style="background-color:#F2F2F2;"
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" 
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return {'gain_new':2, 'bw_new':120, 'mc_new':0};">return {'gain_new':2, 'bw_new':120, 'mc_new':0};</textarea></p>
   <p><tt class="callback_description1">}</tt></p>
@@ -128,8 +128,9 @@
   </p>
 
 
+<div class="topcorner">
 
-<table style="width:50%">
+<table style="width:100%">
   <tr>
     <th>Variable Name</th>
     <th>Meaning</th>
@@ -164,7 +165,7 @@
   </tr>
       <tr>
     <td>f_lower</td>
-    <td> Global variable that contains the l band-edge frequency (MHz) considering the signal bandwidth</td>
+    <td> Global variable that contains the lower band-edge frequency (MHz) considering the signal bandwidth</td>
   </tr>
      <tr>
     <td>i_upper</td>
@@ -175,7 +176,7 @@
     <td> Global variable that contains the upper band-edge frequency (MHz) considering the signal bandwidth</td>
   </tr>
 </table>
-
+</div>
 <form method="GET" id="my_form"></form>
 
 
