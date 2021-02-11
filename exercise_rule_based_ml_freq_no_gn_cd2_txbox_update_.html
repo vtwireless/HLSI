@@ -16,12 +16,12 @@
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
   <p><label for="userfunction" class="callback_description">
-      Fill out a function to change the Interfer Frequency,Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables, this variables must be changed in order:
+      Fill out a function to change the fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables, this variables must be changed in order:
   </label></p>
-  <p ><tt class="callback_description1">function callback( Interfer Frequency, Interfer Bandwidth, Signal Frequency, Gain, Bandwidth, Modulation and Coding, Temporary Variables  ) {</tt> </p>
+  <p ><tt class="callback_description1">function callback( fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables  ) {</tt> </p>
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" style="background-color:#F2F2F2;"
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
-      placeholder="return {'gain':2, 'bandwidth':120, 'modulation_index':0};">return {'gain':2, 'bandwidth':120, 'modulation_index':0};</textarea></p>
+      placeholder="return {'gain_new':2, 'bw_new':120, 'mc_new':0};">return {'gain_new':2, 'bw_new':120, 'mc_new':0};</textarea></p>
   <p><tt class="callback_description1">}</tt></p>
 
     <p><input id="restart" type="button" value="Start" onclick="toggle()">&nbsp;
@@ -58,7 +58,37 @@
         oninput="update_plot(null,null,null,parseInt(value))">
     <output for="modcod" id="mc" class="slider-text"></output>
   </p>
+  <!--
+    <p>
+    <label for="hop_rate">Hop Rate</label>
+    <input class="width-3" type="range" min="0.2" max="2" value="0" id="hop_rate" step="0.01"
+        oninput="update_hop_rate(parseFloat(value))">
+    <output for="hop_rate" id="hr"></output>
+  </p>
+-->
+<!--
+    <div>
+    <input type="radio" id="hr_slow"
+     name="hop" value="slow" onclick="update_hop_rate(parseInt(value) ,null)">
+    <label for="hr_slow">0.2 Hz</label>
 
+    <input type="radio" id="hr_fast"
+     name="hop" value="fast" onclick="update_hop_rate(null, parseInt(value))">
+    <label for="hr_fast">2 Hz</label>
+
+  </div>
+  
+    <div>
+    <input type="radio" id="slow"
+     name="sensing" value="slow" onclick="adjust_dwell(parseInt(value) ,null)">
+    <label for="slow">Slow Sensing</label>
+
+    <input type="radio" id="fast"
+     name="sensing" value="fast" onclick="adjust_dwell(null, parseInt(value))">
+    <label for="fast">Fast Sensing</label>
+
+  </div>
+  -->
   <p>
     <label for="signal_to_noise_ratio">SNR:       </label><output for="signal_to_noise_ratio" id="snr"    class="text-bold"></output>,
     <label for="information_capacity">Capacity:   </label><output for="information_capacity"  id="cap"    class="text-bold"></output>,
@@ -99,6 +129,56 @@
 
 
 
+<table style="width:50%">
+  <tr>
+    <th>Variable Name</th>
+    <th>Meaning</th>
+  </tr>
+  <tr>
+    <td>fc_int</td>
+    <td>Interferer Frequency</td>
+  </tr>
+  <tr>
+    <td>bw_int</td>
+    <td>Interferer Bandwidth</td>
+  </tr>
+    <tr>
+    <td>fc</td>
+    <td>Signal Frequency</td>
+  </tr>
+    <tr>
+    <td>bw</td>
+    <td>Signal Bandwidth</td>
+  </tr>
+    <tr>
+    <td>gn</td>
+    <td>Signal Gain</td>
+  </tr>
+    <tr>
+    <td>mc</td>
+    <td>Modulation and Coding Index</td>
+  </tr>
+     <tr>
+    <td>i_lower</td>
+    <td> Global variable that contains the lower band-edge frequency (MHz) considering the interferer bandwidth</td>
+  </tr>
+      <tr>
+    <td>f_lower</td>
+    <td> Global variable that contains the l band-edge frequency (MHz) considering the signal bandwidth</td>
+  </tr>
+     <tr>
+    <td>i_upper</td>
+    <td> Global variable that contains the upper band-edge frequency (MHz) considering the interferer bandwidth</td>
+  </tr>
+      <tr>
+    <td>f_upper</td>
+    <td> Global variable that contains the upper band-edge frequency (MHz) considering the signal bandwidth</td>
+  </tr>
+</table>
+
+<form method="GET" id="my_form"></form>
+
+
 
 </body>
 
@@ -130,7 +210,7 @@ var bwTemp = 0.19, fcTemp = 0.0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 40;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
-var bw_int = 20, fc_int = 1900, gn_int = -2; // interference values
+var bw_int = 40, fc_int = 1900, gn_int = -2; // interference values
 var bw_intTemp = 0.05, fc_intTemp = 0.25;
 var hop_dwell_time = 200;
 var alpha = 0.5;
@@ -488,6 +568,14 @@ function update_plot(freq,band,gain,modcod) {
 	console.log("New" + bw)
 
 
+	//let  f_lower = fc - 0.5*bw, f_upper = fc + 0.5*bw;
+    //if (f_lower < f_limit_1) { fc += f_limit_1 - f_lower +10; fc =1800;
+	//fcTemp = ((fc / scale_freq_) - f0 )/ fs_;}
+    //if (f_upper >  f_limit_2) { fc -= f_upper-f_limit_2-10; fc = 1800;
+	//fcTemp = ((fc / scale_freq_) - f0 )/ fs_;}
+
+
+	//console.log("fc Update_1" +fc)
 
     document.querySelector('#fc').value = d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
     document.querySelector('#frequency').value = fcTemp;
@@ -498,12 +586,19 @@ function update_plot(freq,band,gain,modcod) {
 	
 
 
-
+    //document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
+   // document.querySelector('#gain').value = gn;
 
 	
     document.querySelector('#mc').value = schemes[mc].name + " (" + d3.format(".3f")(schemes[mc].rate) + " b/s/Hz)"
     document.querySelector('#modcod').value = mc;
 	
+	//if(document.querySelector('#slow').checked) {
+	//adjust_dwell_time = 1.5;
+	//}else if(document.querySelector('#fast').checked) {
+	//adjust_dwell_time = 8;
+	//} 
+
 
 	
     // compute and display SNR
@@ -605,7 +700,16 @@ function restart() {
 		reset();
 		datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} })
 		}
+		//path
+		//svgr.selectAll("pathr").remove();
 
+		//svgr.selectAll("liner").remove();
+		//datar = [];
+		//for (index = 0; index < datar.length; index++) { 
+		//datar.push({"y":0});
+		//datar.shift();
+		//datar [index] = 0;
+		//} 
 		running = true;
 
 		//step();
@@ -614,46 +718,68 @@ function restart() {
 
 		callback = new Function(document.querySelector('#userfunction').value);
 		
+		//let current = (uIndex == 3) ? {'frequency':fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		 //{'gain_new':gn, 'bw_new':bw, 'mc_new':mc};;
 
 
-
- 		let current = (uIndex == 5) ?  {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc, 'temporary1':temp1,
+ 		let current = (uIndex == 5) ?  {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new':fc,  'gain_new':gn, 'bw_new':bw, 'mc_new':mc, 'temporary1':temp1,
 		'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5
-		}:  (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		}:  (uIndex == 4) ? {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new':fc,  'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		(uIndex == 3) ? {'fc_new':fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		 {'gain_new':gn, 'bw_new':bw, 'mc_new':mc};;
 		 
 		 
 		let uservals = callback(current);
 
-		gn = uservals.gain;
+		gn = uservals.gain_new;
 		//gn_offset = uservals.gn_offset;
 		// validate modulation/coding scheme
-        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.modulation_index)));
+        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mc_new)));
         if (typeof mc != "number" || isNaN(mc)) { mc = 0; }
 
+        // validate center frequency
 
-        gn = Math.max(-2, Math.min(5, uservals.gain));
+        // validate bw_new
+		//bw = bw*fs_*scale_freq_
+
+		//bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
+		//if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
+		//bw = bw / (fs_ * scale_freq_)
+
+        gn = Math.max(-2, Math.min(5, uservals.gain_new));
         if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
 		
+		if (uIndex == 3){
+			fc = (f0+(fc*fs_))*scale_freq_
+			fc_int = (f0+(fc_int*fs_))*scale_freq_
+			bw = bw*fs_*scale_freq_
+			bw_int = bw_int*fs_*scale_freq_
 
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
+			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
+			fc = ((fc / scale_freq_) - f0 )/ fs_
+				
+		}
 
 		if (uIndex == 4){
+			//fc = (f0+(fc*fs_))*scale_freq_
+			//fc_int = (f0+(fc_int*fs_))*scale_freq_
+			//bw = bw*fs_*scale_freq_
+			//bw_int = bw_int*fs_*scale_freq_
 
-
-			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
 			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
-			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
+			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_int_new));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
 			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
-			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
+			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_int_new));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
 			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
-			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
 			bwTemp = bw / (fs_ * scale_freq_)
 		}
@@ -687,19 +813,19 @@ function restart() {
 
 			//console.log(fc)
 
-			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
 			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
-			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
+			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_int_new));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
 			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
-			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
+			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_int_new));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
 			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
-			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
 			bwTemp = bw / (fs_ * scale_freq_)
 		}		
@@ -710,16 +836,33 @@ function restart() {
 		//u_ = string.concat("return {'gn':", string1, ", 'bw':", string2, ", 'mc':",  string3, "};")
 		// Error de  
 		var dictU_ = {
-		  'gain': gn,
-		  'bandwidth': bw,
-		  'modulation_index': mc
+		  'gain_new': gn,
+		  'bw_new': bw,
+		  'mc_new': mc
 		};
 		//u_ = String(dictU_);
 		//u_ = {"return ", dictU_}
 		u_ = "return " + JSON.stringify(dictU_);
-		u_1 = "return {'gain': " + JSON.stringify(gn) +  "1, 'bandwidth': " + JSON.stringify(bw) + " , 'modulation_index': " + JSON.stringify(mc) + " -1}\n";
+		u_1 = "return {'gain_new': " + JSON.stringify(gn) +  "1, 'bw_new': " + JSON.stringify(bw) + " , 'mc_new': " + JSON.stringify(mc) + " -1}\n";
 		
-
+		//u_a3  = "// check current link margin and adjust scheme appropriately\n";
+		//u_a3 += "//gn_offset = 1"
+		//u_a3 += ";\n"
+		//u_a3 += "//mc_offset = 1;\n\n"
+        //u_a3 += "if (margin_dB > 0) \n{"
+		//u_a3 += u_1
+		//u_a3 += "}\n";
+        //u_a3 += "else \n{ "
+		//u_a3 += u_1
+		//u_a3 += "}\n";
+		
+        //u  = "// check current link margin and adjust scheme appropriately\n";
+		//u += "//gn_offset = "
+		//u +=  JSON.stringify(gn_offset)
+		//u += ";\n"
+		//u += "//mc_offset = 1;\n\n"
+        //u += "if (margin_dB > 0) \n{ return {'gain_new':gn, 'bw_new':bw, 'mc_new':mc}; }\n";
+        //u += "else \n{ return {'gain_new':gn + 1, 'bw_new':bw, 'mc_new':mc - 1}; }\n";
 		
 		if (uIndex == 3){
 		//	document.querySelector('#userfunction').value = u_a3; 
@@ -759,17 +902,17 @@ async function step_interval() {
     if ((counter > 0) && (running == true)) {
 	    step();
 		//step();
-        //let current = {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};
+        //let current = {'gain_new':gn, 'bw_new':bw, 'mc_new':mc};
 		
 
-		//let current = (uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		// {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		//let current = (uIndex == 3) ? {'frequency':fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		// {'gain_new':gn, 'bw_new':bw, 'mc_new':mc};;
 		 
- 		let current = (uIndex == 5) ?  {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc, 'temporary1':temp1,
+ 		let current = (uIndex == 5) ?  {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new':fc,  'gain_new':gn, 'bw_new':bw, 'mc_new':mc, 'temporary1':temp1,
 		'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5
-		}:  (uIndex == 4) ? {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency':fc,  'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		(uIndex == 3) ? {'frequency':fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc}:
-		 {'gain':gn, 'bandwidth':bw, 'modulation_index':mc};;
+		}:  (uIndex == 4) ? {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new':fc,  'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		(uIndex == 3) ? {'fc_new':fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc}:
+		 {'gain_new':gn, 'bw_new':bw, 'mc_new':mc};;
 		 
 		 
 		 
@@ -778,27 +921,37 @@ async function step_interval() {
 
 		let uservals = callback(current);
 
-		gn = uservals.gain;
+		gn = uservals.gain_new;
 		gn_offset = uservals.gn_offset;
 		//console.log(gn_offset);
 
 		// validate modulation/coding scheme
-        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.modulation_index)));
+        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mc_new)));
         if (typeof mc != "number" || isNaN(mc)) { mc = 0; }
 
         // validate center frequency
 
-        // validate bandwidth
+        // validate bw_new
 		//bw = bw*fs_*scale_freq_
 
-		bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+		bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
 		if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
 		bw = bw / (fs_ * scale_freq_)
 
-        gn = Math.max(-2, Math.min(5, uservals.gain));
+        gn = Math.max(-2, Math.min(5, uservals.gain_new));
         if (typeof gn != "number" || isNaN(gn)) { gn = 1; }
 		
+		if (uIndex == 3){
+			fc = (f0+(fc*fs_))*scale_freq_
+			fc_int = (f0+(fc_int*fs_))*scale_freq_
+			bw = bw*fs_*scale_freq_
+			bw_int = bw_int*fs_*scale_freq_
 
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
+			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
+			fc = ((fc / scale_freq_) - f0 )/ fs_
+				
+		}
 
 		if (uIndex == 4){
 			//fc = (f0+(fc*fs_))*scale_freq_
@@ -806,19 +959,19 @@ async function step_interval() {
 			//bw = bw*fs_*scale_freq_
 			//bw_int = bw_int*fs_*scale_freq_
 
-			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
 			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
-			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
+			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_int_new));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
 			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
-			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
+			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_int_new));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
 			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
-			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
 			bwTemp = bw / (fs_ * scale_freq_)
 		}
@@ -852,19 +1005,19 @@ async function step_interval() {
 
 			//console.log(fc)
 
-			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.frequency));
+			fc = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_new));
 			if (typeof fc != "number" || isNaN(fc)) { fc = (f0+(0*fs_))*scale_freq_; }		
 			fcTemp = ((fc / scale_freq_) - f0 )/ fs_
 			
-			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.interfererfrequency));
+			fc_int = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.fc_int_new));
 			if (typeof fc_int != "number" || isNaN(fc_int)) { fc_int = (f0+(0*fs_))*scale_freq_; }	
 			fc_intTemp = ((fc_int / scale_freq_) - f0 )/ fs_
 			
-			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.interfererbandwidth));
+			bw_int = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_int_new));
 			if (typeof bw_int != "number" || isNaN(bw_int)) { bw_int = 0.05*fs_*scale_freq_; }	
 			bw_intTemp = bw_int / (fs_ * scale_freq_)
 			
-			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bandwidth));
+			bw = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw_new));
 			if (typeof bw != "number" || isNaN(bw)) { bw = 0.05*fs_*scale_freq_; }	
 			bwTemp = bw / (fs_ * scale_freq_)	
 		}	
@@ -941,13 +1094,24 @@ async function adapt_interval() {
   if (uIndex == 0){
         fixed_bw_modcod();
 	}
-
+	else if (uIndex == 1) {
+        adapt_random();
+    }
+	else if (uIndex == 2) {
+ 		adapt();
+    }
+	else if (uIndex == 3) {
+        //adapt_freq_approx_half_band();
+		//adapt_random();
+		///bw = 0.35;
+		adapt_gain();
+	}
 	else if (uIndex == 4) {
-		//adapt_gain();		
+		adapt_gain();		
 		//adapt_freq_max_contiguous_bw();
     }
 	else if (uIndex == 5) {
-		//adapt_gain();		
+		adapt_gain();		
 		//adapt_freq_max_contiguous_bw();
     }
 	if ((counter > 0) && (running == true)) {
@@ -971,10 +1135,10 @@ function adapt_freq_max_contiguous_bw(){
 
 		if (i_lower + f_limit < f_limit - i_upper){  					// if interferer is closer to lower frequency limit then upper unoccupied sub-band is larger
 		fc = f_limit - (f_limit - i_upper) / 2;							// hop to center of upper unocuppied sub-band
-		bw = f_limit - i_upper - 0.5 * bw_int -delta;							// set bandwidth to use entire upper unoccupied sub-band
+		bw = f_limit - i_upper - 0.5 * bw_int -delta;							// set bw_new to use entire upper unoccupied sub-band
 	} else {															// in this case the lower unoccupied sub-band is larger
 		fc = -f_limit + (i_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
-		bw = i_lower + f_limit - 0.5 * bw_int -delta; 							// set bandwidth to use entire lower unoccupied sub-band
+		bw = i_lower + f_limit - 0.5 * bw_int -delta; 							// set bw_new to use entire lower unoccupied sub-band
 	}
 	return 0
 }
@@ -988,7 +1152,7 @@ function accumulate_rate() { bits += rate; rate_avg += rate; cap_avg += cap; upd
 //accumulate_interval();
 
 
-//time, gain, and bandwidth profiles
+//time, gain, and bw_new profiles
 function gn_bw_profile(i) {
     let t = i * step_dwell_time * 1e-3;
     let gain = -5 + 10*Math.log10(0.001 + (0.5 + 0.5*Math.cos(2*Math.PI*0.04*t + 0.7))) *
@@ -1055,26 +1219,79 @@ function populateCallback() {
 	//let u = 'return 0;'
 	//	u  = 'bw = 0.19\n';
     //    u += 'return bw';
-    let u = "return {'gain':0, 'bandwidth':120, 'modulation_index':4};";
+    let u = "return {'gain_new':0, 'bw_new':120, 'mc_new':4};";
 
     switch (selection) {
     case 'default': uIndex = -1; break;	
     case 'a0': uIndex = 0; break;
+    case 'a1': 
+		uIndex = 1; 
+		u = "return {'gain_new':2, 'bw_new':120, 'mc_new':11};";
+		break;
+    case 'a2': 
+	uIndex = 2;
+	u = "return {'gain_new':2, 'bw_new':120, 'mc_new':11};";
+	break;
+    case 'a3': 
+		uIndex = 3; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately\n";
+		u += "//gn_offset = "
+		u +=  JSON.stringify(gn_offset)
+		u += ";\n"
+		u += "//mc_offset = 1;\n\n"
+        u += "if (margin_dB > 0) \n{ return {'fc_new': fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc}; }\n";
+        u += "else \n{ return {'fc_new': fc, 'gain_new':gn + 1, 'bw_new':bw, 'mc_new':mc - 1}; }\n";
+		u_a3 = u;
+		break;	
 	case 'a4':
 		uIndex = 4; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
 
+		//document.querySelector('#userfunction').value = u_;
         u  = "// check current link margin and adjust scheme appropriately\n";
 		u += "gn_temp = 0.0"
 		u += ";\n"
 		u += "//mc_offset = 1;\n\n"
-        u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn , 'bandwidth':bw + gn_temp, 'modulation_index':mc}; }\n";
-        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1}; }\n";
+        u += "if (margin_dB > 0) \n{ return {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new': fc, 'gain_new':gn , 'bw_new':bw + gn_temp, 'mc_new':mc}; }\n";
+        u += "else \n{ return {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new': fc, 'gain_new':gn + 1, 'bw_new':bw, 'mc_new':mc - 1}; }\n";
 		u_a3 = u;
 		break;
 		
 	case 'a5':
 		uIndex = 5; 
+		//var dictU_ = {
+		//  'gn': gn,
+		//  'bw': bw,
+		//  'mc': mc
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
 
+		//document.querySelector('#userfunction').value = u_;
         u  = "// check current link margin and adjust scheme appropriately;\n"
 		u += "let delta = 40; \n"
 		u += "let f_lower = fc     - 0.5*bw,     f_upper = fc     + 0.5*bw; \n"
@@ -1087,10 +1304,10 @@ function populateCallback() {
 		u += "fc = f_limit_1 + (i_lower - f_limit_1) / 2;\n"
 		u += "bw =  i_lower - f_limit_1   -delta;;"
 		u += "}\n\n\n"
-		u += "if (margin_dB > 0) \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn, 'bandwidth':bw, 'modulation_index':mc , "
+		u += "if (margin_dB > 0) \n{ return {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new': fc, 'gain_new':gn, 'bw_new':bw, 'mc_new':mc , "
 		u += " 'temporary1':temp1,'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5"
 		u += "}; }\n";
-        u += "else \n{ return {'interfererfrequency':fc_int, 'interfererbandwidth':bw_int,'frequency': fc, 'gain':gn + 1, 'bandwidth':bw, 'modulation_index':mc - 1,"
+        u += "else \n{ return {'fc_int_new':fc_int, 'bw_int_new':bw_int,'fc_new': fc, 'gain_new':gn + 1, 'bw_new':bw, 'mc_new':mc - 1,"
 		u += "'temporary1':temp1,'temporary2':temp2,'temporary3':temp3,'temporary4':temp4,'temporary5':temp5"
 		u += "}; }\n";
 		u_a3 = u;
