@@ -75,3 +75,26 @@ strategy {
 .title {
 	color: white
 }
+
+body {
+
+	background-color:rgb(72,72,72);
+}
+
+
+body {
+	color: white
+}
+
+th {
+  text-align: left;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+output {
+  display: inline;
+}

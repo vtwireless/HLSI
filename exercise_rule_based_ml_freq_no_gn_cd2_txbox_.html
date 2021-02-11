@@ -535,6 +535,11 @@ var svgr = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
 var rscale = d3.scaleLog   ().domain([100e3, 400e6]).range([height, 0]);
 var liner = d3.line()
@@ -620,6 +625,11 @@ var svgc = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+	svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 // create scale
 var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
 var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
