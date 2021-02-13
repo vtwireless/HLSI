@@ -108,12 +108,12 @@ output {
 .fixed{
 	float: left ;
 
-    width: 600px;
+    width: 400px;
 }
 .flex-item{
     /*flex-grow: 1;*/
     float: right;
-	margin-right:180px;
+	margin-right:70px;
 	margin-top:20px
 
 }
