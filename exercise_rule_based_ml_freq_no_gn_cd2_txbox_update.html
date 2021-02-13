@@ -19,9 +19,63 @@
       Fill out a function to change the fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables, this variables must be changed in order:
   </label></p>
   <p ><tt class="callback_description1">function callback( fc_int, bw_int, fc, gn, bw, mc, f_lower, i_lower, f_upper, i_upper, Temporary Variables  ) {</tt> </p>
+  <div class ="container">
+  <div class = "fixed">
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="120" 
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return {'gain_new':2, 'bw_new':120, 'mc_new':0};">return {'gain_new':2, 'bw_new':120, 'mc_new':0};</textarea></p>
+	  
+	  </div>
+	  <div class="flex-item">
+
+<table style="width:100%">
+  <tr>
+    <th>Variable Name</th>
+    <th>Meaning</th>
+  </tr>
+  <tr>
+    <td>fc_int</td>
+    <td>Interferer Frequency</td>
+  </tr>
+  <tr>
+    <td>bw_int</td>
+    <td>Interferer Bandwidth</td>
+  </tr>
+    <tr>
+    <td>fc</td>
+    <td>Signal Frequency</td>
+  </tr>
+    <tr>
+    <td>bw</td>
+    <td>Signal Bandwidth</td>
+  </tr>
+    <tr>
+    <td>gn</td>
+    <td>Signal Gain</td>
+  </tr>
+    <tr>
+    <td>mc</td>
+    <td>Modulation and Coding Index</td>
+  </tr>
+     <tr>
+    <td>i_lower</td>
+    <td> Global variable:  lowest possible frequency occupied by the interferer (MHz)</td>
+  </tr>
+      <tr>
+    <td>f_lower</td>
+    <td> Global variable:  lowest possible frequency occupied by the signal (MHz)</td>
+  </tr>
+     <tr>
+    <td>i_upper</td>
+    <td> Global variable: highest possible frequency occupied by the interferer (MHz)</td>
+  </tr>
+      <tr>
+    <td>f_upper</td>
+    <td> Global variable: highest possible frequency occupied by the signal (MHz)</td>
+  </tr>
+</table>
+</div>
+</div>
   <p><tt class="callback_description1">}</tt></p>
 
     <p><input id="restart" type="button" value="Start" onclick="toggle()">&nbsp;
@@ -128,55 +182,7 @@
   </p>
 
 
-<div class="topcorner">
 
-<table style="width:100%">
-  <tr>
-    <th>Variable Name</th>
-    <th>Meaning</th>
-  </tr>
-  <tr>
-    <td>fc_int</td>
-    <td>Interferer Frequency</td>
-  </tr>
-  <tr>
-    <td>bw_int</td>
-    <td>Interferer Bandwidth</td>
-  </tr>
-    <tr>
-    <td>fc</td>
-    <td>Signal Frequency</td>
-  </tr>
-    <tr>
-    <td>bw</td>
-    <td>Signal Bandwidth</td>
-  </tr>
-    <tr>
-    <td>gn</td>
-    <td>Signal Gain</td>
-  </tr>
-    <tr>
-    <td>mc</td>
-    <td>Modulation and Coding Index</td>
-  </tr>
-     <tr>
-    <td>i_lower</td>
-    <td> Global variable that contains the lower band-edge frequency (MHz) considering the interferer bandwidth</td>
-  </tr>
-      <tr>
-    <td>f_lower</td>
-    <td> Global variable that contains the lower band-edge frequency (MHz) considering the signal bandwidth</td>
-  </tr>
-     <tr>
-    <td>i_upper</td>
-    <td> Global variable that contains the upper band-edge frequency (MHz) considering the interferer bandwidth</td>
-  </tr>
-      <tr>
-    <td>f_upper</td>
-    <td> Global variable that contains the upper band-edge frequency (MHz) considering the signal bandwidth</td>
-  </tr>
-</table>
-</div>
 <form method="GET" id="my_form"></form>
 
 
@@ -732,6 +738,7 @@ function restart() {
 		 
 		let uservals = callback(current);
 
+		current = uservals
 		gn = uservals.gain_new;
 		//gn_offset = uservals.gn_offset;
 		// validate modulation/coding scheme

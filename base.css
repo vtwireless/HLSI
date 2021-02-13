@@ -98,11 +98,25 @@ table, th, td {
 output {
   display: inline;
 }
- .topcorner{
-   position:absolute;
-   top:180px;
-   right:50px;
-  }
+
+
+.container{
+    /*display: flex;*/
+    overflow: hidden
+
+}
+.fixed{
+	float: left ;
+
+    width: 600px;
+}
+.flex-item{
+    /*flex-grow: 1;*/
+    float: right;
+	margin-right:180px;
+	margin-top:20px
+
+}
 
 textarea {
 		background-color:#686868;
