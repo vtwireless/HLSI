@@ -213,7 +213,7 @@ svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).at
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("class", "stroke-med no-fill stroke-yellow")
     .attr("d", linef);
 
 // generate power spectral density
@@ -587,7 +587,8 @@ svgr.append("g")
     .on("start", tick);
 */
 
-// create x-axis axis label
+
+	
 svgr.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
@@ -609,7 +610,7 @@ svgr.append("text")
 var pathr = svgr.append("path")
     .attr("clip-path","url(#clipr)")
     .datum(datar)
-    .attr("class", "stroke-med no-fill stroke-blue")
+    .attr("class", "stroke-med no-fill stroke-orange")
     .attr("d", liner);
 
 //
@@ -699,7 +700,7 @@ var linec = d3.line()
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
-    .attr("class", "stroke-light no-fill stroke-green")
+    .attr("class", "stroke-light no-fill stroke-green-o")
     .attr("d", linec);
 
 // 9. Append the path, bind the data, and call the line generator
@@ -708,7 +709,7 @@ var datam = d3.range(schemes.length)
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datam)
-    .attr("class", "stroke-light no-fill stroke-green dashed")
+    .attr("class", "stroke-light no-fill stroke-green-o dashed")
     .attr("d", linec);
 
 // add operating ponit
@@ -720,8 +721,8 @@ svgc.append('g')
       .attr("cx", function (d) { return sscale(d.x); } )
       .attr("cy", function (d) { return cscale(d.y); } )
       .attr("r", 5)
-      .attr("class", "stroke-light stroke-green")
-      .style("fill", "#cccccc");
+      .attr("class", "stroke-light stroke-green-o")
+      .style("fill", "#66ff00");
 
 function adjust_dwell(slow_, fast_){
 	if (slow_ != null){

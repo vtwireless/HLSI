@@ -169,8 +169,9 @@ svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).at
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("class", "stroke-med no-fill stroke-yellow")
     .attr("d", linef);
+
 
 // generate power spectral density
 function generate_psd(f,w,g,n) {
@@ -482,6 +483,12 @@ svgr.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+		
 svgr.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
@@ -516,7 +523,8 @@ svgr.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
-   .text("Time Stepj")
+   		.attr("fill", "white")
+   .text("Time Step")
 
 // create y-axis label
 svgr.append("text")
@@ -525,13 +533,14 @@ svgr.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Data Rate (bits/second)")
 
 // 9. Append the path, bind the data, and call the line generator
 var pathr = svgr.append("path")
     .attr("clip-path","url(#clipr)")
     .datum(datar)
-    .attr("class", "stroke-med no-fill stroke-blue")
+    .attr("class", "stroke-med no-fill stroke-orange")
     .attr("d", liner);
 
 //
@@ -565,6 +574,12 @@ svgc.append("defs").append("clipPath")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
+	
+		svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 
 svgc.append("g")
     .attr("class", "x axis")
@@ -590,6 +605,7 @@ svgc.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("SNR (dB)")
 
 // create y-axis label
@@ -599,6 +615,7 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths
@@ -613,7 +630,7 @@ var linec = d3.line()
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
-    .attr("class", "stroke-light no-fill stroke-green")
+    .attr("class", "stroke-light no-fill stroke-green-o")
     .attr("d", linec);
 
 // 9. Append the path, bind the data, and call the line generator
@@ -622,7 +639,7 @@ var datam = d3.range(schemes.length)
 var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datam)
-    .attr("class", "stroke-light no-fill stroke-green dashed")
+    .attr("class", "stroke-light no-fill stroke-green-o dashed")
     .attr("d", linec);
 
 // add operating ponit
@@ -634,8 +651,9 @@ svgc.append('g')
       .attr("cx", function (d) { return sscale(d.x); } )
       .attr("cy", function (d) { return cscale(d.y); } )
       .attr("r", 5)
-      .attr("class", "stroke-light stroke-green")
-      .style("fill", "#cccccc");
+      .attr("class", "stroke-light stroke-green-o")
+      .style("fill", "#66ff00");
+	  
 
 function adjust_dwell(slow_, fast_){
 	if (slow_ != null){

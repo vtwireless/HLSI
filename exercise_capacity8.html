@@ -20,7 +20,7 @@
   </label></p>
   <p><tt>function callback(timer,modcod,current,SNR,lmargin,closed) {</tt></p>
   <p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
-      maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
+      maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return {'fc':0, 'bw':0.1, 'mc':0};">return {'fc':0, 'bw':0.1, 'mc':0};</textarea></p>
   <p><tt>}</tt></p>
   <p><input type="submit" id="toggle" value="Go!" onclick="toggle()">&nbsp;
@@ -121,7 +121,7 @@ svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).at
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)
-    .attr("class", "stroke-med no-fill stroke-red")
+    .attr("class", "stroke-med no-fill stroke-yellow")
     .attr("d", linef);
 
 // generate power spectral density
@@ -147,7 +147,7 @@ var svgr = d3.select("body").append("svg")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
-var rscale = d3.scaleLog   ().domain([400e3, 400e6]).range([height, 0]);
+var rscale = d3.scaleLog   ().domain([100e3, 400e6]).range([height, 0]);
 var liner = d3.line()
     .x(function(d, i) { return tscale(i);   })
     .y(function(d, i) { return rscale(d.y); });
@@ -158,12 +158,18 @@ svgr.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+		
 svgr.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(tscale));
 
-var rtickvalues = [400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+var rtickvalues = [ 100e3, 400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
 svgr.append("g")
     .attr("class", "y axis")
     .call(d3.axisLeft(rscale)
@@ -192,6 +198,7 @@ svgr.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Time Step")
 
 // create y-axis label
@@ -201,13 +208,14 @@ svgr.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Data Rate (bits/second)")
 
 // 9. Append the path, bind the data, and call the line generator
 var pathr = svgr.append("path")
     .attr("clip-path","url(#clipr)")
     .datum(datar)
-    .attr("class", "stroke-med no-fill stroke-blue")
+    .attr("class", "stroke-med no-fill stroke-orange")
     .attr("d", liner);
 
 //
@@ -238,6 +246,12 @@ svgc.append("defs").append("clipPath")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
+	
+		svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 
 svgc.append("g")
     .attr("class", "x axis")
@@ -263,6 +277,7 @@ svgc.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("SNR (dB)")
 
 // create y-axis label
@@ -272,6 +287,7 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths
@@ -283,19 +299,19 @@ var linec = d3.line()
     .y(function(d) { return cscale(d.y); }); // map capacity
 
 // 9. Append the path, bind the data, and call the line generator
-svgc.append("path")
+var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datac)
-    .attr("class", "stroke-light no-fill stroke-green")
+    .attr("class", "stroke-light no-fill stroke-green-o")
     .attr("d", linec);
 
 // 9. Append the path, bind the data, and call the line generator
 var datam = d3.range(schemes.length)
               .map(function(d,i) { return {"x":schemes[i].SNR, "y":schemes[i].rate} });
-svgc.append("path")
+var pathc = svgc.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(datam)
-    .attr("class", "stroke-light no-fill stroke-green dashed")
+    .attr("class", "stroke-light no-fill stroke-green-o dashed")
     .attr("d", linec);
 
 // add operating ponit
@@ -307,9 +323,8 @@ svgc.append('g')
       .attr("cx", function (d) { return sscale(d.x); } )
       .attr("cy", function (d) { return cscale(d.y); } )
       .attr("r", 5)
-      .attr("class", "stroke-light stroke-green")
-      .style("fill", "#cccccc");
-
+      .attr("class", "stroke-light stroke-green-o")
+      .style("fill", "#66ff00");
 function update_plot(band,gain,modcod) {
     if (band !=null) { bw = band;  }
     if (gain !=null) { gn = gain;  }
