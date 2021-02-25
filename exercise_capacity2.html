@@ -119,6 +119,11 @@ svgc.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
+	svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 svgc.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
@@ -137,6 +142,7 @@ svgc.append("g")
       }))
 
 // grid lines
+
 svgc.append("g").attr("class","grid").call(d3.axisBottom(sscale).tickFormat("").tickSize(height));
 svgc.append("g").attr("class","grid").call(d3.axisLeft  (cscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
 
@@ -145,6 +151,8 @@ svgc.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
+
    .text("SNR (dB)")
 
 // create y-axis label
@@ -154,6 +162,8 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+		.attr("fill", "white")
+
    .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths

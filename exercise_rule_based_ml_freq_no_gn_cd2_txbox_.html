@@ -15,14 +15,18 @@
   <p><a href="index.html">[exercises]</a></p>
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
-  <p><label for="userfunction">
+  <p><label for="userfunction" class="callback_description">
       Fill out a function to change the gain, the bandwidth, the modulation and coding, this variables must be changed in order:
   </label></p>
-  <p><tt>function callback( gain, bandWidth, Modulation and Coding  ) {</tt></p>
-  <p><textarea id="userfunction" name="userfunction" rows="18" cols="120"
-      maxlength=2048 autofocus=true style="color:black;font: 1em monospace;"
-      placeholder="return {'gain':2, 'bandwidth':0.1, 'modulation_index':0};">return {'gain':2, 'bandwidth':0.1, 'modulation_index':0};</textarea></p>
-  <p><tt>}</tt></p>
+  <p ><tt class="callback_description1">function callback(  gain, bandWidth, Modulation and Coding   ) {</tt> </p>
+  <div class ="container">
+  <div class = "fixed">
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
+      maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
+      placeholder="return {'gain1':2, 'bw1':120, 'mcs1':0};">return {'gain1':2, 'bw1':120, 'mcs1':0};</textarea></p>
+	  </div>
+
+</div>
 
     <p><input id="restart" type="button" value="Start" onclick="toggle()">&nbsp;
   <label for="strategy" hidden >Select pre-configured strategy:</label>
@@ -527,6 +531,7 @@ function adapt_random(){
 
 //
 // historical rate plot
+// historical rate plot
 //
 var datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} })
 var svgr = d3.select("body").append("svg")
@@ -535,11 +540,6 @@ var svgr = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	svgr.append("rect")
-		.attr("width", "86.2%")
-		.attr("height", "81%")
-		.attr("fill", "black");
-		
 var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
 var rscale = d3.scaleLog   ().domain([100e3, 400e6]).range([height, 0]);
 var liner = d3.line()
@@ -552,6 +552,12 @@ svgr.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+		
 svgr.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
@@ -586,7 +592,8 @@ svgr.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
-   .text("Time Stepj")
+   		.attr("fill", "white")
+   .text("Time Step")
 
 // create y-axis label
 svgr.append("text")
@@ -595,6 +602,7 @@ svgr.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Data Rate (bits/second)")
 
 // 9. Append the path, bind the data, and call the line generator
@@ -625,11 +633,6 @@ var svgc = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	svgc.append("rect")
-		.attr("width", "86.2%")
-		.attr("height", "81%")
-		.attr("fill", "black");
-		
 // create scale
 var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
 var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
@@ -640,6 +643,12 @@ svgc.append("defs").append("clipPath")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
+	
+		svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 
 svgc.append("g")
     .attr("class", "x axis")
@@ -665,6 +674,7 @@ svgc.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("SNR (dB)")
 
 // create y-axis label
@@ -674,6 +684,7 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths

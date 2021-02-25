@@ -16,9 +16,9 @@
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
   <p><label for="userfunction" class="callback_description">
-      Fill out a function to change the freq2, bw2, freq1, gain1, bw1, mcs1, f_lower, i_lower, f_upper, i_upper, Temp1, Temp2, Temp3, Temp4, Temp5 :
+      Fill out a function to change the freq1,  bw1, gain1, mcs1, freq2, bw2, f_lower, i_lower, f_upper, i_upper, temp1, temp2, temp3, temp4, temp5 :
   </label></p>
-  <p ><tt class="callback_description1">function callback( freq2, bw2, freq1, gain1, bw1, mcs1, f_lower, i_lower, f_upper, i_upper, Temp1, Temp2, Temp3, Temp4, Temp5  ) {</tt> </p>
+  <p ><tt class="callback_description1">function callback(  freq1,  bw1, gain1, mcs1, freq2, bw2, f_lower, i_lower, f_upper, i_upper, temp1, temp2, temp3, temp4, temp5  ) {</tt> </p>
   <div class ="container">
   <div class = "fixed">
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
@@ -32,14 +32,6 @@
   <tr>
     <th>Variable Name</th>
     <th>Meaning</th>
-  </tr>
-  <tr>
-    <td>freq2</td>
-    <td>Interferer Frequency</td>
-  </tr>
-  <tr>
-    <td>bw2</td>
-    <td>Interferer Bandwidth</td>
   </tr>
     <tr>
     <td>freq1</td>
@@ -57,6 +49,16 @@
     <td>mcs1</td>
     <td>Modulation and Coding Index</td>
   </tr>
+
+  <tr>
+    <td>freq2</td>
+    <td>Interferer Frequency</td>
+  </tr>
+  <tr>
+    <td>bw2</td>
+    <td>Interferer Bandwidth</td>
+  </tr>
+
      <tr>
     <td>i_lower</td>
     <td> Global variable:  lowest possible frequency occupied by the interferer (MHz)</td>

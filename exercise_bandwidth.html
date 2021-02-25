@@ -32,8 +32,8 @@
 <script>
 
 // 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 50}
-  , width  = 920 - margin.left - margin.right  // Use the window's width
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
   , height = 320 - margin.top - margin.bottom; // Use the window's height
 
 // options
@@ -78,6 +78,9 @@ svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Pow
 
 // clip paths
 svgt.append("clipPath").attr("id","clipt").append("rect").attr("width",width).attr("height",height);
+
+
+
 svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
 
 // 9. Append the path, bind the data, and call the line generator
@@ -86,6 +89,8 @@ var patht = svgt.append("path")
     .datum(datat) // 10. Binds data to the line
     .attr("class", "stroke-med no-fill stroke-blue")
     .attr("d", linet);  // 11. Calls the line generator
+	
+
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
     .datum(dataf)

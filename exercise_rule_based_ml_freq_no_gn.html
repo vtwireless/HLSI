@@ -388,6 +388,12 @@ svgr.append("defs").append("clipPath")
     .attr("width", width)
     .attr("height", height);
 
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+		
 svgr.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
@@ -422,7 +428,8 @@ svgr.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
-   .text("Time Stepj")
+   		.attr("fill", "white")
+   .text("Time Step")
 
 // create y-axis label
 svgr.append("text")
@@ -431,6 +438,7 @@ svgr.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Data Rate (bits/second)")
 
 // 9. Append the path, bind the data, and call the line generator
@@ -471,6 +479,12 @@ svgc.append("defs").append("clipPath")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
+	
+		svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
 
 svgc.append("g")
     .attr("class", "x axis")
@@ -496,6 +510,7 @@ svgc.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("SNR (dB)")
 
 // create y-axis label
@@ -505,6 +520,7 @@ svgc.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
    .text("Spectral Efficiency (bits/second/Hz)")
 
 // clip paths

@@ -59,9 +59,10 @@
 <script>
 
 // 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 70}
-  , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 400 - margin.top - margin.bottom; // Use the window's height
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
@@ -225,12 +226,18 @@ var hist = 30,      // amount of history (seconds) to keep
     n    = Math.round(hist*1000/dur), // number of samples to buffer
     data = d3.range(n).map(function(){ return 1; });
 
+
+
 var svg = d3.select("body").append("svg")
     .attr("width",  width  + margin.left + margin.right)
     .attr("height", height + margin.top +  margin.bottom)
   .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
+	
+	svg.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
 var xscale = d3.scaleLinear()
     .domain([1, n - 2])
     .range([0, width]);
@@ -238,7 +245,12 @@ var xscale = d3.scaleLinear()
 var yscale = d3.scaleLog()
     .domain([40e3, 400e6])
     .range([height, 0]);
+	
+//var tscale = d3.scaleLinear().domain([1, n-2]).range([0, width]);
+//var rscale = d3.scaleLog   ().domain([40e3, 400e6]).range([height, 0]);
 
+//xscale = tscale;
+//yscale = rscale;
 var line = d3.line()
     .curve(d3.curveBasis)
     .x(function(d, i) { return xscale(i); })
@@ -254,6 +266,9 @@ svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(xscale));
+	
+	
+	
 
 var yTickValues = [100e3,200e3,400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
 svg.append("g")
@@ -264,8 +279,12 @@ svg.append("g")
         let [s,u] = scale_units(d);
         return d*s + u;
       }))
+	  
 
 // grid lines
+//svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize(height));
+//svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
+
 svg.append("g").attr("class","grid").call(d3.axisBottom(xscale).tickFormat("").tickSize(height));
 svg.append("g").attr("class","grid").call(d3.axisLeft  (yscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
 
@@ -279,21 +298,33 @@ svg.append("g")
     .ease(d3.easeLinear)
     .on("start", tick);
 
+
+
 // create x-axis axis label
 svg.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
-   .text("Time")
+		.attr("fill", "white")
+   .text("Time Step")
 
-// create y-axis label
+
+   // create y-axis label
 svg.append("text")
    .attr("transform","rotate(-90)")
    .attr("y", 0 - margin.left)
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+   		.attr("fill", "white")
+
    .text("Capacity (bits/second)")
+
+//
+// capacity plot
+//
+
+
 
 function tick() {
   // Push a new data point onto the back.

@@ -61,9 +61,10 @@
 <script>
 
 // 2. Use the margin convention practice
-var margin = {top: 50, right: 50, bottom: 50, left: 70}
-  , width  = 920 - margin.left - margin.right  // Use the window's width
-  , height = 400 - margin.top - margin.bottom; // Use the window's height
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
 
 // options
 var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
@@ -217,6 +218,12 @@ svg.append("defs").append("clipPath")
   .append("rect")
     .attr("width", width)
     .attr("height", height);
+	
+	
+svg.append("rect")
+	.attr("width", "86.2%")
+	.attr("height", "81%")
+	.attr("fill", "black");
 
 svg.append("g")
     .attr("class", "x axis")
@@ -252,6 +259,7 @@ svg.append("text")
    .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
    .attr("dy","-0.3em")
    .style("text-anchor","middle")
+	.attr("fill", "white")
    .text("Time")
 
 // create y-axis label
@@ -261,6 +269,7 @@ svg.append("text")
    .attr("x", 0 - (height/2))
    .attr("dy", "1em")
    .style("text-anchor","middle")
+			.attr("fill", "white")
    .text("Capacity (bits/second)")
 
 function tick() {
@@ -274,7 +283,7 @@ function tick() {
   d3.select(this)
       .attr("d", line)
       .attr("transform", null)
-      .attr("class", "stroke-med no-fill stroke-blue")
+      .attr("class", "stroke-med no-fill stroke-orange")
 
   // Slide it to the left.
   d3.active(this)
