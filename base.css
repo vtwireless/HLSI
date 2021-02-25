@@ -16,6 +16,7 @@ svg * { font: 12px Arial;
 .stroke-med     { stroke-width: 3; }
 .dashed         { stroke-dasharray: 4,4; }
 .stroke-blue    { stroke: #004080; }
+.stroke-blue-o { stroke: #008000; }
 .stroke-green   { stroke: #008040; }
 .stroke-green-o  { stroke: #66ff00;}
 .stroke-red     { stroke: #804000; }

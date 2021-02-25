@@ -95,12 +95,12 @@ svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).at
 var pathi = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(datai) // 10. Binds data to the line
-    .attr("class", "stroke-med no-fill stroke-blue")
+    .attr("class", "stroke-med no-fill stroke-green-o")
     .attr("d", linet);  // 11. Calls the line generator
 var pathq = svgt.append("path")
     .attr("clip-path","url(#clipt)")
     .datum(dataq) // 10. Binds data to the line
-    .attr("class", "stroke-med no-fill stroke-green dashed")
+    .attr("class", "stroke-med no-fill stroke-green-o dashed")
     .attr("d", linet);  // 11. Calls the line generator
 var pathf = svgf.append("path")
     .attr("clip-path","url(#clipf)")
