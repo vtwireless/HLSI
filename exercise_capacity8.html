@@ -344,7 +344,7 @@ function update_plot(band,gain,modcod) {
     // compute and display link margin
     lmargin = snr - schemes[mc].SNR;
     document.querySelector('#margin').value = d3.format(".2f")(lmargin) + " dB";
-    document.querySelector('#margin').style.color = lmargin < 0 ? "red" : "black";
+    document.querySelector('#margin').style.color = lmargin < 0 ? "red" : "white";
 
     // compute and display actual data rate
     valid = lmargin >= 0;
@@ -354,7 +354,7 @@ function update_plot(band,gain,modcod) {
         let percent_capacity = 100 * rate / C;
         document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
                                                 d3.format(".1f")(percent_capacity) + "% capacity)";
-        document.querySelector('#rate').style.color = "black";
+        document.querySelector('#rate').style.color = "white";
     } else {
         rate = 0;
         document.querySelector('#rate').value = "0 bps";
@@ -422,9 +422,9 @@ function reset() {
     document.querySelector('#outages').value = d3.format(",")(outages);
     document.querySelector('#bits').value    = d3.format(",")(bits);
     // set colors to black
-    document.querySelector('#timer').style.color   = "black";
-    document.querySelector('#outages').style.color = "black";
-    document.querySelector('#bits').style.color    = "black";
+    document.querySelector('#timer').style.color   = "white";
+    document.querySelector('#outages').style.color = "white";
+    document.querySelector('#bits').style.color    = "white";
 }
 
 async function step_interval() {

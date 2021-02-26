@@ -734,7 +734,7 @@ function update_plot(freq,band,gain,modcod) {
     // compute and display link margin
     let margin_dB = SNRdB - schemes[mc].SNR;
     document.querySelector('#margin').value = d3.format(".2f")(margin_dB) + " dB";
-    document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "black";
+    document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "white";
 
     // compute and display actual data rate
     valid = margin_dB >= 0;
@@ -744,7 +744,7 @@ function update_plot(freq,band,gain,modcod) {
         let percent_capacity = 100 * rate / C;
         document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
                                                 d3.format(".1f")(percent_capacity) + "% capacity)";
-        document.querySelector('#rate').style.color = "black";
+        document.querySelector('#rate').style.color = "white";
     } else {
         rate = 0;
         document.querySelector('#rate').value = "0 bps";
