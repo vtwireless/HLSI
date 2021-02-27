@@ -20,6 +20,7 @@ svg * { font: 12px Arial;
 .stroke-green   { stroke: #008040; }
 .stroke-green-o  { stroke: #66ff00;}
 .stroke-red     { stroke: #804000; }
+.stroke-red-o     { stroke: #800000; }
 .stroke-gray-0  { stroke: #cccccc; }
 .stroke-yellow  { stroke: #FFFF00;}
 .stroke-orange  { stroke: #ffa500;}
@@ -49,6 +50,10 @@ svg * { font: 12px Arial;
 }
 .text-bold {
 	color: white
+}
+
+.text-bold-1 {
+  font-weight: bold;
 }
 
 label {
