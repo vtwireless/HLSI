@@ -16,9 +16,9 @@
   <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
 
   <p><label for="userfunction" class="callback_description">
-      Fill out a function to change the freq1,  bw1, gn1, mcs1, freq2, bw2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5 :
+      Fill out a function to change the freq1,  bw1, gn1, mcs1, freq2, bw2,  gn2, mcs2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5 :
   </label></p>
-  <p ><tt class="callback_description1">function callback(  freq1,  bw1, gn1, mcs1, freq2, bw2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5  ) {</tt> </p>
+  <p ><tt class="callback_description1">function callback(  freq1,  bw1, gn1, mcs1, freq2, bw2, gn2, mcs2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5  ) {</tt> </p>
   <div class ="container">
   <div class = "fixed">
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
@@ -43,11 +43,11 @@
   </tr>
     <tr>
     <td>gn1</td>
-    <td> Gain (dB) </td>
+    <td> Gain of Signal 1(dB) </td>
   </tr>
     <tr>
     <td>mcs1</td>
-    <td>Modulation and Coding Index</td>
+    <td>Modulation and Coding Index of Signal 1</td>
   </tr>
 
   <tr>
@@ -57,6 +57,14 @@
   <tr>
     <td>bw2</td>
     <td>Bandwidth of Signal 2 (MHz)</td>
+  </tr>
+    <tr>
+    <td>gn1</td>
+    <td> Gain of Signal 2(dB) </td>
+  </tr>
+    <tr>
+    <td>mcs1</td>
+    <td>Modulation and Coding Index of Signal 2</td>
   </tr>
 
      <tr>
@@ -215,11 +223,12 @@ var uIndexHop = -1;
 var checkSensing = 1;
 var running = true;
 var bw1 = 77, freq1 = 1800, gn1 = 2, mcs1 = 0, n0 = -30, snr = 0, rate = 0, valid = false, valid2= false;
+
 var bwTemp = 0.19, fcTemp = 0.0;
 var nfft = 2048, generator = new siggen(nfft);
 generator.m    = 60;  // set filter semi-length
 generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
-var bw2 = 40, freq2 = 1900, gn_int = -2; // interference values
+var bw2 = 40, freq2 = 1900, gn2 = -2, mcs2 = 4; // interference values
 var bw_intTemp = 0.05, fc_intTemp = 0.25;
 var hop_dwell_time = 200;
 var alpha = 0.5;
@@ -288,7 +297,7 @@ function generate_psd(f,w,g,n) {
     generator.clear();
     // add signal with gain compensating for signal bandwidth
     generator.add_signal(f,w,g + 10*Math.log10(w));
-	generator.add_signal(fc_intTemp,bw_intTemp,gn_int+10*Math.log10(bw_intTemp)); // interference
+	generator.add_signal(fc_intTemp,bw_intTemp,gn2+10*Math.log10(bw_intTemp)); // interference
 
     //generator.add_noise(n); // add random noise samples
     generator.generate(n); // generate with specific noise floor
@@ -315,7 +324,7 @@ function compute_interference()
     // partial or full overlap, compensating gain for interference bandwidth
     let f0 = Math.max(freq2_lower, freq1_lower);
     let f1 = Math.min(freq2_upper, freq1_upper);
-    return (f1-f0)*Math.pow(10.,gn_int/10.)/bw2;
+    return (f1-f0)*Math.pow(10.,gn2/10.)/bw2;
 }
 
 
@@ -331,8 +340,8 @@ function adapt_gain(){
 	
     if (margin_dB > 0) 
 	{
-		gn1 = 2;
-		mcs1 = 9;
+		//gn1 = 2;
+		//mcs1 = 9;
 	}		
 	
 
@@ -736,11 +745,11 @@ function restart() {
 		 //{'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1};;
 
 
- 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'temp1':temp1,
+ 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2, 'temp1':temp1,
 		'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5
-		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2,}:
+		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2,}:
 		(uIndex == 3) ? {'freq1':freq1,  'bw1':bw1, 'gn1':gn1,'mcs1':mcs1}:
-		 {'gn1':gn1, 'bw1':bw1, 'mc_new':mcs1};;
+		 {'gn1':gn1, 'bw1':bw1, 'mcs1':mcs1};;
 		 
 		 
 		let uservals = callback(current);
@@ -749,7 +758,7 @@ function restart() {
 		gn1 = uservals.gain_new;
 		//gn_offset = uservals.gn_offset;
 		// validate modulation/coding scheme
-        mcs1 = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mc_new)));
+        mcs1 = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mcs1)));
         if (typeof mcs1 != "number" || isNaN(mcs1)) { mcs1 = 0; }
 
         // validate center frequency
@@ -761,7 +770,7 @@ function restart() {
 		//if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.05*fs_*scale_freq_; }	
 		//bw1 = bw1 / (fs_ * scale_freq_)
 
-        gn1 = Math.max(-2, Math.min(5, uservals.gain_new));
+        gn1 = Math.max(-2, Math.min(5, uservals.gn1));
         if (typeof gn1 != "number" || isNaN(gn1)) { gn1 = 1; }
 		
 		if (uIndex == 3){
@@ -851,14 +860,14 @@ function restart() {
 		//u_ = string.concat("return {'gn1':", string1, ", 'bw1':", string2, ", 'mcs1':",  string3, "};")
 		// Error de  
 		var dictU_ = {
-		  'gain_new': gn1,
+		  'gn1': gn1,
 		  'bw1': bw1,
-		  'mc_new': mcs1
+		  'mcs1': mcs1
 		};
 		//u_ = String(dictU_);
 		//u_ = {"return ", dictU_}
 		u_ = "return " + JSON.stringify(dictU_);
-		u_1 = "return {'gain_new': " + JSON.stringify(gn1) +  "1, 'bw1': " + JSON.stringify(bw1) + " , 'mc_new': " + JSON.stringify(mcs1) + " -1}\n";
+		u_1 = "return {'gn1': " + JSON.stringify(gn1) +  "1, 'bw1': " + JSON.stringify(bw1) + " , 'mcs1': " + JSON.stringify(mcs1) + " -1}\n";
 		
 		//u_a3  = "// check current link margin and adjust scheme appropriately\n";
 		//u_a3 += "//gn_offset = 1"
@@ -927,9 +936,9 @@ async function step_interval() {
 		 
 		 
 	
- 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'temp1':temp1,
+ 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2, 'temp1':temp1,
 		'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5
-		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2,}:
+		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2,}:
 		(uIndex == 3) ? {'freq1':freq1,  'bw1':bw1, 'gn1':gn1,'mcs1':mcs1}:
 		 {'gn1':gn1, 'bw1':bw1, 'mcs1':mcs1};;
 		 
@@ -1293,8 +1302,8 @@ function populateCallback() {
 		u += "gn_temp = 0.0"
 		u += ";\n"
 		u += "//mc_offset = 1;\n\n"
-        u += "if (margin_dB > 0) \n{ return {'freq1': freq1,  'bw1':bw1 + gn_temp, 'gn1':gn1 , 'mcs1':mcs1, 'freq2':freq2, 'bw2':bw2,}; }\n";
-        u += "else \n{ return {'freq1': freq1,  'bw1':bw1, 'gn1':gn1 + 1, 'mcs1':mcs1 - 1, 'freq2':freq2, 'bw2':bw2,}; }\n";
+        u += "if (margin_dB > 0) \n{ return {'freq1': freq1,  'bw1':bw1 + gn_temp, 'gn1':gn1 , 'mcs1':mcs1, 'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2}; }\n";
+        u += "else \n{ return {'freq1': freq1,  'bw1':bw1, 'gn1':gn1 + 1, 'mcs1':mcs1 - 1, 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2,}; }\n";
 		u_a3 = u;
 		break;
 		
@@ -1324,10 +1333,10 @@ function populateCallback() {
 		u += "freq1 = f_limit_1 + (freq2_lower - f_limit_1) / 2;\n"
 		u += "bw1 =  freq2_lower - f_limit_1   -delta;;"
 		u += "}\n\n\n"
-		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, "
+		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2"
 		u += " 'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
-        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,"
+        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2"
 		u += "'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
 		u_a3 = u;
