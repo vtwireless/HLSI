@@ -60,11 +60,11 @@
   </tr>
     <tr>
     <td>gn2</td>
-    <td> Gain of Signal 2(dB) </td>
+    <td> Gain of Signal 2(dB) - (Not Enabled) </td>
   </tr>
     <tr>
     <td>mcs2</td>
-    <td>Modulation and Coding Index of Signal 2</td>
+    <td>Modulation and Coding Index of Signal 2 - (Not Enabled)</td>
   </tr>
 
      <tr>
@@ -1333,10 +1333,10 @@ function populateCallback() {
 		u += "freq1 = f_limit_1 + (freq2_lower - f_limit_1) / 2;\n"
 		u += "bw1 =  freq2_lower - f_limit_1   -delta;;"
 		u += "}\n\n\n"
-		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2"
+		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2,"
 		u += " 'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
-        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2"
+        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2,"
 		u += "'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
 		u_a3 = u;
