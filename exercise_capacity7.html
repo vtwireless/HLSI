@@ -17,13 +17,40 @@
       Fill out a function to return the index of modulation/coding scheme
       selection based on SNR, link margin, etc. here
       (valid return values are integers in the range 0 through 11):  </label></p>
-  <p><tt>function callback(timer,modcod,current,SNR,lmargin,closed)  {</tt></p>
+  <p><tt>function callback(modcod,current,SNR,lmargin)  {</tt></p>
 	      <div class ="container">
   <div class = "fixed">
   <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return 0;">return 0;</textarea></p>
 	  </div>
+	  
+	  	  <div class="flex-item">
+
+<table style="width:100%">
+  <tr>
+    <th>Variable Name</th>
+    <th>Meaning</th>
+  </tr>
+    <tr>
+    <td>modcod</td>
+    <td> Modulation and Coding Array of Signal </td>
+  </tr>
+    <tr>
+    <td>current</td>
+    <td>Modulation and Coding Index of Signal </td>
+  </tr>
+      <tr>
+    <td>SNR</td>
+    <td>Signal to noise ratio </td>
+  </tr>
+    <tr>
+    <td>lmargin</td>
+    <td>Link margin</td>
+  </tr>
+</table>
+</div>
+
 	  </div>
   <p><tt>}</tt></p>
   
