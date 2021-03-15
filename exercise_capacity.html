@@ -45,11 +45,11 @@
     <label for="information_capacity">Information Capacity:  C = </label>
     <output for="information_capacity" id="cap"></output>
   </p>
-  <ol>
+  <!--<ol>
     <li>What combination of parameters (frequency, bandwidth, gain, noise level) maximize the SNR?</li>
     <li>What combination of parameters maximize information capacity? Do these correspond to the maximum SNR?</li>
     <li>What effect does center frequency have on SNR and capacity?</li>
-  </ol>
+  </ol>-->
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -88,7 +88,7 @@ var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
 var svgf = svg_create(margin, width, height, fScale, pScale);
 
 // add labels
-svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectral Density (dB)");
 
 // clip paths
 svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
