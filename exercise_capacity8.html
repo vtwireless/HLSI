@@ -19,10 +19,45 @@
       (valid return values are integers in the range 0 through 11):
   </label></p>
   <p><tt>function callback(timer,modcod,current,SNR,lmargin,closed) {</tt></p>
-  <p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
+  
+  
+  <!--<p><textarea id="userfunction" name="userfunction" rows="10" cols="64"
       maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
       placeholder="return {'fc':0, 'bw':0.1, 'mc':0};">return {'fc':0, 'bw':0.1, 'mc':0};</textarea></p>
   <p><tt>}</tt></p>
+  -->
+  
+    <div class ="container">
+  <div class = "fixed">
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
+      maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
+      placeholder="return {'freq1':0, 'bw1':0.1, 'mcs1':0};">return {'freq1':0, 'bw1':0.1, 'mcs1':0};</textarea></p>
+	  
+	  </div>
+	  <div class="flex-item">
+
+<table style="width:100%">
+  <tr>
+    <th>Variable Name</th>
+    <th>Meaning</th>
+  </tr>
+    <tr>
+    <td>freq1</td>
+    <td> Center or carrier frequency of Signal 1 (MHz)</td>
+  </tr>
+    <tr>
+    <td>bw1</td>
+    <td>Bandwidth of Signal 1 (MHz)</td>
+  </tr>
+    <tr>
+    <td>mcs1</td>
+    <td>Modulation and Coding Index of Signal 1</td>
+  </tr>
+</table>
+</div>
+</div>
+  
+  
   <p><input type="submit" id="toggle" value="Go!" onclick="toggle()">&nbsp;
   <label for="strategy" hidden>Select pre-configured strategy:</label>
   <select id="strategy" onchange="populateCallback()">
@@ -380,10 +415,10 @@ function toggle() {
 
 function populateCallback() {
     let selection = document.getElementById("strategy").value;
-    let u = "return {'fc':0, 'bw':0.9, 'mc':4};";
+    let u = "return {'freq1':0, 'bw1':0.9, 'mcs1':4};";
     switch (selection) {
-    case 'a0': u = "return {'fc':0, 'bw':0.9, 'mc':4};"; break;
-    case 'a1': u = "return {'fc':0.8*Math.random()-0.4, 'bw':0.1, 'mc':4};"; break;
+    case 'a0': u = "return {'freq1':0, 'bw1':0.9, 'mcs1':4};"; break;
+    case 'a1': u = "return {'freq1':0.8*Math.random()-0.4, 'bw1':0.1, 'mcs1':4};"; break;
     default:
         return;
     }
@@ -431,22 +466,22 @@ async function step_interval() {
     await new Promise((res, req) => { setTimeout(res, step_dwell_time) });
     step();
     if (running) {
-        let current = {'fc':fc, 'bw':bw, 'mc':mc};
+        let current = {'freq1':fc, 'bw1':bw, 'mcs1':mc};
         let uservals = callback(counter,schemes,current,snr,margin,valid);
 
         // validate modulation/coding scheme
-        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mc)));
+        mc = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mcs1)));
         if (typeof mc != "number" || isNaN(mc)) { mc = 0; }
 
         // validate center frequency
-        fc = Math.max(-0.5, Math.min(0.5, uservals.fc));
+        fc = Math.max(-0.5, Math.min(0.5, uservals.freq1));
         if (typeof fc != "number" || isNaN(fc)) { fc = 0; }
 
         // validate bandwidth
-        bw = Math.max(0.05, Math.min(0.95, uservals.bw));
+        bw = Math.max(0.05, Math.min(0.95, uservals.bw1));
         if (typeof bw != "number" || isNaN(bw)) { bw = 0.1; }
 
-        console.log("user value: ", uservals, ", interpreting as: ", {'fc':fc,'bw':bw,'mc':mc});
+        console.log("user value: ", uservals, ", interpreting as: ", {'freq1':fc,'bw':bw,'mcs1':mc});
         step_interval();
     } else {
         finished();
