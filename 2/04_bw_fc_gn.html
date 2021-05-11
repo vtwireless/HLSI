@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI 4 - </title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <script src=../d3.v5.min.js></script>
+    <script src=../fft.js></script>
+    <script src=support.js></script>
+    <script src=sliderWidgets.js></script>
+    <script src=simulatedPowerSpectrumPlot.js></script>
+    <script src=simulatedIQPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=conf.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 4 - Bandwidth, Frequency, and Gain</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  <p>
+    <input type=range id=freq />
+  </p>
+  <p>
+    <input type=range id=bw />
+  </p>
+  <p>
+    <input type=range id=gn />
+  </p>
+  <p>
+    <input type=range id=mcs />
+  </p>
+
+
+<!-- <div id=powerSpectrum0>
+</div> -->
+
+
+
+</body>
+    <script>
+'use strict';
+
+
+// This sig contains all the constant parameters associated with the
+// signal and also the 4 changing parameters sig.freq, sig.gn, sig.bw, and
+// sig.mcs (center frequency, gain, bandwidth, and modulation scheme
+// index).  This object is shared across the whole app as a singleton if
+// we do not use "new" to make it.
+//
+var sig = Signal(conf.sig0, "Signal 1");
+
+var sig1 = new Signal(conf.sig1);
+
+
+// We setup the sliders.  This SetupSlider() function knows how to setup
+// the input range slider based on the signal object "sig" and the name
+// of the input elements.
+SetupSlider(sig, 'freq', '#freq');
+SetupSlider(sig, 'bw', '#bw');
+SetupSlider(sig, 'gn', '#gn');
+SetupSlider(sig, 'mcs', '#mcs');
+
+
+SpectralEfficiencyPlot(sig);
+
+
+//SetupSlider(sig1, 'freq', document.querySelector('#freq1'));
+
+
+SpectralEfficiencyPlot(sig);
+
+
+SimulatedIQPlot(sig);
+//SimulatedPowerSpectrumPlot(sig, "#powerSpectrum0");
+
+SimulatedIQPlot(sig1);
+SimulatedPowerSpectrumPlot(sig1);
+
+
+SetupSlider(sig1, "freq");
+SetupSlider(sig1, "freq");
+
+
+</script>
+

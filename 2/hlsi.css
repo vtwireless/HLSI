@@ -1,0 +1,20 @@
+body {
+    color: #FFFFFF;
+    background-color: #484848;
+}
+
+input.slider_bw {
+    width: 640px;
+}
+
+
+/* D3 drawing CSS classes */
+svg {
+    font: 12px Arial;
+}
+.stroke-light   { stroke-width: 2; }
+.stroke-med     { stroke-width: 3; }
+.stroke-green-o { stroke: #66ff00; }
+.dashed         { stroke-dasharray: 4,4; }
+.no-fill        { fill: none; }
+.stroke-yellow  { stroke: #FFFF00; }

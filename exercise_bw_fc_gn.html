@@ -125,6 +125,8 @@ function update_plot(freq,band,gain) {
     document.querySelector('#gn').value = d3.format(".2f")(gn) + " dB";
     document.querySelector('#gain').value = gn;
 
+console.log("fc=" + fc + " bw=" + bw + " gn=" + gn);
+
     // clear time-domain buffer and generate up-sampled time series
     clear_buffer(xi,n);
     clear_buffer(xq,n);
