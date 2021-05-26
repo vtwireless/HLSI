@@ -24,7 +24,7 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
     // compute amount of interference in signal
     function compute_interference() {
 
-        // compute boundaries in old (bull shit) funny slider units.
+        // compute boundaries in old funny slider units.
         // TODO: fix this shit.
         let fc = - 0.5 + (sig.freq - sig.freq_plot_min)/(sig.freq_plot_max - sig.freq_plot_min);
         let bw = 0.1 + 0.8*(sig.bw - sig.bw_min)/(sig.bw_max - sig.bw_min);
@@ -182,6 +182,7 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
     function update_plot() {
 
         // TODO: THIS IS WRONG.......
+        //  Some thought is needed to correct it.
         //
         let gn = sig.gn;
         let mc = sig.mcs;

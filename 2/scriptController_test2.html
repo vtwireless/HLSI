@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>CodeMirror Text</title>
+  <meta charset="UTF-8"/>
+  <link rel=stylesheet type=text/css href=hlsi.css>
+  <link rel=stylesheet type=text/css href=codemirror.min.css/>
+  <link rel=stylesheet type=text/css href=blackboard.min.css/>
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <script src=scriptController.js></script>
+  <script src=conf.js></script>
+  <script src=simulatedPowerSpectrumPlot.js></script>
+  <script src=support.js></script>
+  <script src=fft.js></script>
+  <script src=d3.v5.min.js></script>
+  <script src=sliderWidgets.js></script>
+  <script src=spectralEfficiencyPlot.js></script>
+
+</head>
+
+<body>
+
+
+  <h2>CodeMirror Editor Text</h2>
+  <p><a href="devel_index.html">[Index]</a></p>
+
+  <p>
+  This page tests the abstraction that we define as a
+  <b>Script Controller</b>.  The optional editor and selector
+  allow the user to run javaScript that will control
+  simulated (or real radio transceivers TODO).
+  </p>
+  <p>
+  Try right mouse clicking and viewing the source.  It's very
+  small.
+  </p>
+
+
+</body>
+
+
+<script>
+
+'use strict';
+
+// We are making two signals that have the same initial state but they
+// change values 'freq', 'bw', 'gn', 'mcs' separately.
+
+var sig1 = new Signal(conf.sig0, '1');
+var sig2 = new Signal(conf.sig0, '2');
+
+
+new ScriptController([sig1, sig2],
+        { functionFiles: "functions/default_2.js" });
+
+new ScriptController([sig1], {
+            functionFiles: "functions/default_1.js",
+            postfix: '1'
+        });
+
+
+SetupSlider(sig1, 'freq');
+SetupSlider(sig1, 'bw');
+SetupSlider(sig1, 'gn');
+SetupSlider(sig1, 'mcs');
+
+SetupSlider(sig2, 'freq');
+SetupSlider(sig2, 'bw');
+SetupSlider(sig2, 'gn');
+SetupSlider(sig2, 'mcs');
+
+
+SimulatedPowerSpectrumPlot([sig1, sig2]);
+
+// This is the Spectral Efficiency Plot for sig1 with sig2 being the
+// interferer signal.
+SpectralEfficiencyPlot(sig1, sig2/*interferer*/);
+
+
+</script>
+
+
+</html>

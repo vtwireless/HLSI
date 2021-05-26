@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>CodeMirror Text</title>
+  <meta charset="UTF-8"/>
+  <link rel=stylesheet type=text/css href=hlsi.css>
+  <link rel=stylesheet type=text/css href=codemirror.min.css/>
+  <link rel=stylesheet type=text/css href=blackboard.min.css/>
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <script src=scriptController.js></script>
+  <script src=conf.js></script>
+</head>
+
+<body>
+
+
+  <h2>CodeMirror Editor Text</h2>
+  <p><a href="devel_index.html">[Index]</a></p>
+
+  <p>
+  This page tests the abstraction that we define as a
+  <b>Radio Controller</b>.  The optional editor and selector
+  allow the user to run javaScript that will control
+  simulated or real radio transceivers.
+  </p>
+
+
+</body>
+
+
+<script>
+
+var sig1 = new Signal(conf.sig0);
+var sig2 = new Signal(conf.sig0);
+
+
+new ScriptController([sig1, sig2],
+        { functionFiles: "functions/default_2.js" });
+
+
+
+</script>
+
+
+</html>

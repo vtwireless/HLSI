@@ -18,3 +18,8 @@ svg {
 .dashed         { stroke-dasharray: 4,4; }
 .no-fill        { fill: none; }
 .stroke-yellow  { stroke: #FFFF00; }
+
+.CodeMirror {
+  resize: both;
+  overflow-x: scroll;
+}

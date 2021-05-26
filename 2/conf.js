@@ -196,6 +196,12 @@ Signal.objects = {};
 function Signal(sig, name="") {
 
 
+    if(sig.freq_min === undefined) {
+        alert("Signal(sig) sig is not a conf.sig object");
+        stop();
+        return;
+    }
+
     if(this.document === undefined) 
         // this is a new object, this function was called with new.
         // The user must know what they are doing.
@@ -288,6 +294,15 @@ function Signal(sig, name="") {
         if(typeof obj._callbacks[key] !== "undefined")
             obj._callbacks[key].push(callback);
     };
+
+    obj.getBits = function(dt/*seconds*/, sigs
+            /*array of other signals. Will filter out this.*/) {
+
+        // TODO: write this function.
+
+        return 0.0;
+    };
+
 
     if(this.document === undefined)
         // This was called with new.

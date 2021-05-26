@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>HLSI 4 - </title>
+    <title>HLSI 1 - Bandwidth</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
-    <script src=../d3.v5.min.js></script>
-    <script src=../fft.js></script>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
     <script src=support.js></script>
     <script src=sliderWidgets.js></script>
     <script src=simulatedPowerSpectrumPlot.js></script>
@@ -15,11 +15,8 @@
 
 
 <body>
-  <h2>Exercise 4 - Bandwidth, Frequency, and Gain</h2>
+  <h2>Exercise 1 - Bandwidth</h2>
   <p><a href="index.html">[exercises]</a></p>
-  <p>
-    <input type=range id=bw />
-  </p>
 
 </body>
     <script>
@@ -32,28 +29,18 @@
 // index).  This object is shared across the whole app as a singleton if
 // we do not use "new" to make it.
 //
-var sig = Signal(conf.sig1);
-var sig1 = new Signal(conf.sig1);
-
-
+var sig = Signal(conf.sig0);
 
 
 // We setup the sliders.  This SetupSlider() function knows how to setup
 // the input range slider based on the signal object "sig" and the name
 // of the input elements.
 
-SetupSlider(sig, 'bw', '#bw');
-SetupSlider(sig, 'freq');
-SetupSlider(sig1, 'freq');
-
-
+SetupSlider(sig, 'bw');
 
 SimulatedIQPlot(sig);
 
 SimulatedPowerSpectrumPlot(sig);
-SimulatedPowerSpectrumPlot(sig1);
-
-
 
 </script>
 </html>
