@@ -105,8 +105,12 @@ function ScriptController(sigs, opts = null) {
     });
     dtSelect.onchange = function() {
         dt = parseFloat(this.value);
-        if(running)
+        if(running) {
+            // We must stop and start it in order to change the interval
+            // period.
             Stop();
+            Start();
+        }
     };
     dtSelect.selectedIndex = 9;
     dtSelect.onchange();

@@ -189,7 +189,7 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
         let bw = 0.1 + 0.8*(sig.bw - sig.bw_min)/(sig.bw_max - sig.bw_min);
         const n0 = -10;
 
-        console.log("update gn=" + gn);
+        //console.log("update gn=" + gn);
 
         // compute SNR
 	let I = compute_interference();     // interference power (linear)

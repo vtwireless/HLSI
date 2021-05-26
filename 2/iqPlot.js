@@ -1,6 +1,6 @@
 
 
-function SimulatedIQPlot(sig) {
+function IQPlot(sig) {
 
     // options
     var f0 = sig.freq; // center frequency

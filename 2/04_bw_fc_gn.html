@@ -7,9 +7,9 @@
     <script src=../d3.v5.min.js></script>
     <script src=../fft.js></script>
     <script src=support.js></script>
-    <script src=sliderWidgets.js></script>
-    <script src=simulatedPowerSpectrumPlot.js></script>
-    <script src=simulatedIQPlot.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=iqPlot.js></script>
     <script src=spectralEfficiencyPlot.js></script>
     <script src=conf.js></script>
 </head>
@@ -30,18 +30,18 @@
 // index).  This object is shared across the whole app as a singleton if
 // we do not use "new" to make it.
 //
-var sig = Signal(conf.sig0, "Signal 1");
+var sig = Signal(conf.sig0);
 
 
 // We setup the sliders.  This SetupSlider() function knows how to setup
 // the input range slider based on the signal object "sig" and the name
 // of the input elements.
-SetupSlider(sig, 'freq');
-SetupSlider(sig, 'bw');
-SetupSlider(sig, 'gn');
+Slider(sig, 'freq');
+Slider(sig, 'bw');
+Slider(sig, 'gn');
 
-SimulatedIQPlot(sig);
-SimulatedPowerSpectrumPlot(sig);
+IQPlot(sig);
+PowerSpectrumPlot(sig);
 
 </script>
 </html>

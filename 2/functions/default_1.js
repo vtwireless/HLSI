@@ -13,6 +13,25 @@ var functions = {
     // function callback(freq1, bw1, gn1, mcs1, bits1, dt, userData, init)
     //
 
+    "Changing freq1, bw1, gn1":
+function() {
+    
+    freq1 += 0.1e6;
+    if(freq1 > freq_max1)
+        freq1 = freq_min1;
+
+    bw1 += 0.1e6;
+    if(bw1 > bw_max1)
+        bw1 = bw_min1;
+
+    gn1 += 0.05;
+    if(gn1 > gn_max1)
+        gn1 = gn_min1;
+
+    return { freq1: freq1, bw1: bw1, gn1: gn1 };
+},
+
+
 
     "Changing bw1":
 function() {
@@ -82,8 +101,6 @@ function() {
         return { mcs1: mcs1+1 };
     }
 },
-
-
 
 
     "Changing freq1":

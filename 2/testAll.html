@@ -10,11 +10,11 @@
   <script src=codeMirror_javascript.js></script>
   <script src=scriptController.js></script>
   <script src=conf.js></script>
-  <script src=simulatedPowerSpectrumPlot.js></script>
+  <script src=powerSpectrumPlot.js></script>
   <script src=support.js></script>
   <script src=fft.js></script>
   <script src=d3.v5.min.js></script>
-  <script src=sliderWidgets.js></script>
+  <script src=sliders.js></script>
   <script src=spectralEfficiencyPlot.js></script>
 
 </head>
@@ -50,6 +50,10 @@
 var sig1 = new Signal(conf.sig0, '1');
 var sig2 = new Signal(conf.sig0, '2');
 
+// Change the initial freq value for sig1, so we see it is different from
+// sig2.
+sig1.freq = 1810.0e+6;
+
 
 new ScriptController([sig1, sig2],
         { functionFiles: "functions/default_2.js" });
@@ -60,18 +64,18 @@ new ScriptController([sig1], {
         });
 
 
-SetupSlider(sig1, 'freq');
-SetupSlider(sig1, 'bw');
-SetupSlider(sig1, 'gn');
-SetupSlider(sig1, 'mcs');
+Slider(sig1, 'freq');
+Slider(sig1, 'bw');
+Slider(sig1, 'gn');
+Slider(sig1, 'mcs');
 
-SetupSlider(sig2, 'freq');
-SetupSlider(sig2, 'bw');
-SetupSlider(sig2, 'gn');
-SetupSlider(sig2, 'mcs');
+Slider(sig2, 'freq');
+Slider(sig2, 'bw');
+Slider(sig2, 'gn');
+Slider(sig2, 'mcs');
 
 
-SimulatedPowerSpectrumPlot([sig1, sig2]);
+PowerSpectrumPlot([sig1, sig2]);
 
 // This is the Spectral Efficiency Plot for sig1 with sig2 being the
 // interferer signal.

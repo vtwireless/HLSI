@@ -19,7 +19,7 @@
 //      or null and a HTML <p> and <input> range element are created 
 //      and appended to the body.
 
-function SetupSlider(sig, parameter, n=null) {
+function Slider(sig, parameter, n=null) {
 
 
     {
@@ -81,14 +81,14 @@ function SetupSlider(sig, parameter, n=null) {
         n.min = sig[par + '_min']; // example: sig.freq_min
         n.max = sig[par + '_max'];
         n.step = sig[par + '_step'];
-        n.value = sig[par + '_init'];
+        n.value = sig[par];
 
         // Prefix this input with a label.
         let label = document.createElement('label');
         // We do not care what the node id was, we just need it to be
         // unique for this page.
         if(n.id.length < 1)
-            n.id = par + "__SiLder_zx_" + SetupSlider.nodeCount++;
+            n.id = par + "__SiLder_zx_" + Slider.nodeCount++;
         console.log("      nod ID=" + n.id);
 
         label.setAttribute("for", n.id);
@@ -174,4 +174,4 @@ function SetupSlider(sig, parameter, n=null) {
 }
 
 
-SetupSlider.nodeCount = 0;
+Slider.nodeCount = 0;
