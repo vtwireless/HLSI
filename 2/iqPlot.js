@@ -5,8 +5,8 @@ function IQPlot(sig) {
     // options
     var f0 = sig.freq; // center frequency
 
-
-    var m = 40, k=20, n = 2*k*m+1;  // filter semi-length, over-sampling rate, total length
+    // filter semi-length, over-sampling rate, total length
+    var m = 40, k=20, n = 2*k*m+1;
     var bw = 0.2, gn = 0.0;
     var xi = new Array(n), xq = new Array(n);
 
