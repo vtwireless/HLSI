@@ -130,6 +130,7 @@ function Slider(sig, parameter, n=null) {
                 return d3.format(".2f")(val*scale) + units;
             };
         } else
+            // In this case unit is a function.
             var outputUnitsCallback = unit;
 
 
@@ -161,6 +162,7 @@ function Slider(sig, parameter, n=null) {
         case "mcs": // modulation scheme - input range slider
             makeSlider(sig, n, "Mod Code", parameter, 1.0,
                     function(sig, val) {
+                        //console.log("val=" + val);
                         return conf.schemes[val].name + " (" +
                             conf.schemes[val].rate + " b/s/Hz)";
                     }

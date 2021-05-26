@@ -264,15 +264,18 @@ function Signal(sig, name="") {
             // Define a parameter setter for this key.
             set: function(val) {
                 if(isNaN(val)) return;
-                if(val < sig[key + '_min'])
-                    val = sig[key + '_min'];
-                else if(val > sig[key + '_max'])
-                    val = sig[key + '_max'];
+
+                //console.log("min=" + obj[key + '_min'] + " max=" + obj[key + '_max']);
+
+                if(val < obj[key + '_min'])
+                    val = obj[key + '_min'];
+                else if(val > obj[key + '_max'])
+                    val = obj[key + '_max'];
                 if(obj['_' + key] === val)
                     // No change, so we do nothing.
                     return;
 
-                //console.log("setting: " + sig.id + "." + key + "=" + val);
+                //console.log("setting: " + obj.id + "." + key + "=" + val);
                 obj['_' + key] = val;
 
                 // Call any callbacks that the user set for this setter.
@@ -312,4 +315,4 @@ function Signal(sig, name="") {
 }
 
 
-Signal.creatCount = 0;
+Signal.createCount = 0;
