@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>CodeMirror Text</title>
+  <meta charset="UTF-8"/>
+  <link rel=stylesheet type=text/css href=hlsi.css>
+  <link rel=stylesheet type=text/css href=codemirror.min.css />
+  <link rel=stylesheet type=text/css href=blackboard.min.css />
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <script src=scriptController.js></script>
+  <script src=conf.js></script>
+  <script src=powerSpectrumPlot.js></script>
+  <script src=support.js></script>
+  <script src=fft.js></script>
+  <script src=d3.v5.min.js></script>
+  <script src=sliders.js></script>
+  <script src=spectralEfficiencyPlot.js></script>
+
+</head>
+
+<body>
+
+
+  <h2>CodeMirror Editor Text</h2>
+  <p><a href="devel_index.html">[Index]</a></p>
+
+  <p>
+  This page is not intended to be a usable example, it's for
+  testing.
+  This page tests the abstraction that we define as a
+  <b>Script Controller</b>.  The optional editor and selector
+  allow the user to run javaScript that will control
+  simulated (or real radio transceivers TODO).
+  </p>
+  <p>
+  Try right mouse clicking and viewing the source.  It's very
+  small.
+  </p>
+
+
+</body>
+
+
+<script>
+
+'use strict';
+
+// We are making two signals that have the same initial state but they
+// change values 'freq', 'bw', 'gn', 'mcs' separately.
+
+var sig1 = new Signal(conf.sig0, '1');
+var sig2 = new Signal(conf.sig0, '2');
+
+// Change the initial freq value for sig1, so we see it is different from
+// sig2.
+sig1.freq = 1810.0e+6;
+
+
+new ScriptController([sig1, sig2],
+        { functionFiles: "functions/default_2.js" });
+
+new ScriptController([sig1], {
+            functionFiles: "functions/default_1.js",
+            postfix: '1'
+        });
+
+
+Slider(sig1, 'freq');
+Slider(sig1, 'bw');
+Slider(sig1, 'gn');
+Slider(sig1, 'mcs');
+
+Slider(sig2, 'freq');
+Slider(sig2, 'bw');
+Slider(sig2, 'gn');
+Slider(sig2, 'mcs');
+
+
+PowerSpectrumPlot([sig1, sig2]);
+
+// This is the Spectral Efficiency Plot for sig1 with sig2 being the
+// interferer signal.
+SpectralEfficiencyPlot(sig1, sig2/*interferer*/);
+
+
+</script>
+
+
+</html>
