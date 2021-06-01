@@ -117,7 +117,7 @@
   <p>
     <label for="bandwidth">Bandwidth</label>
     <input class="width-3" type="range" min="0.05" max="0.9" value="0.19" id="bandwidth" step="0.001"
-        oninput="update_plot(null,parseFloat(value),null, null)">
+        oninput="update_https://open.spotify.com/playlist/3Q2GsAzMUmMcIV2TGNqleuplot(null,parseFloat(value),null, null)">
     <output for="bandwidth" id="bw1" class="slider-text">0.1</output>
   </p>
   <p>
@@ -125,6 +125,12 @@
     <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
         oninput="update_plot(null,null,null,parseInt(value))">
     <output for="modcod" id="mcs1" class="slider-text"></output>
+  </p>
+  <p>
+    <label for="trainTime">Start of Training Time</label>
+    <input class="width-3" type="range" min="0" max="2000" value="0" id="trainTime" step="100"
+        oninput="update_plot(null,null,null,null,parseInt(value))">
+    <output for="trainTime" id="testing_num_steps" class="slider-text"></output>
   </p>
   <!--
     <p>
@@ -201,7 +207,7 @@
 
 
 
-</body>
+</body> 	
 
 
 
@@ -530,7 +536,7 @@ function efficiency(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
 
 // capacity curve
 // (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
-var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} })
+var datac = d3.range(-10,50+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} })
 
 var svgc = d3.select("body").append("svg")
     .attr("width",  width  + margin.left + margin.right)
@@ -545,7 +551,7 @@ var svgc = d3.select("body").append("svg")
 		.attr("fill", "black");
 		
 // create scale
-var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
+var sscale = d3.scaleLinear().domain([-10,50]).range([0, width]); // snr (Eb/N0?)
 var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
 //.domain([schemes[0].rate, schemes[schemes.length-1].rate])
 
@@ -655,11 +661,12 @@ function update_hop_rate(slow_, fast_)
     //document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
 }
 
-function update_plot(freq,band,gain,modcod) {
+function update_plot(freq,band,gain,modcod,trainTime) {
     if (freq !=null) { fcTemp = freq;  }
     if (band !=null) { bwTemp = band;  }
     if (gain !=null) { gn1 = gain;  }
     if (modcod!=null){ mcs1 = modcod;}
+	if (trainTime!=null){ testing_num_steps = trainTime;}
     //if (hop_rate!=null){ hr = hop_rate;}
 
 	//adapt()
@@ -699,6 +706,9 @@ function update_plot(freq,band,gain,modcod) {
 	
     document.querySelector('#mcs1').value = schemes[mcs1].name + " (" + d3.format(".3f")(schemes[mcs1].rate) + " b/s/Hz)"
     document.querySelector('#modcod').value = mcs1;
+
+    document.querySelector('#testing_num_steps').value = d3.format(".0f")(testing_num_steps) + "th"  + " Time Step";
+    document.querySelector('#trainTime').value = testing_num_steps;
 	
 	//if(document.querySelector('#slow').checked) {
 	//adjust_dwell_time = 1.5;
