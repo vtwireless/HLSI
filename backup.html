@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title class="title">HLSI Exercise - Frequency Rule Based Adaptation </title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <meta name="author" content=""/>
+  <meta name="keywords" content=""/>
+  <meta name="description" content=""/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body style="background-color:rgb(72,72,72);" >
+  <h2 class="title">Exercise - Frequency Rule Based Adaptation</h2>
+  <p class="title" ><a href="index.html">[exercises]</a></p>
+  <!--<p><input id="restart" type="button" value="Start" onclick="restart()"></p> -->
+
+  <p><label for="userfunction" class="callback_description">
+      Fill out a function to change the freq1,  bw1, gn1, mcs1, freq2, bw2,  gn2, mcs2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5 :
+  </label></p>
+  <p ><tt class="callback_description1">function callback(  freq1,  bw1, gn1, mcs1, freq2, bw2, gn2, mcs2, freq1_lower, freq2_lower, freq1_upper, freq2_upper, temp1, temp2, temp3, temp4, temp5  ) {</tt> </p>
+  <div class ="container">
+  <div class = "fixed">
+  <p><textarea id="userfunction" name="userfunction" rows="18" cols="90" 
+      maxlength=2048 autofocus=true style="color:white;font: 1em monospace;"
+      placeholder="return {'gn1':2, 'bw1':10, 'mcs1':0};">return {'gn1':2, 'bw1':10, 'mcs1':0};</textarea></p>
+	  
+	  </div>
+	  <div class="flex-item">
+
+<table style="width:100%">
+  <tr>
+    <th>Variable Name</th>
+    <th>Meaning</th>
+  </tr>
+    <tr>
+    <td>freq1</td>
+    <td> Center or carrier frequency of Signal 1 (MHz)</td>
+  </tr>
+    <tr>
+    <td>bw1</td>
+    <td>Bandwidth of Signal 1 (MHz)</td>
+  </tr>
+    <tr>
+    <td>gn1</td>
+    <td> Gain of Signal 1(dB) </td>
+  </tr>
+    <tr>
+    <td>mcs1</td>
+    <td>Modulation and Coding Index of Signal 1</td>
+  </tr>
+
+  <tr>
+    <td>freq2</td>
+    <td>  Center or carrier frequency of Signal 2 (MHz)</td>
+  </tr>
+  <tr>
+    <td>bw2</td>
+    <td>Bandwidth of Signal 2 (MHz)</td>
+  </tr>
+    <tr>
+    <td>gn2</td>
+    <td> Gain of Signal 2(dB) - (Not Enabled) </td>
+  </tr>
+    <tr>
+    <td>mcs2</td>
+    <td>Modulation and Coding Index of Signal 2 - (Not Enabled)</td>
+  </tr>
+
+     <tr>
+    <td>freq2_lower</td>
+    <td> Global variable that contains the lowest frequency occupied by Signal 2 (MHz)</td>
+  </tr>
+      <tr>
+    <td>freq1_lower</td>
+    <td>  Global variable that contains the lowest frequency occupied by Signal 1 (MHz)</td>
+  </tr>
+     <tr>
+    <td>freq2_upper</td>
+    <td> Global variable that contains the upper frequency occupied by Signal 2 (MHz)</td>
+  </tr>
+      <tr>
+    <td>freq1_upper</td>
+    <td> Global variable that contains the lowest frequency occupied by Signal 2 (MHz)</td>
+  </tr>
+      <tr>
+    <td>margin_dB</td>
+    <td> Link SINR margin</td>
+  </tr>  
+  margin_dB
+</table>
+</div>
+</div>
+  <p><tt class="callback_description1">}</tt></p>
+
+    <p><input id="restart" type="button" value="Start" onclick="toggle()">&nbsp;
+  <label for="strategy" hidden >Select pre-configured strategy:</label>
+  <select id="strategy" onchange="populateCallback()">
+    <option value="default" selected >Select pre-configured strategy...</option>
+   <!-- <option value="a0">Maximum Bandwidth, Minimum Modulation and Coding</option> -->
+   <!--  <option value="a1">Random Frequency Adaptation</option> -->
+    <!-- <option value="a2">Frequency-based Adaptation, Narrow-band</option> -->
+    <!-- <option value="a3">Gain Adaptation</option> -->
+    <option value="a4">Gain Adaptation with Controllable Interference</option>
+    <option value="a5">Gain Adaptation,  Sensing and  Controllable Interference</option>
+
+	<!-- <option value="a3">Frequency-based Adaptation, Approx. Half-band</option> -->
+    <!--<option value="a4">Frequency and Bandwidth-based Adaptation (Maximum Contiguous Bandwidth)</option> -->
+  </select>
+  </p>
+  <p>
+  </p>
+  <p>
+    <label for="frequency">Frequency</label>
+    <input class="width-3" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.1" oninput="update_plot(parseFloat(value),null,null, null)">
+    <output for="frequency" id="freq1" class="slider-text">1800.0 MHz</output>
+  </p>
+  <p>
+    <label for="bandwidth">Bandwidth</label>
+    <input class="width-3" type="range" min="0.05" max="0.9" value="0.19" id="bandwidth" step="0.001"
+        oninput="update_plot(null,parseFloat(value),null, null)">
+    <output for="bandwidth" id="bw1" class="slider-text">0.1</output>
+  </p>
+  <p>
+    <label for="modcod">Mod./Coding</label>
+    <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
+        oninput="update_plot(null,null,null,parseInt(value))">
+    <output for="modcod" id="mcs1" class="slider-text"></output>
+  </p>
+  <!--
+    <p>
+    <label for="hop_rate">Hop Rate</label>
+    <input class="width-3" type="range" min="0.2" max="2" value="0" id="hop_rate" step="0.01"
+        oninput="update_hop_rate(parseFloat(value))">
+    <output for="hop_rate" id="hr"></output>
+  </p>
+-->
+<!--
+    <div>
+    <input type="radio" id="hr_slow"
+     name="hop" value="slow" onclick="update_hop_rate(parseInt(value) ,null)">
+    <label for="hr_slow">0.2 Hz</label>
+
+    <input type="radio" id="hr_fast"
+     name="hop" value="fast" onclick="update_hop_rate(null, parseInt(value))">
+    <label for="hr_fast">2 Hz</label>
+
+  </div>
+  
+    <div>
+    <input type="radio" id="slow"
+     name="sensing" value="slow" onclick="adjust_dwell(parseInt(value) ,null)">
+    <label for="slow">Slow Sensing</label>
+
+    <input type="radio" id="fast"
+     name="sensing" value="fast" onclick="adjust_dwell(null, parseInt(value))">
+    <label for="fast">Fast Sensing</label>
+
+  </div>
+  -->
+  <p class="text-bold-1">
+    <label for="signal_to_noise_ratio" >SINR:       </label><output for="signal_to_noise_ratio" id="snr"    class="text-bold-1"></output>,
+    <label for="information_capacity">Capacity:   </label><output for="information_capacity"  id="cap"    class="text-bold-1"></output>,
+    <label for="spectral_efficiency">Spect. Eff.: </label><output for="spectral_efficiency"   id="eta"    class="text-bold-1"></output>
+    <label for="link_margin">Margin:              </label><output for="link_margin"           id="margin" class="text-bold-1"></output>,
+    <label for="actual_rate">Actual Rate:         </label><output for="actual_rate"           id="rate"   class="text-bold-1"></output>
+
+	
+  </p>
+  <p>
+    <label for="time_left"> Time Left:  </label><output for="time_left"  id="timer"   class="text-bold"></output>,
+    <label for="outages">   Outages:    </label><output for="outages"    id="outages" class="text-bold"></output>,
+    <label for="outages_survived">   Outages avoided by sensing:    </label><output for="outages_survived"    id="outages_survived" class="text-bold"></output>,
+    <label for="total_bits">Total Bits: </label><output for="total_bits" id="bits"    class="text-bold"></output>
+  </p>
+  
+  <p>
+       <label for="signal_frequency">Signal Frequency:         </label><output for="signal_frequency"           id="frequency_"   class="text-bold"></output>,
+	  <label for="signal_bandwidth">Signal Bandwidth:         </label><output for="signal_bandwidth"           id="bw_"   class="text-bold"></output>,
+	         <label for="">Gain:         </label><output for="gn1"           id="gain"   class="text-bold"></output>
+
+  </p>
+  
+    <p>
+       <label for="interferer_frequency">Interference Frequency:         </label><output for="interferer_frequency"           id="frequency_int"   class="text-bold"></output>,
+	  <label for="interferer_bandwidth">Interference Bandwidth:         </label><output for="signal_bandwidth"           id="bw2"   class="text-bold"></output>.
+
+  </p>
+  
+      <p>
+       <label for="temporary1">Temporary 1:         </label><output for="temporary1"           id="temp1"   class="text-bold"></output>,
+       <label for="temporary2">Temporary 2:         </label><output for="temporary2"           id="temp2"   class="text-bold"></output>,
+       <label for="temporary3">Temporary 3:         </label><output for="temporary3"           id="temp3"   class="text-bold"></output>,
+       <label for="temporary4">Temporary 4:         </label><output for="temporary4"           id="temp4"   class="text-bold"></output>,
+       <label for="temporary5">Temporary 5:         </label><output for="temporary5"           id="temp5"   class="text-bold"></output>,
+
+  </p>
+
+
+
+<form method="GET" id="my_form"></form>
+
+
+
+</body>
+
+
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+var temp1 = 0, temp2 = 0, temp3 = 0, temp4 = 0, temp5 = 0, temp1a = 0;
+
+// options
+var fs = 40e6, f0 = 1800e6;     // sample rate, center frequency
+var fs_ = 400e6; 
+
+var uIndex = -1;
+var uIndexHop = -1;
+var checkSensing = 1;
+var running = true;
+var bw1 = 10, freq1 = 1800, gn1 = 2, mcs1 = 0, n0 = -30, snr = 0, rate = 0, valid = false, valid2= false;
+
+// var bwTemp = 0.19, fcTemp = 0.0; qlearning
+var bwTemp = 0.025, fcTemp = 0.0;
+var nfft = 2048, generator = new siggen(nfft);
+generator.m    = 60;  // set filter semi-length
+generator.beta = 1.5; // set filter window exponent (smaller shows more side-lobes)
+var bw2 = 10, freq2 = 1880, gn2 = -2, mcs2 = 4; // interference values
+var bw_intTemp = 0.025, fc_intTemp = 0.25;
+var hop_dwell_time = 200;
+var alpha = 0.5;
+var counter=0, bits=0, outages=0, outages_survived=0, runtime=60, step_dwell_time=50;
+var fc_saved = -9;
+var hop_check = 0;
+var hop_rate = 0.2;
+var outages_check =0;
+var num_steps_time = 4000;
+var num_steps = Math.round(runtime * num_steps_time / step_dwell_time);
+hop_dwell_time = step_dwell_time;
+var adjust_dwell_time = 1.5;
+var margin_dB = 0;
+var gn_offset = 1;
+var start_freq = -0.4;
+var end_freq = 0.4;
+var num_freq = 9;
+
+
+var reward = 1;
+var alpha = 0.1;
+var testing_num_steps  = 1000
+var qfunc = new Array(num_freq).fill(0);
+
+var schemes = [
+    {'rate':0.50000, 'SINR': 3.979, 'name':'r1/2 BPSK'},
+    {'rate':0.66667, 'SINR': 5.703, 'name':'r2/3 BPSK'},
+    {'rate':1.00000, 'SINR': 7.109, 'name':'r1/2 QPSK'},
+    {'rate':1.33333, 'SINR': 8.782, 'name':'r2/3 QPSK'},
+    {'rate':1.77778, 'SINR':10.202, 'name':'r8/9 QPSK'},
+    {'rate':2.66667, 'SINR':15.036, 'name':'r2/3 16-QAM'},
+    {'rate':3.55556, 'SINR':16.747, 'name':'r8/9 16-QAM'},
+    {'rate':4.44444, 'SINR':20.970, 'name':'r8/9 32-QAM'},
+    {'rate':5.33333, 'SINR':22.920, 'name':'r8/9 64-QAM'},
+    {'rate':6.22222, 'SINR':26.797, 'name':'r8/9 128-QAM'},
+    {'rate':7.11111, 'SINR':28.570, 'name':'r8/9 256-QAM'},
+    {'rate':8.00000, 'SINR':31.050, 'name':'uncoded 256-QAM'}]
+
+// determine scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1);
+var fs_ = 400e6; 
+var [scale_freq_,units_freq_] = scale_units(f0+fs_/2,0.01);
+var f_limit_1 = (f0-0.44*fs_)*scale_freq_;
+var f_limit_2 = (f0+0.44*fs_)*scale_freq_;
+var f_limit = 0.44;
+
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs_)*scale_freq_, (f0+0.5*fs_)*scale_freq_]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-35, 25]).range([height, 0]);
+
+// d3's line generator
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs_)*scale_freq_); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// 8. An array of objects of length N. Each object has key -> value pair, the key being "y" and the value is a random number
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+
+// create SVG objects
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq_+"Hz)", "Power Spectral Density (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height).attr("fill", "pink");
+
+// 9. Append the path, bind the data, and call the line generator
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-yellow")
+    .attr("d", linef);
+
+// generate power spectral density
+function generate_psd(f,w,g,n) {
+    // update generator
+    generator.clear();
+    // add signal with gain compensating for signal bandwidth
+    generator.add_signal(f,w,g + 10*Math.log10(w));
+	generator.add_signal(fc_intTemp,bw_intTemp,gn2+10*Math.log10(bw_intTemp)); // interference
+
+    //generator.add_noise(n); // add random noise samples
+    generator.generate(n); // generate with specific noise floor
+    //console.log(psd);
+    return d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+}
+
+function toggle() {
+    if (running) { stop()    }
+    else         { restart() }
+}
+
+//function getRandomArbitrary(min, max) {
+//  return Math.random() * (max - min) + min;
+//}
+
+
+function makeArr(startValue, stopValue, cardinality) {
+  var arr = [];
+  var step = (stopValue - startValue) / (cardinality - 1);
+  for (var i = 0; i < cardinality; i++) {
+    arr.push(startValue + (step * i));
+  }
+  return arr;
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+
+function getRandomArbitrary(startValue, stopValue, cardinality){
+	arr = makeArr(startValue, stopValue, cardinality)
+	ind = getRandomInt(cardinality)
+	return arr[ind]
+}
+
+function getRandomArbitrary_(startValue, stopValue, cardinality){
+	arr = makeArr(startValue, stopValue, cardinality)
+	ind = getRandomInt(cardinality)
+	return arr[ind]
+}
+
+// compute amount of interference in signal
+function compute_interference()
+{
+    // compute boundaires
+    let freq1_lower = freq1     - 0.5*bw1,     freq1_upper = freq1     + 0.5*bw1;
+    let freq2_lower = freq2 - 0.5*bw2, freq2_upper = freq2 + 0.5*bw2;
+
+    // check for no overlap
+    if ((freq1_lower > freq2_upper || freq1_upper < freq2_lower)) 
+	{ return 0; }
+
+    // partial or full overlap, compensating gain for interference bandwidth
+    let f0 = Math.max(freq2_lower, freq1_lower);
+    let f1 = Math.min(freq2_upper, freq1_upper);
+    return (f1-f0)*Math.pow(10.,gn2/10.)/bw2;
+}
+
+
+function adapt_gain(){
+    //let freq1_lower = freq1     - alpha*bw1,     freq1_upper = freq1     + alpha*bw1;
+	delta = 0.1;
+	//bw1 = 0.19;
+	//mcs1 = 11;
+
+	 
+	//randomNum = getRandomArbitrary(start_freq,end_freq,num_freq);
+	//console.log(randomNum)
+	//freq1 = (f0+(randomNum*fs_))*scale_freq_;update_plot();
+	//fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+	
+	
+	if (counter > testing_num_steps ){
+		arr = makeArr(start_freq, end_freq, num_freq)
+		ind = getRandomInt(num_freq)
+		qfunc[ind] = qfunc[ind]  + alpha * (reward - qfunc[ind])
+		randomNum = arr[ind]
+		console.log("Adapt" + ind)
+		freq1 = (f0+(randomNum*fs_))*scale_freq_;//update_plot();
+		fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+		console.log("freq1  " + freq1)
+		console.log("fcTemp  " + fcTemp)
+
+	}
+	else{
+	
+	}
+	
+
+	
+    //let freq1_lower = freq1     - 0.5*bw1,     freq1_upper = freq1     + 0.5*bw1;
+
+    //let freq2_lower = freq2 - 0.5*bw2, freq2_upper = freq2 + 0.5*bw2;	
+	
+    if (margin_dB > 0) 
+	{
+		//gn1 = 2;
+		//mcs1 = 9;
+	}		
+	
+
+	return 0; 
+}
+
+
+
+//
+// historical rate plot
+//
+var datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} })
+var svgr = d3.select("body").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top +  margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	svgr.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+var tscale = d3.scaleLinear().domain([0, num_steps]).range([0, width]);
+var rscale = d3.scaleLog   ().domain([100e3, 400e6]).range([height, 0]);
+var liner = d3.line()
+    .x(function(d, i) { return tscale(i);   })
+    .y(function(d, i) { return rscale(d.y); });
+
+svgr.append("defs").append("clipPath")
+    .attr("id", "clipr")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svgr.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(tscale));
+
+var rtickvalues = [ 100e3, 400e3,1e6,2e6,4e6,10e6,20e6,40e6,100e6,200e6,400e6]
+svgr.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(rscale)
+      .tickValues(rtickvalues)
+      .tickFormat(function(d, i) {
+        let [s,u] = scale_units(d);
+        return d*s + u;
+      }))
+
+// grid lines
+svgr.append("g").attr("class","grid").call(d3.axisBottom(tscale).tickFormat("").tickSize(height));
+svgr.append("g").attr("class","grid").call(d3.axisLeft  (rscale).tickFormat("").tickSize(-width).tickValues(rtickvalues));
+
+/*
+svgr.append("g")
+    .attr("clip-path", "url(#clip)")
+  .append("path")
+  .transition()
+    .duration(dur)
+    .ease(d3.easeLinear)
+    .on("start", tick);
+*/
+
+// create x-axis axis label
+svgr.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+		.attr("fill", "white")
+   .text("Time Step")
+
+// create y-axis label
+svgr.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 0 - margin.left)
+   .attr("x", 0 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+		.attr("fill", "white")
+   .text("Data Rate (bits/second)")
+
+// 9. Append the path, bind the data, and call the line generator
+var pathr = svgr.append("path")
+    .attr("clip-path","url(#clipr)")
+    .datum(datar)
+    .attr("class", "stroke-med no-fill stroke-orange")
+    .attr("d", liner);
+
+//
+// capacity plot
+//
+
+
+
+
+// channel capacity (b/s/Hz) given SINR in dB
+function efficiency(snr) { return Math.log2(1.0 + Math.pow(10,snr/10)); }
+
+// capacity curve
+// (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
+var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} })
+
+var svgc = d3.select("body").append("svg")
+    .attr("width",  width  + margin.left + margin.right)
+    .attr("height", height + margin.top +  margin.bottom)
+    .attr("id", "svg-capacity")
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+	svgc.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
+		
+// create scale
+var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
+var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
+//.domain([schemes[0].rate, schemes[schemes.length-1].rate])
+
+svgc.append("defs").append("clipPath")
+    .attr("id", "clip")
+  .append("rect")
+    .attr("width", width)
+    .attr("height", height);
+
+svgc.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(sscale));
+
+//var yTickValues = [0.1,0.2,0.5,1,2,5,10,20]
+var yTickValues = [];
+schemes.forEach(function(d,i) { yTickValues.push(d.rate); });
+
+svgc.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(cscale)
+      .tickValues(yTickValues)
+        .tickFormat(function(d) { return d3.format(".2f")(d); } ))
+
+// grid lines
+svgc.append("g").attr("class","grid").call(d3.axisBottom(sscale).tickFormat("").tickSize(height));
+svgc.append("g").attr("class","grid").call(d3.axisLeft  (cscale).tickFormat("").tickSize(-width).tickValues(yTickValues));
+
+// create x-axis axis label
+svgc.append("text")
+   .attr("transform","translate("+(width/2)+","+(height + 0.75*margin.bottom)+")")
+   .attr("dy","-0.3em")
+   .style("text-anchor","middle")
+		.attr("fill", "white")
+   .text("SINR (dB)")
+
+// create y-axis label
+svgc.append("text")
+   .attr("transform","rotate(-90)")
+   .attr("y", 0 - margin.left)
+   .attr("x", 0 - (height/2))
+   .attr("dy", "1em")
+   .style("text-anchor","middle")
+		.attr("fill", "white")
+   .text("Spectral Efficiency (bits/second/Hz)")
+
+// clip paths
+svgc.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// line generator for capacity, mod/cod curves
+var linec = d3.line()
+    .x(function(d) { return sscale(d.x); })  // map SINR
+    .y(function(d) { return cscale(d.y); }); // map capacity
+
+// 9. Append the path, bind the data, and call the line generator
+var pathc = svgc.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(datac)
+    .attr("class", "stroke-light no-fill stroke-green-o")
+    .attr("d", linec);
+
+// 9. Append the path, bind the data, and call the line generator
+var datam = d3.range(schemes.length)
+              .map(function(d,i) { return {"x":schemes[i].SINR, "y":schemes[i].rate} });
+var pathc = svgc.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(datam)
+    .attr("class", "stroke-light no-fill stroke-green-o dashed")
+    .attr("d", linec);
+
+// add operating ponit
+svgc.append('g')
+    .selectAll("dot")
+    .data( [{"x":0, "y":efficiency(0)}] )
+    .enter()
+    .append("circle")
+      .attr("cx", function (d) { return sscale(d.x); } )
+      .attr("cy", function (d) { return cscale(d.y); } )
+      .attr("r", 5)
+      .attr("class", "stroke-light stroke-green-o")
+      .style("fill", "#66ff00");
+
+function adjust_dwell(slow_, fast_){
+	if (slow_ != null){
+		adjust_dwell_time = 1.5
+	}
+	if (fast_ != null){
+		adjust_dwell_time = 8
+	}
+}
+
+// 'hop' interference around
+function update_hop_rate(slow_, fast_)
+{
+	if (slow_ != null){
+		rate = 0.2;
+		uIndexHop = 1;
+		hop_dwell_time = step_dwell_time*10 / rate;
+	}
+	if (fast_ != null){
+		rate = 2
+		uIndexHop = 2;
+
+		hop_dwell_time = step_dwell_time*10 / rate;
+
+	}
+    //document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
+}
+
+function update_plot(freq,band,gain,modcod) {
+    if (freq !=null) { fcTemp = freq;  }
+    if (band !=null) { bwTemp = band;  }
+    if (gain !=null) { gn1 = gain;  }
+    if (modcod!=null){ mcs1 = modcod;}
+    //if (hop_rate!=null){ hr = hop_rate;}
+
+	//adapt()
+
+	let  freq1_lower = fcTemp - 0.5*bwTemp, freq1_upper = fcTemp + 0.5*bwTemp;
+    if (freq1_lower < -f_limit) { fcTemp -= freq1_lower+f_limit; }
+    if (freq1_upper >  f_limit) { fcTemp -= freq1_upper-f_limit; }
+	
+	freq1 = (f0+(fcTemp*fs_))*scale_freq_
+	//freq2 = (f0+(fc_intTemp*fs_))*scale_freq_
+	bw1 = bwTemp*fs_*scale_freq_
+	//bw2 = bw_intTemp*fs_*scale_freq_
+	console.log("New" + bw1)
+
+
+	//let  freq1_lower = freq1 - 0.5*bw1, freq1_upper = freq1 + 0.5*bw1;
+    //if (freq1_lower < f_limit_1) { freq1 += f_limit_1 - freq1_lower +10; freq1 =1800;
+	//fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_;}
+    //if (freq1_upper >  f_limit_2) { freq1 -= freq1_upper-f_limit_2-10; freq1 = 1800;
+	//fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_;}
+
+
+	//console.log("freq1 Update_1" +freq1)
+
+    document.querySelector('#freq1').value = d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+    document.querySelector('#frequency').value = fcTemp;
+	//console.log("freq1 Update_2" +freq1)
+
+    document.querySelector('#bw1').value = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+    document.querySelector('#bandwidth').value = bwTemp;
+	
+
+
+    //document.querySelector('#gn1').value = d3.format(".2f")(gn1) + " dB";
+   // document.querySelector('#gain').value = gn1;
+
+	
+    document.querySelector('#mcs1').value = schemes[mcs1].name + " (" + d3.format(".3f")(schemes[mcs1].rate) + " b/s/Hz)"
+    document.querySelector('#modcod').value = mcs1;
+	
+	//if(document.querySelector('#slow').checked) {
+	//adjust_dwell_time = 1.5;
+	//}else if(document.querySelector('#fast').checked) {
+	//adjust_dwell_time = 8;
+	//} 
+
+
+	
+    // compute and display SINR
+	let I     = compute_interference();     // interference power (linear)
+    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
+ 
+	let SNRdB = 0;// gn1 - n0 - 10*Math.log10(bw1);
+    let SINRdB= gn1 - 10*Math.log10(N+I);
+	SNRdB = SINRdB;
+	
+    document.querySelector('#snr').value = d3.format(".2f")(SNRdB) + " dB";
+
+    // compute and display spectral efficiency, capacity
+    let R = efficiency(SNRdB);  // spectral efficiency (b/s/Hz)
+    let C = fs * bwTemp * R;        // capacity (b/s)
+    var [scale_cap,units_cap] = scale_units(C,0.1);
+    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "b/s";
+    document.querySelector('#eta').value = d3.format(".3f")(R) + " " + "b/s/Hz";
+
+    // compute and display link margin
+    margin_dB = SNRdB - schemes[mcs1].SINR;
+    document.querySelector('#margin').value = d3.format(".2f")(margin_dB) + " dB";
+    document.querySelector('#margin').style.color = margin_dB < 0 ? "red" : "white";
+
+    // compute and display actual data rate
+    valid = margin_dB >= 0;
+    if (valid) {
+        rate = schemes[mcs1].rate * bwTemp * fs;
+        var [scale_rate,units_rate] = scale_units(rate,0.1);
+        let percent_capacity = 100 * rate / C;
+        document.querySelector('#rate').value = d3.format(".1f")(rate*scale_rate) + " " + units_rate + "bps (" +
+                                                d3.format(".1f")(percent_capacity) + "% capacity)";
+        document.querySelector('#rate').style.color = "white";
+    } else {
+        rate = 0;
+        document.querySelector('#rate').value = "0 bps";
+        document.querySelector('#rate').style.color = "red";
+    }
+
+    // generate power spectral density, compensating for bandwidth
+    dataf = generate_psd(fcTemp,bwTemp,gn1,n0);
+	
+    pathf.datum(dataf).attr("d", linef);
+
+    // update capacity value
+    d3.selectAll("circle")
+      .data( [{"x":SNRdB, "y":R}] )
+      .attr("cx", function(d) { return sscale(d.x); })
+      .attr("cy", function(d) { return cscale(schemes[mcs1].rate); })
+      .attr("r", 5)
+      .attr("class", valid ? "stroke-med stroke-green" : "stroke-med stroke-red")
+		.attr("style", valid ? "fill:#90EE90;stroke:stroke-green-o;stroke-width:4;opacity:2" : "fill:#ffcccb ;stroke:stroke-red-o;stroke-width:4;opacity:2");
+
+
+
+}
+
+// restart simulation
+var counter=0, bits=0, outages=0, outages_survived = 0, runtime=60, step_dwell_time=50;
+var num_steps = Math.round(runtime * num_steps_time / step_dwell_time);
+hop_dwell_time = step_dwell_time;
+
+function reset() {
+    mcs1 = Math.max(0,schemes.length - 3);
+    [gn1,bwTemp] = gn_bw_profile(0);
+	bw1 = bwTemp * (fs_ * scale_freq_)	
+
+    counter = num_steps;
+    bits  = 0;
+    outages = 0;
+	outages_survived = 0;
+	gn1 = 2;
+    document.querySelector('#bits').value    = d3.format(",")(bits);
+    document.querySelector('#outages').value = d3.format(",")(outages);
+	document.querySelector('#outages_survived').value = d3.format(",")(outages_survived);
+    document.querySelector('#timer').value   = d3.format(",")(counter);
+	document.querySelector('#gain').value   = d3.format(".2f")(gn1) + " dB";
+
+
+	document.querySelector('#frequency_').value   =d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_').value  = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	//hop_interval();
+
+	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_intTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw2').value  = d3.format(".2f")(bw_intTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	
+	document.querySelector('#temp1').value   = temp1;
+	document.querySelector('#temp2').value   = temp2;
+	document.querySelector('#temp3').value   = temp3;
+	document.querySelector('#temp4').value   = temp4;
+	document.querySelector('#temp5').value   = temp5;
+
+	finished();
+	//adapt_interval();
+
+}
+
+function restart() {
+
+
+		//reset();
+		//random_arr = makeArr(-0.8, 0.8, 17) 
+		//getRandomInt(max)
+
+		qfunc = new Array(num_freq).fill(0);
+		if (!((uIndex == -1) )){
+		
+		if (!(counter > 0)){
+		reset();
+		datar = d3.range(0,num_steps-1).map(function(f) { return {"y":1} })
+		}
+		//path
+		//svgr.selectAll("pathr").remove();
+
+		//svgr.selectAll("liner").remove();
+		//datar = [];
+		//for (index = 0; index < datar.length; index++) { 
+		//datar.push({"y":0});
+		//datar.shift();
+		//datar [index] = 0;
+		//} 
+		running = true;
+
+		//step();
+		//console.log(uIndex)
+
+
+		callback = new Function(document.querySelector('#userfunction').value);
+		
+		//let current = (uIndex == 3) ? {'frequency':freq1, 'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1}:
+		 //{'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1};;
+
+
+ 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2, 'temp1':temp1,
+		'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5
+		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2,}:
+		(uIndex == 3) ? {'freq1':freq1,  'bw1':bw1, 'gn1':gn1,'mcs1':mcs1}:
+		 {'gn1':gn1, 'bw1':bw1, 'mcs1':mcs1};;
+		 
+		 
+		let uservals = callback(current);
+
+		current = uservals
+		gn1 = uservals.gain_new;
+		//gn_offset = uservals.gn_offset;
+		// validate modulation/coding scheme
+        mcs1 = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mcs1)));
+        if (typeof mcs1 != "number" || isNaN(mcs1)) { mcs1 = 0; }
+
+        // validate center frequency
+
+        // validate bw1
+		//bw1 = bw1*fs_*scale_freq_
+
+		//bw1 = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+		//if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.05*fs_*scale_freq_; }	
+		//bw1 = bw1 / (fs_ * scale_freq_)
+
+        gn1 = Math.max(-2, Math.min(5, uservals.gn1));
+        if (typeof gn1 != "number" || isNaN(gn1)) { gn1 = 1; }
+		
+		if (uIndex == 3){
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			//=freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			//if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			//freq1 = ((freq1 / scale_freq_) - f0 )/ fs_
+				
+		}
+
+		if (uIndex == 4){
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+			
+			freq2 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq2));
+			if (typeof freq2 != "number" || isNaN(freq2)) { freq2 = (f0+(0*fs_))*scale_freq_; }	
+			fc_intTemp = ((freq2 / scale_freq_) - f0 )/ fs_
+			
+			bw2 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw2));
+			if (typeof bw2 != "number" || isNaN(bw2)) { bw2 = 0.025*fs_*scale_freq_; }	
+			bw_intTemp = bw2 / (fs_ * scale_freq_)
+			
+			bw1 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+			//bw1 = (( uservals.bw1));
+			if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.025*fs_*scale_freq_; }	
+			bwTemp = bw1 / (fs_ * scale_freq_)
+		}
+
+		if (uIndex == 5){
+			temp1 = Math.max(-0.5, Math.min(0.5, uservals.temporary1));
+			temp1 = uservals.temporary1;
+			if (typeof temp1 != "number" || isNaN(temp1)) { temp1 = 0; }	
+
+			temp2 = Math.max(-0.5, Math.min(0.5, uservals.temporary2));
+			temp2 = uservals.temporary2;
+			if (typeof temp2 != "number" || isNaN(temp2)) { temp2 = 0; }
+
+			temp3 = Math.max(-0.5, Math.min(0.5, uservals.temporary3));
+			temp3 = uservals.temporary3;
+			if (typeof temp3 != "number" || isNaN(temp3)) { temp3 = 0; }
+			
+			temp4 = Math.max(-0.5, Math.min(0.5, uservals.temporary4));
+			temp4 = uservals.temporary4;
+			if (typeof temp4 != "number" || isNaN(temp4)) { temp4 = 0; }
+			
+			temp5 = Math.max(-0.5, Math.min(0.5, uservals.temporary5));
+			temp5 = uservals.temporary5;
+			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
+			
+
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			//console.log(freq1)
+
+			freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+			
+			freq2 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq2));
+			if (typeof freq2 != "number" || isNaN(freq2)) { freq2 = (f0+(0*fs_))*scale_freq_; }	
+			fc_intTemp = ((freq2 / scale_freq_) - f0 )/ fs_
+			
+			bw2 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw2));
+			if (typeof bw2 != "number" || isNaN(bw2)) { bw2 = 0.025*fs_*scale_freq_; }	
+			bw_intTemp = bw2 / (fs_ * scale_freq_)
+			
+			bw1 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+			if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.025*fs_*scale_freq_; }	
+			bwTemp = bw1 / (fs_ * scale_freq_)
+		}		
+		//string1 = gn1.toString();
+		//string2 = bw1.toString();
+		//string3 = mcs1.toString();
+
+		//u_ = string.concat("return {'gn1':", string1, ", 'bw1':", string2, ", 'mcs1':",  string3, "};")
+		// Error de  
+		var dictU_ = {
+		  'gn1': gn1,
+		  'bw1': bw1,
+		  'mcs1': mcs1
+		};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		u_ = "return " + JSON.stringify(dictU_);
+		u_1 = "return {'gn1': " + JSON.stringify(gn1) +  "1, 'bw1': " + JSON.stringify(bw1) + " , 'mcs1': " + JSON.stringify(mcs1) + " -1}\n";
+		
+		//u_a3  = "// check current link margin and adjust scheme appropriately\n";
+		//u_a3 += "//gn_offset = 1"
+		//u_a3 += ";\n"
+		//u_a3 += "//mc_offset = 1;\n\n"
+        //u_a3 += "if (margin_dB > 0) \n{"
+		//u_a3 += u_1
+		//u_a3 += "}\n";
+        //u_a3 += "else \n{ "
+		//u_a3 += u_1
+		//u_a3 += "}\n";
+		
+        //u  = "// check current link margin and adjust scheme appropriately\n";
+		//u += "//gn_offset = "
+		//u +=  JSON.stringify(gn_offset)
+		//u += ";\n"
+		//u += "//mc_offset = 1;\n\n"
+        //u += "if (margin_dB > 0) \n{ return {'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1}; }\n";
+        //u += "else \n{ return {'gain_new':gn1 + 1, 'bw1':bw1, 'mc_new':mcs1 - 1}; }\n";
+		
+		if (uIndex == 3){
+		//	document.querySelector('#userfunction').value = u_a3; 
+		}
+		else{
+		//	document.querySelector('#userfunction').value = u_;
+		}
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		
+		step_interval();
+		hop_interval();
+		adapt_interval();
+		running = true;
+		
+		document.querySelector('#restart').value = "stop"
+		document.querySelector('#userfunction').disabled = true;
+		
+
+		//if (checkSensing == 1){
+		//	document.querySelector('#slow').checked = true;
+		//	document.querySelector('#hr_slow').checked = true;
+		//	checkSensing = 0
+		//}
+	}
+}
+
+function stop() {
+    //console.log("stop!");
+    running = false;
+    document.querySelector('#restart').value = 'start';
+    document.querySelector('#userfunction').disabled = false;
+}
+
+async function step_interval() {
+    await new Promise((res, req) => { setTimeout(res, step_dwell_time) });
+    if ((counter > 0) && (running == true)) {
+	    step();
+		//step();
+        //let current = {'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1};
+		
+
+		//let current = (uIndex == 3) ? {'frequency':freq1, 'gain_new':gn1, 'bw1':bw1, 'mc_new':mcs1}:
+		// {'gn1':gn1, 'bw1':bw1, 'mc_new':mcs1};;
+		 
+		 
+		 
+	
+ 		let current = (uIndex == 5) ?  {'freq1':freq1, 'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2, 'temp1':temp1,
+		'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5
+		}:  (uIndex == 4) ? {'freq1':freq1,  'bw1':bw1,  'gn1':gn1,'mcs1':mcs1 ,'freq2':freq2, 'bw2':bw2, 'gn2':gn2, 'mcs2':mcs2,}:
+		(uIndex == 3) ? {'freq1':freq1,  'bw1':bw1, 'gn1':gn1,'mcs1':mcs1}:
+		 {'gn1':gn1, 'bw1':bw1, 'mcs1':mcs1};;
+		 
+		 
+		callback = new Function(document.querySelector('#userfunction').value);
+
+
+		let uservals = callback(current);
+
+		gn1 = uservals.gn1;
+		gn_offset = uservals.gn_offset;
+		//console.log(gn_offset);
+
+		// validate modulation/coding scheme
+        mcs1 = Math.max(0, Math.min(schemes.length-1, Math.round(uservals.mcs1)));
+        if (typeof mcs1 != "number" || isNaN(mcs1)) { mcs1 = 0; }
+
+        // validate center frequency
+
+        // validate bw1
+		//bw1 = bw1*fs_*scale_freq_
+
+		bw1 = Math.max(0.05*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+		if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.05*fs_*scale_freq_; }	
+		bw1 = bw1 / (fs_ * scale_freq_)
+
+        gn1 = Math.max(-2, Math.min(5, uservals.gn1));
+        if (typeof gn1 != "number" || isNaN(gn1)) { gn1 = 1; }
+		
+		if (uIndex == 3){
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			//freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			//if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			//freq1 = ((freq1 / scale_freq_) - f0 )/ fs_
+				
+			//adapt_gain()
+			//adapt_gain()
+		}
+
+		if (uIndex == 4){
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+			
+			freq2 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq2));
+			if (typeof freq2 != "number" || isNaN(freq2)) { freq2 = (f0+(0*fs_))*scale_freq_; }	
+			fc_intTemp = ((freq2 / scale_freq_) - f0 )/ fs_
+			
+			bw2 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw2));
+			if (typeof bw2 != "number" || isNaN(bw2)) { bw2 = 0.025*fs_*scale_freq_; }	
+			bw_intTemp = bw2 / (fs_ * scale_freq_)
+			
+			bw1 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+			//bw1 = (( uservals.bw1));
+			if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.025*fs_*scale_freq_; }	
+			bwTemp = bw1 / (fs_ * scale_freq_)
+		}
+
+		if (uIndex == 5){
+			temp1 = Math.max(-0.5, Math.min(0.5, uservals.temp1));
+			temp1 = uservals.temp1;
+			if (typeof temp1 != "number" || isNaN(temp1)) { temp1 = 0; }	
+
+			temp2 = Math.max(-0.5, Math.min(0.5, uservals.temp2));
+			temp2 = uservals.temp2;
+			if (typeof temp2 != "number" || isNaN(temp2)) { temp2 = 0; }
+
+			temp3 = Math.max(-0.5, Math.min(0.5, uservals.temp3));
+			temp3 = uservals.temp3;
+			if (typeof temp3 != "number" || isNaN(temp3)) { temp3 = 0; }
+			
+			temp4 = Math.max(-0.5, Math.min(0.5, uservals.temp4));
+			temp4 = uservals.temp4;
+			if (typeof temp4 != "number" || isNaN(temp4)) { temp4 = 0; }
+			
+			temp5 = Math.max(-0.5, Math.min(0.5, uservals.temp5));
+			temp5 = uservals.temp5;
+			if (typeof temp5 != "number" || isNaN(temp5)) { temp5 = 0; }
+			
+
+			//freq1 = (f0+(freq1*fs_))*scale_freq_
+			//freq2 = (f0+(freq2*fs_))*scale_freq_
+			//bw1 = bw1*fs_*scale_freq_
+			//bw2 = bw2*fs_*scale_freq_
+
+			//console.log(freq1)
+
+			freq1 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq1));
+			if (typeof freq1 != "number" || isNaN(freq1)) { freq1 = (f0+(0*fs_))*scale_freq_; }		
+			fcTemp = ((freq1 / scale_freq_) - f0 )/ fs_
+			
+			freq2 = Math.max((f0+(-0.5*fs_))*scale_freq_, Math.min((f0+(0.5*fs_))*scale_freq_, uservals.freq2));
+			if (typeof freq2 != "number" || isNaN(freq2)) { freq2 = (f0+(0*fs_))*scale_freq_; }	
+			fc_intTemp = ((freq2 / scale_freq_) - f0 )/ fs_
+			
+			bw2 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw2));
+			if (typeof bw2 != "number" || isNaN(bw2)) { bw2 = 0.025*fs_*scale_freq_; }	
+			bw_intTemp = bw2 / (fs_ * scale_freq_)
+			
+			bw1 = Math.max(0.025*fs_*scale_freq_, Math.min(0.95*fs_*scale_freq_, uservals.bw1));
+			if (typeof bw1 != "number" || isNaN(bw1)) { bw1 = 0.025*fs_*scale_freq_; }	
+			bwTemp = bw1 / (fs_ * scale_freq_)	
+		}	
+		
+		document.querySelector('#temp1').value   = temp1;
+		document.querySelector('#temp2').value   = temp2;
+		document.querySelector('#temp3').value   = temp3;
+		document.querySelector('#temp4').value   = temp4;
+		document.querySelector('#temp5').value   = temp5;
+		step_interval();
+    } else {
+
+        finished() ;
+    }
+}
+
+
+// 'hop' interference around
+
+//function update_hop_rate(rate)
+//{
+//    hop_dwell_time = step_dwell_time*10 / rate;
+//    document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
+//}
+update_hop_rate(0.2)
+function hop() { 
+    // compute boundaires
+	if ((counter <= 0) || (running == false))
+	{ return 0;}
+	
+	
+    let freq1_lower = fcTemp     - 0.8*bwTemp,     freq1_upper = fcTemp     + 0.8*bwTemp;
+    let freq2_lower = fc_intTemp - 0.8*bw_intTemp, freq2_upper = fc_intTemp + 0.8*bw_intTemp;
+
+    // check for no overlap
+//    if (!((freq1_lower > freq2_upper || freq1_upper < freq2_lower))) 
+//		{freq2 = freq2; return 0; }
+	
+	if ((((uIndex == 4) || (uIndex == 3)))) {
+		randomNum = getRandomArbitrary(start_freq,end_freq,5);
+		console.log(randomNum)
+		freq2 = (f0+(randomNum*fs_))*scale_freq_;
+		console.log("freq2 "+freq2)
+
+		fc_intTemp = ((freq2 / scale_freq_) - f0 )/ fs_
+		console.log("fc_intTemp "+fc_intTemp)
+
+		adapt_gain()
+
+		//update_plot();
+		//freq2 = 0.97*(Math.random()-0.5)*(1-bw2);update_plot();    
+	}
+    // compute and display SINR
+	let I     = compute_interference();     // interference power (linear)
+    let N     = bwTemp * Math.pow(10.,n0/10.);  // noise power (linear)
+ 
+	let SNRdB = 0;// gn1 - n0 - 10*Math.log10(bw1);
+    let SINRdB= gn1 - 10*Math.log10(N+I);
+    let SINRdB1= gn1 - 10*Math.log10(N);
+
+	SNRdB = SINRdB;
+	
+     // compute and display link margin
+    let margin_dB = SNRdB - schemes[mcs1].SINR;
+    let margin_dB1 = SINRdB1 - schemes[mcs1].SINR;
+	
+    valid2 = margin_dB >= 0;
+    valid2_1 = margin_dB1 < 0;
+
+	if (!(valid2_1)){
+		hop_check = 1;
+	}
+	//fc_saved = freq2;
+}
+	
+
+async function hop_interval() {
+  await new Promise((res, req) => { setTimeout(res, hop_dwell_time) })
+  hop()
+  hop_interval() 
+}
+
+async function adapt_interval() {
+  await new Promise((res, req) => { setTimeout(res, hop_dwell_time/adjust_dwell_time) })
+  
+  if (uIndex == 0){
+        fixed_bw_modcod();
+	}
+	else if (uIndex == 1) {
+        adapt_random();
+    }
+	else if (uIndex == 2) {
+ 		adapt();
+    }
+	else if (uIndex == 3) {
+        //adapt_freq_approx_half_band();
+		//adapt_random();
+		///bw1 = 0.35;
+		//adapt_gain();
+	}
+	else if (uIndex == 4) {
+		//adapt_gain();		
+		//adapt_freq_max_contiguous_bw();
+    }
+	else if (uIndex == 5) {
+		//adapt_gain();		
+		//adapt_freq_max_contiguous_bw();
+    }
+	if ((counter > 0) && (running == true)) {
+		update_plot()
+		adapt_interval() 
+	}
+}
+
+function adapt_freq_max_contiguous_bw(){
+
+    //let freq1_lower = freq1     - alpha*bw1,     freq1_upper = freq1     + alpha*bw1;
+	//delta = 0.1;
+	//bw1 = 0.19;
+	//freq1 = 0;
+	mcs1 = 11;
+	delta = 0.08;
+
+	let freq1_lower = freq1     - 0.5*bw1,     freq1_upper = freq1     + 0.5*bw1;
+
+	let freq2_lower = freq2 - 0.5*bw2, freq2_upper = freq2 + 0.5*bw2;
+
+		if (freq2_lower + f_limit < f_limit - freq2_upper){  					// if interferer is closer to lower frequency limit then upper unoccupied sub-band is larger
+		freq1 = f_limit - (f_limit - freq2_upper) / 2;							// hop to center of upper unocuppied sub-band
+		bw1 = f_limit - freq2_upper - 0.5 * bw2 -delta;							// set bw1 to use entire upper unoccupied sub-band
+	} else {															// in this case the lower unoccupied sub-band is larger
+		freq1 = -f_limit + (freq2_lower + f_limit) / 2;						// hop to center of lower unoccupied sub-band
+		bw1 = freq2_lower + f_limit - 0.5 * bw2 -delta; 							// set bw1 to use entire lower unoccupied sub-band
+	}
+	return 0
+}
+// integrate
+function accumulate_rate() { bits += rate; rate_avg += rate; cap_avg += cap; update_count += 1; }
+//async function accumulate_interval() {
+//  await new Promise((res, req) => { setTimeout(res, 50) })
+//  accumulate_rate()
+//  accumulate_interval()
+//}
+//accumulate_interval();
+
+
+//time, gain, and bw1 profiles
+function gn_bw_profile(i) {
+    let t = i * step_dwell_time * 1e-3;
+    let gain = -5 + 10*Math.log10(0.001 + (0.5 + 0.5*Math.cos(2*Math.PI*0.04*t + 0.7))) *
+           Math.exp(-0.05*t);
+    let bandwidth = (0.1 + 0.8*(0.5 + 0.5*Math.cos(2*Math.PI*0.07*t + 1.5))) *
+            Math.exp(-0.015*t);
+    return [gn1,bwTemp];
+}
+
+function step() {
+    // gain and bandwidth profiles
+    [gn1,bwTemp] = gn_bw_profile(num_steps - counter);
+	bw1 = bwTemp * (fs_ * scale_freq_)	
+	if (counter>0){
+    counter -= 1;
+	}
+    update_plot();
+	
+    // update historical plot
+    datar.push({"y":Math.max(rate,1)});
+    datar.shift();
+    pathr.datum(datar).attr("d", liner);
+    bits += Math.round(rate * step_dwell_time * 1e-3);
+    outages += valid ? 0 : 1;
+	
+    let freq1_lower = fcTemp     - 0.5*bwTemp,     freq1_upper = fcTemp     + 0.5*bwTemp;
+    let freq2_lower = fc_intTemp - 0.5*bw_intTemp, freq2_upper = fc_intTemp + 0.5*bw_intTemp;
+
+    // check for  overlap
+    if (((freq1_lower > freq2_upper || freq1_upper < freq2_lower))) 
+		{fc_saved = fc_intTemp }
+
+	
+	if (valid2){
+		outages_survived += 0;
+	}
+	else{
+		if ((fc_saved == fc_intTemp)&& (hop_check == 1)){
+			outages_survived += 1;
+		}
+	}
+    document.querySelector('#bits').value    = d3.format(",")(bits);
+    document.querySelector('#outages').value = d3.format(",")(outages);
+	document.querySelector('#outages_survived').value = d3.format(",")(outages_survived);
+    document.querySelector('#timer').value   = d3.format(",")(counter);
+	document.querySelector('#gain').value   = d3.format(".2f")(gn1) + " dB";
+
+	document.querySelector('#frequency_').value   = d3.format(".1f")((f0+fcTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw_').value  = d3.format(".2f")(bwTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+
+	document.querySelector('#frequency_int').value   =d3.format(".1f")((f0+fc_intTemp*fs_)*scale_freq_) + " " + units_freq_ + "Hz";
+	document.querySelector('#bw2').value  = d3.format(".2f")(bw_intTemp*fs_*scale_freq_) + " " + units_freq_ + "Hz";
+	
+	document.querySelector('#temp1').value   = temp1;
+	document.querySelector('#temp2').value   = temp2;
+	document.querySelector('#temp3').value   = temp3;
+	document.querySelector('#temp4').value   = temp4;
+	document.querySelector('#temp5').value   = temp5;
+	
+	
+}
+
+function populateCallback() {
+    let selection = document.getElementById("strategy").value;
+    //let u = -1;
+	//let u = 'return 0;'
+	//	u  = 'bw1 = 0.19\n';
+    //    u += 'return bw1';
+    let u = "return {'gn1':0, 'bw1':120, 'mcs1':4};";
+
+    switch (selection) {
+    case 'default': uIndex = -1; break;	
+    case 'a0': uIndex = 0; break;
+    case 'a1': 
+		uIndex = 1; 
+		u = "return {'gn1':2, 'bw1':10, 'mcs1':11};";
+		break;
+    case 'a2': 
+	uIndex = 2;
+	u = "return {'gn1':2, 'bw1':10, 'mcs1':11};";
+	break;
+    case 'a3': 
+		uIndex = 3; 
+		//var dictU_ = {
+		//  'gn1': gn1,
+		//  'bw1': bw1,
+		//  'mcs1': mcs1
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately\n";
+		u += "//gn_offset = "
+		u +=  JSON.stringify(gn_offset)
+		u += ";\n"
+		u += "//mc_offset = 1;\n\n"
+        u += "if (margin_dB > 0) \n{ return {'freq1': freq1,'bw1':bw1, 'gn1':gn1,  'mcs1':mcs1}; }\n";
+        u += "else \n{ return {'freq1': freq1,'bw1':bw1,  'gn1':gn1 , 'mcs1':mcs1 }; }\n";
+		u_a3 = u;
+		break;	
+	case 'a4':
+		uIndex = 3; 
+		//var dictU_ = {
+		//  'gn1': gn1,
+		//  'bw1': bw1,
+		//  'mcs1': mcs1
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately\n";
+		u += "//gn_offset = "
+		u +=  JSON.stringify(gn_offset)
+		u += ";\n"
+		u += "//mc_offset = 1;\n\n"
+        u += "if (margin_dB > 0) \n{ return {'freq1': freq1,'bw1':bw1, 'gn1':gn1,  'mcs1':mcs1}; }\n";
+        u += "else \n{ return {'freq1': freq1,'bw1':bw1,  'gn1':gn1 , 'mcs1':mcs1 }; }\n";
+		u_a3 = u;
+		break;
+		
+	case 'a5':
+		uIndex = 5; 
+		//var dictU_ = {
+		//  'gn1': gn1,
+		//  'bw1': bw1,
+		//  'mcs1': mcs1
+		//};
+		//u_ = String(dictU_);
+		//u_ = {"return ", dictU_}
+		//u_ = "return " + JSON.stringify(dictU_);
+		//console.log(u_)
+		//u_ = string.concat("return ", u_)
+
+		//document.querySelector('#userfunction').value = u_;
+        u  = "// check current link margin and adjust scheme appropriately;\n"
+		u += "let delta = 40; \n"
+		u += "let freq1_lower = freq1     - 0.5*bw1,     freq1_upper = freq1     + 0.5*bw1; \n"
+		u += "let freq2_lower = freq2 - 0.5*bw2, freq2_upper = freq2 + 0.5*bw2; \n;"
+		u += "if (freq2_lower - f_limit_1 < f_limit_2 - freq2_upper){  \n"
+		u += "freq1 = freq2_upper + (f_limit_2 - freq2_upper) / 2;	 \n"
+		u += "bw1 = f_limit_2 - freq2_upper  -delta;}\n"
+		u += " \n"
+		u += "else {\n"
+		u += "freq1 = f_limit_1 + (freq2_lower - f_limit_1) / 2;\n"
+		u += "bw1 =  freq2_lower - f_limit_1   -delta;;"
+		u += "}\n\n\n"
+		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2,"
+		u += " 'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
+		u += "}; }\n";
+        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2,"
+		u += "'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
+		u += "}; }\n";
+		u_a3 = u;
+		break;
+		default:
+		//u  = 'bw1 = 0.19\n';
+        //u += 'return bw1';
+        return;
+    }
+    document.querySelector('#userfunction').value = u;
+}
+
+function finished() {
+	update_hop_rate(0.2)
+
+    document.querySelector('#restart').value = "start" ;
+    document.querySelector('#bits').style.color = "#008040";
+    document.querySelector('#outages').style.color = outages > 0 ? "#800000" : "#008040";
+    document.querySelector('#outages_survived').style.color = outages_survived > 0 ? "#800000" : "#008040";
+	
+	
+}
+
+// set initial values and replot
+reset();
+update_plot();
+
+</script>
+</html>
+
