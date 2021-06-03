@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -111,26 +112,32 @@
   </p>
   <p>
     <label for="frequency">Frequency</label>
-    <input class="width-3" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.1" oninput="update_plot(parseFloat(value),null,null, null)">
+    <input class="width-3" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.1" oninput="update_plot(parseFloat(value),null,null, null,null,null)">
     <output for="frequency" id="freq1" class="slider-text">1800.0 MHz</output>
   </p>
   <p>
     <label for="bandwidth">Bandwidth</label>
     <input class="width-3" type="range" min="0.05" max="0.9" value="0.19" id="bandwidth" step="0.001"
-        oninput="update_https://open.spotify.com/playlist/3Q2GsAzMUmMcIV2TGNqleuplot(null,parseFloat(value),null, null)">
+        oninput="update_plot(null,parseFloat(value),null, null,null,null)">
     <output for="bandwidth" id="bw1" class="slider-text">0.1</output>
   </p>
   <p>
     <label for="modcod">Mod./Coding</label>
     <input class="width-3" type="range" min="0" max="11" value="0" id="modcod" step="1"
-        oninput="update_plot(null,null,null,parseInt(value))">
+        oninput="update_plot(null,null,null,parseInt(value),null,null)">
     <output for="modcod" id="mcs1" class="slider-text"></output>
   </p>
   <p>
     <label for="trainTime">Start of Training Time</label>
     <input class="width-3" type="range" min="0" max="2000" value="0" id="trainTime" step="100"
-        oninput="update_plot(null,null,null,null,parseInt(value))">
+        oninput="update_plot(null,null,null,null,parseInt(value),null)">
     <output for="trainTime" id="testing_num_steps" class="slider-text"></output>
+  </p>
+    <p>
+    <label for="learningRate">Learning Rate</label>
+    <input class="width-3" type="range" min="0.00" max="1.00" value="0.0" id="learningRate" step="0.01"
+        oninput="update_plot(null,null,null,null,null,parseFloat(value))">
+    <output for="learningRate" id="learning_Rate" class="slider-text"></output>
   </p>
   <!--
     <p>
@@ -261,7 +268,8 @@ var num_freq = 5;
 
 var reward = -1;
 var alpha = 0.1;
-var testing_num_steps  = 1000
+var testing_num_steps  = 1000;
+var learning_Rate = 0.4;
 var qfunc = new Array(num_freq).fill(0);
 var ind = 0;
 var schemes = [
@@ -661,12 +669,14 @@ function update_hop_rate(slow_, fast_)
     //document.querySelector('#hr').value = d3.format(".2f")(rate) + " Hz";
 }
 
-function update_plot(freq,band,gain,modcod,trainTime) {
+function update_plot(freq,band,gain,modcod,trainTime,learningRate) {
     if (freq !=null) { fcTemp = freq;  }
     if (band !=null) { bwTemp = band;  }
     if (gain !=null) { gn1 = gain;  }
     if (modcod!=null){ mcs1 = modcod;}
 	if (trainTime!=null){ testing_num_steps = trainTime;}
+	if (learningRate!=null){ learning_Rate = learningRate;}
+	console.log("Check lr "+ learning_Rate)
     //if (hop_rate!=null){ hr = hop_rate;}
 
 	//adapt()
@@ -709,7 +719,9 @@ function update_plot(freq,band,gain,modcod,trainTime) {
 
     document.querySelector('#testing_num_steps').value = d3.format(".0f")(testing_num_steps) + "th"  + " Time Step";
     document.querySelector('#trainTime').value = testing_num_steps;
-	
+
+    document.querySelector('#learning_Rate').value = d3.format(".2f")(learning_Rate) ;
+    document.querySelector('#learningRate').value = learning_Rate;	
 	//if(document.querySelector('#slow').checked) {
 	//adjust_dwell_time = 1.5;
 	//}else if(document.querySelector('#fast').checked) {
@@ -756,7 +768,7 @@ function update_plot(freq,band,gain,modcod,trainTime) {
         rate = 0;
         document.querySelector('#rate').value = "0 bps";
         document.querySelector('#rate').style.color = "red";
-				qfunc[ind] = qfunc[ind]  + alpha * (reward - qfunc[ind])
+				qfunc[ind] = qfunc[ind]  + learning_Rate * (reward - qfunc[ind])
 						console.log("Update Qfunction" + qfunc)	
     }
 
@@ -1229,7 +1241,7 @@ function hop() {
     valid2_1 = margin_dB1 < 0;
 
 	if (margin_dB < 0){
-		qfunc[ind] = qfunc[ind]  + alpha * (reward - qfunc[ind])
+		qfunc[ind] = qfunc[ind]  + learning_Rate * (reward - qfunc[ind])
 		//console.log("Adapt" + ind)	
 		console.log("Update Qfunction" + qfunc)	
 		}
@@ -1457,7 +1469,7 @@ function populateCallback() {
 		u += "let delta = 40; \n"
 		u += "let freq1_lower = freq1     - 0.5*bw1,     freq1_upper = freq1     + 0.5*bw1; \n"
 		u += "let freq2_lower = freq2 - 0.5*bw2, freq2_upper = freq2 + 0.5*bw2; \n;"
-		u += "if (freq2_lower - f_limit_1 < f_limit_2 - freq2_upper){  \n"
+		u += "if (freq2_lower - f_limit_1 < f_limit_2 - freq2_upper){  \n"
 		u += "freq1 = freq2_upper + (f_limit_2 - freq2_upper) / 2;	 \n"
 		u += "bw1 = f_limit_2 - freq2_upper  -delta;}\n"
 		u += " \n"
@@ -1468,7 +1480,7 @@ function populateCallback() {
 		u += "if (margin_dB > 0) \n{ return { 'freq1': freq1,'bw1':bw1,  'gn1':gn1, 'mcs1':mcs1 , 'freq2':freq2, 'bw2':bw2, 'gn2':gn2 , 'mcs2':mcs2,"
 		u += " 'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
-        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2,"
+        u += "else \n{ return {'freq1': freq1, 'gn1':gn1 + 1, 'bw1':bw1, 'mcs1':mcs1 - 1,'freq2':freq2, 'bw2':bw2,'gn2':gn2 , 'mcs2':mcs2,"
 		u += "'temp1':temp1,'temp2':temp2,'temp3':temp3,'temp4':temp4,'temp5':temp5"
 		u += "}; }\n";
 		u_a3 = u;
