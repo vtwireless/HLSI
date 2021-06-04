@@ -277,6 +277,7 @@ function Signal(sig, name = "") {
     if (typeof obj._callbacks[key] !== "undefined")
       obj._callbacks[key].push(callback);
   };
+  obj.onChange = obj.addSetterCallback;
 
   obj.getBits = function (
     dt /*seconds*/,

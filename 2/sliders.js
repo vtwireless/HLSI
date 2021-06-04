@@ -134,7 +134,7 @@ function Slider(sig, parameter, n=null) {
             var outputUnitsCallback = unit;
 
 
-        sig.addSetterCallback(par, function(sig, val) {
+        sig.onChange(par, function(sig, val) {
             n.value = val;
             output.value = outputUnitsCallback(sig, val);
         });
