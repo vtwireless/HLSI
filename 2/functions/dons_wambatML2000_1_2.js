@@ -26,11 +26,21 @@ var functions = {
     //
     // They are called like so:
     //
-    // function callback(freq1, bw1, gn1, mcs1, bits1, dt, userData, init)
+    // function callback(freq1, bw1, gn1, mcs1, bits1, freq2, bw2, gn2, mcs2, bits2, dt, userData, init)
     //
 
     "Changing freq1, bw1, gn1 as an example for Don, change the name of this please":
 function() {
+
+if(init) {
+
+  // setup stuff.
+  userData.myState02 = 0.6;
+
+  userData.myExtra = { magicStuff: 0.67 };
+}
+
+console.log( "magicStuff= " + userData.myExtra.magicStuff);
 
 
 // Add more and remove code here.  This is currently just a stupid example.
