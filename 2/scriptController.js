@@ -44,7 +44,7 @@ function ScriptController(sigs, opts = null) {
     function getOpts() {
 
         var defaultOpts = {
-            functionFiles: 'functions/default_2.js',
+            functionFiles: 'functions/default_1_2.js',
             element: null,
             postfix: []
         };
