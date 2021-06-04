@@ -12,14 +12,37 @@ input.slider_bw {
 svg {
     font: 12px Arial;
 }
-.stroke-light   { stroke-width: 2; }
-.stroke-med     { stroke-width: 3; }
-.stroke-green-o { stroke: #66ff00; }
-.dashed         { stroke-dasharray: 4,4; }
-.no-fill        { fill: none; }
-.stroke-yellow  { stroke: #FFFF00; }
+
+.stroke-light {
+    stroke-width: 2;
+}
+
+.stroke-med {
+    stroke-width: 3;
+}
+
+.stroke-green-o {
+    stroke: #66ff00;
+}
+
+.dashed {
+    stroke-dasharray: 4, 4;
+}
+
+.no-fill {
+    fill: none;
+}
+
+.stroke-yellow {
+    stroke: #FFFF00;
+}
 
 .CodeMirror {
-  resize: both;
-  overflow-x: scroll;
+    resize: both;
+    overflow-x: scroll;
 }
+
+a {
+    color: rgb(36, 248, 255);
+}
+
