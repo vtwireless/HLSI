@@ -112,17 +112,13 @@
   </p>
   <p>
     <label for="frequency">Frequency</label>
-    <input class="width-3" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.1" oninput="update_plot(parseFloat(value),null,null, null,null,null)">
+    <input class="width-3" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.1" oninput="update_plot(parseFloat(value),null,null, null)">
     <output for="frequency" id="freq1" class="slider-text">1800.0 MHz</output>
   </p>
   <p>
     <label for="bandwidth">Bandwidth</label>
     <input class="width-3" type="range" min="0.05" max="0.9" value="0.19" id="bandwidth" step="0.001"
-<<<<<<< HEAD
-        oninput="update_plot(null,parseFloat(value),null, null,null,null)">
-=======
-        oninput="update_plot(null,parseFloat(value),null, null)">
->>>>>>> e15ff30774f69e0da4ff13034012ac76ffb1aa72
+        oninput="update_plot(null,parseFloat(value),null, null,null, null)">
     <output for="bandwidth" id="bw1" class="slider-text">0.1</output>
   </p>
   <p>
