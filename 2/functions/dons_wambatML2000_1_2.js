@@ -35,7 +35,13 @@ function() {
 
 // Add more and remove code here.  This is currently just a stupid example.
 
-freq1 += 0.1e6;
+// Example of using userData to add state (uaserData.df) that is
+// preserved between calls.
+if(init)
+    // This is set in the first call.
+    userData.df = 0.1e6;
+
+freq1 += userData.df;
 if(freq1 > freq_max1)
     freq1 = freq_min1;
 
