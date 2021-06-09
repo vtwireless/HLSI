@@ -147,11 +147,36 @@ var conf = {
     //
     // The step size that we allow the user to change the sig1 gain
     // with the slider.
-    gn_step: 0.01,
+    gn_step: 0.1,
     // gn_scale is used to display the value of the "gn" variable.
     gn_scale: 1.0,
     // initial gain variable value
     gn_init: 0.0,
+  },
+  noise: {
+    // Dummy signal to act as noise floor
+    // ? should this be a global noise floor
+    // ? if used globally, freq and bw must be changed to cover the entire spectrum
+    mcs_init: 2, // unused
+
+    freq_min: 1780.0e6, // unused
+    freq_max: 1820.0e6, // unused
+    freq_plot_min: 1780.0e6, // unused
+    freq_plot_max: 1820.0e6, // unused
+    freq_step: 0.01e6, // unused
+    freq_init: 1800.0e6, // unused
+
+    bw_min: 400.0e6, // unused
+    bw_max: 4000.0e6, // unused
+    bw_step: 0.01e6, // unused
+    bw_init: 4000.0e6, // unused
+
+    // Gain represents noise level
+    gn_min: -40.0,
+    gn_max: 0.0,
+    gn_step: 0.01,
+    gn_scale: 1.0,
+    gn_init: -30.0,
   },
 };
 
