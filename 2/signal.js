@@ -1,3 +1,5 @@
+'use strict';
+
 // We expose just one global configuration object called "conf"
 //
 // There are a lot of parameters, and there is no way around that.  For
@@ -26,7 +28,7 @@
 // sin(w t + a) where t is time, and scale them all away.
 //
 
-// This conf object defines all the signals that we can have to this
+// This conf object defines all the signals that we can have from this
 // thing.  The variables, keyed by: "freq", "bw", "gn", and "mcs" are
 // setup in the Signal() object/function constructor like for example in:
 //
@@ -90,7 +92,7 @@ var conf = {
         //
         // It's not likely you can change one value and not change many
         // others.  There are a lot of natural constraint relations
-        // between these parameter values.
+        // between these constant parameter values.
 
         /////////////////////////////////////////////////////////////////
         //
@@ -154,7 +156,25 @@ var conf = {
         gn_init: 0.0,
     },
 
+
+    // A "noise" signal just uses the gn (gain) variable/parameters.  If
+    // this "noise" model is usable, then we can get away with only one
+    // "noise" like signal.  The user can make any number of noise
+    // objects.   The only variable of interest, gn, in it can be set by
+    // the user.  There may be a need for a different "noise" like signal
+    // for when the user needs to limit the gn (gain) values, as in
+    // setting the constants, gn_min, gn_max, gn_step, and gn_init.
+    //
     noise: {
+
+        // TODO: We might be able to get away with not having the unused
+        // parameters set here.  Testing all uses needs to confirm this.
+        // These unused dummy variables/parameters could be auto-generated
+        // in the Signal() constructor.  Maybe make them javaScript
+        // getters that throw an exception if a user tries to use them;
+        // but that complexity may be not a great help.  A use case study
+        // is needed.
+        //
         // Dummy signal to act as noise floor
         // ? should this be a global noise floor
         // ? if used globally, freq and bw must be changed to cover the entire spectrum
@@ -178,6 +198,11 @@ var conf = {
         gn_step: 0.01,
         gn_scale: 1.0,
         gn_init: -30.0,
+
+        // bool that lets you know this is a special noise signal.
+        is_noise: true
+        // Other non-noise signals with get this bool set to false in the
+        // Signal() constructor.
     },
 };
 
@@ -235,13 +260,20 @@ function Signal(sig, name = "") {
     // We only get to here once per object, obj.
     obj.id = Signal.createCount++;
 
-    // Label prefix, or the name we give the signal.
+    // Label prefix and postfix, or the name we give the signal.
     obj.name = name;
+    // We'll be freezing much of this object (obj) so we can debug this
+    // code.
+    Object.freeze(obj.name);
 
     // Theses are just indexes into conf.schemes[]
     obj.mcs_min = 0;
     obj.mcs_max = conf.schemes.length - 1;
     obj.mcs_step = 1;
+    Object.freeze(obj.mcs_min);
+    Object.freeze(obj.mcs_max);
+    Object.freeze(obj.mcs_step);
+
 
     // We copy the constant values in sig to this object.
     // It's just handy for the user.
@@ -259,6 +291,18 @@ function Signal(sig, name = "") {
     obj._bw = sig.bw_init;
     obj._gn = sig.gn_init;
     obj._mcs = sig.mcs_init;
+
+
+    // obj.is_noise will be a bool, no matter what.
+    if(obj.is_noise === undefined)
+        obj.is_noise = false;
+    else
+        // fix stupid code.
+        obj.is_noise = true;
+    Object.freeze(obj.is_noise);
+
+    //console.log("sig" + obj.name + ".is_noise=" + obj.is_noise);
+
 
     // list of user callbacks that are called when one of the "values"
     // changes do a setter being set.  They start as empty arrays.
