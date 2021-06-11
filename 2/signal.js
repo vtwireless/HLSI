@@ -40,18 +40,18 @@ var conf = {
     // "signal" (mcs) can pick one modulation scheme at a time via index
     // into this array, mcs = 0 to 11.
     schemes: [
-        { rate: 0.5, SNR: 3.979, name: "r1/2 BPSK" }, //    0
-        { rate: 0.66667, SNR: 5.703, name: "r2/3 BPSK" }, //    1
-        { rate: 1.0, SNR: 7.109, name: "r1/2 QPSK" }, //    2
-        { rate: 1.33333, SNR: 8.782, name: "r2/3 QPSK" }, //    3
-        { rate: 1.77778, SNR: 10.202, name: "r8/9 QPSK" }, //    4
-        { rate: 2.66667, SNR: 15.036, name: "r2/3 16-QAM" }, //    5
-        { rate: 3.55556, SNR: 16.747, name: "r8/9 16-QAM" }, //    6
-        { rate: 4.44444, SNR: 20.97, name: "r8/9 32-QAM" }, //    7
-        { rate: 5.33333, SNR: 22.92, name: "r8/9 64-QAM" }, //    8
-        { rate: 6.22222, SNR: 26.797, name: "r8/9 128-QAM" }, //   9
-        { rate: 7.11111, SNR: 28.57, name: "r8/9 256-QAM" }, //  10
-        { rate: 8.0, SNR: 31.05, name: "uncoded 256-QAM" }, //11
+        { rate: 0.5,     SNR: 3.979,  name: "r1/2 BPSK" },      //  0
+        { rate: 0.66667, SNR: 5.703,  name: "r2/3 BPSK" },      //  1
+        { rate: 1.0,     SNR: 7.109,  name: "r1/2 QPSK" },      //  2
+        { rate: 1.33333, SNR: 8.782,  name: "r2/3 QPSK" },      //  3
+        { rate: 1.77778, SNR: 10.202, name: "r8/9 QPSK" },      //  4
+        { rate: 2.66667, SNR: 15.036, name: "r2/3 16-QAM" },    //  5
+        { rate: 3.55556, SNR: 16.747, name: "r8/9 16-QAM" },    //  6
+        { rate: 4.44444, SNR: 20.97,  name: "r8/9 32-QAM" },    //  7
+        { rate: 5.33333, SNR: 22.92,  name: "r8/9 64-QAM" },    //  8
+        { rate: 6.22222, SNR: 26.797, name: "r8/9 128-QAM" },   //  9
+        { rate: 7.11111, SNR: 28.57,  name: "r8/9 256-QAM" },   // 10
+        { rate: 8.0,     SNR: 31.05,  name: "uncoded 256-QAM" },// 11
     ],
 
     // This signal (sig0) is from an old code that we started with but we
@@ -153,6 +153,7 @@ var conf = {
         // initial gain variable value
         gn_init: 0.0,
     },
+
     noise: {
         // Dummy signal to act as noise floor
         // ? should this be a global noise floor
