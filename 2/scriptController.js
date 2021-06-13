@@ -213,6 +213,7 @@ function ScriptController(sigs, opts = null) {
         let args = argList.concat([constants + editor.getValue()]);
 
         userFunction = new Function(...args);
+        userData = {};
         init = true;
         intervalId = setInterval(callUserFunction, Math.round(1000.0*dt)/*milliseconds*/);
         runCheckbox.checked = true;
