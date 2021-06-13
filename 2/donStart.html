@@ -39,14 +39,17 @@
 
 // We are making two signals that have the same initial state but they
 // change values 'freq', 'bw', 'gn', 'mcs' separately.
-
+var num_freq = 4;
 var sig1 = new Signal(conf.sig0, '1');
 var sig2 = new Signal(conf.sig0, '2');
-
+var qfunc = new Array(num_freq).fill(0);
+var userData = {}
+userData['qfunc'] = qfunc;
 // Change the initial freq value for sig1, so we see it is different from
 // sig2.
 sig1.freq = 1810.0e+6;
-
+//sig1.bw_min = 4.0e6;
+//sig1.bw_max = 40.0e6;
 
 //
 // This adds javaScript code that controls sig1 while seeing sig2.
@@ -60,9 +63,9 @@ new ScriptController([sig1, sig2], {
 //
 // This adds javaScript code that controls sig1 while seeing sig2.
 //
-new ScriptController([sig2], {
-    functionFiles: "functions/dons_freqHopper_2.js",
-    postfix: [ '2' ]
+new ScriptController([sig1,sig2], {
+    functionFiles: "functions/dons_freqHopper_1_2.js",
+    postfix: [ '1','2' ]
 });
 
 

@@ -79,17 +79,21 @@ function() {
 
 const start_freq = freq_min2 + 5e6;
 const end_freq = freq_max2 - 5e6;
-randomNum = getRandomArbitrary(start_freq,end_freq,2);
-
+randomNum2 = getRandomArbitrary(start_freq,end_freq,2);
+randomNum1 = getRandomArbitrary(start_freq,end_freq,4);
+//qfunc[1] = qfunc[1] +1;
 // Initialize / update userData.freq2, used to set freq2 (freq2 is in Hz)
 if(init)
-//    freq2 = (freq_max2 + freq_min2)/2.0; m
-    freq2 = randomNum;
+//    freq2 = (freq_max2 + freq_min2)/2.0;
+    freq2 = randomNum2;
+    //freq1 = randomNum1;
 
 else
     // Select a random freq2.
     //freq2 += -2.0e5 + 4e5*Math.random();
-    freq2 = randomNum;
+    freq2 = randomNum2;
+    freq1 = randomNum1;
+
 		//console.log(randomNum)
 
 
@@ -101,7 +105,12 @@ if(freq2 > freq_max2)
 else if(freq2 < freq_min2)
     freq2 = freq_min2;
 
-return { freq2: freq2 };
+if(freq1 > freq_max1)
+    freq1 = freq_max1;
+else if(freq1 < freq_min1)
+    freq1 = freq_min1;
+
+return { freq2: freq2, freq1: freq1 };
 },
 
 
