@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>UserData</title>
+  <meta charset="UTF-8"/>
+  <link rel=stylesheet type=text/css href=hlsi.css>
+  <link rel=stylesheet type=text/css href=codemirror.min.css />
+  <link rel=stylesheet type=text/css href=blackboard.min.css />
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <script src=scriptController.js></script>
+  <script src=signal.js></script>
+  <script src=powerSpectrumPlot.js></script>
+  <script src=support.js></script>
+  <script src=fft.js></script>
+  <script src=d3.v5.min.js></script>
+  <script src=sliders.js></script>
+
+</head>
+
+<body>
+
+
+  <h2>UserData example</h2>
+  <p><a href="devel_index.html">[Index]</a></p>
+
+  <p>
+  This page is not intended to be a usable example, it's just
+  an example.
+  </p>
+
+
+</body>
+
+
+<script>
+
+'use strict';
+
+var sig1 = new Signal(conf.sig0, '1');
+
+
+new ScriptController([sig1],
+        { functionFiles: "functions/userData_example_1.js" });
+
+
+Slider(sig1, 'freq');
+Slider(sig1, 'bw');
+Slider(sig1, 'gn');
+Slider(sig1, 'mcs');
+
+PowerSpectrumPlot([sig1]);
+
+</script>
+
+
+</html>
