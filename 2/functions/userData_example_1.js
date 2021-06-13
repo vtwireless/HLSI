@@ -19,7 +19,7 @@ var functions = {
 function() {
 
   if(init) {
-    // initialize the userData.
+    //// initialize the userData.
     userData.freqRate = (freq_max1 - freq_min1)/20.0;
   } else {
     // second order change

@@ -39,12 +39,19 @@
 
 // We are making two signals that have the same initial state but they
 // change values 'freq', 'bw', 'gn', 'mcs' separately.
-var num_freq = 4;
+var num_channels = 4;
+var epsilon = 1;
+var decaying_constant = 0.9;
+
 var sig1 = new Signal(conf.sig0, '1');
 var sig2 = new Signal(conf.sig0, '2');
-var qfunc = new Array(num_freq).fill(0);
+var qfunc = new Array(num_channels).fill(0);
 var userData = {}
 userData['qfunc'] = qfunc;
+userData['num_channels'] = num_channels;
+userData['epsilon'] = epsilon;
+userData['decaying_constant'] = decaying_constant;
+
 // Change the initial freq value for sig1, so we see it is different from
 // sig2.
 sig1.freq = 1810.0e+6;

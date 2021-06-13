@@ -56,8 +56,10 @@ function indexOfMax(arr) {
     }
 
     return maxIndex;
-}
+}//
 
+//var sorted = qfunc.slice().sort(function(a,b){return b-a})
+//var ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 
 
 var functions = {
@@ -79,24 +81,90 @@ function() {
 
 const start_freq = freq_min2 + 5e6;
 const end_freq = freq_max2 - 5e6;
-randomNum2 = getRandomArbitrary(start_freq,end_freq,2);
-randomNum1 = getRandomArbitrary(start_freq,end_freq,4);
+num_channels  = userData.num_channels;
+decaying_constant  = userData.decaying_constant;
+epsilon  = userData.epsilon;
+minimum_epsilon  = userData.minimum_epsilon;
+
+decaying_constant = 0.9;
+//epsilon = 1;
+minimum_epsilon = 0.1;
+//decaying_constant
+
+var len = qfunc.length;
+var indices = new Array(len);
+for (var i = 0; i < len; ++i) indices[i] = i;
+indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
+//console.log(indices);
+
+//
+//arr = makeArr(startValue, stopValue, cardinality)
+//ind = getRandomInt(cardinality)
+	
+//randomNum2 = getRandomArbitrary(start_freq,end_freq,2);
+//randomNum1 = getRandomArbitrary(start_freq,end_freq,4);
+
+arr2 = makeArr(start_freq, end_freq, 2)
+ind2 = getRandomInt(2)
+randomNum2 = arr2[ind2]
+
+
+
+
+
+//getRandomArbitrary(start_freq,end_freq,num_channels);
 //qfunc[1] = qfunc[1] +1;
 // Initialize / update userData.freq2, used to set freq2 (freq2 is in Hz)
-if(init)
-//    freq2 = (freq_max2 + freq_min2)/2.0;
-    freq2 = randomNum2;
+if(init){
+	//    freq2 = (freq_max2 + freq_min2)/2.0;
+    //freq2 = randomNum2;
     //freq1 = randomNum1;
+	//console.log("if"+epsilon)
+ 	epsilon  = 1;
+	num_channels =4;
 
-else
+}
+else{
     // Select a random freq2.
     //freq2 += -2.0e5 + 4e5*Math.random();
+	//console.log("else"+epsilon)
+
+	if (epsilon > minimum_epsilon ){
+		arr1 = makeArr(start_freq, end_freq, num_channels)
+		ind1 = getRandomInt(num_channels)
+		randomNum1 = arr1[ind1]	
+		epsilon = decaying_constant*epsilon;
+	}
+	else{
+		indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
+		slicedQfunc = indices.slice(0,2)
+		len_slicedQfunc = slicedQfunc.length
+		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
+		randomNum1 = arr1[ind1slicedQfunc]	
+
+		//console.log(len_slicedQfunc)
+		console.log("SlicedWrong" + randomNum1)
+
+		//console.log("Wrong" + slicedQfunc)
+		//console.log("Wrong" + qfunc)
+
+		//sorted = qfunc.slice().sort(function(a,b){return b-a})
+		//ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
+	}
     freq2 = randomNum2;
     freq1 = randomNum1;
-
+}
 		//console.log(randomNum)
 
+if (freq1 == freq2){
+	qfunc[ind1] = qfunc[ind1] +0.9*(-1 + qfunc[ind1] );
+}
+	
+userData.qfunc = qfunc;
+userData.epsilon = epsilon;
+userData.num_channels = num_channels;
 
+//console.log(qfunc.slice(0,2))
 
 
 // Check and fix bounds of freq2.
