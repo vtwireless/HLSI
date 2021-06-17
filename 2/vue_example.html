@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>HLSI - Information Capacity</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+  <script src=../d3.v5.min.js> </script>
+  <script src=../fft.js> </script>
+  <script src=support.js></script>
+  <script src=sliders.js></script>
+  <script src=label.js></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.14/vue.min.js"
+    integrity="sha512-XdUZ5nrNkVySQBnnM5vzDqHai823Spoq1W3pJoQwomQja+o4Nw0Ew1ppxo5bhF2vMug6sfibhKWcNJsG8Vj9tg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src=powerSpectrumPlot.js></script>
+  <script src=spectralEfficiencyPlot.js></script>
+  <script src=signal.js></script>
+</head>
+
+
+<body>
+  <div id="vueExample">
+    <h2>Exercise - Information Capacity</h2>
+    <h4>Test page for plotting signals against a noise floor</h4>
+    <p><a href="./index.html">[Return to Index]</a></p>
+  </div>
+</body>
+<script>
+  'use strict';
+  // example of vue usage
+  var example = new Vue({
+    name: 'example',
+    el: '#vueExample',
+    data: {
+      signal: null,
+      noise: null,
+    },
+    computed: {
+      signalToNoiseRatio: function () {
+        return this.signal._gn - this.noise._gn - 10 * Math.log10(this.bandwidthSliderPercentage);
+      },
+      bandwidthSliderPercentage: function () {
+        let bwPercentage = (this.signal._bw - this.signal.bw_min) / (this.signal.bw_max - this.signal.bw_min);
+        if (bwPercentage === 0)
+          bwPercentage =
+            0.00001; // ensure bwPercentage is not zero, log(0)=inf
+        return bwPercentage;
+      }
+    },
+  });
+  // Exercise 5: Information Capacity
+  // init signal off sig0 schema in signal.js
+  example.signal = new Signal(conf.sig0, '1');
+  // init signal to represent noise, off noise schema in signal.js
+  example.noise = new Signal(conf.noise, '2');
+
+  // TODO: proper vue implementation of sliders and label
+
+  
+  // init sliders
+  Slider(example.signal, 'freq'); // frequency
+  Slider(example.signal, 'bw'); // bandwidth
+  Slider(example.signal, 'gn'); // gain
+
+  Slider(example.noise, 'noise'); // noise floor slider (gain slider for the noise 'signal')
+
+  // Example of label usage
+  Label([example.signal, example.noise], [
+    ["gn", "bw"],
+    ["gn"]
+  ], "SNR", "SNR: ");
+
+
+  PowerSpectrumPlot(example.signal, example.noise);
+
+</script>
+
+</html>
