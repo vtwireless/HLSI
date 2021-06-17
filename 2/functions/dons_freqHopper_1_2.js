@@ -81,20 +81,28 @@ function() {
 
 const start_freq = freq_min2 + 5e6;
 const end_freq = freq_max2 - 5e6;
-num_channels  = userData.num_channels;
-decaying_constant  = userData.decaying_constant;
-epsilon  = userData.epsilon;
-minimum_epsilon  = userData.minimum_epsilon;
+num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
 
-decaying_constant = 0.9;
-//epsilon = 1;
-minimum_epsilon = 0.1;
+decaying_constant  = userData.decaying_constant;  // 
+epsilon  = userData.epsilon;  
+// Epsilon - Value from zero to one
+// This helps decide if the user should use the current optimal channels or 
+// Explore for better channels
+minimum_epsilon  = userData.minimum_epsilon;
+minimum_epsilon = 0.01;
+// minimum_epsilon
+// After this threshold is exceeded, the user only selects the optimal channels.
+
+decaying_constant = 0.9;  
+// At every time interval, the epsilon is updated as follows
+// epsilon = epsilon^decaying_constant;
 //decaying_constant
 
 var len = qfunc.length;
 var indices = new Array(len);
 for (var i = 0; i < len; ++i) indices[i] = i;
-indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
+indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; }); 
+// Qlearning Sort - Rank the channels with best qvalues in ascending order 
 //console.log(indices);
 
 //
@@ -128,22 +136,26 @@ else{
     // Select a random freq2.
     //freq2 += -2.0e5 + 4e5*Math.random();
 	//console.log("else"+epsilon)
-
-	if (epsilon > minimum_epsilon ){
+	prob_epsilon = Math.random();
+	console.log(epsilon)
+	if ((epsilon > minimum_epsilon ) & (prob_epsilon < epsilon )){
 		arr1 = makeArr(start_freq, end_freq, num_channels)
 		ind1 = getRandomInt(num_channels)
 		randomNum1 = arr1[ind1]	
 		epsilon = decaying_constant*epsilon;
-	}
+		// At every time interval, the epsilon is updated as follows
+		// epsilon = epsilon^decaying_constant;
+ 	}
 	else{
 		indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
 		slicedQfunc = indices.slice(0,2)
 		len_slicedQfunc = slicedQfunc.length
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
 		randomNum1 = arr1[ind1slicedQfunc]	
+		epsilon = decaying_constant*epsilon;
 
 		//console.log(len_slicedQfunc)
-		console.log("SlicedWrong" + randomNum1)
+		//console.log("SlicedWrong" + randomNum1)
 
 		//console.log("Wrong" + slicedQfunc)
 		//console.log("Wrong" + qfunc)
