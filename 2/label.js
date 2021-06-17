@@ -4,9 +4,16 @@
  * @param {Signal[]} signalArray - Array of signals related to computation of display variable
  * @param {Array[String[]]} valuesWatched - what values to add callback func onto within the signals
  * @param {String} computedElement - name of variable to compute for label
- * @param {*} [n=null] - display element
+ * @param {String} [suffix=""] - label suffix, optional
+ * @param {*} [n=null] - display element, optional
  */
-function Label(signalArray, valuesWatched, computedElement, n = null) {
+function Label(
+  signalArray,
+  valuesWatched,
+  computedElement,
+  suffix = "",
+  n = null
+) {
   if (!n) {
     // nullcheck
     n = document.createElement("OUTPUT");
@@ -36,8 +43,7 @@ function Label(signalArray, valuesWatched, computedElement, n = null) {
     switch (computedElement) {
       case "SNR":
         // hardcoded to treat 2nd signal (1) as noise
-        n.value =
-          "SNR: " + signalArray[0].computeSNR(signalArray[1]).toFixed(2);
+        n.value = suffix + signalArray[0].computeSNR(signalArray[1]).toFixed(2);
         break;
       default:
         break;
