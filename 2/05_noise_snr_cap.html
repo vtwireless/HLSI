@@ -2,49 +2,48 @@
 <html lang="en-US">
 
 <head>
-    <title>HLSI - Information Capacity</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.15.0/d3.min.js"
-        integrity="sha512-PLXQkW9K9twsr6kg2YomYaGdxSAEWSlr25vmbfxXxnYtDop+CPzidL8IDsQZMNPYF2UgLSLVyUxyAjwyTcMVtQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src=../fft.js> </script> <script src=support.js></script>
-    <script src=sliders.js></script>
-    <script src=powerSpectrumPlot.js></script>
-    <script src=spectralEfficiencyPlot.js></script>
-    <script src=signal.js></script>
+  <title>HLSI - Information Capacity</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+  <script src=../d3.v5.min.js> </script>
+  <script src=../fft.js> </script>
+  <script src=support.js></script>
+  <script src=sliders.js></script>
+  <script src=label.js></script>
+  <script src=powerSpectrumPlot.js></script>
+  <script src=spectralEfficiencyPlot.js></script>
+  <script src=signal.js></script>
 </head>
 
 
 <body>
-    <h2>Exercise - Information Capacity</h2>
-    <h4>Test page for plotting signals against a noise floor</h4>
-    <p><a href="./index.html">[Return to Index]</a></p>
+  <h2>Exercise - Information Capacity</h2>
+  <h4>Test page for plotting signals against a noise floor</h4>
+  <p><a href="./index.html">[Return to Index]</a></p>
 </body>
 <script>
-'use strict';
-// Exercise 5: Information Capacity
+  'use strict';
+  // Exercise 5: Information Capacity
+  // init signal off sig0 schema in signal.js
+  var sig1 = new Signal(conf.sig0, '1');
+  // init signal to represent noise, off noise schema in signal.js
+  var noise = new Signal(conf.noise, '2');
 
-// init signal off sig0 schema in signal.js
-var sig1 = new Signal(conf.sig0, '1');
-// init signal to represent noise, off noise schema in signal.js
-var noise = new Signal(conf.noise, '2');
+  // init sliders
+  Slider(sig1, 'freq'); // frequency
+  Slider(sig1, 'bw'); // bandwidth
+  Slider(sig1, 'gn'); // gain
 
-// init sliders
-Slider(sig1, 'freq'); // frequency
-Slider(sig1, 'bw'); // bandwidth
-Slider(sig1, 'gn'); // gain
+  Slider(noise, 'noise'); // noise floor slider (gain slider for the noise 'signal')
 
-// noise floor slider (gain slider for the noise 'signal')
-Slider(noise, 'noise');
+  // Example of label usage
+  Label([sig1, noise], [
+    ["gn", "bw"],
+    ["gn"]
+  ], "SNR", "SNR: ");
 
-PowerSpectrumPlot(sig1, noise);
 
-// TODO: Add real-time display of SNR and IC
-// SNR & IC caluculated within signal, gets passed noise floor db
-// sig1.computeSNR(noise, [addl signals]);
-// new display object?
-
+  PowerSpectrumPlot(sig1, noise);
 </script>
 
 </html>

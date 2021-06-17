@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>HLSI - Information Capacity</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+  <script src=../d3.v5.min.js> </script>
+  <script src=../fft.js> </script>
+  <script src=support.js></script>
+  <script src=sliders.js></script>
+  <script src=label.js></script>
+  <script src=vue.min.js></script>
+  <script src=powerSpectrumPlot_vue.js></script>
+  <script src=signal.js></script>
+</head>
+
+
+<body>
+  <div id="vueExample">
+    <h2>Exercise - Information Capacity (with vue.js)</h2>
+    <h4>Test page for plotting signals against a noise floor</h4>
+    <p><a href="./index.html">[Return to Index]</a></p>
+    <p>Signal to Noise Ratio: {{ signalToNoiseRatio }}</p>
+
+    <p>Bandwidth: <input type="range" min="4000000" max="40000000" step="10000" class="slider_bw"
+        v-model.number="signal._bw"><output>{{signal._bw / 1000000}} MHz</output></p>
+
+    <p>Frequency: <input type="range" min="1780000000" max="1820000000" step="10000" class="slider_bw"
+        v-model.number="signal._freq"><output>{{signal._freq / 1000000}} MHz</output></p>
+
+    <p>Gain: <input type="range" min="-30" max="0" step="0.01" class="slider_bw"
+        v-model.number="signal._gn"><output>{{signal._gn}} dB</output></p>
+
+    <p>Noise: <input type="range" min="-40" max="0" step="0.01" class="slider_bw"
+        v-model.number="noise"><output>{{noise}} dB/Hz</output></p>
+
+
+    <svg width="720" height="320">
+      <g class="graph-svg-component" transform="translate(50,10)">
+        <g class="x axis" transform="translate(0,260)" fill="none" font-size="10" font-family="sans-serif"
+          text-anchor="middle">
+          <path class="domain" stroke="currentColor" d="M0.5,6V0.5H620.5V6"></path>
+          <g class="tick" opacity="1" transform="translate(0.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,780</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(78,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,785</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(155.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,790</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(233,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,795</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(310.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,800</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(388,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,805</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(465.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,810</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(543,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,815</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(620.5,0)">
+            <line stroke="currentColor" y2="6"></line><text fill="currentColor" y="9" dy="0.71em">1,820</text>
+          </g>
+        </g>
+        <g class="y axis" fill="none" font-size="10" font-family="sans-serif" text-anchor="end">
+          <path class="domain" stroke="currentColor" d="M-6,260.5H0.5V0.5H-6"></path>
+          <g class="tick" opacity="1" transform="translate(0,260.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-60</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,228)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-50</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,195.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-40</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,163)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-30</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,130.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-20</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,98)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">-10</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,65.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">0</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,33)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">10</text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,0.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">20</text>
+          </g>
+        </g>
+        <rect width="86.2%" height="81%" fill="black"></rect>
+        <g class="grid" fill="none" font-size="10" font-family="sans-serif" text-anchor="middle">
+          <path class="domain" stroke="currentColor" d="M0.5,260V0.5H620.5V260"></path>
+          <g class="tick" opacity="1" transform="translate(0.5,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(78,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(155.5,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(233,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(310.5,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(388,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(465.5,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(543,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(620.5,0)">
+            <line stroke="currentColor" y2="260"></line><text fill="currentColor" y="263" dy="0.71em"></text>
+          </g>
+        </g>
+        <g class="grid" fill="none" font-size="10" font-family="sans-serif" text-anchor="end">
+          <path class="domain" stroke="currentColor" d="M620,260.5H0.5V0.5H620"></path>
+          <g class="tick" opacity="1" transform="translate(0,260.5)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,228)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,195.5)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,163)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,130.5)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,98)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,65.5)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,33)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+          <g class="tick" opacity="1" transform="translate(0,0.5)">
+            <line stroke="currentColor" x2="620"></line><text fill="currentColor" x="-3" dy="0.32em"></text>
+          </g>
+        </g><text transform="translate(310,297.5)" dy="-0.3em" fill="white" style="text-anchor: middle;">Frequency
+          (MHz)</text><text transform="rotate(-90)" y="-50" x="-130" dy="1em" fill="white"
+          style="text-anchor: middle;">Power Spectral Density (dB)</text>
+        <clipPath id="clipf">
+          <rect width="620" height="260"></rect>
+        </clipPath>
+        <path clip-path="url(#clipf)" class="stroke-med no-fill stroke-yellow" v-bind:d="updatePlot"></path>
+
+      </g>
+    </svg>
+
+  </div>
+</body>
+<script>
+  'use strict';
+  // example of vue usage
+  var example = new Vue({
+    name: 'example',
+    el: '#vueExample',
+    data: {
+      signal: new Signal(conf.sig0, '1'),
+      noise: 0
+    },
+    computed: {
+      signalToNoiseRatio: function () {
+        return (this.signal._gn - this.noise - 10 * Math.log10(this.bandwidthSliderPercentage)).toFixed(2);
+      },
+      bandwidthSliderPercentage: function () {
+        let bwPercentage = (this.signal._bw - this.signal.bw_min) / (this.signal.bw_max - this.signal.bw_min);
+        if (bwPercentage === 0)
+          bwPercentage =
+            0.00001; // ensure bwPercentage is not zero, log(0)=inf
+        return bwPercentage;
+      },
+      updatePlot: function () {
+        return PowerSpectrumPlot(this.signal, this.noise);
+      }
+    }
+  });
+</script>
+
+</html>
