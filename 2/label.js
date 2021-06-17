@@ -24,10 +24,11 @@ function Label(signalArray, valuesWatched, computedElement, n = null) {
     valuesWatched[sigIndex].forEach(function (valToWatch) {
       // add callback attached to that var
       signal.addSetterCallback(valToWatch, updateLabel);
-      // ! temp, set initial value
-      updateLabel();
     });
   });
+
+  // sets initial value
+  updateLabel();
 
   // updates label display
   // ! Any new computedElements (SINR, etc) must be added here
@@ -35,7 +36,8 @@ function Label(signalArray, valuesWatched, computedElement, n = null) {
     switch (computedElement) {
       case "SNR":
         // hardcoded to treat 2nd signal (1) as noise
-        n.value = "SNR: " + signalArray[0].computeSNR(signalArray[1]).toFixed(2);
+        n.value =
+          "SNR: " + signalArray[0].computeSNR(signalArray[1]).toFixed(2);
         break;
       default:
         break;
