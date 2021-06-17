@@ -90,10 +90,11 @@ epsilon  = userData.epsilon;
 // Explore for better channels
 minimum_epsilon  = userData.minimum_epsilon;
 minimum_epsilon = 0.01;
-// minimum_epsilon
+// minimum_epsilon - Value from zero to one
 // After this threshold is exceeded, the user only selects the optimal channels.
 
 decaying_constant = 0.9;  
+//decaying_constant - Value from zero to one
 // At every time interval, the epsilon is updated as follows
 // epsilon = epsilon^decaying_constant;
 //decaying_constant
