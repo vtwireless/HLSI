@@ -22,8 +22,9 @@
 //            functionFiles:  filename of array list of filenames to load
 //                  Controller function objects from.
 //
-//            element: an HTML element or a CSS node selector string or null
-//                if this is null a <p> will be appended to the body.
+//            element: an HTML element or a CSS node selector string to a
+//                <div> or <p>.  If this is not set a <p> will be appended
+//                to the body.
 //
 //            postfix:  a string to append to the variable names, or
 //                an array of strings to append to the variable names.

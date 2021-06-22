@@ -10,8 +10,8 @@ var functions = {
     //
     // They are called like so:
     //
-    // function callback(freq1, bw1, gn1, mcs1, bits1, freq2, bw2, gn2, mcs2,\
-    //                   bits2, dt, userData, init)
+    // function callback(freq1, bw1, gn1, mcs1, rate1, freq2, bw2, gn2, mcs2,\
+    //                   rate2, dt, userData, init)
     //
 
 
@@ -24,13 +24,13 @@ function() {
     function reset() {
         userData.t = 0.0;
         userData.done = false;
-        userData.lastBits = bits1;
+        userData.lastBits = rate1 * dt;
     }
 
 
     if(init){
         userData.lastLastBits = 0;
-        userData.lastBits = bits1;
+        userData.lastBits = rate1 * dt;
         userData.lastdBits = 0;
         userData.tSinceBeginning = 0.0;
         userData.tLastTimeBelowThreshold = 0.0;
@@ -49,7 +49,7 @@ function() {
     if(userData.t < measureT) return;
  
     // Total bits over 5 seconds.
-    var dBits = bits1 - userData.lastBits;
+    var dBits = rate1 * dt - userData.lastBits;
  
     console.log("   dBits=" + dBits);
  
@@ -207,7 +207,7 @@ function() {
     function reset() {
         userData.t = 0.0;
         userData.done = false;
-        userData.lastBits = bits1;
+        userData.lastBits = rate1 * dt;
     }
 
     if(init)
@@ -222,7 +222,7 @@ function() {
     if(userData.t < measureT) return;
 
     // Total bits over 5 seconds.
-    var dBits = bits1 - userData.lastBits;
+    var dBits = rate1 * dt - userData.lastBits;
 
     console.log("   dBits=" + dBits);
 

@@ -38,9 +38,19 @@ function Label(sig, par, opts = null) {
         // Setup default options:
         opts = {};
 
-    if(opts.element !== undefined)
-        output = opts.element;
-    else {
+    if(opts.element !== undefined) {
+        if(typeof(opts.element) === "string") {
+            output = document.querySelector(opts.element);
+            if(output === null) {
+                let msg = "Failed to get element with selector: " +
+                    opts.element;
+                console.log(msg);
+                alert(msg);
+                return;
+            }
+        } else
+            output = opts.element;
+    } else {
         output = document.createElement("OUTPUT");
         let p = document.createElement("p");
         p.appendChild(output);
@@ -54,7 +64,7 @@ function Label(sig, par, opts = null) {
     //
     // opts done.
     //////////////////////////////////////////////////////////
-    
+
 
     // TODO: This shares some code with sliders.js.  Merge it into common
     // code.

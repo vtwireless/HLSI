@@ -39,6 +39,16 @@
   small.
   </p>
 
+  <div style="font-size: 200%"id=scriptController1></div>
+
+  <p>
+  <span>stuff in text in span</span> <output id="freq1"></output>
+          more test not in span
+  </p>
+
+  <p id=scriptController2></p>
+
+
 
 </body>
 
@@ -62,16 +72,25 @@ sig1.freq = 1810.0e+6;
 noise1.gn = -10;
 
 
-new ScriptController([sig1, sig2],
-        { functionFiles: "functions/default_1_2.js" });
+new ScriptController([sig1, sig2], {
+    functionFiles: "functions/default_1_2.js",
+    element: "#scriptController1"
+});
+
 
 new ScriptController([sig1], {
-            functionFiles: "functions/default_1.js",
-            postfix: '1'
-        });
+    functionFiles: "functions/default_1.js",
+    element: "#scriptController2",
+    postfix: '1'
+});
 
 
-Label(sig1, 'freq', { prefix: "freq 1: "});
+Label(sig1, 'freq', {
+    prefix: "freq 1: ",
+    element: "#freq1"
+});
+
+
 Label(sig1, 'mcs', { prefix: "mod/code: "});
 Label(sig1, 'gn', { prefix: "gn 1: "});
 Label(sig1, 'bw', { prefix: "bw 1: "});
