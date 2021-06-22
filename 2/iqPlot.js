@@ -82,9 +82,9 @@ function IQPlot(sig) {
         pathq.datum(dataq).attr("d", linet);
     }
 
-    sig.addSetterCallback("freq", update_plot);
-    sig.addSetterCallback("bw", update_plot);
-    sig.addSetterCallback("gn", update_plot);
+    sig.onChange("freq", update_plot);
+    sig.onChange("bw", update_plot);
+    sig.onChange("gn", update_plot);
 
     // setup initial plot
     update_plot();

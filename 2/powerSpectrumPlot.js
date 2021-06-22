@@ -3,150 +3,180 @@
 // TODO:
 //
 //   1. We need to find the axis vertical scale based on all the signals
-//      gn_min and gn_max.
+//      gn_min and gn_max (and etc).
 //
 
 // This function does not expose/return any object or other functions.
 // Yes, it's magic.
 //
-// Generates a Power Spectrum Plot with one or more signals
-// and an optional noise floor, represented by a signal
-//
-// Function Parameters
+// Generates a Power Spectrum Plot with one or more signals that are in
+// the environment Signal.env
 //
 //
-//
-//   sigs: is a signal or array of signals
-//
-//   noise (optional): a signal object whos gain value controls the noise floor
-//                     if not given, generate(null) defaults to -120db floor
-//
-//
-function PowerSpectrumPlot(sigs, noise) {
-  if (!Array.isArray(sigs)) sigs = [sigs];
-  if (sigs.length < 1) return;
+function PowerSpectrumPlot() {
 
-  var freq_plot_min = sigs[0].freq_plot_min;
-  var freq_plot_max = sigs[0].freq_plot_max;
-  // Find the freq_plot_min and freq_plot_max for all signals.
-  sigs.forEach(function (sig) {
-    // TODO: Note we are doing sigs element 0 twice.
-    if (freq_plot_min > sig.freq_plot_min) freq_plot_min = sig.freq_plot_min;
-    if (freq_plot_max < sig.freq_plot_max) freq_plot_max = sig.freq_plot_max;
+    var sigs = [];
+    var noises = []; // We can only have one noise.
 
-    // Setup the plot to be updated when signals change.
+    var freq_plot_min = 1.0e32; // large number that we change
+    var freq_plot_max = -1.0;   // small number that we change
+
+    // We'll display spectrum from all signals in Signal.env;
     //
-    // TODO: How do we keep the update_plot() from being called too
-    // often?
-    sig.addSetterCallback("freq", update_plot);
-    sig.addSetterCallback("bw", update_plot);
-    sig.addSetterCallback("gn", update_plot);
-  });
+    Object.keys(Signal.env).forEach(function(key) {
 
-  // add callback for updating to changes in the gain of the noise 'signal'
-  if (noise !== undefined) {
-    noise.addSetterCallback("gn", update_plot);
-  }
+        let sig = Signal.env[key];
 
-  // filter semi-length(m), over-sampling rate(k), total length
-  const m = 40, // ! increasing this value squares off the signal
-    k = 20,
-    n = 2 * k * m + 1;
-  var bw = 0.2, // bw
-    gn = 0.0; // gain
-  var nfft = 2048,
-    generator = new siggen(nfft);
-  generator.m = m;
+        // Setup the plot to be updated when sig parameters change.
 
-  // determine time and frequency scale/units
-  var [scale_freq, units_freq] = scale_units(
-    sigs[0].freq_init + sigs[0].bw_max * 0.5,
-    0.1
-  ); // freq scale
+        if(sig.is_noise) {
+            noises.push(sig);
+            return;
+        }
 
-  // 5. X scale will use the index of our data
-  var fScale = d3
-    .scaleLinear()
-    .domain([freq_plot_min * scale_freq, freq_plot_max * scale_freq])
-    .range([0, plot.width]);
+        // sig is not noise, so we add it to the list of signals.
+        sigs.push(sig);
 
-  // 6. Y scale will use the randomly generate number
-  var pScale = d3.scaleLinear().domain([-60, 20]).range([plot.height, 0]);
-
-  const df = (freq_plot_max - freq_plot_min) / (nfft - 1);
-
-  // 7. d3's line generator
-  var linef = d3
-    .line()
-    .x(function (d, i) {
-      return fScale((freq_plot_min + i * df) * scale_freq);
-    }) // map frequency
-    .y(function (d) {
-      return pScale(d.y);
-    }); // map PSD
-
-  // 8. An array of objects of length N. Each object has key -> value
-  // pair, the key being "y" and the value is a random number
-  var dataf = d3.range(0, nfft - 1).map(function (f) {
-    return { y: 0 };
-  });
-
-  // create SVG objects
-  var svgf = svg_create(fScale, pScale, null); // ! null was formerly parentElement
-
-  var labelPrefix = "";
-  // TODO: This prefix label needs fixing so it works well for all the
-  // signals in "sigs'
-  //if(sigs[0].name.length > 0)
-  //    labelPrefix = sigs[0].name + " ";
-
-  // add labels
-  svg_add_labels(
-    svgf,
-    labelPrefix + "Frequency (" + units_freq + "Hz)",
-    labelPrefix + "Power Spectral Density (dB)"
-  );
-
-  // clip paths
-  svgf
-    .append("clipPath")
-    .attr("id", "clipf")
-    .append("rect")
-    .attr("width", plot.width)
-    .attr("height", plot.height);
-
-  // 9. Append the path, bind the data, and call the line generator
-  var pathf = svgf
-    .append("path")
-    .attr("clip-path", "url(#clipf)")
-    .datum(dataf)
-    .attr("class", "stroke-med no-fill stroke-yellow")
-    .attr("d", linef);
-
-  function update_plot() {
-    generator.clear();
-    // Iterate through signal array, calc values and pass to generator
-    sigs.forEach(function (sig) {
-      var fc =
-        -0.5 +
-        (sig.freq - sig.freq_plot_min) /
-          (sig.freq_plot_max - sig.freq_plot_min);
-      var bw = 0.1 + (0.8 * (sig.bw - sig.bw_min)) / (sig.bw_max - sig.bw_min);
-      var gn = sig.gn;
-      // ! bw (slider %) is limited to 90% range, as log(0) == inf
-      generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
-    });
-    // use custom noise floor if given
-    if (noise !== undefined) generator.generate(noise.gn);
-    // else default noise floor is used (-120db, see generator src)
-    else generator.generate();
-    dataf = d3.range(0, nfft - 1).map(function (i) {
-      return { y: generator.psd[i] };
+        // Get the limits freq_plot_min and freq_plot_max
+        if(freq_plot_min > sig.freq_plot_min)
+            freq_plot_min = sig.freq_plot_min;
+        if(freq_plot_max < sig.freq_plot_max)
+            freq_plot_max = sig.freq_plot_max;
     });
 
-    pathf.datum(dataf).attr("d", linef);
-  }
 
-  // setup initial plot
-  update_plot();
+    // filter semi-length(m), over-sampling rate(k), total length
+    const m = 40, // ! increasing this value squares off the signal
+        k = 20,
+        n = 2 * k * m + 1;
+    var bw = 0.2, // bw
+        gn = 0.0; // gain
+    var nfft = 2048;
+
+    var generator = new siggen(nfft);
+    generator.m = m;
+
+    // determine time and frequency scale/units
+    var [scale_freq, units_freq] = scale_units(
+        sigs[0].freq_init + sigs[0].bw_max * 0.5,
+        0.1
+    ); // freq scale
+
+    // 5. X scale will use the index of our data
+    var fScale = d3
+        .scaleLinear()
+        .domain([freq_plot_min * scale_freq, freq_plot_max * scale_freq])
+        .range([0, plot.width]);
+
+    // 6. Y scale will use the randomly generate number
+    var pScale = d3.scaleLinear().domain([-60, 20]).range([plot.height, 0]);
+
+    const df = (freq_plot_max - freq_plot_min) / (nfft - 1);
+
+    // 7. d3's line generator
+    var linef = d3
+        .line()
+        .x(function (d, i) {
+            return fScale((freq_plot_min + i * df) * scale_freq);
+        }) // map frequency
+        .y(function (d) {
+            return pScale(d.y);
+        }); // map PSD
+
+    // 8. An array of objects of length N. Each object has key -> value
+    // pair, the key being "y" and the value is a random number
+    var dataf = d3.range(0, nfft - 1).map(function (f) {
+        return { y: 0 };
+    });
+
+    // create SVG objects
+    var svgf = svg_create(fScale, pScale, null); // ! null was formerly parentElement
+
+    var labelPrefix = "";
+    // TODO: This prefix label needs fixing so it works well for all the
+    // signals in "sigs'
+    //if(sigs[0].name.length > 0)
+    //    labelPrefix = sigs[0].name + " ";
+
+    // add labels
+    svg_add_labels(
+        svgf,
+        labelPrefix + "Frequency (" + units_freq + "Hz)",
+        labelPrefix + "Power Spectral Density (dB)"
+    );
+
+    // clip paths
+    svgf
+        .append("clipPath")
+        .attr("id", "clipf")
+        .append("rect")
+        .attr("width", plot.width)
+        .attr("height", plot.height);
+
+    // 9. Append the path, bind the data, and call the line generator
+    var pathf = svgf
+        .append("path")
+        .attr("clip-path", "url(#clipf)")
+        .datum(dataf)
+        .attr("class", "stroke-med no-fill stroke-yellow")
+        .attr("d", linef);
+
+    function update_plot() {
+
+        generator.clear();
+        // Iterate through signal array, calc values and pass to generator
+        sigs.forEach(function (sig) {
+            let fc =
+                -0.5 +
+                (sig.freq - sig.freq_plot_min) /
+                (sig.freq_plot_max - sig.freq_plot_min);
+            let bw = 0.1 + (0.8 * (sig.bw - sig.bw_min)) / (sig.bw_max - sig.bw_min);
+            let gn = sig.gn;
+            // ! bw (slider %) is limited to 90% range, as log(0) == inf
+            generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
+        });
+
+        // use custom noise floor if given
+
+        if(noises.length > 0) {
+            let n_gn = 0.0; // total noise gain will be summed to n_gn.
+            //
+            // Having more than one noise is odd, but nothing says we can't.
+            // We sum the noise gains this way:
+            noises.forEach(function(noise) {
+                // Sum the power.
+                n_gn += Math.pow(10, noise.gn/10.0);
+            });
+            // Now make it be in dB.
+            n_gn = 10 * Math.log10(n_gn);
+            //
+            // Note: if there was just one noise than n_gn is just that
+            // one (noise.gn).
+            generator.generate(n_gn);
+        } else 
+            // else default noise floor is used (-120db, see generator src)
+            generator.generate();
+
+        dataf = d3.range(0, nfft - 1).map(function (i) {
+            return { y: generator.psd[i] };
+        });
+
+        pathf.datum(dataf).attr("d", linef);
+    }
+
+    // Add the update_plot callback to all the signals callbacks.
+
+    noises.forEach(function(noise) {
+        noise.onChange("gn", update_plot);
+    });
+
+    sigs.forEach(function(sig) {
+        // Setup the plot to be updated when sig parameters change.
+        sig.onChange("freq", update_plot);
+        sig.onChange("bw", update_plot);
+        sig.onChange("gn", update_plot);
+    });
+
+    // update_plot() will be called by the callbacks that are set just
+    // above.
 }

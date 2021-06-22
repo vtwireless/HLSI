@@ -216,9 +216,9 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
     }
 
 
-    sig.addSetterCallback("bw", update_plot);
-    sig.addSetterCallback("gn", update_plot);
-    sig.addSetterCallback("mcs", update_plot);
+    sig.onChange("bw", update_plot);
+    sig.onChange("gn", update_plot);
+    sig.onChange("mcs", update_plot);
 
     // setup initial plot
     update_plot();

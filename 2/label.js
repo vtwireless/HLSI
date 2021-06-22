@@ -1,52 +1,100 @@
 /**
- * Generate display label, which updates on changes to signal variables
- * TODO: add support for far more computedElements
- * @param {Signal[]} signalArray - Array of signals related to computation of display variable
- * @param {Array[String[]]} valuesWatched - what values to add callback func onto within the signals
- * @param {String} computedElement - name of variable to compute for label
- * @param {String} [suffix=""] - label suffix, optional
- * @param {*} [n=null] - display element, optional
+ * Generate a signal HTML display label
+ *
+ * @param {Signal Object}
+ * @param {String} signal par - name of variable or method to compute for label;
+ *                        example "freq".  May be 'freq', 'bw', 'gn', 'mcs' and 'rate'
+ * @param {Object options}
+ *
+ *     element:  CSS node selector as a string or
+ *               HTML element output node
+ *
+ *     prefix:  prefix String. You may want to have a space on the end.
+ *
+ *     suffix:  suffix String. You may want to have a space in the first
+ *              character.
+ *
  */
-function Label(
-  signalArray,
-  valuesWatched,
-  computedElement,
-  suffix = "",
-  n = null
-) {
-  if (!n) {
-    // nullcheck
-    n = document.createElement("OUTPUT");
-    n.value = computedElement;
-    let p = document.createElement("p");
-    p.appendChild(n);
-    document.body.appendChild(p);
-  }
+function Label(sig, par, opts = null) {
 
-  // For each signal that needs to be watched, check what values
-  // need to be watched by iterating through the string array at
-  // the index of the current signal in signalArray
-  signalArray.forEach(function (signal, sigIndex) {
-    // grab the str array we want, then execute on each in that array
-    valuesWatched[sigIndex].forEach(function (valToWatch) {
-      // add callback attached to that var
-      signal.addSetterCallback(valToWatch, updateLabel);
-    });
-  });
 
-  // sets initial value
-  updateLabel();
+    var output; // The HTML element that has a value to display
+    var scale,
+        unitPrefix, // example: scale = 1000  unitPrefix = 'M'
+        unit; // example: "Hz"
+    var prefix = "", suffix = "";
 
-  // updates label display
-  // ! Any new computedElements (SINR, etc) must be added here
-  function updateLabel() {
-    switch (computedElement) {
-      case "SNR":
-        // hardcoded to treat 2nd signal (1) as noise
-        n.value = suffix + signalArray[0].computeSNR(signalArray[1]).toFixed(2);
-        break;
-      default:
-        break;
+    // This parseValue() get values turned into a string for most
+    // types of par (parameters), but for "mcs" we change it below.
+    //
+    var parseValue = function(val) {
+        return d3.format(".2f")(val * scale);
+    };
+
+    //////////////////////////////////////////////////////////
+    //   Parse options (opts):
+    //////////////////////////////////////////////////////////
+    if(!opts)
+        // Setup default options:
+        opts = {};
+
+    if(opts.element !== undefined)
+        output = opts.element;
+    else {
+        output = document.createElement("OUTPUT");
+        let p = document.createElement("p");
+        p.appendChild(output);
+        document.body.appendChild(p);
     }
-  }
+
+    if(opts.prefix !== undefined)
+        prefix = opts.prefix;
+    if(opts.suffix !== undefined)
+        suffix = opts.suffix;
+    //
+    // opts done.
+    //////////////////////////////////////////////////////////
+    
+
+    // TODO: This shares some code with sliders.js.  Merge it into common
+    // code.
+    switch(par) {
+        case 'freq':
+            [scale, unitPrefix] = scale_units(sig[par + "_init"], 0.1);
+            unit = 'Hz';
+            break;
+        case 'bw':
+            [scale, unitPrefix] = scale_units(sig[par + "_init"], 1.0);
+            unit = 'Hz';
+            break;
+        case 'mcs':
+            scale = 1.0;
+            unitPrefix = '';
+            unit = '';
+            parseValue = function(val) {
+                if(val < 0)
+                    val = 0;
+                else if(val > 11)
+                    val = 11;
+                return conf.schemes[parseInt(val)].name;
+            };
+            break;
+        case 'gn':
+            scale = 1.0;
+            unitPrefix = '';
+            unit = 'dB';
+            break;
+        case 'rate':
+            [scale, unitPrefix] = scale_units(1000.0, 1.0);
+            unit = 'bits/s';
+            break;
+    }
+
+    // Mung the strings into one suffix string.
+    suffix = " " + unitPrefix + unit + suffix 
+
+    // add callback attached to that variable/parameter
+    sig.onChange(par, function(s, val) {
+        output.value = prefix + parseValue(val) + suffix;
+    });
 }

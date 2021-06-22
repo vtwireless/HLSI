@@ -38,6 +38,8 @@
 // See Signal() below.
 //
 var conf = {
+
+
     // Modulation schemes that are available for all the signals.  The
     // "signal" (mcs) can pick one modulation scheme at a time via index
     // into this array, mcs = 0 to 11.
@@ -193,7 +195,7 @@ var conf = {
         bw_init: 4000.0e6, // unused
 
         // Gain represents noise level
-        gn_min: -40.0,
+        gn_min: -60.0,
         gn_max: 0.0,
         gn_step: 0.01,
         gn_scale: 1.0,
@@ -212,6 +214,12 @@ Object.freeze(conf.freeze);
 // We keep a list of signal objects that are created.
 Signal.objects = {};
 
+
+// TODO: We are not considering destroying signals yet.  We just let the
+// page run and closing the page will cleanup signals.  Removing signals
+// is not considered yet.  The environment object with cause a crash if
+// signals are removed.  We can only add signals.
+
 //
 // This function can create an object via "new" or without "new".
 //
@@ -228,11 +236,15 @@ Signal.objects = {};
 //
 //     is like conf.sig0, conf.sig1, conf.sig2 and etc ...
 //     The "sig" argument is constant from the conf object above.
-
+//
 //
 //  name:
 //
-//     is an optional prefix added to slider labels and plot labels.
+//     is an optional prefix string added to slider labels and plot labels.
+//
+//
+// Please do not access the variables that start with "_" from outside
+// this function.   We'd like to make them private, but we are too lazy.
 //
 function Signal(sig, name = "") {
     if (sig.freq_min === undefined) {
@@ -259,6 +271,27 @@ function Signal(sig, name = "") {
     // This is a new object with a new id.
     // We only get to here once per object, obj.
     obj.id = Signal.createCount++;
+    // All existing signals in the environment are interferers, be they
+    // noise or otherwise.  This will be the obj list of interferer
+    // signals.
+    obj.interferers = [];
+
+    // 1) Add this object to the environment of all other signals as in
+    // interferer, and 2) add the other signals to this ones' list of
+    // interferers.
+    Object.keys(Signal.env).forEach(function(id/*other signal id*/) {
+        // 1. This signal obj is an interferer to the signal with id.
+        Signal.env[id].interferers.push(obj);
+        // 2. append list of interferers for this obj.
+        obj.interferers.push(Signal.env[id]);
+    });
+
+    // Now we can add this new signal object (obj) to the list of signals
+    // in the environment, via the unique signal id.
+    Signal.env[obj.id.toString()] = obj;
+
+    console.log("Signals.env = " + Object.keys(Signal.env));
+
 
     // Label prefix and postfix, or the name we give the signal.
     obj.name = name;
@@ -275,7 +308,7 @@ function Signal(sig, name = "") {
     Object.freeze(obj.mcs_step);
 
 
-    // We copy the constant values in sig to this object.
+    // We copy the constant values in sig to this object (obj).
     // It's just handy for the user.
     Object.keys(sig).forEach(function (key) {
         // this[key] does not work, but we can use obj[key] in its place.
@@ -284,17 +317,8 @@ function Signal(sig, name = "") {
         Object.freeze(obj[key]);
     });
 
-    // _freq, _bw, and _gn are the dynamical variables that the user may
-    // set or get using the setter and getter functions that we define
-    // next.
-    obj._freq = sig.freq_init; // same as obj['_freq'] = sig.freq_init
-    obj._bw = sig.bw_init;
-    obj._gn = sig.gn_init;
-    obj._mcs = sig.mcs_init;
-
-
     // obj.is_noise will be a bool, no matter what.
-    if(obj.is_noise === undefined)
+    if(typeof(obj.is_noise) === 'undefined')
         obj.is_noise = false;
     else
         // fix stupid code.
@@ -304,26 +328,103 @@ function Signal(sig, name = "") {
     //console.log("sig" + obj.name + ".is_noise=" + obj.is_noise);
 
 
-    // list of user callbacks that are called when one of the "values"
-    // changes do a setter being set.  They start as empty arrays.
-    obj._callbacks = { freq: [], bw: [], gn: [], mcs: [] };
-
-    // Set up setters and getters for the three varying parameters,
-    // "freq", "bw", "gn", and "mcs".
+    // freq, bw, gn, mcs, and _rate are the dynamical variables that
+    // the user may set (not rate) or get using the setter and getter
+    // functions that we define next.  The user will think of them are
+    // parameters that change; so keep in mind that this nomenclature is
+    // depends on prospective.  In some cases they are called parameters
+    // and in a truer more functional sense they are variables.  Unlike
+    // freq, bw, gn, and mcs, rate is dependent on other variables and
+    // variables in other signals too.  freq, bw, gn, and mcs manifest
+    // themselves are independent variables with values that have
+    // non-hollonomic constraints that depend on the constants selected
+    // from the constant conf objects this is passed to this constructor,
+    // function Signal().
     //
-    ["freq", "bw", "gn", "mcs"].forEach(function (key) {
+    // TODO: How do we make these effectively private?  So that we know
+    // when the getter is called.
+    //
+    obj._freq = sig.freq_init; // same as obj['_freq'] = sig.freq_init
+    obj._bw = sig.bw_init;
+    obj._gn = sig.gn_init;
+    obj._mcs = sig.mcs_init;
+    //
+    // rate is a dependent variable that we must calculate to initialize
+    // now to a value that is not possible, so it gets set when we call
+    // checkSetRate() to initialize it, far below here.
+    obj._rate = -1.0;
+
+
+    // list of user callbacks that are called when one of the "values"
+    // changes happen from a setter being set, or in the case of the
+    // parameter/variable "rate" a parameter/variable in one of the
+    // dependency signals independent parameter/variables changing.
+    obj._callbacks = { freq: [], bw: [], gn: [], mcs: [], rate: [ ] };
+
+
+    obj.interferers.forEach(function(interferer) {
+
+        if(interferer.is_noise)
+            // Only the noise gain has an effect on this signal rate.
+            var parameters = [ "gn" ];
+        else
+            var parameters = ["freq", "bw", "gn", "mcs"];
+
+        // For all parameters that can effect the rate we set a callback
+        // that will get triggered if the one of the parameters changes.
+        parameters.forEach(function(parameter) {
+            interferer.onChange(checkSetRate);
+        });
+    });
+
+
+    // This tries to change the "rate", due to a change in a dependency.
+    function checkSetRate() {
+
+        // A noise signal does not have a rate.
+        if(obj.is_noise) return 0.0;
+
+        // We will calculate the next/new rate:
+        var new_rate = 0.0;
+
+        // MORE HERE ...............
+        // Math.random() returns 0.0 to less than 1.0
+        new_rate = 1000.0 * Math.random();
+
+        // MORE HERE ...............
+        
+        // if the new rate and old rate are the same we do not
+        // trigger events.
+        if(new_rate === obj._rate) return;
+
+        // We have a change and an event triggered.
+        obj._rate = new_rate;
+
+        // trigger rate change callbacks:
+        obj._callbacks.rate.forEach(function(callback) {
+            //console.log("CALLING: " + callback);
+            callback(obj, val);
+        });
+    }
+
+
+
+    // Set up setters for the 3 independent varying variables/parameters,
+    // "freq", "bw", "gn", and "mcs".  "rate" is dependent variable so
+    // it can't have a setter.
+    //
+    ["freq", "bw", "gn", "mcs" ].forEach(function (key) {
         Object.defineProperty(obj, key, {
-            // Define a parameter setter for this key.
-            set: function (val) {
-                if (isNaN(val)) return;
+            // Define a parameter setter for this key/parameter.
+            set: function(val) {
+                if(isNaN(val)) return;
 
-                //console.log("min=" + obj[key + '_min'] + " max=" + obj[key + '_max']);
+                //console.log("min=" + obj[key + '_min'] +
+                //" max=" + obj[key + '_max']);
+                if(val < obj[key + "_min"]) val = obj[key + "_min"];
+                else if(val > obj[key + "_max"]) val = obj[key + "_max"];
 
-                if (val < obj[key + "_min"]) val = obj[key +
-                    "_min"];
-                else if (val > obj[key + "_max"]) val = obj[
-                    key + "_max"];
-                if (obj["_" + key] === val)
+                if(obj["_" + key] === val)
                     // No change, so we do nothing.
                     return;
 
@@ -331,54 +432,59 @@ function Signal(sig, name = "") {
                 obj["_" + key] = val;
 
                 // Call any callbacks that the user set for this setter.
-                obj._callbacks[key].forEach(function (
-                    callback) {
+                obj._callbacks[key].forEach(function(callback) {
                     //console.log("CALLING: " + callback);
                     callback(obj, val);
                 });
             },
 
-            // Define a parameter getter for this key.
-            get: function () {
+            // Make a getter:
+            get: function() {
                 return obj["_" + key];
-            },
+            }
         });
     });
-    // Add a callback that is called when the value of "key" ("freq",
-    // "bw", or "gn") changes.
-    obj.addSetterCallback = function (key, callback) {
-        if (typeof obj._callbacks[key] !== "undefined")
-            obj._callbacks[key].push(callback);
-    };
-    obj.onChange = obj.addSetterCallback;
 
-    obj.getBits = function (
-        dt /*seconds*/ ,
-        sigs
-        /*array of other signals. Will filter out this.*/
-    ) {
-        // TODO: write this function.
+    // Let "rate" have a setter that makes an error.
+    //
+    // TODO: We can add other dependent variables to this array:
+    ["rate" ].forEach(function (key) {
+        Object.defineProperty(obj, key, {
 
-        return 0.0;
-    };
+            // Make a setter that is broken:
+            set: function(val) {
+                let msg = "Code ERROR: signal " + name +
+                    " cannot set " + key + " (" + val + ")";
+                alert(msg);
+                console.log(msg);
+            },
 
-
-    obj.computeSNR = function (noise, signals = []) {
-        signals.forEach(function (sig) {
-            // TODO: Support for more than 1 signal
-            alert(
-                "computeSNR does not support multiple signals yet."
-            );
+            // Make a getter:
+            get: function() {
+                return obj["_" + key];
+            }
         });
-        // calculate slider percentage [0.0f - 1.0f] 
-        let bwPercentage = (obj._bw - obj.bw_min) / (obj.bw_max - obj
-            .bw_min);
-        if (bwPercentage === 0)
-            bwPercentage =
-            0.00001; // ensure bwPercentage is not zero, log(0)=inf
-        // signal gain - (division, db is log scale) noise floor - 10 * log_10 (bandwidth SLIDER %, from above)
-        return obj._gn - noise._gn - 10 * Math.log10(bwPercentage);
+    });
+
+
+    // Add a callback that is called when the value of "key" ("freq",
+    // "bw", "gn", "mcs" or "rate") changes.
+    obj.onChange = function(key, callback) {
+        if(typeof obj._callbacks[key] !== "undefined") {
+            obj._callbacks[key].push(callback);
+            // Trigger the first call.  Clearly there is a change in value
+            // from an "unknown" that the user of this had before the
+            // onChange() call.
+            callback(obj, obj['_' + key]);
+        }
     };
+
+
+    // Initialize the rate based on all the initial parameter/variable
+    // values:
+    checkSetRate();
+
+
 
     if (this.document === undefined)
         // This was called with new.
@@ -387,4 +493,19 @@ function Signal(sig, name = "") {
     return obj;
 }
 
+
+// This counter only increases.  It is used to ID the signals.
+//
+// This should be private to Signal, but module support in client side
+// javaScript sucks (year 2021), so what can ya do.
 Signal.createCount = 0;
+
+
+// This is the default signals environment object.  It may be the only
+// one, but one can imagine more then one environment (TODO make more).
+// It defines all interacting signals that are in the environment.
+// Signals may only be in one environment.  The environment (env) is a
+// list of signal objects.
+//
+// List of signals keyed by signal id:
+Signal.env = {};

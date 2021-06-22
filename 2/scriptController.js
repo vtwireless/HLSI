@@ -127,7 +127,7 @@ function ScriptController(sigs, opts = null) {
             'bw' + fix,
             'gn' + fix,
             'mcs' + fix,
-            'bits' + fix
+            'rate' + fix
         ]);
         ++i;
 
@@ -259,8 +259,7 @@ function ScriptController(sigs, opts = null) {
 
         var args = [];
         sigs.forEach(function(sig) {
-            let bits = sig.getBits(dt, sigs);
-            args = args.concat([sig.freq, sig.bw, sig.gn, sig.mcs, bits]);
+            args = args.concat([sig.freq, sig.bw, sig.gn, sig.mcs, sig.rate]);
         });
         args = args.concat([dt, userData, init]);
 
