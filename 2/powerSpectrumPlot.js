@@ -5,6 +5,10 @@
 //   1. We need to find the axis vertical scale based on all the signals
 //      gn_min and gn_max (and etc).
 //
+//   2. Optional HTML element to place the plot on, like in Slider() and
+//      Label().  Now it just appends the plot at the end of the <body>.
+//      This may be okay for all 15 starting exercises.
+//
 
 // This function does not expose/return any object or other functions.
 // Yes, it's magic.

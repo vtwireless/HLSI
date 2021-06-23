@@ -16,6 +16,17 @@
 function SpectralEfficiencyPlot(sig, interferers=[]) {
 
 
+    if(typeof(interferers) !== "Array")
+        interferers = [ interferers ];
+
+    if(interferers.length < 1)
+        // push all the environments signals into the interferers array
+        // of signals.
+        Object.keys(Signal.env).forEach(function(id) {
+            if(sig.id != id)
+                interferers.push(Signal.env[id]);
+        });
+
     // channel capacity (b/s/Hz) given SNR in dB
     function efficiency(snr) {
         return Math.log2(1.0 + Math.pow(10,snr/10));
@@ -26,7 +37,8 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
 
         // compute boundaries in old funny slider units.
         // TODO: fix this shit.
-        let fc = - 0.5 + (sig.freq - sig.freq_plot_min)/(sig.freq_plot_max - sig.freq_plot_min);
+        let fc = - 0.5 + (sig.freq - sig.freq_plot_min)/(
+            sig.freq_plot_max - sig.freq_plot_min);
         let bw = 0.1 + 0.8*(sig.bw - sig.bw_min)/(sig.bw_max - sig.bw_min);
 
         // TODO: interferer values from old code.  gn_int = -200 to turn
@@ -48,9 +60,6 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
         return 0;
     }
 
-    if(typeof(interferers) !== "Array")
-        interferers = [ interferers ];
-
 
     let width = plot.width;
     let height = plot.height;
@@ -60,7 +69,8 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
 
     // capacity curve
     // (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
-    var datac = d3.range(-10,40+0.01).map(function(d,i) { return {"x":d, "y":efficiency(d)} });
+    var datac = d3.range(-10,40+0.01).map(function(d,i) {
+        return {"x":d, "y":efficiency(d)} });
 
     // We need a unique DOM HTML element ID.
     var svg_id = "svg-capaciZty_" + SpectralEfficiencyPlot.plotId++;
@@ -181,46 +191,24 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
 
     function update_plot() {
 
-        // TODO: THIS IS WRONG.......
-        //  Some thought is needed to correct it.
-        //
-        let gn = sig.gn;
-        let mc = sig.mcs;
-        let bw = 0.1 + 0.8*(sig.bw - sig.bw_min)/(sig.bw_max - sig.bw_min);
-        const n0 = -10;
+        //console.log("update_plot   rate=" + sig.rate);
 
-        //console.log("update gn=" + gn);
-
-        // compute SNR
-	let I = compute_interference();     // interference power (linear)
-        let N = bw * Math.pow(10.,n0/10.);  // noise power (linear)
- 
-	let SNRdB = gn - 10*Math.log10(N+I);
-
-        // compute and display spectral efficiency, capacity
-        let R = efficiency(SNRdB);  // spectral efficiency (b/s/Hz)
-        let C = bw * R;        // capacity (b/s)
-
-        // compute and display link margin
-        let margin_dB = SNRdB - schemes[mc].SNR;
-
-        let valid = (margin_dB >= 0);
-
+	let SNRdB = sig.sinr;
+        let R = schemes[sig.mcs].rate;
 
         // update capacity value
         d3.selectAll('#' + svg_id + ' circle')
-            .data( [{"x":SNRdB, "y":R}] )
+            .data( [{"x": SNRdB, "y":R}] )
             .attr("cx", function(d) { return sscale(d.x); })
-            .attr("cy", function(d) { return cscale(schemes[mc].rate); })
-            .attr("class", valid ? "stroke-med stroke-green" : "stroke-med stroke-red")
+            .attr("cy", function(d) { return cscale(R); })
+            .attr("class", (sig.rate > 0.0) ?
+                "stroke-med stroke-green" :"stroke-med stroke-red");
     }
 
-
-    sig.onChange("bw", update_plot);
-    sig.onChange("gn", update_plot);
+    sig.onChange("rate", update_plot);
+    sig.onChange("sinr", update_plot);
     sig.onChange("mcs", update_plot);
 
-    // setup initial plot
     update_plot();
 }
 

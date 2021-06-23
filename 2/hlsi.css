@@ -37,6 +37,11 @@ svg {
     stroke: #FFFF00;
 }
 
+.stroke-red {
+    stroke: #FF0000;
+}
+
+
 .CodeMirror {
     resize: both;
     overflow-x: scroll;

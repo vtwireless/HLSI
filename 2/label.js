@@ -95,13 +95,19 @@ function Label(sig, par, opts = null) {
             unit = 'dB';
             break;
         case 'rate':
-            [scale, unitPrefix] = scale_units(1000.0, 1.0);
-            unit = 'bits/s';
-            break;
+            // For 'rate' scale and unitPrefix can change as we go, so
+            // we finish it here, because this case is not like the
+            // others.
+            sig.onChange(par, function(s, val) {
+                [scale, unitPrefix] = scale_units(val, 1.0);
+                output.value = prefix + parseValue(val) + " " +
+                    unitPrefix + 'bits/s' + suffix;
+            });
+            return;
     }
 
     // Mung the strings into one suffix string.
-    suffix = " " + unitPrefix + unit + suffix 
+    suffix = " " + unitPrefix + unit + suffix;
 
     // add callback attached to that variable/parameter
     sig.onChange(par, function(s, val) {

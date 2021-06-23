@@ -39,7 +39,11 @@
   small.
   </p>
 
-  <div style="font-size: 200%"id=scriptController1></div>
+  <div style="font-size: 120%"id=scriptController1></div>
+
+  <p>
+    <input type=range id=freq1slider></input>
+  </p>
 
   <p>
   <span>stuff in text in span</span> <output id="freq1"></output>
@@ -90,14 +94,13 @@ Label(sig1, 'freq', {
     element: "#freq1"
 });
 
-
+Label(sig1, 'rate', { prefix: "Rate: ", suffix: " don't ya know"});
 Label(sig1, 'mcs', { prefix: "mod/code: "});
 Label(sig1, 'gn', { prefix: "gn 1: "});
 Label(sig1, 'bw', { prefix: "bw 1: "});
 
 
-
-Slider(sig1, 'freq');
+Slider(sig1, 'freq', "#freq1slider");
 Slider(sig1, 'bw');
 Slider(sig1, 'gn');
 Slider(sig1, 'mcs');
@@ -118,7 +121,9 @@ PowerSpectrumPlot();
 
 // This is the Spectral Efficiency Plot for sig1 with sig2 being the
 // interferer signal.
-//SpectralEfficiencyPlot(sig1, sig2/*interferer*/);
+SpectralEfficiencyPlot(sig1);
+SpectralEfficiencyPlot(sig2);
+
 
 
 </script>

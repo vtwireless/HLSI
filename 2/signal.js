@@ -42,7 +42,7 @@ var conf = {
 
     // Modulation schemes that are available for all the signals.  The
     // "signal" (mcs) can pick one modulation scheme at a time via index
-    // into this array, mcs = 0 to 11.
+    // into this array, mcs = 0 to 11 (including 11).
     schemes: [
         { rate: 0.5,     SNR: 3.979,  name: "r1/2 BPSK" },      //  0
         { rate: 0.66667, SNR: 5.703,  name: "r2/3 BPSK" },      //  1
@@ -247,19 +247,20 @@ Signal.objects = {};
 // this function.   We'd like to make them private, but we are too lazy.
 //
 function Signal(sig, name = "") {
-    if (sig.freq_min === undefined) {
+
+    if(sig.freq_min === undefined) {
         alert("Signal(sig) sig is not a conf.sig object");
         stop();
         return;
     }
 
-    if (this.document === undefined)
+    if(this.document === undefined)
         // this is a new object, this function was called with new.
         // The user must know what they are doing.
         var obj = this;
     else {
         // this is NOT a new object, this function was called without new.
-        if (Signal.objects[sig.id])
+        if(Signal.objects[sig.id])
             // We already created a signal object with sig.
             return Signal.objects[sig.id];
         // Make the first and new Signal object from sig.
@@ -268,22 +269,41 @@ function Signal(sig, name = "") {
         Signal.objects[sig.id] = obj;
     }
 
+    // Label prefix and postfix, or the name we give the signal.
+    obj.name = name;
+    // We'll be freezing much of this object (obj) so we can debug this
+    // code.
+    Object.freeze(obj.name);
+
+    // obj.is_noise will be a bool, no matter what.
+    if(typeof(obj.is_noise) === 'undefined')
+        obj.is_noise = false;
+    else
+        // fix stupid code.
+        obj.is_noise = true;
+    Object.freeze(obj.is_noise);
+
     // This is a new object with a new id.
     // We only get to here once per object, obj.
     obj.id = Signal.createCount++;
     // All existing signals in the environment are interferers, be they
     // noise or otherwise.  This will be the obj list of interferer
-    // signals.
+    // signals.  obj.interferers is just all other signals in the
+    // environment.
     obj.interferers = [];
 
-    // 1) Add this object to the environment of all other signals as in
-    // interferer, and 2) add the other signals to this ones' list of
-    // interferers.
+    // 1) Add this object to the environment of all other signals as
+    // an interferer, and 2) add the other signals to this ones' list
+    // of interferers.
     Object.keys(Signal.env).forEach(function(id/*other signal id*/) {
-        // 1. This signal obj is an interferer to the signal with id.
-        Signal.env[id].interferers.push(obj);
+
+        let signal = Signal.env[id];
+
+        // 1. This signal obj is an interferer to this other signal.
+        signal.interferers.push(obj);
+
         // 2. append list of interferers for this obj.
-        obj.interferers.push(Signal.env[id]);
+        obj.interferers.push(signal);
     });
 
     // Now we can add this new signal object (obj) to the list of signals
@@ -293,11 +313,6 @@ function Signal(sig, name = "") {
     console.log("Signals.env = " + Object.keys(Signal.env));
 
 
-    // Label prefix and postfix, or the name we give the signal.
-    obj.name = name;
-    // We'll be freezing much of this object (obj) so we can debug this
-    // code.
-    Object.freeze(obj.name);
 
     // Theses are just indexes into conf.schemes[]
     obj.mcs_min = 0;
@@ -317,16 +332,12 @@ function Signal(sig, name = "") {
         Object.freeze(obj[key]);
     });
 
-    // obj.is_noise will be a bool, no matter what.
-    if(typeof(obj.is_noise) === 'undefined')
-        obj.is_noise = false;
-    else
-        // fix stupid code.
-        obj.is_noise = true;
-    Object.freeze(obj.is_noise);
 
     //console.log("sig" + obj.name + ".is_noise=" + obj.is_noise);
 
+    // TODO: We need to remove more code for the obj.is_noise = true case.
+    // For the obj.is_noise case we only have one independent parameter
+    // "gn" (gain).
 
     // freq, bw, gn, mcs, and _rate are the dynamical variables that
     // the user may set (not rate) or get using the setter and getter
@@ -353,32 +364,26 @@ function Signal(sig, name = "") {
     // now to a value that is not possible, so it gets set when we call
     // checkSetRate() to initialize it, far below here.
     obj._rate = -1.0;
+    obj._sinr = -1.0;
 
 
     // list of user callbacks that are called when one of the "values"
     // changes happen from a setter being set, or in the case of the
     // parameter/variable "rate" a parameter/variable in one of the
     // dependency signals independent parameter/variables changing.
-    obj._callbacks = { freq: [], bw: [], gn: [], mcs: [], rate: [ ] };
+    obj._callbacks = { 
+        // These are independent variables:
+        freq: [], bw: [], gn: [], mcs: [],
+        // These are dependent variables.
+        rate: [ ], sinr: [] };
+    if(obj.is_noise)
+        // Noise signals only have gain (gn).
+        obj._callbacks = { gn: [] };
 
-
-    obj.interferers.forEach(function(interferer) {
-
-        if(interferer.is_noise)
-            // Only the noise gain has an effect on this signal rate.
-            var parameters = [ "gn" ];
-        else
-            var parameters = ["freq", "bw", "gn", "mcs"];
-
-        // For all parameters that can effect the rate we set a callback
-        // that will get triggered if the one of the parameters changes.
-        parameters.forEach(function(parameter) {
-            interferer.onChange(checkSetRate);
-        });
-    });
 
 
     // This tries to change the "rate", due to a change in a dependency.
+    // Also tries to change the "sinr", due to a change in a dependency.
     function checkSetRate() {
 
         // A noise signal does not have a rate.
@@ -386,34 +391,87 @@ function Signal(sig, name = "") {
 
         // We will calculate the next/new rate:
         var new_rate = 0.0;
+        var new_sinr = 0.0;
 
-        // MORE HERE ...............
-        // Math.random() returns 0.0 to less than 1.0
-        new_rate = 1000.0 * Math.random();
+        // sum the power of all overlapping signals.
+        // Call it ip (interferer power).
+        var ip = 0.0;
+        obj.interferers.forEach(function(i) {
+            //
+            // i is interferer signal.
+            if(!i.is_noise &&
+                (
+                    // Do they NOT overlap?
+                    (obj._freq - 0.5*obj._bw) >= (i._freq + 0.5*i._bw) ||
+                    (obj._freq + 0.5*obj._bw) <= (i._freq - 0.5*i._bw)
+                ))
+                // This interferer (i) is not currently interfering.
+                return;
 
-        // MORE HERE ...............
-        
-        // if the new rate and old rate are the same we do not
-        // trigger events.
-        if(new_rate === obj._rate) return;
-
-        // We have a change and an event triggered.
-        obj._rate = new_rate;
-
-        // trigger rate change callbacks:
-        obj._callbacks.rate.forEach(function(callback) {
-            //console.log("CALLING: " + callback);
-            callback(obj, val);
+            // They overlap, so add to interferer power (ip), be it noise
+            // or regular signal.
+            ip += Math.pow(10.0, i._gn/10.0);
         });
+
+        // ip is the current interferer power summed for all interferers
+        // including any noise interferers.
+
+        // p is set to sig power here:
+        var p = Math.pow(10.0, obj._gn/10.0);
+
+        // sinr (signal to interferer plus noise)
+        // in dB
+        new_sinr = 10*Math.log10(p/ip);
+
+        if(new_sinr >= conf.schemes[obj._mcs].SNR)
+            new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+
+        // Tricky shit:
+        let have_sinr_change = (obj._sinr !== new_sinr);
+        // We need to set obj._sinr in case the users "rate" onChange
+        // callback gets that value.
+        if(have_sinr_change)
+            obj._sinr = new_sinr;
+
+        // if the new rate and old rate are the same we do not
+        // trigger events. 
+        if(obj._rate !== new_rate) {
+
+            obj._rate = new_rate;
+
+            // trigger rate change callbacks:
+            obj._callbacks.rate.forEach(function(callback) {
+                //console.log("CALLING: " + callback);
+                callback(obj, obj._rate);
+            });
+        }
+
+        if(have_sinr_change) {
+
+            //console.log("sinr=" + new_sinr);
+
+            // trigger rate change callbacks:
+            obj._callbacks.sinr.forEach(function(callback) {
+                //console.log("CALLING: " + callback);
+                callback(obj, obj._sinr);
+            });
+        }
     }
 
+    // We need to access this function from other signals as we create
+    // more signals, so we can have the other signals effect this "rate".
+    obj.checkSetRate = checkSetRate;
 
 
     // Set up setters for the 3 independent varying variables/parameters,
     // "freq", "bw", "gn", and "mcs".  "rate" is dependent variable so
     // it can't have a setter.
     //
-    ["freq", "bw", "gn", "mcs" ].forEach(function (key) {
+    let independentParameters = ["freq", "bw", "gn", "mcs" ];
+    if(obj.is_noise)
+        independentParameters = [ "gn" ];
+
+    independentParameters.forEach(function (key) {
         Object.defineProperty(obj, key, {
             // Define a parameter setter for this key/parameter.
             set: function(val) {
@@ -445,48 +503,97 @@ function Signal(sig, name = "") {
         });
     });
 
-    // Let "rate" have a setter that makes an error.
-    //
-    // TODO: We can add other dependent variables to this array:
-    ["rate" ].forEach(function (key) {
-        Object.defineProperty(obj, key, {
 
-            // Make a setter that is broken:
-            set: function(val) {
-                let msg = "Code ERROR: signal " + name +
-                    " cannot set " + key + " (" + val + ")";
-                alert(msg);
-                console.log(msg);
-            },
-
-            // Make a getter:
-            get: function() {
-                return obj["_" + key];
-            }
-        });
-    });
-
-
-    // Add a callback that is called when the value of "key" ("freq",
-    // "bw", "gn", "mcs" or "rate") changes.
-    obj.onChange = function(key, callback) {
-        if(typeof obj._callbacks[key] !== "undefined") {
-            obj._callbacks[key].push(callback);
+    // Add a callback that is called when the value of parameter, par
+    // ("freq", "bw", "gn", "mcs" or "rate") changes.
+    obj.onChange = function(par, callback) {
+        if(typeof obj._callbacks[par] !== "undefined") {
+            obj._callbacks[par].push(callback);
             // Trigger the first call.  Clearly there is a change in value
             // from an "unknown" that the user of this had before the
             // onChange() call.
-            callback(obj, obj['_' + key]);
-        }
+            callback(obj, obj['_' + par]);
+        } else
+            console.log("ERROR: you can't add a '" + par +
+                "' callback to signal " + obj.name);
     };
 
 
-    // Initialize the rate based on all the initial parameter/variable
-    // values:
-    checkSetRate();
+    if(!obj.is_noise) {
+
+        // Let "rate" have a setter that makes an error.
+        //
+        // TODO: We can add other dependent variables to this array:
+        ["rate", "sinr" ].forEach(function (key) {
+            Object.defineProperty(obj, key, {
+
+                // Make a setter that is broken:
+                set: function(val) {
+                    let msg = "Code ERROR: signal " + name +
+                        " cannot set " + key + " (" + val + ")";
+                    alert(msg);
+                    console.log(msg);
+                },
+
+                // Make a getter:
+                get: function() {
+                    return obj["_" + key];
+                }
+            });
+        });
+
+        // All signal onChange callbacks that trigger "rate" changes.
+        //
+        // First interferers effect "rate":
+        obj.interferers.forEach(function(interferer) {
+            if(interferer.is_noise)
+                // Only the noise gain has an effect on this signal
+                // rate.
+                var parameters = [ "gn" ];
+            else
+                var parameters = ["freq", "bw", "gn"];
+
+            // For all parameters that can effect the rate we set a
+            // callback that will get triggered if the one of the
+            // parameters changes.
+            parameters.forEach(function(par) {
+                interferer.onChange(par, checkSetRate);
+            });
+        });
+        // And this signals "freq", "bw", "gn", and "mcs" effect this
+        // signals "rate":
+        ["freq", "bw", "gn", "mcs"].forEach(function(par) {
+            obj.onChange(par, checkSetRate);
+        });
+
+        // Initialize the rate based on all the initial parameter/variable
+        // values:
+        checkSetRate();
+    }
+
+    // Add a 'rate' callback checkSetRate() trigger to all other signals
+    // that are not noise.
+    obj.interferers.forEach(function(signal) {
+        if(signal.is_noise)
+            // noise has no "rate"
+            return;
+        // trigger the signal.checkSetRate call if gain (gn) changes in
+        // this obj signal.
+        obj.onChange("gn", signal.checkSetRate);
+        if(obj.is_noise)
+            // noise only has parameter gain (gn).
+            return;
+
+        // trigger the signal.checkSetRate call if freq changes in
+        // this obj signal.
+        obj.onChange("freq", signal.checkSetRate);
+        // trigger the signal.checkSetRate call if bandwidth (bw) changes
+        // in this obj signal.
+        obj.onChange("bw", signal.checkSetRate);
+    });
 
 
-
-    if (this.document === undefined)
+    if(this.document === undefined)
         // This was called with new.
         return;
 
