@@ -50,4 +50,10 @@ svg {
 a {
     color: rgb(36, 248, 255);
 }
+a:visited {
+    color: #46BCDB;
+}
+a:hover {
+    color: #99D4E4;
+}
 

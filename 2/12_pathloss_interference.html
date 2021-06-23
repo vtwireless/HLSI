@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <title>12 - Path Loss</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+</head>
+
+<body>
+  <h2>Exercise 12 - Path Loss with Interference</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  <p style="color: #62B9E4"><label>Distance = </label><output id="d0"></output>, <label>Path Loss = </label><output id="L0"></output> - User</p>
+  <p style="color: #EAB6B6"><label>Distance = </label><output id="d1"></output>, <label>Path Loss = </label><output id="L1"></output> - Interferer</p>
+  <p>
+    <label for="signal_to_int_noise_ratio">Signal to Interference &amp; Noise Ratio:  SINR = </label>
+    <output for="signal_to_int_noise_ratio" id="sinr"></output>
+  </p>
+  <p>
+    <label for="information_capacity">Information Capacity:  C = </label>
+    <output for="information_capacity" id="cap"></output>
+  </p>
+</body>
+
+<!-- Load in the javascript libraries -->
+<script src="d3.v5.min.js"></script>
+<script src="fft.js"></script>
+<script src="support1.js"></script>
+<script>
+
+// 2. Use the margin convention practice
+var margin = {top: 10, right: 50, bottom: 50, left: 50}
+  , width  = 720 - margin.left - margin.right  // Use the window's width
+  , height = 320 - margin.top - margin.bottom; // Use the window's height
+
+// options
+var fs=40e6, f0=1800e6;    // sample rate, center frequency
+var bw     = 0.23712234, fc     =  0.0,        gn     = 20;  // user values
+var bw_int = 0.04231945, fc_int = -0.07221980, gn_int = 20;  // interference values
+var n0 = -80, sinr = 0, cap = 10;
+var xrange=1200, yrange=200; // range in meters
+var xmax  =1150, ymax  =180; // maximum values
+var dmin = 10;               // minimum distance between nodes for path loss calculation
+var nfft = 2048, generator = new siggen(nfft);
+generator.m = 80;  // set filter semi-length
+generator.beta = 2;
+
+var lambda = 299.792458e6 / (fc*fs + f0);   // wavelength in meters
+
+// scale
+var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
+var yScale = d3.scaleLinear().domain([-yrange, yrange]).range([height, 0]);
+
+// inverted scale
+var xInvScale = d3.scaleLinear().range([-xrange, xrange]).domain([0, width]);
+var yInvScale = d3.scaleLinear().range([-yrange, yrange]).domain([height, 0]);
+
+// determine time and frequency scale/units
+var [scale_freq,units_freq] = scale_units(f0+fs/2,0.1); // freq scale
+var fScale = d3.scaleLinear().domain([(f0-0.5*fs)*scale_freq, (f0+0.5*fs)*scale_freq]).range([0, width]);
+var pScale = d3.scaleLinear().domain([-90, -20]).range([height, 0]);
+
+// create SVG objects (map and frequency plot)
+var svgm = svg_create(margin, width, height, xScale, yScale);
+var svgf = svg_create(margin, width, height, fScale, pScale);
+
+// add labels
+svg_add_labels(svgm, margin, width, height, "Horizonal Position (m)", "Vertical Position (m)");
+svg_add_labels(svgf, margin, width, height, "Frequency ("+units_freq+"Hz)", "Power Spectra Density (dB)");
+
+// clip paths
+svgf.append("clipPath").attr("id","clipf").append("rect").attr("width",width).attr("height",height);
+
+// add pointer definition
+var pointer = svgm.append("defs").append("g")
+        .attr("id","pointer")
+        .attr("transform","scale(0.8)");
+pointer.append("path").attr("d","M0-1c-14.5-25.6-14.5-25.7-14.5-33.8c0-8.1,6.5-14.6,14.5-14.6s14.5,6.6,14.5,14.6C14.5-26.7,14.5-26.6,0-1z");
+pointer.append("path").attr("d","M0-49c7.7,0,14,6.3,14,14.1c0,8,0,8.1-14,32.8c-14-24.7-14-24.9-14-32.8C-14-42.7-7.7-49,0-49 M0-50c-8.3,0-15,6.8-15,15.1 S-15-26.5,0,0c15-26.5,15-26.5,15-34.9S8.3-50,0-50L0-50z");
+
+// create markers with default positions
+var markers = [
+    {x:xScale(-xmax), y:yScale( ymax), c:"#039be5", b:"#004080"},
+    {x:xScale(    0), y:yScale(    0), c:"#03e539", b:"#008040"},
+    {x:xScale(    0), y:yScale(-ymax), c:"#9d7d7d", b:"#400000"},];
+// spectrum data
+var dataf = d3.range(0,nfft-1).map(function(f) { return {"y": 0 } })
+
+// d3's line generator
+var line = d3.line()
+    .x(function(d) { return d.x; })
+    .y(function(d) { return d.y; });
+var linef = d3.line()
+    .x(function(d, i) { return fScale((f0+(i/nfft-0.5)*fs)*scale_freq); })  // map frequency
+    .y(function(d)    { return pScale(d.y);        }); // map PSD
+
+// Append the path, bind the data, and call the line generator
+var path = svgm.append("path")
+    .datum(markers)
+    .attr("class", "stroke-light no-fill dashed stroke-gray-0")
+    .attr("d", line);
+var pathf = svgf.append("path")
+    .attr("clip-path","url(#clipf)")
+    .datum(dataf)
+    .attr("class", "stroke-med no-fill stroke-yellow")
+    .attr("d", linef);
+
+// add markers with associated data
+svgm.selectAll("use")
+    .data(markers)
+    .enter()
+    .append("use")
+        .attr("href","#pointer")
+        .attr("x",      function(d) { return (d.x) })
+        .attr("y",      function(d) { return (d.y) })
+        .attr("fill",   function(d) { return (d.c) })
+        .attr("stroke", function(d) { return (d.b) })
+        .attr("class","pin");
+
+var dragHandler = d3.drag()
+    .on("drag", function(d) {
+        d3.select(this)
+            .attr("x", d.x = Math.max(Math.min(d3.event.x,xScale(xmax)),xScale(-xmax)))
+            .attr("y", d.y = Math.min(Math.max(d3.event.y,yScale(ymax)),yScale(-ymax))); // min/max flipped for y-axis
+        update_display();
+    });
+
+dragHandler(svgm.selectAll("use"));
+
+// run initial update
+update_display();
+
+// generate power spectral density
+function compute_pathloss(marker_a, marker_b)
+{
+    let dx = xInvScale(marker_a.x) - xInvScale(marker_b.x);
+    let dy = yInvScale(marker_a.y) - yInvScale(marker_b.y);
+    let d  = Math.max(dmin,Math.sqrt(dx**2 + dy**2));
+    return [d, 20*Math.log10(4*Math.PI*d/lambda)];
+}
+
+function update_display() {
+    // compute loss between appropriate nodes and update generator
+    let [d0, L0] = compute_pathloss(markers[0], markers[1]);
+    let [d1, L1] = compute_pathloss(markers[2], markers[1]);
+    // update generator, compensating for bandwidth
+    generator.clear();
+    generator.add_signal(fc,    bw,    gn    -L0+10*Math.log10(bw)    ); // user signal
+    generator.add_signal(fc_int,bw_int,gn_int-L1+10*Math.log10(bw_int)); // interference
+    generator.generate(n0); // generate with specific noise floor
+    dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
+    pathf.datum(dataf).attr("d", linef);
+
+    // draw line between markers
+    path.datum(markers).attr("d", line);
+
+    // update ouput values
+    document.querySelector('#d0').value = d3.format(".3f")(d0) + " m";
+    document.querySelector('#L0').value = d3.format(".1f")(L0) + " dB";
+    document.querySelector('#d1').value = d3.format(".3f")(d1) + " m";
+    document.querySelector('#L1').value = d3.format(".1f")(L1) + " dB";
+
+    // compute and display SINR
+    let S     = Math.pow(10.,(gn    -L0)/10); // received signal power (linear)
+    let I     = Math.pow(10.,(gn_int-L1)/10); // received interference power (linear)
+    let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+    //console.log("S = " + 10*Math.log10(S) + ", I = " + 10*Math.log10(I) + ", N = " + 10*Math.log10(N));
+    let SINRdB= 10*Math.log10(S/(N+I));
+    document.querySelector('#sinr').value = d3.format(".2f")(SINRdB) + " dB";
+
+    // compute and display capacity
+    let C = fs * bw * Math.log2(1+Math.pow(10.,SINRdB/10.));
+    var [scale_cap,units_cap] = scale_units(C,0.1);
+    document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
+}
+
+</script>
+</html>
+
