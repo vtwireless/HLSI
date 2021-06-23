@@ -101,6 +101,7 @@ Label(sig1, 'bw', { prefix: "bw 1: "});
 
 
 Slider(sig1, 'freq', "#freq1slider");
+Slider(sig1, 'freq');
 Slider(sig1, 'bw');
 Slider(sig1, 'gn');
 Slider(sig1, 'mcs');
@@ -115,15 +116,15 @@ Slider(noise2, 'gn');
 
 
 
-//ThroughputPlot(sig1, 
-
-PowerSpectrumPlot();
+ThroughputPlot(sig1);
+ThroughputPlot(sig2);
 
 // This is the Spectral Efficiency Plot for sig1 with sig2 being the
 // interferer signal.
 SpectralEfficiencyPlot(sig1);
 SpectralEfficiencyPlot(sig2);
 
+PowerSpectrumPlot();
 
 
 </script>

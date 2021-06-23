@@ -97,7 +97,7 @@ function ScriptController(sigs, opts = null) {
     // All the possible delta time (dt) values.  dt is the period of time
     // between user callback function calls.
     [ 10.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.75, 0.5,
-        0.25, 0.1, 0.05, 0.02, 0.01 ].forEach(function(ddt) {
+        0.25, 0.1, 0.05, 0.02 ].forEach(function(ddt) {
 
         let opt = document.createElement('option');
         opt.value = ddt;

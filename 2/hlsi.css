@@ -41,6 +41,11 @@ svg {
     stroke: #FF0000;
 }
 
+.stroke-orange {
+    stroke: #FAB81F;
+}
+
+
 
 .CodeMirror {
     resize: both;
