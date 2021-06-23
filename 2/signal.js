@@ -75,7 +75,7 @@ var conf = {
         freq_init: 1800.0e6,
 
         bw_min: 4.0e6,
-        bw_max: 40.0e6,
+        bw_max: 36.0e6,
         bw_step: 0.01e6,
         bw_init: 8.0e6,
 

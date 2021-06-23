@@ -130,14 +130,15 @@ function PowerSpectrumPlot() {
         generator.clear();
         // Iterate through signal array, calc values and pass to generator
         sigs.forEach(function (sig) {
-            let fc =
-                -0.5 +
-                (sig.freq - sig.freq_plot_min) /
-                (sig.freq_plot_max - sig.freq_plot_min);
-            let bw = 0.1 + (0.8 * (sig.bw - sig.bw_min)) / (sig.bw_max - sig.bw_min);
+            let df = sig.freq_plot_max - sig.freq_plot_min;
+            let fc = -0.5 + (sig.freq - sig.freq_plot_min) / df;
+            let bw = sig.bw / df;
             let gn = sig.gn;
+
+            //console.log("fc=" + fc + " bw=" + bw + " gn=" + gn);
             // ! bw (slider %) is limited to 90% range, as log(0) == inf
             generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
+            //generator.add_signal(fc, bw, gn);
         });
 
         // use custom noise floor if given
