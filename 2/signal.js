@@ -211,9 +211,6 @@ var conf = {
 // We'll make sure we keep all conf data constant.
 Object.freeze(conf.freeze);
 
-// We keep a list of signal objects that are created.
-Signal.objects = {};
-
 
 // TODO: We are not considering destroying signals yet.  We just let the
 // page run and closing the page will cleanup signals.  Removing signals
@@ -254,19 +251,35 @@ function Signal(sig, name = "") {
         return;
     }
 
-    if(this.document === undefined)
-        // this is a new object, this function was called with new.
-        // The user must know what they are doing.
-        var obj = this;
-    else {
-        // this is NOT a new object, this function was called without new.
-        if(Signal.objects[sig.id])
+    var obj = false;
+    var called_with_new = false;
+
+    try {
+        if(typeof(this) !== "undefined") {
+            // This was called with new.
+            console.log("Made Signal with new");
+            obj = this;
+            called_with_new = true;
+            Signal.objects.set(sig, obj);
+        }
+    } catch(e) {
+        console.log("Signal() not called with new");
+    };
+
+
+    if(obj === false) {
+        // this function was called without new.
+        if(Signal.objects.has(sig)) {
             // We already created a signal object with sig.
-            return Signal.objects[sig.id];
+            obj = Signal.objects.get(sig);
+            console.log("returning old Signal with id " + obj.id);
+            return obj;
+        }
         // Make the first and new Signal object from sig.
-        var obj = new Object(); // Should be same as: obj = {};
+        obj = new Object(); // Should be same as: obj = {};
         // Add to the list of Signal objects
-        Signal.objects[sig.id] = obj;
+        Signal.objects.set(sig, obj);
+        console.log("returning a new Signal object");
     }
 
     // Label prefix and postfix, or the name we give the signal.
@@ -310,7 +323,7 @@ function Signal(sig, name = "") {
     // in the environment, via the unique signal id.
     Signal.env[obj.id.toString()] = obj;
 
-    console.log("Signals.env = " + Object.keys(Signal.env));
+    //console.log("Signals.env = " + Object.keys(Signal.env));
 
 
 
@@ -593,12 +606,16 @@ function Signal(sig, name = "") {
     });
 
 
-    if(this.document === undefined)
-        // This was called with new.
+    if(called_with_new)
+        // This was called with new so we cannot return anything.
         return;
 
     return obj;
 }
+
+
+// We keep a list of signal objects that are created.
+Signal.objects = new Map();
 
 
 // This counter only increases.  It is used to ID the signals.
