@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI 2</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=support.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=iqPlot.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 2 - Frequency</h2>
+  <p><a href="index.html">[exercises]</a></p>
+
+</body>
+<script>
+'use strict';
+
+
+// This sig contains all the constant parameters associated with the
+// signal and also the 4 changing parameters (independent variables)
+// sig.freq, sig.gn, sig.bw, and sig.mcs (center frequency, gain,
+// bandwidth, and modulation scheme index), in addition to dependent
+// variables sig.rate and sig.sinr.
+//
+var sig = Signal(conf.sig0);
+
+Signal(conf.noise).gn = -60.0;
+
+Slider(sig, 'freq');
+
+IQPlot(sig);
+
+PowerSpectrumPlot();
+
+</script>
+</html>

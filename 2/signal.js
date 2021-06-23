@@ -67,8 +67,8 @@ var conf = {
     sig0: {
         mcs_init: 2,
 
-        freq_min: 1780.0e6,
-        freq_max: 1820.0e6,
+        freq_min: 1786.0e6,
+        freq_max: 1814.0e6,
         freq_plot_min: 1780.0e6,
         freq_plot_max: 1820.0e6,
         freq_step: 0.01e6,
