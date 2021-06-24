@@ -14,6 +14,9 @@
  *     suffix:  suffix String. You may want to have a space in the first
  *              character.
  *
+ *     func:    user custom function(val) to change the string in the
+ *              element.
+ *
  */
 function Label(sig, par, opts = null) {
 
@@ -23,6 +26,11 @@ function Label(sig, par, opts = null) {
         unitPrefix, // example: scale = 1000  unitPrefix = 'M'
         unit; // example: "Hz"
     var prefix = "", suffix = "";
+
+    var func = null;
+    if(opts && opts.func !== undefined)
+        func = opts.func;
+
 
     // This parseValue() get values turned into a string for most
     // types of par (parameters), but for "mcs" we change it below.
@@ -66,6 +74,16 @@ function Label(sig, par, opts = null) {
     //////////////////////////////////////////////////////////
 
 
+    if(func) {
+        // This called a user custom string generator.
+        sig.onChange(par, function(s, val) {
+            output.value = prefix + func(val) + suffix;
+        });
+        return;
+    }
+
+
+
     // TODO: This shares some code with sliders.js.  Merge it into common
     // code.
     switch(par) {
@@ -92,6 +110,11 @@ function Label(sig, par, opts = null) {
         case 'gn':
             scale = 1.0;
             unitPrefix = '';
+            unit = 'dB';
+            break;
+        case 'sinr':
+            unitPrefix = '';
+            scale = 1.0;
             unit = 'dB';
             break;
         case 'rate':

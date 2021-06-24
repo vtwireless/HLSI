@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 6</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=support.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=label.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 6 - Information Capacity</h2>
+  <p><a href="index.html">[exercises]</a></p>
+
+</body>
+<script>
+'use strict';
+
+// This sig contains all the constant parameters associated with the
+// signal and also the 4 changing parameters (independent variables)
+// sig.freq, sig.gn, sig.bw, and sig.mcs (center frequency, gain,
+// bandwidth, and modulation scheme index), in addition to dependent
+// variables sig.rate and sig.sinr.
+//
+var sig = Signal(conf.sigIC_05);
+sig.gn = -10.0; // dB
+sig.bw = 12.0e6; // Hz
+// the interferer is a different/new signal so we use new Signal().
+var interferer = new Signal(conf.sigEx_06);
+
+var noise = Signal(conf.noiseIC_05, "Noise");
+noise.gn = -40; // dB
+
+Slider(sig, 'freq');
+Slider(sig, 'bw');
+Slider(sig, 'gn');
+
+Slider(noise, 'gn');
+
+Label(sig, 'sinr', {
+    prefix: "Signal to Interference & Noise Ratio: SINR = "
+});
+
+Label(sig, 'sinr', {
+    prefix: "Information Capacity: C = ",
+    func: function(val) {
+        // val is SNR in dB
+        let C = sig.bw * Math.log2(1 + Math.pow(10.0,val/10.));
+        let [scale_cap,units_cap] = scale_units(C,0.1);
+        return d3.format(".1f")(C*scale_cap) + " " +
+            units_cap + "bits/s";
+    }
+});
+
+
+PowerSpectrumPlot();
+
+</script>
+</html>

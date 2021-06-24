@@ -86,6 +86,82 @@ var conf = {
         gn_init: 0.0,
     },
 
+    sigIC_05: {
+        // Used in exercise 5 & 6
+        mcs_init: 2,
+
+        freq_min: 1786.0e6,
+        freq_max: 1814.0e6,
+        freq_plot_min: 1780.0e6,
+        freq_plot_max: 1820.0e6,
+        freq_step: 0.01e6,
+        freq_init: 1800.0e6,
+
+        bw_min: 4.0e6,
+        bw_max: 36.0e6,
+        bw_step: 0.01e6,
+        bw_init: 4.0e6,
+
+        gn_min: -20.0,
+        gn_max: 0.0,
+        gn_step: 0.01,
+        gn_scale: 1.0,
+        gn_init: -10.0,
+    },
+
+    sigEx_06: {
+        // Used in exercise 6
+        mcs_init: 2,
+
+        freq_min: 1786.0e6,
+        freq_max: 1814.0e6,
+        freq_plot_min: 1780.0e6,
+        freq_plot_max: 1820.0e6,
+        freq_step: 0.01e6,
+        freq_init: 1797.0e6,
+
+        bw_min: 0.5e6,
+        bw_max: 36.0e6,
+        bw_step: 0.01e6,
+        bw_init: 1.8e6,
+
+        gn_min: -20.0,
+        gn_max: 20.0,
+        gn_step: 0.01,
+        gn_scale: 1.0,
+        gn_init: 0.0,
+    },
+
+    noiseIC_05: {
+
+        mcs_init: 2, // unused
+
+        freq_min: 1780.0e6, // unused
+        freq_max: 1820.0e6, // unused
+        freq_plot_min: 1780.0e6, // unused
+        freq_plot_max: 1820.0e6, // unused
+        freq_step: 0.01e6, // unused
+        freq_init: 1800.0e6, // unused
+
+        bw_min: 400.0e6, // unused
+        bw_max: 4000.0e6, // unused
+        bw_step: 0.01e6, // unused
+        bw_init: 4000.0e6, // unused
+
+        // Gain represents noise level
+        gn_min: -60.0,
+        gn_max: 0.0,
+        gn_step: 0.01,
+        gn_scale: 1.0,
+        gn_init: -30.0,
+
+        // bool that lets you know this is a special noise signal.
+        is_noise: true
+        // Other non-noise signals with get this bool set to false in the
+        // Signal() constructor.
+    },
+
+
     // We figure there will not be more than 8 or so signals, so names
     // have one number digit in them, not two as in sig01.
     sig1: {
@@ -179,7 +255,8 @@ var conf = {
         //
         // Dummy signal to act as noise floor
         // ? should this be a global noise floor
-        // ? if used globally, freq and bw must be changed to cover the entire spectrum
+        // ? if used globally, freq and bw must be changed to
+        //   cover the entire spectrum
         mcs_init: 2, // unused
 
         freq_min: 1780.0e6, // unused
@@ -499,7 +576,6 @@ function Signal(sig, name = "") {
                     // No change, so we do nothing.
                     return;
 
-                //console.log("setting: " + obj.id + "." + key + "=" + val);
                 obj["_" + key] = val;
 
                 // Call any callbacks that the user set for this setter.
