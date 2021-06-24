@@ -471,22 +471,46 @@ function Signal(sig, name = "") {
         obj._callbacks = { gn: [] };
 
 
-
     // This tries to change the "rate", due to a change in a dependency.
-    // Also tries to change the "sinr", due to a change in a dependency.
+    // This rate is based on conf.scheme and sinr.  With other schemes not
+    // in conf.scheme this rate will differ from this.
+    //
+    // Also tries to change the "sinr" (signal to interferer & noise ratio
+    // in dB), due to a change in a dependency variable/parameter.
+    //
+    // If changes are found the parameter ("rate" and/or "sinr") callbacks
+    // are called, that is what we mean by "tries".  If there are no
+    // changes than no callbacks are called.  If not for this "trying"
+    // we'd could get infinite callbacks looping do to loops in the
+    // callback chains.
+    //
     function checkSetRate() {
 
+        // "obj" is the signal object of interest.
+
         // A noise signal does not have a rate.
-        if(obj.is_noise) return 0.0;
+        if(obj.is_noise) return;
 
         // We will calculate the next/new rate:
         var new_rate = 0.0;
+        // and sinr:
         var new_sinr = 0.0;
+
+        // The end points of the obj signal band.
+        var bmin = obj._freq - 0.5 * obj._bw;
+        var bmax = obj._freq + 0.5 * obj._bw;
+
+        function GainToPowerDensity(gn) {
+            // Return some kind of power per bandwidth in Watts/Hz.
+            return Math.pow(10.0, gn/10.0);
+        }
 
         // sum the power of all overlapping signals.
         // Call it ip (interferer power).
         var ip = 0.0;
+        //
         obj.interferers.forEach(function(i) {
+
             //
             // i is interferer signal.
             if(!i.is_noise &&
@@ -495,22 +519,48 @@ function Signal(sig, name = "") {
                     (obj._freq - 0.5*obj._bw) >= (i._freq + 0.5*i._bw) ||
                     (obj._freq + 0.5*obj._bw) <= (i._freq - 0.5*i._bw)
                 ))
-                // This interferer (i) is not currently interfering.
+                // This interferer (i) is not currently interfering.  It
+                // does not overlap the signal (obj).
                 return;
 
-            // They overlap, so add to interferer power (ip), be it noise
-            // or regular signal.
-            ip += Math.pow(10.0, i._gn/10.0);
+            // The power (of interest) is proportional to the overlap in
+            // frequency space.  Call it "b".  More overlap, more
+            // interfering power.
+            //
+            // Compute the band overlap in Hz, b.
+            if(i.is_noise)
+                // Noise overlaps the whole signal.
+                var b = obj._bw;
+            else {
+                let min = i._freq - 0.5 * i._bw;
+                if(min < bmin)
+                    min = bmin;
+                let max = i._freq + 0.5 * i._bw;
+                if(max > bmax)
+                    max = bmax;
+                // partial overlap for non-noise.
+                var b = max - min;
+            }
+
+            // They overlap (b in Hz), so add to interferer power (ip), be
+            // it noise with full overlap or regular signal with partial
+            // overlap.  This is power within a multiplicative constant.
+            // We assume it's the same constant for all signals.  It's
+            // just the model we are using.
+            ip += b * GainToPowerDensity(i._gn);
         });
 
-        // ip is the current interferer power summed for all interferers
-        // including any noise interferers.
+        // ip is now the current interferer power summed for all
+        // interferers including any noise interferers.
 
-        // p is set to sig power here:
-        var p = Math.pow(10.0, obj._gn/10.0);
+        // p is set to (obj) relative signal power here:
+        var p = obj._bw * GainToPowerDensity(obj._gn);
 
-        // sinr (signal to interferer plus noise)
-        // in dB
+        // sinr (signal to interferer and noise ratio) in dB.
+        //
+        // Note, any unknown proportionality constants divided out in the
+        // p/ip ratio.
+        //
         new_sinr = 10*Math.log10(p/ip);
 
         if(new_sinr >= conf.schemes[obj._mcs].SNR)
@@ -529,18 +579,19 @@ function Signal(sig, name = "") {
 
             obj._rate = new_rate;
 
-            // trigger rate change callbacks:
+            // trigger "rate" change callbacks:
             obj._callbacks.rate.forEach(function(callback) {
                 //console.log("CALLING: " + callback);
                 callback(obj, obj._rate);
             });
         }
 
+        // Now this is way we needed that stupid have_sinr_change flag:
         if(have_sinr_change) {
 
             //console.log("sinr=" + new_sinr);
 
-            // trigger rate change callbacks:
+            // trigger "sinr" change callbacks:
             obj._callbacks.sinr.forEach(function(callback) {
                 //console.log("CALLING: " + callback);
                 callback(obj, obj._sinr);
@@ -548,8 +599,10 @@ function Signal(sig, name = "") {
         }
     }
 
+
     // We need to access this function from other signals as we create
-    // more signals, so we can have the other signals effect this "rate".
+    // more signals, so we can have the other signals effect this "rate"
+    // and "sinr".
     obj.checkSetRate = checkSetRate;
 
 
