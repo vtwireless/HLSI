@@ -501,6 +501,9 @@ function Signal(sig, name = "") {
         var bmax = obj._freq + 0.5 * obj._bw;
 
         function GainToPowerDensity(gn) {
+            // There is an arbitrary multiplicative constant that we will
+            // divide out in p/ip below.
+            //
             // Return some kind of power per bandwidth in Watts/Hz.
             return Math.pow(10.0, gn/10.0);
         }
