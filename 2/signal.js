@@ -550,14 +550,14 @@ function Signal(sig, name = "") {
             // overlap.  This is power within a multiplicative constant.
             // We assume it's the same constant for all signals.  It's
             // just the model we are using.
-            ip += b * GainToPowerDensity(i._gn);
+            ip += b * GainToPowerDensity(i._gn) / obj._bw;
         });
 
         // ip is now the current interferer power summed for all
         // interferers including any noise interferers.
 
         // p is set to (obj) relative signal power here:
-        var p = obj._bw * GainToPowerDensity(obj._gn);
+        var p = GainToPowerDensity(obj._gn);
 
         // sinr (signal to interferer and noise ratio) in dB.
         //

@@ -49,9 +49,9 @@ Label(sig, 'sinr', {
 
 Label(sig, 'sinr', {
     prefix: "Information Capacity: C = ",
-    func: function(val) {
-        // val is SNR in dB
-        let C = sig.bw * Math.log2(1 + Math.pow(10.0,val/10.));
+    func: function(sinr) {
+        // sinr is SNR in dB
+        let C = sig.bw * Math.log2(1 + Math.pow(10.0, sinr/10.));
         let [scale_cap,units_cap] = scale_units(C,0.1);
         return d3.format(".1f")(C*scale_cap) + " " +
             units_cap + "bits/s";
