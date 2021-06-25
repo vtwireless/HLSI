@@ -489,10 +489,10 @@ function Signal(sig, name = "") {
         // "obj" is the signal object of interest.
         //
         // Magic reference bandwidth.  In order for our Power Spectral
-        // Density plot to be consistent with our gain we use this
-        // frequency difference to define the "reference" bandwidth that
-        // is used to calculate PowerSpectralDensity() for our interferers
-        // and noise signals.  I hope to understand this some day.
+        // Density plot to be consistent with an older version of the code
+        // we use this magic number as a factor to get
+        // PowerSpectralDensity.  This is not correct and neither is the
+        // older version of the code.
         var bw_max = obj.freq_plot_max - obj.freq_plot_min;
 
         // A noise signal does not have a rate.
