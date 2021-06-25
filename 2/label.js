@@ -20,7 +20,6 @@
  */
 function Label(sig, par, opts = null) {
 
-
     var output; // The HTML element that has a value to display
     var scale,
         unitPrefix, // example: scale = 1000  unitPrefix = 'M'
@@ -75,15 +74,27 @@ function Label(sig, par, opts = null) {
 
 
     if(func) {
-        // This called a user custom string generator.
-        sig.onChange(par, function(s, val) {
-            output.value = prefix + func(val) + suffix;
-        });
+
+        // We let par be an array of parameters if the user passed in a
+        // user custom string generator function.
+
+        if(!Array.isArray(par))
+            // This called a user custom string generator with one
+            // signal parameter.
+            sig.onChange(par, function(s, val) {
+                output.value = prefix + func(val) + suffix;
+            });
+        else
+            par.forEach(function(p) {
+                sig.onChange(p, function(s, val) {
+                    output.value = prefix + func(val) + suffix;
+                });
+            });
+
         return;
     }
 
-
-
+    
     // TODO: This shares some code with sliders.js.  Merge it into common
     // code.
     switch(par) {
@@ -121,7 +132,7 @@ function Label(sig, par, opts = null) {
             // For 'rate' scale and unitPrefix can change as we go, so
             // we finish it here, because this case is not like the
             // others.
-            sig.onChange(par, function(s, val) {
+            sig.onChange(par, onChange = function(s, val) {
                 [scale, unitPrefix] = scale_units(val, 1.0);
                 output.value = prefix + parseValue(val) + " " +
                     unitPrefix + 'bits/s' + suffix;
@@ -133,7 +144,7 @@ function Label(sig, par, opts = null) {
     suffix = " " + unitPrefix + unit + suffix;
 
     // add callback attached to that variable/parameter
-    sig.onChange(par, function(s, val) {
+    sig.onChange(par, onChange = function(s, val) {
         output.value = prefix + parseValue(val) + suffix;
     });
 }

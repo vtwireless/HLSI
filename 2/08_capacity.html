@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 8</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <style> 
+        output {font-weight: bold;}
+        output.red { color: #F00;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=support.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 8 - Information Capacity</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  <p>
+    <input type="range" id=bw />
+  </p>
+  <p>
+    <input type="range" id=gn />
+  </p>
+  <p>
+    <input type="range" id=mcs />
+  </p>
+  <p>
+    <label for="signal_to_noise_ratio">SNR: </label>
+        <output for="signal_to_noise_ratio" id="snr"></output>,
+    <label for="information_capacity">Capacity: </label>
+        <output for="information_capacity" id="cap"></output>,
+
+    <label for="spectral_efficiency">Spect. Eff.: </label>
+        <output for="spectral_efficiency" id="eta"></output>,
+    <label for="link_margin">Margin: </label>
+        <output for="link_margin" id="margin"></output>,
+    <label for="actual_rate">Actual Rate: </label>
+        <output for="actual_rate" id="rate"></output>
+  </p>
+  <ol>
+    <li>What combination of parameters (bandwidth, gain)
+        maximize the SNR?</li>
+    <li>What combination of parameters maximize information
+        capacity? Do these correspond to the maximum SNR?</li>
+  </ol>
+
+</body>
+<script>
+'use strict';
+
+var sig = Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz
+    gn_init: -20, // dB
+    gn_min: -40, // dB
+    mcs_init: 6 // array index int
+});
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -30})
+
+Slider(sig, 'bw', '#bw');
+Slider(sig, 'gn', '#gn');
+Slider(sig, 'mcs', '#mcs');
+
+
+Label(sig, 'sinr', { element: '#snr' });
+
+Label(sig, 'sinr', {
+    func: function(sinr) {
+        // sinr is SNR in dB
+        let C = sig.bw * Math.log2(1 + Math.pow(10.0, sinr/10.));
+        let [scale,units] = scale_units(C,0.1);
+        return d3.format(".1f")(C*scale) + " " +
+            units + "b/s";
+    },
+    element: '#cap'
+});
+
+Label(sig, 'sinr', {
+    func: function(sinr) {
+        // sinr is SNR in dB
+        let se = Math.log2(1 + Math.pow(10.0, sinr/10.0));
+        return d3.format(".3f")(se) + " b/s/Hz";
+    },
+    element: '#eta'
+});
+
+// This Label trigger a change from 2 signal parameters.
+var margin = document.querySelector('#margin');
+Label(sig, [ 'sinr', 'mcs'], {
+    func: function() {
+        // sig.sinr is SNR in dB
+        let m = sig.sinr - conf.schemes[sig.mcs].SNR;
+        if(m <= 0) margin.className = 'red';
+        else margin.className = '';
+        return d3.format(".2f")(m) + " dB";
+    },
+    element: '#margin'
+});
+
+// This Label trigger a change from 2 signal parameters.
+var rate = document.querySelector('#rate');
+Label(sig, [ 'sinr', 'mcs'], {
+    func: function() {
+
+        let r = sig.rate;
+
+        if(r <= 0) {
+            rate.className = 'red';
+            return "0 b/s";
+        }
+
+        rate.className = '';
+
+        let [scale,units] = scale_units(r,1.0);
+        let percent = 100.0 * r/(sig.bw *
+            Math.log2(1 + Math.pow(10.0, sig.sinr/10.0)));
+
+        return d3.format(".2f")(r*scale) + " " +
+            units + "b/s (" +
+            d3.format(".1f")(percent) + "% capacity)";
+    },
+    element: '#rate'
+});
+
+
+PowerSpectrumPlot();
+SpectralEfficiencyPlot(sig);
+
+</script>
+</html>

@@ -317,10 +317,17 @@ Object.freeze(conf.freeze);
 //     is an optional prefix string added to slider labels and plot labels.
 //
 //
+//  opts:  options object
+//
+//     signal conf constant to change example:
+//
+//        Signal(sig, "2", { bw_max: 30.0e6, freq_min: 515.0e6 });
+//
+//
 // Please do not access the variables that start with "_" from outside
 // this function.   We'd like to make them private, but we are too lazy.
 //
-function Signal(sig, name = "") {
+function Signal(sig, name = "", opts = null) {
 
     if(sig.freq_min === undefined) {
         alert("Signal(sig) sig is not a conf.sig object");
@@ -414,11 +421,34 @@ function Signal(sig, name = "") {
 
 
     // We copy the constant values in sig to this object (obj).
-    // It's just handy for the user.
-    Object.keys(sig).forEach(function (key) {
-        // this[key] does not work, but we can use obj[key] in its place.
+    Object.keys(sig).forEach(function(key) {
         obj[key] = sig[key];
-        // keep it as a constant.
+    });
+
+    if(opts !== null)
+        // Optionally set constants from the users opts object:
+        Object.keys(opts).forEach(function(key) {
+            // User option to override signal parameter.
+            obj[key] = opts[key];
+        });
+
+    // We copy the constant values in sig to this object (obj).
+    Object.keys(sig).forEach(function(key) {
+        // keep it as a constant from here out.
+        Object.freeze(obj[key]);
+    });
+
+
+
+
+    // We copy the constant values in sig to this object (obj).
+    Object.keys(sig).forEach(function(key) {
+        // We don't add it if the users opts object had it already.
+        if(!(key in obj))
+            // this[key] does not work, but we can use obj[key] in its
+            // place.
+            obj[key] = sig[key];
+        // keep it as a constant from here out.
         Object.freeze(obj[key]);
     });
 
@@ -445,10 +475,10 @@ function Signal(sig, name = "") {
     // TODO: How do we make these effectively private?  So that we know
     // when the getter is called.
     //
-    obj._freq = sig.freq_init; // same as obj['_freq'] = sig.freq_init
-    obj._bw = sig.bw_init;
-    obj._gn = sig.gn_init;
-    obj._mcs = sig.mcs_init;
+    obj._freq = obj.freq_init; // same as obj['_freq'] = obj.freq_init
+    obj._bw = obj.bw_init;
+    obj._gn = obj.gn_init;
+    obj._mcs = obj.mcs_init;
     //
     // rate is a dependent variable that we must calculate to initialize
     // now to a value that is not possible, so it gets set when we call

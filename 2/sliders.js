@@ -154,7 +154,8 @@ function Slider(sig, parameter, n = null) {
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
         //console.log("val=" + val);
         return (
-          conf.schemes[val].name + " (" + conf.schemes[val].rate + " b/s/Hz)"
+            conf.schemes[val].name + " (" +
+            d3.format(".2f")(conf.schemes[val].rate) + " b/s/Hz)"
         );
       });
       break;
