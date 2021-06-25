@@ -492,7 +492,12 @@ function Signal(sig, name = "") {
         // Density plot to be consistent with an older version of the code
         // we use this magic number as a factor to get
         // PowerSpectralDensity.  This is not correct and neither is the
-        // older version of the code.
+        // older version of the code.  These numbers are used to make the
+        // power spectrum display, and have nothing to do with the signal
+        // model.  Even if we calculate the width of all signals that
+        // would still be arbitrary.  I think there may be a missing
+        // independent parameter/variable in the signal model, maybe
+        // sample rate.
         var bw_max = obj.freq_plot_max - obj.freq_plot_min;
 
         // A noise signal does not have a rate.
@@ -511,8 +516,8 @@ function Signal(sig, name = "") {
             // There is an arbitrary multiplicative constant that will
             // divide out later, so we don't need it.
             //
-            // Return some kind of power per bandwidth in Watts/Hz.
-            return Math.pow(10.0, gn/10.0)/bw_max;
+            // Return some kind of relative power.
+            return Math.pow(10.0, gn/10.0);
         }
 
         // sum the power of all overlapping signals.
@@ -544,8 +549,9 @@ function Signal(sig, name = "") {
             //
             // Compute the band overlap in Hz, b.
             if(i.is_noise) {
-                // Noise overlaps the whole signal.
-                ip += obj._bw * PowerSpectralDensity(i._gn);
+                // Noise overlaps the whole signal.  This is wrong.  The
+                // bw_max number is a fug.
+                ip += obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
                 let min = i._freq - 0.5 * i._bw;
                 if(min < bmin)
@@ -556,7 +562,7 @@ function Signal(sig, name = "") {
                 // partial overlap for non-noise.
                 let b = max - min;
 
-                ip += b * PowerSpectralDensity(i._gn);
+                ip += b * PowerSpectralDensity(i._gn)/i._bw;
             }
         });
 
@@ -607,9 +613,9 @@ function Signal(sig, name = "") {
     }
 
 
-    // We need to access this function from other signals as we create
-    // more signals, so we can have the other signals effect this "rate"
-    // and "sinr".
+    // We need to access this checkSetRate() function from other signals
+    // as we create more signals, so we can have the other signals effect
+    // this "rate" and "sinr".
     obj.checkSetRate = checkSetRate;
 
 
