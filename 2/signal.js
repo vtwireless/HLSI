@@ -487,6 +487,13 @@ function Signal(sig, name = "") {
     function checkSetRate() {
 
         // "obj" is the signal object of interest.
+        //
+        // Magic reference bandwidth.  In order for our Power Spectral
+        // Density plot to be consistent with our gain we use this
+        // frequency difference to define the "reference" bandwidth that
+        // is used to calculate PowerSpectralDensity() for our interferers
+        // and noise signals.  I hope to understand this some day.
+        var bw_max = obj.freq_plot_max - obj.freq_plot_min;
 
         // A noise signal does not have a rate.
         if(obj.is_noise) return;
@@ -500,16 +507,16 @@ function Signal(sig, name = "") {
         var bmin = obj._freq - 0.5 * obj._bw;
         var bmax = obj._freq + 0.5 * obj._bw;
 
-        function GainToPowerDensity(gn) {
-            // There is an arbitrary multiplicative constant that we will
-            // divide out in p/ip below.
+        function PowerSpectralDensity(gn) {
+            // There is an arbitrary multiplicative constant that will
+            // divide out later, so we don't need it.
             //
             // Return some kind of power per bandwidth in Watts/Hz.
-            return Math.pow(10.0, gn/10.0);
+            return Math.pow(10.0, gn/10.0)/bw_max;
         }
 
         // sum the power of all overlapping signals.
-        // Call it ip (interferer power).
+        // Call it ip (interferer power) is a sum of linear power.
         var ip = 0.0;
         //
         obj.interferers.forEach(function(i) {
@@ -530,11 +537,16 @@ function Signal(sig, name = "") {
             // frequency space.  Call it "b".  More overlap, more
             // interfering power.
             //
+            // They overlap (b in Hz), so add to interferer power (ip), be
+            // it noise with full overlap or regular signal with partial
+            // overlap.  This is power within a multiplicative constant.
+            // We assume it's the same constant for all signals.
+            //
             // Compute the band overlap in Hz, b.
-            if(i.is_noise)
+            if(i.is_noise) {
                 // Noise overlaps the whole signal.
-                var b = obj._bw;
-            else {
+                ip += obj._bw * PowerSpectralDensity(i._gn);
+            } else {
                 let min = i._freq - 0.5 * i._bw;
                 if(min < bmin)
                     min = bmin;
@@ -542,38 +554,30 @@ function Signal(sig, name = "") {
                 if(max > bmax)
                     max = bmax;
                 // partial overlap for non-noise.
-                var b = max - min;
-            }
+                let b = max - min;
 
-            // They overlap (b in Hz), so add to interferer power (ip), be
-            // it noise with full overlap or regular signal with partial
-            // overlap.  This is power within a multiplicative constant.
-            // We assume it's the same constant for all signals.  It's
-            // just the model we are using.
-            ip += b * GainToPowerDensity(i._gn) / obj._bw;
+                ip += b * PowerSpectralDensity(i._gn);
+            }
         });
 
         // ip is now the current interferer power summed for all
         // interferers including any noise interferers.
 
-        // p is set to (obj) relative signal power here:
-        var p = GainToPowerDensity(obj._gn);
-
         // sinr (signal to interferer and noise ratio) in dB.
         //
-        // Note, any unknown proportionality constants divided out in the
-        // p/ip ratio.
-        //
-        new_sinr = 10*Math.log10(p/ip);
+        new_sinr = obj._gn - 10*Math.log10(ip);
+
+        //console.log(" ip=" + ip + " sinr=" + new_sinr);
+
 
         if(new_sinr >= conf.schemes[obj._mcs].SNR)
             new_rate = obj._bw * conf.schemes[obj._mcs].rate;
 
         // Tricky shit:
-        let have_sinr_change = (obj._sinr !== new_sinr);
+        let have_change = (obj._sinr !== new_sinr);
         // We need to set obj._sinr in case the users "rate" onChange
         // callback gets that value.
-        if(have_sinr_change)
+        if(have_change)
             obj._sinr = new_sinr;
 
         // if the new rate and old rate are the same we do not
@@ -589,8 +593,8 @@ function Signal(sig, name = "") {
             });
         }
 
-        // Now this is way we needed that stupid have_sinr_change flag:
-        if(have_sinr_change) {
+        // Now this is way we needed that stupid have_change flag:
+        if(have_change) {
 
             //console.log("sinr=" + new_sinr);
 
