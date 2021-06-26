@@ -1,5 +1,27 @@
 
-function CapacityRunner(sig, parentElement = null, opts = null) {
+// Run a function at regular intervals.  Adds a "Start" button and some dynamic
+// labels.
+//
+//  ARGUMENTS:
+//
+//     sig:  a signal object from Signal().
+//
+//     func: a function that takes to the argument t (time).
+//
+//     parentElement: an HTML CSS selector string, or <p> HTML element
+//                    or none (null).
+//                    This adds, HTML, a "Start" button and run numbers
+//                    labels.
+//
+
+function CapacityRunner(func = null, parentElement = null) {
+
+    if(typeof(func) !== 'function') {
+        let msg = "Code ERROR BAD func arguement to CapacityRunner()";
+        alert(msg);
+        console.log(msg);
+        throw(msg);
+    }
 
     // Generate a unique id for HTML element ids.
     var id = (CapacityRunner.count++).toString() + '_capRu';
@@ -48,31 +70,6 @@ function CapacityRunner(sig, parentElement = null, opts = null) {
     }
 
 
-    // The default Gain and Bandwidth vs time functions.
-    //
-    function Gain(t) {
-        // t is time in seconds.
-        return -25 + 13*Math.log10(0.001 +
-                (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
-            Math.exp(-0.05*t);
-    }
-    //
-    function Bandwidth(t) {
-        // t is time in seconds.
-        return bw_avg + bw_amp * Math.exp(-0.015*t) *
-            Math.cos(2*Math.PI*0.03*t + 1.5);
-    }
-
-    if(opts !== null) {
-        if(typeof(opts.gainFunc) === 'function')
-            // User overrides Gain(t) with custom function.
-            Gain = opts.gainFunc;
-        if(typeof(opts.bandwidthFunc) === 'function')
-            // User overrides Bandwidth(t) with custom function.
-            Bandwidth = opts.bandwidthFunc;
-    }
-
-
     function SetLabels() {
 
         getElement('#timeLeft').value =
@@ -95,8 +92,8 @@ function CapacityRunner(sig, parentElement = null, opts = null) {
 
         const t = runTime - timeLeft;
 
-        sig.bw = Bandwidth(t);
-        sig.gn = Gain(t);
+        // Call user function:
+        func(t);
 
         if(sig.rate <= 0.0)
             outage += tStep;

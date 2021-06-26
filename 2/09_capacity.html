@@ -61,21 +61,24 @@ const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
 
 
 function Gain(t) {
-
     return -25 + 13*Math.log10(0.001 +
             (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
         Math.exp(-0.05*t);
 }
 
 function Bandwidth(t) {
-
     return bw_avg + bw_amp * Math.exp(-0.015*t) *
         Math.cos(2*Math.PI*0.03*t + 1.5);
 }
 
 
-CapacityRunner(sig, '#capacityRunner',
-    { gainFunc: Gain, bandwidthFunc: Bandwidth} );
+CapacityRunner(function(t/*seconds*/) {
+
+    sig.gn = Gain(t);
+    sig.bw = Bandwidth(t);
+
+}, '#capacityRunner');
+
 
 Slider(sig, 'mcs', '#mcs');
 
