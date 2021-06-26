@@ -10,7 +10,7 @@ function CapacityBanner(sig, parentElement = null) {
         <output for=information_capacity'+ id +' id=cap'+ id +'></output>,\
     <label for=spectral_efficiency'+ id +'>Spect. Eff.: </label>\
         <output for=spectral_efficiency'+ id +' id=eta'+ id +'></output>,\
-    <label for=link_margin'+ id +'>Margin: </label>\
+    <label for=link_margin'+ id +'>Link Margin: </label>\
         <output for=link_margin'+ id +' id=margin'+ id +'></output>,\
     <label for=actual_rate'+ id +'>Actual Rate: </label>\
         <output for=actual_rate'+ id +' id=rate'+ id +'></output>\

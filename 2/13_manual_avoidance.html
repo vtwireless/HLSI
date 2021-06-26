@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 13</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <style> 
+        output {font-weight: bold;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=common.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+    <script src=throughputPlot.js></script>
+    <script src=hoppingInterferer.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 13 - Manual Interferer Avoidance</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  <p>
+    <input type="range" id=bw />
+  </p>
+  <p>
+    <input type="range" id=gn />
+  </p>
+  <p>
+    <input type="range" id=mcs />
+  </p>
+
+  <p id=hoppingInterferer>
+  </p>
+
+  <p id=capacityBanner>
+  </p>
+
+
+</body>
+<script>
+'use strict';
+
+var sig = Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6 // array index int
+});
+
+
+var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 2.5e6, // Hz
+    gn_init: -12, // dB
+    gn_min: -40, // dB
+    freq_init: 1785.0e6 // Hz
+});
+
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -40})
+
+Slider(sig, 'bw', '#bw');
+Slider(sig, 'gn', '#gn');
+Slider(sig, 'mcs', '#mcs');
+
+CapacityBanner(sig, '#capacityBanner');
+
+HoppingInterferer(interferer, '#hoppingInterferer');
+
+PowerSpectrumPlot();
+ThroughputPlot(sig);
+SpectralEfficiencyPlot(sig);
+
+</script>
+</html>
