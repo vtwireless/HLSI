@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 9</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <style> 
+        output {font-weight: bold;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=support.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 9 - Information Capacity</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  
+  <p>
+    Press the "Start" button to start the changing of signal
+    parameters gain and bandwidth as time go on.
+    Move the "Mode Code" slider to keep data throughput.
+  </p>
+
+  <p>
+    <input id=reset type=button
+        value=Reset onclick="Reset()"/>
+    <input id=start type=button
+        value=Start onclick="StartStop()"/>
+
+    <label for=runTime>Run Time: </label>
+    <output id=runTime></output>, &nbsp;
+
+    <label for=timeLeft>Time Left: </label>
+    <output id=timeLeft></output>, &nbsp;
+
+    <label for=outage> Outage: </label>
+    <output id=outage style="color: #C00;"></output>, &nbsp;
+
+    <label for=bits>Total Bits: </label>
+    <output id="bits" style="color: #0C0;"></output>
+  </p>
+
+  <p>
+    <input type="range" id=mcs />
+  </p>
+
+  <p id=capacityBanner>
+  </p>
+
+</body>
+<script>
+'use strict';
+
+
+var sig = Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 25.0e6, // Hz
+    gn_init: -12.12, // dB
+    gn_min: -40, // dB
+    mcs_init: 4 // array index int 0 to 11
+});
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -40});
+
+Slider(sig, 'mcs', '#mcs');
+
+CapacityBanner(sig, '#capacityBanner');
+
+PowerSpectrumPlot();
+SpectralEfficiencyPlot(sig);
+
+
+///////////////////////////////////////////////
+// Got some code below:
+
+const tStep = 0.1; // seconds
+const runTime = 60.0; // seconds
+const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
+const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
+
+var outage = 0.0;  // seconds with no throughput
+var timeLeft = runTime; // seconds
+var bits = 0; // number of bits in bits
+var timerId = null;
+
+var isRunning = false;
+
+document.querySelector('#runTime').value =
+    d3.format('.2f')(runTime) + " s";
+document.querySelector('#timeLeft').value =
+    d3.format('.2f')(timeLeft) + " s";
+
+function Gain(t) {
+
+    return -25 + 13*Math.log10(0.001 +
+            (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
+        Math.exp(-0.05*t);
+}
+
+function Bandwidth(t) {
+
+    return bw_avg + bw_amp * Math.exp(-0.015*t) *
+        Math.cos(2*Math.PI*0.03*t + 1.5);
+}
+
+function SetLabels() {
+
+    document.querySelector('#timeLeft').value =
+        d3.format(".2f")(timeLeft) + " s";
+    document.querySelector('#outage').value =
+        d3.format(".2f")(outage) + " s";
+    document.querySelector('#bits').value =
+        d3.format(",")(bits);
+}
+
+
+function RunStep() {
+
+    if(!isRunning) return;
+
+    // Advance the time.
+    timeLeft -= tStep;
+    if(timeLeft <= 0.0)
+        timeLeft = 0.0;
+
+    const t = runTime - timeLeft;
+
+    sig.bw = Bandwidth(t);
+    sig.gn = Gain(t);
+
+    if(sig.rate <= 0.0)
+        outage += tStep;
+    else
+        bits += Math.round(sig.rate * tStep);
+
+    SetLabels();
+
+    if(timeLeft === 0.0)
+        Stop();
+}
+
+
+function Reset() {
+
+    sig.bw = Bandwidth(0.0);
+    sig.gn = Gain(0.0);
+    outage = 0.0;  // seconds with no throughput
+    timeLeft = runTime; // seconds
+    bits = 0; // number of bits in bits
+    timerId = null;
+    SetLabels();
+}
+
+
+function Start() {
+
+    timerId = setInterval(RunStep, tStep * 1000 /*1000 ms/s*/);
+    isRunning = true;
+    document.querySelector('#start').value = "Stop ";
+}
+
+
+function Stop() {
+
+    // Stop does not also reset, it just stops.
+    clearTimeout(timerId);
+    isRunning = false;
+    document.querySelector('#start').value = "Start";
+}
+
+
+function StartStop() {
+    if(isRunning) Stop();
+    else Start();
+}
+
+
+Reset();
+
+
+</script>
+</html>
