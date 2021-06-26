@@ -1,18 +1,25 @@
 
 function CapacityBanner(sig, parentElement = null) {
 
-    var innerHTML = '\n\
-    <label for=signal_to_noise_ratio>SNR: </label>\n\
-        <output for=signal_to_noise_ratio id=snr></output>,\n\
-    <label for=information_capacity>Capacity: </label>\n\
-        <output for=information_capacity id=cap></output>,\n\
-    <label for=spectral_efficiency>Spect. Eff.: </label>\n\
-        <output for=spectral_efficiency id=eta></output>,\n\
-    <label for=link_margin>Margin: </label>\n\
-        <output for=link_margin id=margin></output>,\n\
-    <label for=actual_rate>Actual Rate: </label>\n\
-        <output for=actual_rate id=rate></output>\n\
+    var id = (CapacityBanner.count++).toString() + '_cap';
+
+    var innerHTML = '\
+    <label for=signal_to_noise_ratio'+ id +'>SNR: </label>\
+        <output for=signal_to_noise_ratio'+ id +' id=snr'+ id +'></output>,\
+    <label for=information_capacity'+ id +'>Capacity: </label>\
+        <output for=information_capacity'+ id +' id=cap'+ id +'></output>,\
+    <label for=spectral_efficiency'+ id +'>Spect. Eff.: </label>\
+        <output for=spectral_efficiency'+ id +' id=eta'+ id +'></output>,\
+    <label for=link_margin'+ id +'>Margin: </label>\
+        <output for=link_margin'+ id +' id=margin'+ id +'></output>,\
+    <label for=actual_rate'+ id +'>Actual Rate: </label>\
+        <output for=actual_rate'+ id +' id=rate'+ id +'></output>\
 ';
+
+
+    function getElement(sel) {
+        return document.querySelector(sel + id);
+    }
 
 
     if(parentElement === null) {
@@ -25,7 +32,7 @@ function CapacityBanner(sig, parentElement = null) {
     parentElement.innerHTML = innerHTML;
 
 
-    Label(sig, 'sinr', { element: '#snr' });
+    Label(sig, 'sinr', { element: '#snr'+ id });
 
     Label(sig, 'sinr', {
         func: function(sinr) {
@@ -35,7 +42,7 @@ function CapacityBanner(sig, parentElement = null) {
             return d3.format(".1f")(C*scale) + " " +
                 units + "b/s";
         },
-        element: '#cap'
+        element: '#cap'+ id
     });
 
     Label(sig, 'sinr', {
@@ -44,11 +51,11 @@ function CapacityBanner(sig, parentElement = null) {
             let se = Math.log2(1 + Math.pow(10.0, sinr/10.0));
             return d3.format(".3f")(se) + " b/s/Hz";
         },
-        element: '#eta'
+        element: '#eta'+ id
     });
 
     // This Label trigger a change from 2 signal parameters.
-    var margin = document.querySelector('#margin');
+    var margin = getElement('#margin');
     Label(sig, [ 'sinr', 'mcs'], {
         func: function() {
             // sig.sinr is SNR in dB
@@ -57,11 +64,11 @@ function CapacityBanner(sig, parentElement = null) {
             else margin.className = '';
             return d3.format(".2f")(m) + " dB";
         },
-        element: '#margin'
+        element: '#margin'+ id
     });
 
     // This Label trigger a change from 2 signal parameters.
-    var rate = document.querySelector('#rate');
+    var rate = getElement('#rate');
     Label(sig, [ 'sinr', 'mcs'], {
         func: function() {
 
@@ -82,6 +89,9 @@ function CapacityBanner(sig, parentElement = null) {
                 units + "b/s (" +
                 d3.format(".1f")(percent) + "% capacity)";
         },
-        element: '#rate'
+        element: '#rate'+ id
     });
 }
+
+// Used to get ids.
+CapacityBanner.count = 0;
