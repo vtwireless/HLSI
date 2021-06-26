@@ -1,84 +1,57 @@
-'use strict';
-
-// All the plots use these length parameters and they are used in other
-// files too.
-//
-var plot = {
-    margin: { top: 10, right: 50, bottom: 50, left: 50 },
-};
-
-plot.width = 720 - plot.margin.left - plot.margin.right; // Use the window's width
-plot.height = 320 - plot.margin.top - plot.margin.bottom; // Use the window's height
-
-Object.freeze(plot);
-
-
-// parentElement is a CSS selector for the parent node that we will append
-// the d3 <svg> plot element to.
-//
-function svg_create(_xscale, _yscale, parentElement=null)
+function svg_create(_margin, _width, _height, _xscale, _yscale)
 {
-
-    if(parentElement === null) parentElement = "body";
-
-    // We need to add data to the object that is what we are given, svg.
-    // We did not start this fun code so in order to refactor it without
-    // braking it we need to use kludgey methods like so:
-
     // 1. Add the SVG (time) to the page and employ #2
-    var svg = d3.select(parentElement).append("svg")
-        .attr("width",  plot.width  + plot.margin.left + plot.margin.right)
-        .attr("height", plot.height + plot.margin.top +  plot.margin.bottom)
-        .append("g")
-	.attr("class", "graph-svg-component")
-        .attr("transform", "translate(" + plot.margin.left + "," + plot.margin.top + ")");
+    var svg = d3.select("body").append("svg")
+        .attr("width",  _width  + _margin.left + _margin.right)
+        .attr("height", _height + _margin.top +  _margin.bottom)
+      .append("g")
+	  .attr("class", "graph-svg-component")
+        .attr("transform", "translate(" + _margin.left + "," + _margin.top + ")");
 
     // create axes
     svg.append("g").attr("class", "x axis")
-        .attr("transform", "translate(0," + plot.height + ")")
+        .attr("transform", "translate(0," + _height + ")")
         .call(d3.axisBottom(_xscale));
     svg.append("g").attr("class", "y axis")
         .call(d3.axisLeft(_yscale));
 
-    svg.append("rect")
-        .attr("width", "86.2%")
-	.attr("height", "81%")
-	.attr("fill", "black");
-
+	svg.append("rect")
+		.attr("width", "86.2%")
+		.attr("height", "81%")
+		.attr("fill", "black");
     // create grid lines
-    svg.append("g").attr("class","grid").call(d3.axisBottom(_xscale).tickFormat("").tickSize( plot.height));
-    svg.append("g").attr("class","grid").call(d3.axisLeft  (_yscale).tickFormat("").tickSize(- plot.width));
-
+    svg.append("g").attr("class","grid").call(d3.axisBottom(_xscale).tickFormat("").tickSize( _height));
+    svg.append("g").attr("class","grid").call(d3.axisLeft  (_yscale).tickFormat("").tickSize(- _width));
     return svg;
 }
 
-
-function svg_add_labels(_svg, _xlabel, _ylabel)
+function svg_add_labels(_svg, _margin, _width, _height, _xlabel, _ylabel)
 {
     // create x-axis axis label
     _svg.append("text")
-        .attr("transform","translate("+(plot.width/2)+","+(plot.height + 0.75*plot.margin.bottom)+")")
-        .attr("dy","-0.3em")
-        .style("text-anchor","middle")
-	.attr("fill", "white")
-        .text(_xlabel);
+       .attr("transform","translate("+(_width/2)+","+(_height + 0.75*_margin.bottom)+")")
+       .attr("dy","-0.3em")
+       .style("text-anchor","middle")
+		.attr("fill", "white")
+       .text(_xlabel)
+
 
     // create y-axis label
     _svg.append("text")
-        .attr("transform","rotate(-90)")
-        .attr("y", 0 - plot.margin.left)
-        .attr("x", 0 - (plot.height/2))
-        .attr("dy", "1em")
-        .style("text-anchor","middle")
-        .attr("fill", "white")
-        .text(_ylabel);
+       .attr("transform","rotate(-90)")
+       .attr("y", 0 - _margin.left)
+       .attr("x", 0 - (_height/2))
+       .attr("dy", "1em")
+       .style("text-anchor","middle")
+		.attr("fill", "white")
+       .text(_ylabel)
+
 }
 
-
 // determine scale and units for sample value v; use p to adjust cut-off threshold
-function scale_units(v,p=1)
+function scale_units(v,p)
 {
-    let r = v * p;
+    let r = v * (p==null ? 1 : p);
     if      (r >= 1e+12) { return [1e-12, 'T']; }
     else if (r >= 1e+09) { return [1e-09, 'G']; }
     else if (r >= 1e+06) { return [1e-06, 'M']; }
