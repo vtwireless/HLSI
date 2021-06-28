@@ -1,4 +1,7 @@
 
+// Works well with parentElement being an existing <p> that gets its'
+// innerHTML over written.
+//
 function HoppingInterferer(interferer, parentElement = null, opts = null) {
 
     // Generate a unique id for HTML element ids.

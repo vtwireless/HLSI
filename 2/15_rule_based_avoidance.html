@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 15</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <style> 
+        output {font-weight: bold;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=common.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+    <script src=capacityRunner.js></script>
+    <script src=throughputPlot.js></script>
+    <script src=hoppingInterferer.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 15 Rule Based Interferer Avoidance</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  
+  <p>
+    Press the "Start" button to start the changing of signal parameters
+    gain and bandwidth as time go on.  The interferer has a "frequency
+    hopping mind" of its' own, which we do not control; we just try to
+    avoid it by selecting one of the pre-programmed schemes (rules).
+  </p>
+
+  <p id=capacityRunner></p>
+
+  <p id=hoppingInterferer></p>
+
+  <p id=capacityBanner></p>
+
+  <p>
+    <input type="range" id=freq />
+  </p>
+  <p>
+    <input type="range" id=bw />
+  </p>
+  <p>
+    <input type="range" id=mcs />
+  </p>
+
+</body>
+<script>
+'use strict';
+
+
+var sig = Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 25.0e6, // Hz
+    gn_max: 1.0, // dB
+    gn_init: -10.0, // dB
+    gn_min: -40, // dB
+    mcs_init: 4 // array index int 0 to 11
+});
+
+var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 2.5e6, // Hz
+    gn_max: 0.0, // dB
+    gn_init: -12, // dB
+    gn_min: -40, // dB
+    freq_init: 1785.0e6 // Hz
+});
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -40});
+
+
+const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
+const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
+
+
+function Gain(t) {
+    return -9 + 13*Math.log10(0.001 +
+            (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
+        Math.exp(-0.05*t);
+}
+
+function Bandwidth(t) {
+    return bw_avg + bw_amp * Math.exp(-0.015*t) *
+        Math.cos(2*Math.PI*0.03*t + 1.5);
+}
+
+
+CapacityRunner(function(t/*seconds*/) {
+
+    sig.gn = Gain(t);
+    sig.bw = Bandwidth(t);
+
+}, '#capacityRunner');
+
+HoppingInterferer(interferer, '#hoppingInterferer');
+
+
+Slider(sig, 'freq', '#freq');
+Slider(sig, 'bw', '#bw');
+Slider(sig, 'mcs', '#mcs');
+
+
+CapacityBanner(sig, '#capacityBanner');
+
+PowerSpectrumPlot();
+ThroughputPlot(sig);
+SpectralEfficiencyPlot(sig);
+
+
+</script>
+</html>
