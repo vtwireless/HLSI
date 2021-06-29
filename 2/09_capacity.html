@@ -72,7 +72,7 @@ function Bandwidth(t) {
 }
 
 
-CapacityRunner(function(t/*seconds*/) {
+CapacityRunner(sig, function(t/*seconds*/) {
 
     sig.gn = Gain(t);
     sig.bw = Bandwidth(t);

@@ -30,7 +30,7 @@
     Press the "Start" button to start the changing of signal parameters
     gain and bandwidth as time go on.  The interferer has a "frequency
     hopping mind" of its' own, which we do not control; we just try to
-    avoid it by selecting one of the pre-programmed schemes (rules).
+    avoid it by selecting one of the pre-programmed rules.
   </p>
 
   <p id=capacityRunner></p>
@@ -54,9 +54,9 @@
 'use strict';
 
 
-var sig = Signal(conf.sig0, '', {
+var sig = new Signal(conf.sig0, '', {
     bw_max: 38.0e6, // Hz
-    bw_init: 25.0e6, // Hz
+    bw_init: 10.0e6, // Hz
     gn_max: 1.0, // dB
     gn_init: -10.0, // dB
     gn_min: -40, // dB
@@ -75,28 +75,128 @@ var interferer = new Signal(conf.sig0, 'interferer', {
 var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 
 
-const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
-const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
 
+// How many bits of randomness are there in Math.random()?
+//
+// Lets say it's 30 bits (due too float round-off of 32 bits) and just
+// cycle the value after that.  Computing Math.random() is not cheap.
+const rbits = 30;
+const rsize = (0x01 << rbits) - 1;
+// rsize = 2^(rbits)
+const randBits = Math.round(Math.random()*rsize);
+// randBits is now a big random integer.
 
-function Gain(t) {
-    return -9 + 13*Math.log10(0.001 +
-            (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
-        Math.exp(-0.05*t);
+var randBit = 1; // one bit gets set in randBit.
+//
+// Coin() returns +1 or -1 depending on randomness in randBits.
+function Coin() {
+    // pick a bit
+    let bit = randBits & randBit;
+    // Go to the next bit.
+    randBit = randBit << 1;
+    if(randBit > rsize)
+        // Reset back to the first bit.
+        randBit = 1;
+    return (bit)?(1):(-1);
 }
 
-function Bandwidth(t) {
-    return bw_avg + bw_amp * Math.exp(-0.015*t) *
-        Math.cos(2*Math.PI*0.03*t + 1.5);
+
+// The list of "Rule Based" functions in the <select> after the "Start"
+// button.
+var funcs = {
+
+
+    "Select pre-configured Strategy ...":
+    "This is not an otional function",
+
+    "No Adaption":
+    function() { },
+
+    "Random Frequency Adaption":
+    function(t) {
+	sig.freq = sig.freq_min + Math.random()*(sig.freq_max - sig.freq_min);
+    },
+
+    "Frequency Based Adaption":
+    function(t) {
+
+        let i = interferer;
+        let s = sig;
+
+        // A small standard frequency change size.
+        let delta = 0.1 * (s.freq_max - s.freq_min);
+        // The mean frequency.
+        let favg = (s.freq_max + s.freq_min)/2.0;
+
+        let f_lower = s.freq - 0.5*s.bw,
+            f_upper = s.freq + 0.5*s.bw,
+            i_lower = i.freq - 0.5*i.bw,
+            i_upper = i.freq + 0.5*i.bw;
+        if(!(f_lower > i_upper || f_upper < i_lower)) {
+
+            // The interferer and the signal overlap.
+
+            let ch1 = f_lower - i_lower;
+	    let ch2 = f_upper - i_upper;
+	    let ch3 = Math.abs(i_upper - f_lower);
+	    let ch4 = Math.abs(i_lower - f_upper);
+
+	    if((ch2 > 0) && (ch1 > 0)) {
+	        if(f_lower < s.freq_min || f_upper >  s.freq_max) s.freq = favg;
+		s.freq += Coin() * ch3 + delta;
+                return;
+	    }
+
+	    if((ch2 > 0) && (ch1 < 0)) {
+	        if(f_lower < s.freq_min || f_upper > s.freq_max) s.freq = favg;
+
+		let ch5 = Math.abs(ch3) + Math.abs(ch4);
+                s.freq += Coin() * ch5 + delta;
+ 		return;
+	    }
+    
+            if((ch2 < 0) && (ch1 < 0)) {
+	        if(f_lower < s.freq_min || f_upper >  s.freq_max) s.freq = favg;
+                s.freq += Coin() * ch4 + delta;
+ 		return;
+            }
+
+	    s.freq = favg;
+	    return;
+        }
+    },
+
+    "Frequency and Bandwidth Based Adaption":
+    function(t) {
+
+        let i = interferer;
+        let s = sig;
+
+        // A small standard frequency change size.
+        let delta = 0.1 * (s.freq_max - s.freq_min);
+        // The mean frequency.
+        let favg = (s.freq_max + s.freq_min)/2.0;
+
+        let f_lower = s.freq - 0.5*s.bw,
+            f_upper = s.freq + 0.5*s.bw,
+            i_lower = i.freq - 0.5*i.bw,
+            i_upper = i.freq + 0.5*i.bw;
+
+            if(i.freq < favg) {
+                s.freq = (i.freq_max + i_upper)/2.0;
+                s.bw = i.freq_max - i_upper - delta
+            } else {
+                s.freq = (i_lower + i.freq_min)/2.0;
+                s.bw = i_lower - i.freq_min - delta;
+            }
+        }
 }
 
 
-CapacityRunner(function(t/*seconds*/) {
+CapacityRunner(sig, funcs, '#capacityRunner', {
+    tStep: 0.3/*seconds*/
+});
 
-    sig.gn = Gain(t);
-    sig.bw = Bandwidth(t);
-
-}, '#capacityRunner');
 
 HoppingInterferer(interferer, '#hoppingInterferer');
 

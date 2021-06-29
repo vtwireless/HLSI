@@ -85,7 +85,7 @@ function() {
 
     if(freq2 > mid_freq) {
         freq1 = (freq2 - bw2/2.0 + freq_min1)/2.0;
-        bw1 = 2.0*(freq1 - min_freq);
+        bw1 = 2.0*(freq1 - freq_min1);
     } else {
         freq1 = (freq2 + bw2/2.0 + freq_max1)/2.0;
         bw1 = 2.0*(freq_max1 - freq1);
