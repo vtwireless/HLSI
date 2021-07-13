@@ -113,7 +113,7 @@ decaying_constant = 0.99;
 var len = qfunc.length;
 var indices = new Array(len);
 for (var i = 0; i < len; ++i) indices[i] = i;
-indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; }); 
+//indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; }); 
 // Qlearning Sort - Rank the channels with best qvalues in ascending order 
 //console.log(indices);
 
@@ -143,6 +143,7 @@ if(init){
 	countNumberOfIterations = 0
 	arr1 = makeArr(start_freq, end_freq, num_channels)
 	inteferenceIndex = createInteference(num_channels)
+	ind1 = 0;
 	ind2 = getRandomInt(4)
 	randomNum2 = arr1[inteferenceIndex[ind2]];
 	checkIfStopped = 1
@@ -178,7 +179,7 @@ else{
 		// epsilon = epsilon^decaying_constant;
  	}
 	else{
-		indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
+		indices.sort(function (a, b) { return (qfunc[a] > qfunc[b]) ? -1 : ((qfunc[a] < qfunc[b]) ? 1 : 0); });
 		slicedQfunc = indices.slice(0,4)
 		len_slicedQfunc = slicedQfunc.length
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
@@ -197,7 +198,7 @@ else{
 		checkIfStopped = 0
 		console.log("Exploring Stopped")
 		console.log(countNumberOfIterations)
-		alert("Exploring Stopped");
+		alert(Exploring Stopped);
 
 
 	}
