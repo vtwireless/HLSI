@@ -198,7 +198,7 @@ else{
 		checkIfStopped = 0
 		console.log("Exploring Stopped")
 		console.log(countNumberOfIterations)
-		alert(Exploring Stopped);
+		alert("Exploring Stopped");
 
 
 	}
