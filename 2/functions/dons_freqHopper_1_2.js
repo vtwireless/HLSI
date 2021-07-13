@@ -145,6 +145,8 @@ if(init){
 	inteferenceIndex = createInteference(num_channels)
 	ind2 = getRandomInt(4)
 	randomNum2 = arr1[inteferenceIndex[ind2]];
+	checkIfStopped = 1
+
 	//arr2 = makeArr(start_freq, end_freq, 2)
 
 	//randomNum2 = arr2[ind2]
@@ -191,9 +193,12 @@ else{
 		//sorted = qfunc.slice().sort(function(a,b){return b-a})
 		//ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 	}
-	if ((epsilon <= minimum_epsilon ) ){
+	if ((epsilon <= minimum_epsilon )  & (checkIfStopped == 1) ){
+		checkIfStopped = 0
 		console.log("Exploring Stopped")
 		console.log(countNumberOfIterations)
+		alert("Exploring Stopped");
+
 
 	}
 	console.log("Q function" + qfunc)
