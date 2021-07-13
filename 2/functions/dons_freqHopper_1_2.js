@@ -62,7 +62,8 @@ function createInteference(length) {
   var arr = [];
 
 	for (var i = 0; i < length; i++) {
-		if(i % 2 === 0) { // index is even
+		//if(i % 2 === 0) { // index is even
+	    if(i < (length/2)) { // interferer uses the first half of the set of available channels
 			arr.push(i);
 		}
 	}
