@@ -67,54 +67,54 @@ var conf = {
     sig0: {
         mcs_init: 2,
 
-        freq_min: 1786.0e6,
-        freq_max: 1814.0e6,
+        freq_min: 1780.0e6,
+        freq_max: 1820.0e6,
         freq_plot_min: 1780.0e6,
         freq_plot_max: 1820.0e6,
         freq_step: 0.01e6,
         freq_init: 1800.0e6,
 
-        bw_min: 4.0e6,
+        bw_min: 0.10e6,
         bw_max: 36.0e6,
         bw_step: 0.01e6,
-        bw_init: 8.0e6,
+        bw_init: 0.150e6,
 
         gn_min: -30.0,
         gn_max: 0.0,
         gn_step: 0.01,
         gn_scale: 1.0,
-        gn_init: 0.0,
+        gn_init: -14.0,
     },
 
     sigIC_05: {
         // Used in exercise 5 & 6
         mcs_init: 2,
 
-        freq_min: 1786.0e6,
-        freq_max: 1814.0e6,
+        freq_min: 1780.0e6,
+        freq_max: 1820.0e6,
         freq_plot_min: 1780.0e6,
         freq_plot_max: 1820.0e6,
         freq_step: 0.01e6,
         freq_init: 1800.0e6,
 
-        bw_min: 4.0e6,
+        bw_min: 0.10e6,
         bw_max: 36.0e6,
         bw_step: 0.01e6,
-        bw_init: 4.0e6,
+        bw_init: 0.150e6,
 
-        gn_min: -20.0,
+        gn_min: -30.0,
         gn_max: 0.0,
         gn_step: 0.01,
         gn_scale: 1.0,
-        gn_init: -10.0,
+        gn_init: -25.0,
     },
 
     sigEx_06: {
         // Used in exercise 6
         mcs_init: 2,
 
-        freq_min: 1786.0e6,
-        freq_max: 1814.0e6,
+        freq_min: 1785.0e6,
+        freq_max: 1815.0e6,
         freq_plot_min: 1780.0e6,
         freq_plot_max: 1820.0e6,
         freq_step: 0.01e6,
@@ -136,8 +136,8 @@ var conf = {
 
         mcs_init: 2, // unused
 
-        freq_min: 1780.0e6, // unused
-        freq_max: 1820.0e6, // unused
+        freq_min: 1785.0e6, // unused
+        freq_max: 1815.0e6, // unused
         freq_plot_min: 1780.0e6, // unused
         freq_plot_max: 1820.0e6, // unused
         freq_step: 0.01e6, // unused

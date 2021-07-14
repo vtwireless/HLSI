@@ -58,6 +58,17 @@ function indexOfMax(arr) {
     return maxIndex;
 }//
 
+function createInteference(length) {
+  var arr = [];
+
+	for (var i = 0; i < length; i++) {
+		//if(i % 2 === 0) { // index is even
+	    if(i < (length/2)) { // interferer uses the first half of the set of available channels
+			arr.push(i);
+		}
+	}
+	return arr;
+}
 //var sorted = qfunc.slice().sort(function(a,b){return b-a})
 //var ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 
@@ -79,8 +90,8 @@ var functions = {
 
 function() {
 
-const start_freq = freq_min2 + 5e6;
-const end_freq = freq_max2 - 5e6;
+const start_freq = freq_min2 + 2.5e6;
+const end_freq = freq_max2 - 2.5e6;
 num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
 
 decaying_constant  = userData.decaying_constant;  // 
@@ -89,11 +100,11 @@ epsilon  = userData.epsilon;
 // This helps decide if the user should use the current optimal channels or 
 // Explore for better channels
 minimum_epsilon  = userData.minimum_epsilon;
-minimum_epsilon = 0.01;
+minimum_epsilon = 0.25;
 // minimum_epsilon - Value from zero to one
 // After this threshold is exceeded, the user only selects the optimal channels.
 
-decaying_constant = 0.9;  
+decaying_constant = 0.99;  
 //decaying_constant - Value from zero to one
 // At every time interval, the epsilon is updated as follows
 // epsilon = epsilon^decaying_constant;
@@ -102,7 +113,7 @@ decaying_constant = 0.9;
 var len = qfunc.length;
 var indices = new Array(len);
 for (var i = 0; i < len; ++i) indices[i] = i;
-indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; }); 
+//indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; }); 
 // Qlearning Sort - Rank the channels with best qvalues in ascending order 
 //console.log(indices);
 
@@ -113,9 +124,7 @@ indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfun
 //randomNum2 = getRandomArbitrary(start_freq,end_freq,2);
 //randomNum1 = getRandomArbitrary(start_freq,end_freq,4);
 
-arr2 = makeArr(start_freq, end_freq, 2)
-ind2 = getRandomInt(2)
-randomNum2 = arr2[ind2]
+
 
 
 
@@ -129,27 +138,49 @@ if(init){
     //freq2 = randomNum2;
     //freq1 = randomNum1;
 	//console.log("if"+epsilon)
- 	epsilon  = 1;
-	num_channels =4;
+ 	epsilon  = decaying_constant;
+	num_channels =8;
+	countNumberOfIterations = 0
+	arr1 = makeArr(start_freq, end_freq, num_channels)
+	inteferenceIndex = createInteference(num_channels)
+	ind1 = 0;
+	ind2 = getRandomInt(4)
+	randomNum2 = arr1[inteferenceIndex[ind2]];
+	checkIfStopped = 1
 
+	//arr2 = makeArr(start_freq, end_freq, 2)
+
+	//randomNum2 = arr2[ind2]
 }
 else{
+	//console.log(start_freq)
     // Select a random freq2.
     //freq2 += -2.0e5 + 4e5*Math.random();
 	//console.log("else"+epsilon)
+	
+	//ind2 = getRandomInt(4)
+	//randomNum2 = arr2[ind2]
+	
+	ind2 = getRandomInt(4)
+	randomNum2 = arr1[inteferenceIndex[ind2]];	
+	
 	prob_epsilon = Math.random();
-	console.log(epsilon)
-	if ((epsilon > minimum_epsilon ) & (prob_epsilon < epsilon )){
+
+	//console.log(epsilon)
+	//if ((epsilon > minimum_epsilon ) & (prob_epsilon < epsilon )){
+	if ((epsilon > minimum_epsilon ) ){
+
 		arr1 = makeArr(start_freq, end_freq, num_channels)
 		ind1 = getRandomInt(num_channels)
 		randomNum1 = arr1[ind1]	
-		epsilon = decaying_constant*epsilon;
+
+
 		// At every time interval, the epsilon is updated as follows
 		// epsilon = epsilon^decaying_constant;
  	}
 	else{
-		indices.sort(function (a, b) { return qfunc[a] > qfunc[b] ? -1 : qfunc[a] > qfunc[b] ? 1 : 0; });
-		slicedQfunc = indices.slice(0,2)
+		indices.sort(function (a, b) { return (qfunc[a] > qfunc[b]) ? -1 : ((qfunc[a] < qfunc[b]) ? 1 : 0); });
+		slicedQfunc = indices.slice(0,4)
 		len_slicedQfunc = slicedQfunc.length
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
 		randomNum1 = arr1[ind1slicedQfunc]	
@@ -159,11 +190,22 @@ else{
 		//console.log("SlicedWrong" + randomNum1)
 
 		//console.log("Wrong" + slicedQfunc)
-		//console.log("Wrong" + qfunc)
 
 		//sorted = qfunc.slice().sort(function(a,b){return b-a})
 		//ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 	}
+	if ((epsilon <= minimum_epsilon )  & (checkIfStopped == 1) ){
+		checkIfStopped = 0
+		console.log("Exploring Stopped")
+		console.log(countNumberOfIterations)
+		alert("Exploring Stopped");
+
+
+	}
+	console.log("Q function" + qfunc)
+
+	epsilon = decaying_constant**countNumberOfIterations;
+	countNumberOfIterations = countNumberOfIterations +1
     freq2 = randomNum2;
     freq1 = randomNum1;
 }
