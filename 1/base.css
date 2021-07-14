@@ -82,10 +82,14 @@ strategy {
 	color: white
 }
 
+body {
+
+	background-color:rgb(72,72,72);
+}
+
 
 body {
-	background-color:rgb(72,72,72);
-	color: white;
+	color: white
 }
 
 th {
@@ -105,8 +109,8 @@ output {
 .container{
     /*display: flex;*/
     overflow: hidden
-}
 
+}
 .fixed{
 	float: left ;
 
@@ -121,18 +125,7 @@ output {
 }
 
 textarea {
-	background-color:#686868;
-	font-color:white
-	border-width: 5px;
+		background-color:#686868;
+		font-color:white
+		border-width: 5px;
 }
-
-a {
-    color: #46BCDB;
-}
-a:visited {
-    color: #46BCDB;
-}
-a:hover {
-    color: #99D4E4;
-}
-
