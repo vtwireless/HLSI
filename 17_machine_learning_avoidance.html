@@ -57,13 +57,14 @@ var sig = new Signal(conf.sig0, '', {
     bw_init: 0.150e6, // Hz
     gn_max: 1.0, // dB
     gn_init: -10.0, // dB
-    gn_min: -14, // dB
+    gn_min: -8, // dB
     mcs_init:11// array index int 0 to 11
 	
     //freq_init: 1785.0e6 // Hz
 
 
 });
+sig.freq = 1812.5e+6;
 
 var interferer = new Signal(conf.sig0, 'interferer', {
     bw_max: 38.0e6, // Hz
@@ -118,7 +119,7 @@ CapacityBanner(sig, '#capacityBanner');
 
 PowerSpectrumPlot();
 ThroughputPlot(sig);
-SpectralEfficiencyPlot(sig);
+//SpectralEfficiencyPlot(sig);
 
 
 </script>
