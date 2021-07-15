@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 9</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <style> 
+        output {font-weight: bold;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=common.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+    <script src=capacityRunner.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 9 - Information Capacity</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  
+  <p>
+    Press the "Start" button to start the changing of signal
+    parameters gain and bandwidth as time go on.
+    Move the "Mode Code" slider to keep data throughput.
+  </p>
+
+  <p id=capacityRunner>
+  </p>
+
+  <p>
+    <input type="range" id=mcs />
+  </p>
+
+  <p id=capacityBanner>
+  </p>
+
+</body>
+<script>
+'use strict';
+
+
+var sig = Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 25.0e6, // Hz
+    gn_init: -12.12, // dB
+    gn_min: -40, // dB
+    mcs_init: 4 // array index int 0 to 11
+});
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -40});
+
+
+const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
+const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
+
+
+function Gain(t) {
+    return -25 + 13*Math.log10(0.001 +
+            (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
+        Math.exp(-0.05*t);
+}
+
+function Bandwidth(t) {
+    return bw_avg + bw_amp * Math.exp(-0.015*t) *
+        Math.cos(2*Math.PI*0.03*t + 1.5);
+}
+
+
+CapacityRunner(sig, function(t/*seconds*/) {
+
+    sig.gn = Gain(t);
+    sig.bw = Bandwidth(t);
+
+}, '#capacityRunner');
+
+
+Slider(sig, 'mcs', '#mcs');
+
+CapacityBanner(sig, '#capacityBanner');
+
+PowerSpectrumPlot();
+SpectralEfficiencyPlot(sig);
+
+
+</script>
+</html>
