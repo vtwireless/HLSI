@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>HLSI Ex 9</title>
+    <title>HLSI Ex 16</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <link rel=stylesheet type=text/css href=codemirror.min.css />
+    <link rel=stylesheet type=text/css href=blackboard.min.css />
     <style> 
         output {font-weight: bold;}
     </style>
@@ -16,28 +18,33 @@
     <script src=spectralEfficiencyPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
-    <script src=capacityRunner.js></script>
+    <script src=codemirror.min.js></script>
+    <script src=codeMirror_javascript.js></script>
+    <script src=scriptController.js></script>
+    <script src=throughputPlot.js></script>
+    <script src=hoppingInterferer.js></script>
 </head>
 
 
 <body>
-  <h2>Exercise 9 - Information Capacity</h2>
+  <h2>Exercise 16 Q Learning Interferer Avoidance</h2>
   <p><a href="index.html">[exercises]</a></p>
   
+
+  <p id=scriptController></p>
+
+  <p id=hoppingInterferer></p>
+
+  <p id=capacityBanner></p>
+
   <p>
-    Press the "Start" button to start the changing of signal
-    parameters gain and bandwidth as time go on.
-    Move the "Mode Code" slider to keep data throughput.
+    <input type="range" id=freq />
   </p>
-
-  <p id=capacityRunner>
+  <p>
+    <input type="range" id=bw />
   </p>
-
   <p>
     <input type="range" id=mcs />
-  </p>
-
-  <p id=capacityBanner>
   </p>
 
 </body>
@@ -45,46 +52,72 @@
 'use strict';
 
 
-var sig = Signal(conf.sig0, '', {
+var sig = new Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz        
+    bw_init: 0.150e6, // Hz
+    gn_max: 1.0, // dB
+    gn_init: -10.0, // dB
+    gn_min: -14, // dB
+    mcs_init:11// array index int 0 to 11
+	
+    //freq_init: 1785.0e6 // Hz
+
+
+});
+
+var interferer = new Signal(conf.sig0, 'interferer', {
     bw_max: 38.0e6, // Hz
-    bw_init: 25.0e6, // Hz
-    gn_init: -12.12, // dB
+    bw_init: 0.150e6, // Hz
+    gn_max: 0.0, // dB
+    gn_init: -12, // dB
     gn_min: -40, // dB
-    mcs_init: 4 // array index int 0 to 11
+    freq_init: 1782.5e6 // Hz
+    //mcs_init: 11// array index int 0 to 11
+
 });
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 
 
-const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
-const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
+var num_channels = 8;
+var epsilon = 1;
+var decaying_constant = 0.9;
+
+var qfunc = new Array(num_channels).fill(0);
+var userData = {}
+userData['qfunc'] = qfunc;
+userData['num_channels'] = num_channels;
+userData['epsilon'] = epsilon;
+userData['decaying_constant'] = decaying_constant;
+
+// Change the initial freq value for sig1, so we see it is different from
+// sig2.
+//sig1.freq = 1810.0e+6;
 
 
-function Gain(t) {
-    return -25 + 13*Math.log10(0.001 +
-            (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
-        Math.exp(-0.05*t);
-}
 
-function Bandwidth(t) {
-    return bw_avg + bw_amp * Math.exp(-0.015*t) *
-        Math.cos(2*Math.PI*0.03*t + 1.5);
-}
+//new ScriptController([ sig, interferer ], { 
+//    element: '#scriptController',
+//    functionFiles: 'functions/default_1_2.js'
+//});
 
+new ScriptController([sig,interferer], {
+    functionFiles: "functions/dons_freqHopper_1_2.js",
+    postfix: [ '1','2' ]
+});
 
-CapacityRunner(sig, function(t/*seconds*/) {
-
-    sig.gn = Gain(t);
-    sig.bw = Bandwidth(t);
-
-}, '#capacityRunner');
+//HoppingInterferer(interferer, '#hoppingInterferer');
 
 
+Slider(sig, 'freq', '#freq');
+Slider(sig, 'bw', '#bw');
 Slider(sig, 'mcs', '#mcs');
+
 
 CapacityBanner(sig, '#capacityBanner');
 
 PowerSpectrumPlot();
+ThroughputPlot(sig);
 SpectralEfficiencyPlot(sig);
 
 
