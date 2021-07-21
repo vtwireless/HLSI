@@ -10,7 +10,7 @@ var functions = {
     //
     // They are called like so:
     //
-    // function callback(freq1, bw1, gn1, mcs1, bits1, dt, userData, init)
+    // function callback(freq1, bw1, gn1, mcs1, bits1, dt, userData, init, globalUserData)
     //
 
     "Changing freq1, bw1, gn1":
