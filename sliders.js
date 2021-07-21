@@ -87,7 +87,7 @@ function Slider(sig, parameter, n = null) {
     // We do not care what the node id was, we just need it to be
     // unique for this page.
     if (n.id.length < 1) n.id = par + "__SiLder_zx_" + Slider.nodeCount++;
-    console.log("      nod ID=" + n.id);
+    //console.log("      nod ID=" + n.id);
 
     label.setAttribute("for", n.id);
     label.appendChild(document.createTextNode(labelText));
@@ -137,7 +137,7 @@ function Slider(sig, parameter, n = null) {
     n.oninput();
     output.value = outputUnitsCallback(sig, sig[par]);
 
-    console.log("Made slider id=" + n.id + " :\n" + n.parentNode.innerHTML);
+    //console.log("Made slider id=" + n.id + " :\n" + n.parentNode.innerHTML);
   }
 
   switch (parameter) {

@@ -341,7 +341,7 @@ function Signal(sig, name = "", opts = null) {
     try {
         if(typeof(this) !== "undefined") {
             // This was called with new.
-            console.log("Made Signal with new");
+            //console.log("Made Signal with new");
             obj = this;
             called_with_new = true;
             Signal.objects.set(sig, obj);
@@ -356,14 +356,14 @@ function Signal(sig, name = "", opts = null) {
         if(Signal.objects.has(sig)) {
             // We already created a signal object with sig.
             obj = Signal.objects.get(sig);
-            console.log("returning old Signal with id " + obj.id);
+            //console.log("returning old Signal with id " + obj.id);
             return obj;
         }
         // Make the first and new Signal object from sig.
         obj = new Object(); // Should be same as: obj = {};
         // Add to the list of Signal objects
         Signal.objects.set(sig, obj);
-        console.log("returning a new Signal object");
+        //console.log("returning a new Signal object");
     }
 
     // Label prefix and postfix, or the name we give the signal.
@@ -609,7 +609,7 @@ function Signal(sig, name = "", opts = null) {
         if(new_sinr >= conf.schemes[obj._mcs].SNR)
             new_rate = obj._bw * conf.schemes[obj._mcs].rate;
 
-        // Tricky shit:
+        // Tricky:
         let have_change = (obj._sinr !== new_sinr);
         // We need to set obj._sinr in case the users "rate" onChange
         // callback gets that value.
@@ -617,7 +617,7 @@ function Signal(sig, name = "", opts = null) {
             obj._sinr = new_sinr;
 
         // if the new rate and old rate are the same we do not
-        // trigger events. 
+        // trigger rate events. 
         if(obj._rate !== new_rate) {
 
             obj._rate = new_rate;

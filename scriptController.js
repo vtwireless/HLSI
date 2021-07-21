@@ -1,9 +1,12 @@
-// This file just adds a wrapper that uses CodeMirror a client side
-// javaScript API, https://codemirror.net/
+// This file uses CodeMirror a client side javaScript API,
+// https://codemirror.net/
 //
 // CodeMirror is a versatile text editor implemented in JavaScript for the
 // browser, see https://codemirror.net/
 //
+
+// This globalUserData is passed to all user functions.
+var globalUserData = {};
 
 
 // We combine the javaScript editor with a script selector in one thingy
@@ -28,6 +31,9 @@
 //
 //            postfix:  a string to append to the variable names, or
 //                an array of strings to append to the variable names.
+//
+//            sync: scriptController
+//                synchronize running with another Script Controller.
 //
 //
 function ScriptController(sigs, opts = null) {
@@ -84,6 +90,7 @@ function ScriptController(sigs, opts = null) {
     var editor;
     var funcSelect = document.createElement('select');
     var dtSelect = document.createElement('select');
+    this._dtSelect = dtSelect;
     var runCheckbox = document.createElement('input');
     var dt = 0.2; // run period in seconds
     var userData = {};
@@ -92,6 +99,60 @@ function ScriptController(sigs, opts = null) {
     var argList = [];
     var editor;
     var sigByPostfix = {};
+
+    var obj = this;
+
+    const initDtSelectedIndex = 9;
+
+    // Generate a unique ID for this script controller.
+    var _id = this._id = ScriptController.count++;
+
+    // We keep a list of script controllers that we run synchronously
+    // with.
+    obj._syncGroup = false;
+
+    if(typeof(opts.sync) === 'object' || Array.isArray(opts.sync)) {
+
+        if(!Array.isArray(opts.sync))
+            opts.sync = [opts.sync];
+
+        // See if the group list exists already.
+        opts.sync.forEach(function(sc) {
+            if(obj._syncGroup === false && sc._syncGroup !== false)
+                obj._syncGroup = sc._syncGroup;
+        });
+
+        if(obj._syncGroup === false) {
+            // Create a sync group object that is a list of script
+            // controllers list keyed by ID.
+            obj._syncGroup = {
+                list /*script controller objects list*/ : {},
+                /* We only handle one event at a time, so we need only
+                 * one "active" event flag */
+                //active: false/*not running stuff for the group*/,
+                running: false,
+                dtSelectedIndex: initDtSelectedIndex
+            };
+            opts.sync.forEach(function(sc) {
+                if(typeof(obj._syncGroup.list[sc._id]) === 'undefined') {
+                    obj._syncGroup.list[sc._id] = sc;
+
+                    // All script controllers get a pointer to the group
+                    // list object.
+                    sc._syncGroup = obj._syncGroup;
+                }
+            });
+            obj._syncGroup.list[_id] = this;
+        } else {
+            // Add this new script controller to the existing group list.
+            obj._syncGroup.list[_id] = obj;
+        }
+
+        // TODO: We need to add cleanup of this sync group if we delete
+        // this object.
+        //
+        // TODO: stop all the objects in the group.
+    }
 
 
     // All the possible delta time (dt) values.  dt is the period of time
@@ -104,8 +165,27 @@ function ScriptController(sigs, opts = null) {
         opt.innerHTML = ddt.toString() + " seconds";
         dtSelect.appendChild(opt);
     });
+
     dtSelect.onchange = function() {
+
         dt = parseFloat(this.value);
+
+        if(obj._syncGroup) {
+
+                if(obj._syncGroup.dtSelectedIndex !== dtSelect.selectedIndex) {
+                    // This is the first dt select to see the change.
+                    obj._syncGroup.dtSelectedIndex = dtSelect.selectedIndex;
+
+                    Object.keys(obj._syncGroup.list).forEach(function(i) {
+                        var sc = obj._syncGroup.list[i];
+                        if(sc._id == _id) return;
+                        // We tell the other script controllers in the group to
+                        // use this selected index for the dt value.
+                        sc._dtSelect.selectedIndex = obj._syncGroup.dtSelectedIndex;
+                    });
+                }
+        }
+
         if(running) {
             // We must stop and start it in order to change the interval
             // period.
@@ -113,9 +193,13 @@ function ScriptController(sigs, opts = null) {
             Start();
         }
     };
-    dtSelect.selectedIndex = 9;
-    dtSelect.onchange();
 
+    if(obj._syncGroup)
+        dtSelect.selectedIndex = obj._syncGroup.dtSelectedIndex;
+    else
+        dtSelect.selectedIndex = initDtSelectedIndex;
+
+    dtSelect.onchange();
 
 
     // Make the arguments list: argList that is the arguments as an array
@@ -143,7 +227,7 @@ function ScriptController(sigs, opts = null) {
         sigByPostfix[fix] = sig;
     });
 
-    argList = argList.concat(['dt', 'userData', 'init']);
+    argList = argList.concat(['dt', 'userData', 'init', 'globalUserData']);
 
 
     runCheckbox.type = "checkbox";
@@ -181,11 +265,29 @@ function ScriptController(sigs, opts = null) {
     funcSelect.value = ""; // initialize to something.
 
 
+
+    function callUserFunctions() {
+
+        if(!running) return;
+
+        if(obj._syncGroup) {
+            // There is a group of script controllers.
+            if(obj._syncGroup.running)
+                Object.keys(obj._syncGroup.list).forEach(function(i) {
+                    var sc = obj._syncGroup.list[i];
+                    sc._callUserFunction();
+                });
+        } else
+            // There is no group of script controllers.
+            callUserFunction();
+    }
+
+
     function Start() {
 
         if(running) return;
 
-        console.log("Starting");
+        //console.log("Starting " + _id);
 
         var constants = "";
 
@@ -205,30 +307,68 @@ function ScriptController(sigs, opts = null) {
             constants += "const bw_max" + fix + " = " + sig.bw_max + ";\n";
             constants += "const gn_min" + fix + " = " + sig.gn_min + ";\n";
             constants += "const gn_max" + fix + " = " + sig.gn_max + ";\n";
+            constants += "const mcs_max" + fix + " = " + sig.mcs_max + ";\n";
+            constants += "const mcs_min" + fix + " = " + sig.mcs_min + ";\n";
+
             ++i;
         });
 
-        console.log("constants=\n" + constants);
-
+        //console.log("constants=\n" + constants);
 
         let args = argList.concat([constants + editor.getValue()]);
 
         userFunction = new Function(...args);
         userData = {};
         init = true;
-        intervalId = setInterval(callUserFunction, Math.round(1000.0*dt)/*milliseconds*/);
+        if(!obj._syncGroup)
+            intervalId = setInterval(callUserFunction, Math.round(1000.0*dt)/*milliseconds*/);
+        else if(!obj._syncGroup.running) {
+            obj._syncGroup.running = true;
+            // We all the start functions in this sync group.
+            Object.keys(obj._syncGroup.list).forEach(function(i) {
+                var sc = obj._syncGroup.list[i];
+                if(sc._id === _id) return;
+                // Initialize the other user functions by calling the
+                // other Start functions.
+                sc._Start();
+            });
+            obj._syncGroup.intervalId = setInterval(
+                callUserFunctions, Math.round(1000.0*dt)/*milliseconds*/);
+        }
         runCheckbox.checked = true;
         running = true;
+
     }
+
+    // The script controllers can access each others Start().
+    this._Start = Start;
 
 
     function Stop() {
 
-        console.log("Stopping");
-        clearInterval(intervalId);
+        console.log("Stopping " + _id);
         runCheckbox.checked = false;
         running = false;
+
+        if(obj._syncGroup) {
+
+            if(obj._syncGroup.running) {
+                clearInterval(obj._syncGroup.intervalId);
+                obj._syncGroup.running = false;
+
+                Object.keys(obj._syncGroup.list).forEach(function(i) {
+                    var sc = obj._syncGroup.list[i];
+                    if(i === _id) return;
+                    sc._Stop();
+                });
+            }
+        } else
+            clearInterval(intervalId);
     }
+
+    // The script controllers can access each others Stop().
+    this._Stop = Stop;
+
 
 
     runCheckbox.onclick = function() {
@@ -252,17 +392,20 @@ function ScriptController(sigs, opts = null) {
     };
 
 
+
     function callUserFunction() {
 
         if(!running)
             // The timer popped after we set the flag.
             return;
 
+        //console.log("calling sc id=" + _id);
+
         var args = [];
         sigs.forEach(function(sig) {
             args = args.concat([sig.freq, sig.bw, sig.gn, sig.mcs, sig.rate]);
         });
-        args = args.concat([dt, userData, init]);
+        args = args.concat([dt, userData, init, globalUserData]);
 
         try {
 
@@ -298,6 +441,9 @@ function ScriptController(sigs, opts = null) {
                 });
             });
     }
+
+
+    this._callUserFunction = callUserFunction;
 
     function makeWidget() {
 
@@ -340,7 +486,7 @@ function ScriptController(sigs, opts = null) {
         //
         let script = document.createElement('script');
         delete functions;
-        console.log("loading=" + src);
+        //console.log("loading=" + src);
         script.onload = function() {
 
             // Rip out 'functions' from the script file that just loaded.
@@ -357,7 +503,7 @@ function ScriptController(sigs, opts = null) {
                     console.log(err);
                     return;
                 }
-                console.log("Adding function named: " + fname);
+                //console.log("Adding function named: " + fname);
 
                 let opt = document.createElement('option');
 
@@ -381,5 +527,7 @@ function ScriptController(sigs, opts = null) {
         document.body.appendChild(script);
     });
 
-
 }
+
+// Used to create unique object IDs.
+ScriptController.count = 0;
