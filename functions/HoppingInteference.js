@@ -126,12 +126,12 @@ var functions = {
 
 function() {
 
-bw_margin = userData.bw_margin; 
-bw_margin = 2.5e6
+bw_margin = globalUserData.bw_margin; 
+//bw_margin = 2.5e6
 start_freq = freq_min2 + bw_margin;
 end_freq = freq_max2 - bw_margin;
-num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
-num_channels = 8
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+//num_channels = 8
 console.log(num_channels)
 
 
@@ -143,6 +143,7 @@ if(init){
 
 	inteferenceIndex = createLowerInteference(num_channels)
 	ind2 = getRandomInt(4)
+	globalUserData["ind2"] = ind2;
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 
 
@@ -154,7 +155,9 @@ else{
 	ind2 = getRandomInt(4)
 	available_freq = available_freq
 
-	randomNum2 = available_freq[inteferenceIndex[ind2]];	
+	randomNum2 = available_freq[inteferenceIndex[ind2]];
+	globalUserData["ind2"] = ind2;
+
     freq2 = randomNum2;
 }
 
@@ -173,12 +176,12 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = userData.bw_margin; 
-bw_margin = 2.5e6
+bw_margin = globalUserData.bw_margin; 
+//bw_margin = 2.5e6
 start_freq = freq_min2 + bw_margin;
 end_freq = freq_max2 - bw_margin;
-num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
-num_channels = 8
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+//num_channels = 8
 console.log(num_channels)
 
 
@@ -220,14 +223,13 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = userData.bw_margin; 
-bw_margin = 2.5e6
+bw_margin = globalUserData.bw_margin; 
+//bw_margin = 2.5e6
 start_freq = freq_min2 + bw_margin;
 end_freq = freq_max2 - bw_margin;
-num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
-num_channels = 8
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+//num_channels = 8
 console.log(num_channels)
-
 
 var len = qfunc.length;
 var indices = new Array(len);
@@ -238,7 +240,7 @@ if(init){
 	inteferenceIndex = createEvenInteference(num_channels)
 	ind2 = getRandomInt(4)
 	available_freq = makeArr(start_freq, end_freq, num_channels)
-
+	globalUserData["ind2"] = ind2;
 
 }
 else{
@@ -249,6 +251,8 @@ else{
 	available_freq = available_freq
 
 	randomNum2 = available_freq[inteferenceIndex[ind2]];	
+	globalUserData["ind2"] = inteferenceIndex[ind2];
+
     freq2 = randomNum2;
 }
 
@@ -266,12 +270,12 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = userData.bw_margin; 
-bw_margin = 2.5e6
+bw_margin = globalUserData.bw_margin; 
+//bw_margin = 2.5e6
 start_freq = freq_min2 + bw_margin;
 end_freq = freq_max2 - bw_margin;
-num_channels  = userData.num_channels; // Defines the number of channels; Please keep constant
-num_channels = 8
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+//num_channels = 8
 console.log(num_channels)
 
 
