@@ -194,6 +194,7 @@ if(init){
 	inteferenceIndex = createUpperInteference(num_channels)
 	ind2 = getRandomInt(4)
 	available_freq = makeArr(start_freq, end_freq, num_channels)
+	globalUserData["ind2"] = inteferenceIndex[ind2];
 
 
 }
@@ -205,6 +206,8 @@ else{
 	available_freq = available_freq
 
 	randomNum2 = available_freq[inteferenceIndex[ind2]];	
+	globalUserData["ind2"] = inteferenceIndex[ind2];
+
     freq2 = randomNum2;
 }
 
@@ -240,7 +243,7 @@ if(init){
 	inteferenceIndex = createEvenInteference(num_channels)
 	ind2 = getRandomInt(4)
 	available_freq = makeArr(start_freq, end_freq, num_channels)
-	globalUserData["ind2"] = ind2;
+	globalUserData["ind2"] = inteferenceIndex[ind2];
 
 }
 else{
@@ -288,6 +291,7 @@ if(init){
 	inteferenceIndex = createOddInteference(num_channels)
 	ind2 = getRandomInt(4)
 	available_freq = makeArr(start_freq, end_freq, num_channels)
+	globalUserData["ind2"] = inteferenceIndex[ind2];
 
 
 }
@@ -298,7 +302,9 @@ else{
 	ind2 = getRandomInt(4)
 	available_freq = available_freq
 
-	randomNum2 = available_freq[inteferenceIndex[ind2]];	
+	randomNum2 = available_freq[inteferenceIndex[ind2]];
+	globalUserData["ind2"] = inteferenceIndex[ind2];
+
     freq2 = randomNum2;
 }
 

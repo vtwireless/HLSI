@@ -172,7 +172,7 @@ else{
 
 	ind2 = globalUserData["ind2"]
 	randomNum2 = available_freq[ind2];
-
+	
 	prob_epsilon = Math.random();
 
 	
