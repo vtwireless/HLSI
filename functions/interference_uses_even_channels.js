@@ -63,7 +63,7 @@ function createInteference(length) {
 
 	for (var i = 0; i < length; i++) {
 		//if(i % 2 === 0) { // index is even
-	    if(i < (length/2)) { // interferer uses the first half of the set of available channels
+	    if(i > (length/2)) { // interferer uses the first half of the set of available channels
 			arr.push(i);
 		}
 	}
@@ -86,7 +86,7 @@ var functions = {
     // Or something like that.
     //
     //
-    "Randomly hopping freq2":
+    "Interference Uses Lower Channels":
 
 function() {
 

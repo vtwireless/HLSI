@@ -73,7 +73,7 @@ var functions = {
     // Or something like that.
     //
     //
-    "Randomly hopping freq2":
+    "Randomly hopping freq23":
 
 function() {
 
