@@ -6,26 +6,19 @@
 //
 //   is the signal that we are getting the Spectral Efficiency Plot for
 //
-// interferers:
-//
-//   is one or an array of signals that are interfering.  This may
-//   include a noise which has infinite bandwidth.  If interfaerers
-//   is null than the signal gain (gn) is relative to the noise floor.
 //
 //
-function SpectralEfficiencyPlot(sig, interferers=[]) {
+//
+function SpectralEfficiencyPlot(sig) {
 
+    var interferers = [];
 
-    if(typeof(interferers) !== "Array")
-        interferers = [ interferers ];
-
-    if(interferers.length < 1)
-        // push all the environments signals into the interferers array
-        // of signals.
-        Object.keys(Signal.env).forEach(function(id) {
-            if(sig.id != id)
-                interferers.push(Signal.env[id]);
-        });
+    // push all the environments signals into the interferers array
+    // of signals.
+    Object.keys(Signal.env).forEach(function(id) {
+        if(sig.id != id)
+            interferers.push(Signal.env[id]);
+    });
 
     // channel capacity (b/s/Hz) given SNR in dB
     function efficiency(snr) {
@@ -69,6 +62,8 @@ function SpectralEfficiencyPlot(sig, interferers=[]) {
 
     // capacity curve
     // (-10, 4 Mb/s, 0.1375 b/s/Hz), (40 dB, 382 Mb/s, 13.288 b/s/Hz)
+    //
+    //
     var datac = d3.range(-10,40+0.01).map(function(d,i) {
         return {"x":d, "y":efficiency(d)} });
 

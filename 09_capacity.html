@@ -49,9 +49,11 @@ var sig = Signal(conf.sig0, '', {
     bw_max: 38.0e6, // Hz
     bw_init: 25.0e6, // Hz
     gn_init: -12.12, // dB
-    gn_min: -40, // dB
+    gn_min: -35, // dB
+    gn_max: 0, // dB
     mcs_init: 4 // array index int 0 to 11
 });
+
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 
@@ -59,14 +61,26 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
 const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
 
+const gn_min = sig.gn_min; // dB
+const gn_max = sig.gn_max; // dB
+
+// t is time in seconds.
 
 function Gain(t) {
-    return -25 + 13*Math.log10(0.001 +
+
+    let phi = Math.PI * t / 6/*period in seconds*/;
+    let gn = Math.sin(phi);
+    gn *= (gn_max - gn_min)*gn; // gn = 70*gn*gn
+    gn += gn_min;   // minimum value
+    return gn;
+
+    /*return -25 + 13*Math.log10(0.001 +
             (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
-        Math.exp(-0.05*t);
+        Math.exp(-0.05*t);*/
 }
 
 function Bandwidth(t) {
+
     return bw_avg + bw_amp * Math.exp(-0.015*t) *
         Math.cos(2*Math.PI*0.03*t + 1.5);
 }
@@ -75,7 +89,7 @@ function Bandwidth(t) {
 CapacityRunner(sig, function(t/*seconds*/) {
 
     sig.gn = Gain(t);
-    sig.bw = Bandwidth(t);
+    // sig.bw = Bandwidth(t);
 
 }, '#capacityRunner');
 
@@ -84,7 +98,7 @@ Slider(sig, 'mcs', '#mcs');
 
 CapacityBanner(sig, '#capacityBanner');
 
-PowerSpectrumPlot();
+PowerSpectrumPlot({ yMin: -45.0, yMax: 10.0});
 SpectralEfficiencyPlot(sig);
 
 
