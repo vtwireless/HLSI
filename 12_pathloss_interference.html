@@ -20,6 +20,13 @@
     <label for="information_capacity">Information Capacity:  C = </label>
     <output for="information_capacity" id="cap"></output>
   </p>
+  <p>
+    <label style="color: #62B9E4" for="frequency">Frequency</label>
+    <input class="width-4" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001"
+        oninput="update_display(parseFloat(value))">
+    <output for="frequency" id="fc"></output>
+  </p>
+
 </body>
 
 <!-- Load in the javascript libraries -->
@@ -139,7 +146,21 @@ function compute_pathloss(marker_a, marker_b)
     return [d, 20*Math.log10(4*Math.PI*d/lambda)];
 }
 
-function update_display() {
+
+
+function update_display(freq) {
+
+    if(freq!=null) { fc = freq; }
+
+    function update_freq() {
+
+        document.querySelector('#fc').value = d3.format(".2f")((f0+fc*fs)*scale_freq) + " " + units_freq + "Hz";
+        document.querySelector('#frequency').value = fc;
+    }
+
+
+    update_freq();
+
     // compute loss between appropriate nodes and update generator
     let [d0, L0] = compute_pathloss(markers[0], markers[1]);
     let [d1, L1] = compute_pathloss(markers[2], markers[1]);
