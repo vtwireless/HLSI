@@ -112,12 +112,12 @@ var funcs = {
     "No Adaption":
     function() { },
 
-    "Random Frequency Adaption":
+    "Random Frequency":
     function(t) {
 	sig.freq = sig.freq_min + Math.random()*(sig.freq_max - sig.freq_min);
     },
 
-    "Frequency Based Adaption":
+    "Frequency Adaption":
     function(t) {
 
         let i = interferer;
