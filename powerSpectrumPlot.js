@@ -17,7 +17,18 @@
 // the environment Signal.env
 //
 //
-function PowerSpectrumPlot() {
+// opts:  options object
+//
+//    yMax:  maximum y plot values in dB
+//    yMin:  manimum y plot values in dB
+///
+//
+function PowerSpectrumPlot(opts = {}) {
+
+    if(typeof(opts.yMax) === 'undefined')
+        opts.yMax = 20;
+    if(typeof(opts.yMin) === 'undefined')
+        opts.yMin = -60;
 
     var sigs = [];
     var noises = []; // We can only have one noise.
@@ -73,7 +84,7 @@ function PowerSpectrumPlot() {
         .range([0, plot.width]);
 
     // 6. Y scale will use the randomly generate number
-    var pScale = d3.scaleLinear().domain([-60, 20]).range([plot.height, 0]);
+    var pScale = d3.scaleLinear().domain([opts.yMin, opts.yMax]).range([plot.height, 0]);
 
     const df = (freq_plot_max - freq_plot_min) / (nfft - 1);
 
