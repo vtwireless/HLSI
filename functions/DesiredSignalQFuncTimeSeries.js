@@ -173,11 +173,39 @@ else if ((timeForML % timeScaleForML ) === 3){
 	console.log("Channel 2 " + globalUserData["ind2"])
 }
 else if ((timeForML % timeScaleForML ) === 0){	
-	currentTimeForML=  3;
+	if (timeScaleForML === 8){
+		currentTimeForML=  7;
+	}
+	else {
+		currentTimeForML=  3;
+	}
+	
 	console.log("Desired Multiple of 4")
 	console.log("Channel 2 " + globalUserData["ind2"])
 
 }
+else if ((timeForML % timeScaleForML  ) === 4){	
+	currentTimeForML=  3;
+	console.log("Desired Multiple of 1")
+	console.log("Channel 2 " + globalUserData["ind2"])
+
+}
+else if ((timeForML % timeScaleForML ) === 5){	
+	currentTimeForML=  4;
+	console.log("Desired Multiple of 2")
+	console.log("Channel 2 " + globalUserData["ind2"])
+}
+else if ((timeForML % timeScaleForML ) === 6){	
+	currentTimeForML=  5;
+	console.log("Desired Multiple of 3")
+	console.log("Channel 2 " + globalUserData["ind2"])
+}
+else if ((timeForML % timeScaleForML ) === 7){	
+	currentTimeForML=  6;
+	console.log("Desired Multiple of 3")
+	console.log("Channel 2 " + globalUserData["ind2"])
+}
+
 else	
 {
 	alert("Error")

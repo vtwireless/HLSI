@@ -122,7 +122,7 @@ var functions = {
     // Or something like that.
     //
     //
-    "Time-Based Interference Controller":
+    "Time-Based Interference - Even, Odd, Upper ,Lower ":
 
 function() {
 
@@ -134,7 +134,8 @@ num_channels  = globalUserData.num_channels; // Defines the number of channels; 
 //num_channels = 8
 globalUserData['timeForML'] = globalUserData['timeForML'] + 1
 timeForML = globalUserData['timeForML']
-timeScaleForML = globalUserData['timeScaleForML'];
+timeScaleForML = 4
+globalUserData['timeScaleForML'] = timeScaleForML;
 
 var len = qfunc[0].length;
 var indices = new Array(len);
@@ -142,6 +143,8 @@ for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
 
+	qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+	globalUserData['qfunc'] = qfunc;
 	
 	if ((timeForML % timeScaleForML  ) === 1){	
 		inteferenceIndex = createLowerInteference(num_channels)
@@ -167,6 +170,8 @@ if(init){
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = inteferenceIndex[ind2];
 	//globalUserData["ind2"] = ind2;
+	
+	
 
 
 }
@@ -213,6 +218,110 @@ return { freq2: freq2, freq1: freq1 };
 },
 
 
+    "Time-Based Interference - Sweeping Channels ":
+
+function() {
+
+bw_margin = globalUserData.bw_margin; 
+//bw_margin = 2.5e6
+start_freq = freq_min2 + bw_margin;
+end_freq = freq_max2 - bw_margin;
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+//num_channels = 8
+globalUserData['timeForML'] = globalUserData['timeForML'] + 1
+timeForML = globalUserData['timeForML']
+timeScaleForML = 8
+globalUserData['timeScaleForML'] = timeScaleForML;
+
+var len = qfunc[0].length;
+var indices = new Array(len);
+for (var i = 0; i < len; ++i) indices[i] = i;
+
+if(init){
+
+	qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+	globalUserData['qfunc'] = qfunc;
+	
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = 0
+	}
+	else if ((timeForML % timeScaleForML ) === 2){	
+		ind2 = 1
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = 2
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = 3
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = 4
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = 5
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = 6
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = 7
+	}
+
+	//ind2 = getRandomInt(4)
+	available_freq = makeArr(start_freq, end_freq, num_channels)
+	//globalUserData["ind2"] = inteferenceIndex[ind2];
+	globalUserData["ind2"] = ind2
+	//globalUserData["ind2"] = ind2;
+
+}
+else{
+
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = 0
+	}
+	else if ((timeForML % timeScaleForML ) === 2){	
+		ind2 = 1
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = 2
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = 3
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = 4
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = 5
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = 6
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = 7
+	}
+	
+	available_freq = makeArr(start_freq, end_freq, num_channels)
+	
+	//ind2 = getRandomInt(4)
+	available_freq = available_freq
+
+	//randomNum2 = available_freq[inteferenceIndex[ind2]];
+	randomNum2 = available_freq[[ind2]];
+
+	globalUserData["ind2"] = [ind2];
+
+    freq2 = randomNum2;
+}
+
+if(freq2 > freq_max2)
+    freq2 = freq_max2;
+else if(freq2 < freq_min2)
+    freq2 = freq_min2;
+
+
+return { freq2: freq2, freq1: freq1 };
+},
 
 
 
