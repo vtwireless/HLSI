@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <title>HLSI Ex 16</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <link rel=stylesheet type=text/css href=codemirror.min.css />
+    <link rel=stylesheet type=text/css href=blackboard.min.css />
+    <style> 
+        output {font-weight: bold;}
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=common.js></script>
+    <script src=signal.js></script>
+    <script src=sliders.js></script>
+    <script src=powerSpectrumPlot.js></script>
+    <script src=spectralEfficiencyPlot.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+    <script src=codemirror.min.js></script>
+    <script src=codeMirror_javascript.js></script>
+    <script src=scriptController.js></script>
+    <script src=throughputPlot.js></script>
+    <script src=hoppingInterferer.js></script>
+</head>
+
+
+<body>
+  <h2>Exercise 17 Q-Learning Interferer Avoidance</h2>
+  <p><a href="index.html">[exercises]</a></p>
+  
+
+  <p id=scriptController></p>
+
+  <p id=hoppingInterferer></p>
+
+  <p id=capacityBanner></p>
+
+  <p>
+    <input type="range" id=freq />
+  </p>
+  <p>
+    <input type="range" id=bw />
+  </p>
+  <p>
+    <input type="range" id=mcs />
+  </p>
+
+</body>
+<script>
+'use strict';
+
+
+var sig = new Signal(conf.sig0, '', {
+    bw_max: 38.0e6, // Hz        
+    bw_init: 0.150e6, // Hz
+    gn_max: 1.0, // dB
+    gn_init: -10.0, // dB
+    gn_min: -8, // dB
+    mcs_init:11// array index int 0 to 11
+	
+    //freq_init: 1785.0e6 // Hz
+
+
+});
+sig.freq = 1812.5e+6;
+
+var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 0.150e6, // Hz
+    gn_max: 0.0, // dB
+    gn_init: -30, // dB
+    gn_min: -40, // dB
+    freq_init: 1782.5e6 // Hz
+    //mcs_init: 11// array index int 0 to 11
+
+});
+
+var noise = Signal(conf.noise, "Noise", { gn_init: -40});
+
+
+var num_channels = 8;
+var epsilon = 1;
+var minimum_epsilon = 0.25;
+var decaying_constant = 0.997;  
+
+var qfunc = new Array(num_channels).fill(0);
+var userData = {}
+userData["bw_margin"] = 2.5e6;
+userData['qfunc'] = qfunc;
+userData['num_channels'] = num_channels;
+userData['epsilon'] = epsilon;
+userData['decaying_constant'] = decaying_constant;
+
+
+var globalUserData = {}
+globalUserData["bw_margin"] = 2.5e6;
+//globalUserData['qfunc'] = qfunc;
+globalUserData['num_channels'] = num_channels;
+globalUserData['epsilon'] = epsilon;
+globalUserData['decaying_constant'] = decaying_constant;
+globalUserData['minimum_epsilon'] = minimum_epsilon;
+globalUserData['timeForML'] = 0;
+globalUserData['timeScaleForML'] = 4;
+
+var qfunc = new Array(globalUserData['timeScaleForML']);
+for (var i = 0; i < qfunc.length; i++) {
+  qfunc[i] = new Array(num_channels);
+}
+qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+
+
+globalUserData['qfunc'] = qfunc;
+
+
+// Change the initial freq value for sig1, so we see it is different from
+// sig2.
+//sig1.freq = 1810.0e+6;
+
+
+
+//new ScriptController([ sig, interferer ], { 
+//    element: '#scriptController',
+//    functionFiles: 'functions/default_1_2.js'
+//});
+
+sync: sc
+
+
+
+var sc = new ScriptController([sig,interferer,globalUserData], {
+    //functionFiles: "functions/HoppingInteference.js",
+    functionFiles: "functions/HoppingInteferenceTimeSeriesbk.js",
+    postfix: [ '1','2' ]
+});
+
+new ScriptController([sig,interferer,globalUserData], {
+    //functionFiles: "functions/HoppingInteference.js",
+    functionFiles: "functions/DesiredSignalQFuncTimeSeries.js",
+    postfix: [ '1','2' ],
+	sync:sc
+});
+
+
+//new ScriptController([sig,interferer], {
+//    functionFiles: "functions/DesiredSignalQFunc.js",
+//    postfix: [ '1','2' ]
+//});
+
+/*
+new ScriptController([sig,interferer], {
+    functionFiles: "functions/interference_uses_upper_channels.js",
+    postfix: [ '1','2' ]
+});
+
+new ScriptController([sig,interferer], {
+    functionFiles: "functions/interference_uses_even_channels.js",
+    postfix: [ '1','2' ]
+});
+
+new ScriptController([sig,interferer], {
+    functionFiles: "functions/interference_uses_odd_channels.js",
+    postfix: [ '1','2' ]
+});
+*/
+//HoppingInterferer(interferer, '#hoppingInterferer');
+
+console.log()
+Slider(sig, 'freq', '#freq');
+Slider(sig, 'bw', '#bw');
+Slider(sig, 'mcs', '#mcs');
+
+
+CapacityBanner(sig, '#capacityBanner');
+
+PowerSpectrumPlot();
+ThroughputPlot(sig);
+//SpectralEfficiencyPlot(sig);
+
+
+</script>
+</html>
