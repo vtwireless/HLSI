@@ -68,9 +68,9 @@ const gn_max = sig.gn_max; // dB
 
 function Gain(t) {
 
-    let phi = Math.PI * t / 6/*period in seconds*/;
+    let phi = Math.PI * t / 20/*period in seconds*/;
     let gn = Math.sin(phi);
-    gn *= (gn_max - gn_min)*gn; // gn = 70*gn*gn
+    gn *= (gn_max - gn_min)*gn*gn*gn; // gn = Amp*gn*gn*gn*gn
     gn += gn_min;   // minimum value
     return gn;
 

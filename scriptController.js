@@ -81,6 +81,9 @@ function ScriptController(sigs, opts = null) {
         p = document.createElement('p');
         document.body.appendChild(p);
     }
+    //p.className = 'scriptController';
+
+    // <p><div>editor</div><div>table</div></p>
 
 
     // We use all these wonderful variables as this runs.
@@ -201,19 +204,16 @@ function ScriptController(sigs, opts = null) {
 
     dtSelect.onchange();
 
+    const standArgs = [ 'freq', 'bw', 'gn', 'mcs', 'rate' ];
 
     // Make the arguments list: argList that is the arguments as an array
     // of strings.
     let i = 0;
     sigs.forEach(function(sig) {
         let fix = postfix[i];
-        argList = argList.concat([
-            'freq' + fix,
-            'bw' + fix,
-            'gn' + fix,
-            'mcs' + fix,
-            'rate' + fix
-        ]);
+        standArgs.forEach(function(a) {
+            argList = argList.concat([a + fix]);
+        });
         ++i;
 
         if(sigByPostfix[fix] !== undefined) {
@@ -233,36 +233,138 @@ function ScriptController(sigs, opts = null) {
     runCheckbox.type = "checkbox";
     runCheckbox.checked = false;
 
+    var editorDiv = document.createElement('div');
+    editorDiv.className = 'editor';
+    p.appendChild(editorDiv);
+
 
     var funcDeclareSpan = document.createElement('span');
     // TODO: add the function declaration.
+    let argsStr;
+    argsStr = argList.toString().replace(/\,/g , ', ');
     funcDeclareSpan.appendChild(document.createTextNode(
-        "function callback(" + argList + "){"));
-    p.appendChild(funcDeclareSpan);
+        "function callback(" + argsStr + "){"));
+    editorDiv.appendChild(funcDeclareSpan);
 
     var textArea = document.createElement('textarea');
-    p.appendChild(textArea);
+    editorDiv.appendChild(textArea);
+    textArea.className = 'scriptController';
 
     let e = document.createElement('span');
     e.appendChild(document.createTextNode("}"));
-    p.appendChild(e);
+    editorDiv.appendChild(e);
 
-    p.appendChild(document.createElement('br'));
-    p.appendChild(document.createTextNode(
+    editorDiv.appendChild(document.createElement('br'));
+    editorDiv.appendChild(document.createTextNode(
         "The above function will be called once every "));
-    p.appendChild(dtSelect);
-    p.appendChild(document.createTextNode(" when this is checked:"));
-    p.appendChild(runCheckbox);
-    p.appendChild(document.createElement('br'));
+    editorDiv.appendChild(dtSelect);
+    editorDiv.appendChild(document.createTextNode(" when this is checked:"));
+    editorDiv.appendChild(runCheckbox);
+    editorDiv.appendChild(document.createElement('br'));
 
     let sp = String.fromCharCode(160);
-    p.appendChild(document.createTextNode("Select function "));
+    editorDiv.appendChild(document.createTextNode("Select function "));
     //sp += String.fromCharCode(160);/*nbsp*/
-    p.appendChild(document.createTextNode(sp));
+    editorDiv.appendChild(document.createTextNode(sp));
 
     funcSelect.className = "notedited";
-    p.appendChild(funcSelect);
+    editorDiv.appendChild(funcSelect);
     funcSelect.value = ""; // initialize to something.
+
+
+    let argsTable = document.createElement('table');
+    argsTable.className = 'argsTable';
+    argsTable.setAttribute('border', '2');
+
+    let thead = document.createElement('thead');
+    argsTable.appendChild(thead);
+
+    let tr = document.createElement('tr');
+    tr.innerHTML = "<th scope=\"col\" colspan=\"2\" class=ph1>callback parameters</th>";
+    thead.appendChild(tr);
+    tr = document.createElement('tr');
+    tr.innerHTML = "<th scope=\"col\" class=ph2>parameter</th>" +
+        "</th><th scope=\"col\" class=ph3>decription</th>";
+    thead.appendChild(tr);
+
+
+
+    var tbody = document.createElement('tbody');
+    argsTable.appendChild(tbody);
+
+    i = 0;
+    var tbody;
+    sigs.forEach(function(sig) {
+        let fix = postfix[i];
+
+        let tr = document.createElement('tr');
+        tr.innerHTML = "<td>freq" + fix +
+            "</td class=p1><td class=p2>center frequency of signal in Hz" +
+            fix + "</td>";
+        tbody.appendChild(tr);
+
+        tr = document.createElement('tr');
+        tr.innerHTML = "<td class=p1>bw" + fix +
+            "</td><td class=p2>bandwidth of signal " + fix + " in Hz</td>";
+        tbody.appendChild(tr);
+
+        tr = document.createElement('tr');
+        tr.innerHTML = "<td class=p1>gn" + fix +
+            "</td><td class=p2>gain of signal " + fix + " in dB</td>";
+        tbody.appendChild(tr);
+
+        tr = document.createElement('tr');
+        tr.innerHTML = "<td class=p1>mcs" + fix +
+            "</td><td class=p2>modulation coding scheme of signal " + fix +
+            ", index 0 to 11</td>";
+        tbody.appendChild(tr);
+
+        tr = document.createElement('tr');
+        tr.innerHTML = "<td class=p1>rate" + fix +
+            "</td><td class=p2>rate of signal " + fix + ", read only</td>";
+        tbody.appendChild(tr);
+
+        ++i;
+    });
+
+
+    /*
+    argsTable.setAttribute('title', 'hide');
+
+    argsTable.onclick = function() {
+        if(tbody.style.display === "none") {
+            argsTable.setAttribute('title', 'show');
+            tbody.style.display = 'block';
+        } else {
+            tbody.style.display = 'none';
+            argsTable.setAttribute('title', 'hide');
+
+        }
+    };
+    */
+
+    tr = document.createElement('tr');
+    tr.innerHTML = "<td class=p1>dt</td><td class=p2>time elapsed since late call, in seconds</td>";
+    tbody.appendChild(tr);
+
+    tr = document.createElement('tr');
+    tr.innerHTML = "<td class=p1>userData</td><td class=p2>object preserved between calls</td>";
+    tbody.appendChild(tr);
+
+    tr = document.createElement('tr');
+    tr.innerHTML = "<td class=p1>init</td><td class=p2>true when callback is first called, false otherwise</td>";
+    tbody.appendChild(tr);
+
+    tr = document.createElement('tr');
+    tr.innerHTML = "<td class=p1>globalUserData</td><td class=p2>object preserved between calls and between all code</td>";
+    tbody.appendChild(tr);
+
+    p.appendChild(argsTable);
+
+
+    var clearLeft = document.createElement('div');
+    clearLeft.className = 'clearLeft';
+    p.appendChild(clearLeft);
 
 
 
@@ -391,7 +493,14 @@ function ScriptController(sigs, opts = null) {
             Stop();
     };
 
-
+/*    
+ // listen for the beforeChange event, test the changed line number, and cancel
+editor.on('beforeChange', function (cm, change) {
+    if (~[0, editor.getDoc().size - 1].indexOf(change.from.line)) {
+        change.cancel();
+    }
+});
+*/
 
     function callUserFunction() {
 

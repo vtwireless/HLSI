@@ -47,7 +47,6 @@ svg {
 }
 
 
-
 .CodeMirror {
     resize: both;
     overflow-x: scroll;
@@ -62,4 +61,33 @@ a:visited {
 a:hover {
     color: #99D4E4;
 }
+
+div.editor {
+    float: left;
+    width: auto;
+}
+
+
+table.argsTable {
+    border: 2px solid #FFF;
+    margin: 12px;
+    border-collapse: collapse;
+    float: left;
+}
+
+th.ph1,th.ph2,th.ph3 {
+    padding: 5px;
+}
+
+td.p1 {
+    padding: 4px;
+}
+td.p2 {
+    padding: 4px;
+}
+
+div.clearLeft {
+    clear: left;
+}
+
 
