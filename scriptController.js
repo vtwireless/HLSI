@@ -321,7 +321,7 @@ function ScriptController(sigs, opts = null) {
 
         tr = document.createElement('tr');
         tr.innerHTML = "<td class=p1>rate" + fix +
-            "</td><td class=p2>rate of signal " + fix + ", read only</td>";
+            "</td><td class=p2>rate of signal " + fix + ", read only, bits/second</td>";
         tbody.appendChild(tr);
 
         ++i;
