@@ -243,7 +243,7 @@ function ScriptController(sigs, opts = null) {
     let argsStr;
     argsStr = argList.toString().replace(/\,/g , ', ');
     funcDeclareSpan.appendChild(document.createTextNode(
-        "function callback(" + argsStr + "){"));
+        "Function Callback(" + argsStr + "){"));
     editorDiv.appendChild(funcDeclareSpan);
 
     var textArea = document.createElement('textarea');
@@ -280,11 +280,11 @@ function ScriptController(sigs, opts = null) {
     argsTable.appendChild(thead);
 
     let tr = document.createElement('tr');
-    tr.innerHTML = "<th scope=\"col\" colspan=\"2\" class=ph1>callback parameters</th>";
+    tr.innerHTML = "<th scope=\"col\" colspan=\"2\" class=ph1>Callback Parameters</th>";
     thead.appendChild(tr);
     tr = document.createElement('tr');
-    tr.innerHTML = "<th scope=\"col\" class=ph2>parameter</th>" +
-        "</th><th scope=\"col\" class=ph3>decription</th>";
+    tr.innerHTML = "<th scope=\"col\" class=ph2>Parameter</th>" +
+        "</th><th scope=\"col\" class=ph3>Description</th>";
     thead.appendChild(tr);
 
 
@@ -299,8 +299,7 @@ function ScriptController(sigs, opts = null) {
 
         let tr = document.createElement('tr');
         tr.innerHTML = "<td>freq" + fix +
-            "</td class=p1><td class=p2>center frequency of signal in Hz" +
-            fix + "</td>";
+            "</td class=p1><td class=p2>center frequency of signal " + fix + " in Hz</td>";
         tbody.appendChild(tr);
 
         tr = document.createElement('tr');
