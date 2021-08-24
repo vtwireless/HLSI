@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <title>HLSI Ex 16</title>
+    <title>HLSI Ex 18</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
     <link rel=stylesheet type=text/css href=codemirror.min.css />
@@ -27,7 +27,7 @@
 
 
 <body>
-  <h2>Exercise 17 Q-Learning Interferer Avoidance</h2>
+  <h2>Exercise 18 Q-Learning Interferer Avoidance</h2>
   <p><a href="index.html">[exercises]</a></p>
   
 
@@ -103,6 +103,7 @@ globalUserData['decaying_constant'] = decaying_constant;
 globalUserData['minimum_epsilon'] = minimum_epsilon;
 globalUserData['timeForML'] = 0;
 globalUserData['timeScaleForML'] = 4;
+globalUserData['sweepingVector'] = [0,1,2,3,4,5,6,7];
 
 var qfunc = new Array(globalUserData['timeScaleForML']);
 for (var i = 0; i < qfunc.length; i++) {
