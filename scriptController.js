@@ -320,7 +320,7 @@ function ScriptController(sigs, opts = null) {
 
         tr = document.createElement('tr');
         tr.innerHTML = "<td class=p1>rate" + fix +
-            "</td><td class=p2>rate of signal " + fix + ", read only, bits/second</td>";
+            "</td><td class=p2>rate of signal " + fix + ", read only, in bits/second</td>";
         tbody.appendChild(tr);
 
         ++i;
@@ -343,7 +343,7 @@ function ScriptController(sigs, opts = null) {
     */
 
     tr = document.createElement('tr');
-    tr.innerHTML = "<td class=p1>dt</td><td class=p2>time elapsed since late call, in seconds</td>";
+    tr.innerHTML = "<td class=p1>dt</td><td class=p2>time elapsed since last call, in seconds</td>";
     tbody.appendChild(tr);
 
     tr = document.createElement('tr');
