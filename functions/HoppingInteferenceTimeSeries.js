@@ -353,7 +353,7 @@ var len = qfunc[0].length;
 var indices = new Array(len);
 for (var i = 0; i < len; ++i) indices[i] = i;
 
-sweepingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6, 0.1/6]
+sweepingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6]
 
 
 if(init){

@@ -403,6 +403,8 @@ if(init){
 	ind1 = 0;
 	ind2 = globalUserData["ind2"]
 	randomNum2 = available_freq[ind2];
+	var saveIndArr = new Array(num_channels).fill(0);
+
 	checkIfStopped = 1
 	storeBw1 = bw1;
 
@@ -426,18 +428,26 @@ else{
  	}
 	else{
 		currentQfunc = deepCopyFunction(qfunc[currentTimeForML]);
-		console.log("Current TimeStep: " + " "+ currentTimeForML )
+		//console.log("Current TimeStep: " + " "+ currentTimeForML )
 
 		indices.sort(function (a, b) { return (currentQfunc[a] > currentQfunc[b]) ? -1 : ((currentQfunc[a] < currentQfunc[b]) ? 1 : 0); });
 		slicedQfunc = indices.slice(0,4)
-		console.log("Sliced_QFunc: " + " "+ slicedQfunc )
+		//console.log("Sliced_QFunc: " + " "+ slicedQfunc )
 
 		saveInd = slicedQfunc[0];
-		for (var indSliced = 1; i < 4; ++i){
-			if (Math.abs(slicedQfunc[indSliced] - saveInd) == 1 )
+		for (var indSliced = 1; indSliced < 4; ++indSliced){
+			//console.log("Next: " + indSliced )
+				//console.log("Previous: " + saveInd + " Next: " + indSliced )
+
+			if (Math.abs(slicedQfunc[indSliced] - saveInd) == 1 ){
+				console.log("Previous: " + saveInd + " Next: " + indSliced )
+				//console.log("Previous: " + saveInd )
+				//console.log("Next: " + 0 )
 				break;
+			}
 			else
-				saveInd = slicedQfunc[indSliced] 
+				saveInd = slicedQfunc[indSliced]
+				//saveIndArr[currentTimeForML] = saveInd;
 		}
 		len_slicedQfunc = slicedQfunc.length
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
