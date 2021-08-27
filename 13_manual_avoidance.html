@@ -24,6 +24,17 @@
 <body>
   <h2>Exercise 13 - Manual Interferer Avoidance</h2>
   <p><a href="index.html">[exercises]</a></p>
+
+
+  <p id=hoppingInterferer>
+  </p>
+
+  <p id=capacityBanner>
+  </p>
+
+  <p>
+    <input type="range" id=freq />
+  </p>
   <p>
     <input type="range" id=bw />
   </p>
@@ -32,12 +43,6 @@
   </p>
   <p>
     <input type="range" id=mcs />
-  </p>
-
-  <p id=hoppingInterferer>
-  </p>
-
-  <p id=capacityBanner>
   </p>
 
 
@@ -64,13 +69,14 @@ var interferer = new Signal(conf.sig0, 'interferer', {
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -40})
 
+Slider(sig, 'freq', '#freq');
 Slider(sig, 'bw', '#bw');
 Slider(sig, 'gn', '#gn');
 Slider(sig, 'mcs', '#mcs');
 
-CapacityBanner(sig, '#capacityBanner');
 
 HoppingInterferer(interferer, '#hoppingInterferer');
+CapacityBanner(sig, '#capacityBanner');
 
 PowerSpectrumPlot();
 ThroughputPlot(sig);
