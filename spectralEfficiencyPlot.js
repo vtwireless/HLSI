@@ -191,7 +191,7 @@ function SpectralEfficiencyPlot(sig) {
 
 	let SNRdB = sig.sinr;
 
-        // We constrain it to be v
+        // We constrain it to be in view.
         if(SNRdB > snrMaxEdge)
             SNRdB = snrMaxEdge;
         else if(SNRdB < snrMinEdge)
