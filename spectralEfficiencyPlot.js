@@ -131,7 +131,7 @@ function SpectralEfficiencyPlot(sig) {
         .attr("dy","-0.3em")
         .style("text-anchor","middle")
    	.attr("fill", "white")
-        .text(pre + "SNR (dB)")
+        .text(pre + sig.snrLabel + " (dB)")
 
     // create y-axis label
     svgc.append("text")

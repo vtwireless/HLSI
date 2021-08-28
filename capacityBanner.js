@@ -4,7 +4,7 @@ function CapacityBanner(sig, parentElement = null) {
     var id = (CapacityBanner.count++).toString() + '_cap';
 
     var innerHTML = '\
-    <label for=signal_to_noise_ratio'+ id +'>SNR: </label>\
+    <label for=signal_to_noise_ratio'+ id +'>'+ sig.snrLabel +': </label>\
         <output for=signal_to_noise_ratio'+ id +' id=snr'+ id +'></output>,\
     <label for=information_capacity'+ id +'>Capacity: </label>\
         <output for=information_capacity'+ id +' id=cap'+ id +'></output>,\
@@ -67,7 +67,7 @@ function CapacityBanner(sig, parentElement = null) {
         element: '#margin'+ id
     });
 
-    // This Label trigger a change from 2 signal parameters.
+    // This Label triggers a change from 2 signal parameters.
     var rate = getElement('#rate');
     Label(sig, [ 'sinr', 'mcs'], {
         func: function() {
