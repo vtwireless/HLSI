@@ -146,7 +146,7 @@ minimum_epsilon  = globalUserData.minimum_epsilon;
 
 minimum_epsilon = 0.25; // This is the cut-off point. After this point, the Algo selects the best channels
 decaying_constant = 0.99;  // How fast should the exploration decay.
-learning_rate = 0.9;
+learning_rate = 0.9; // How fast should we learn
 // At every time step  - epsilon = decaying_constant**countNumberOfIterations
 // When epsilon < minimum_epsilon; exploration stops
 
@@ -188,7 +188,7 @@ else{
 		checkIfStopped = 0 // Stop Exploration
 		//console.log("Exploring Stopped")
 		//console.log(countNumberOfIterations)
-		//alert("Exploring Stopped");
+		alert("Exploring Stopped");
 	}
 	
 	console.log("Q function" + qfunc)

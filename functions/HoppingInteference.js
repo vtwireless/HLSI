@@ -127,33 +127,26 @@ var functions = {
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-//num_channels = 8
-console.log(num_channels)
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
 
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
+
 
 sweepingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6]
 
 
 if(init){
 
-	//inteferenceIndex = createLowerInteference(num_channels)
-	ind2 = getRandomInt(4)
 	var sweepingVectorCum = [];
 	sweepingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
 	ind2 = sweepingVectorCum.findIndex(element => element > Math.random());
-
+	// This block probabilistic controls the hopper
 	globalUserData["ind2"] = ind2;
-
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 
 
 }
@@ -162,14 +155,8 @@ else{
 	sweepingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
 	ind2 = sweepingVectorCum.findIndex(element => element > Math.random());
 
-	available_freq = makeArr(start_freq, end_freq, num_channels)
-	
-	//ind2 = getRandomInt(4)
-	available_freq = available_freq
-
 	randomNum2 = available_freq[ind2];
 	globalUserData["ind2"] = ind2;
-
     freq2 = randomNum2;
 }
 
@@ -189,38 +176,25 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-//num_channels = 8
-console.log(num_channels)
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
-
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
 
-	inteferenceIndex = createLowerInteference(num_channels)
+	inteferenceIndex = createLowerInteference(num_channels) // Hops on lower numbered channels
 	ind2 = getRandomInt(4)
 	globalUserData["ind2"] = ind2;
-	available_freq = makeArr(start_freq, end_freq, num_channels)
-
 
 }
 else{
-
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	
 	ind2 = getRandomInt(4)
-	available_freq = available_freq
-
 	randomNum2 = available_freq[inteferenceIndex[ind2]];
 	globalUserData["ind2"] = ind2;
-
     freq2 = randomNum2;
 }
 
@@ -239,24 +213,17 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-//num_channels = 8
-console.log(num_channels)
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
-
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
 
 	inteferenceIndex = createUpperInteference(num_channels)
 	ind2 = getRandomInt(4)
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = inteferenceIndex[ind2];
 
 
@@ -289,36 +256,25 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-//num_channels = 8
-console.log(num_channels)
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
 
 	inteferenceIndex = createEvenInteference(num_channels)
 	ind2 = getRandomInt(4)
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = inteferenceIndex[ind2];
 
 }
 else{
-
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	
 	ind2 = getRandomInt(4)
-	available_freq = available_freq
-
 	randomNum2 = available_freq[inteferenceIndex[ind2]];	
 	globalUserData["ind2"] = inteferenceIndex[ind2];
-
     freq2 = randomNum2;
 }
 
@@ -336,35 +292,23 @@ return { freq2: freq2, freq1: freq1 };
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-//num_channels = 8
-console.log(num_channels)
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
 
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
 
 	inteferenceIndex = createOddInteference(num_channels)
 	ind2 = getRandomInt(4)
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = inteferenceIndex[ind2];
-
-
 }
 else{
-
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	
 	ind2 = getRandomInt(4)
-	available_freq = available_freq
-
 	randomNum2 = available_freq[inteferenceIndex[ind2]];
 	globalUserData["ind2"] = inteferenceIndex[ind2];
 
