@@ -756,6 +756,27 @@ function Signal(sig, name = "", opts = null) {
         checkSetRate();
     }
 
+    // Adds getter sig.snrLabel returns a string that is either "SINR" or
+    // "SNR" depending on whither there are any interferer (other)
+    // signals in the environment, or just noise.
+    //
+    Object.defineProperty(obj, "snrLabel", {
+        // Make a getter:
+        get: function() {
+            var snrLabel = 'SNR';
+            obj.interferers.some(function(signal) {
+                if(signal.id = obj.id) return false;
+                if(signal.is_noise) return false;
+                // There is at least one interferer signal.
+                snrLabel = 'SINR';
+                // Break out of some() call.
+                return true;
+            });
+            return snrLabel;
+        }
+    });
+
+
     // Add a 'rate' callback checkSetRate() trigger to all other signals
     // that are not noise.
     obj.interferers.forEach(function(signal) {

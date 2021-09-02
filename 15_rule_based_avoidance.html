@@ -46,6 +46,9 @@
     <input type="range" id=bw />
   </p>
   <p>
+    <input type="range" id=gn />
+  </p>
+  <p>
     <input type="range" id=mcs />
   </p>
 
@@ -198,14 +201,12 @@ CapacityRunner(sig, funcs, '#capacityRunner', {
 });
 
 
-HoppingInterferer(interferer, '#hoppingInterferer');
-
-
 Slider(sig, 'freq', '#freq');
 Slider(sig, 'bw', '#bw');
+Slider(sig, 'gn', '#gn');
 Slider(sig, 'mcs', '#mcs');
 
-
+HoppingInterferer(interferer, '#hoppingInterferer');
 CapacityBanner(sig, '#capacityBanner');
 
 PowerSpectrumPlot();

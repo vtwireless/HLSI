@@ -9,7 +9,7 @@ function HoppingInterferer(interferer, parentElement = null, opts = null) {
 
     var innerHTML = '\
     <label for="hop_rate'+id+'">Hop Rate</label>\
-    <input class=slider_bw type="range" min="0.5"\
+    <input class=slider_bw type="range" min="0.0"\
         max="4.0" id="hop_rate'+id+'" step="0.01">\
     <output for="hop_rate'+id+'" id="hr'+id+'"></output>\
 ';
@@ -66,6 +66,9 @@ console.log("parentElement.innerHTML=" + parentElement.innerHTML);
         UpdateLabel(r);
 
         clearInterval(itimer);
+
+        if(hopRate < 0.01)
+            return;
         itimer = setInterval(Hop, 1000.0/hopRate);
     }
 

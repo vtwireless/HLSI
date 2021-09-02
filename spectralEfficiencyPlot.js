@@ -79,7 +79,8 @@ function SpectralEfficiencyPlot(sig) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // create scale
-    var sscale = d3.scaleLinear().domain([-10,40]).range([0, width]); // snr (Eb/N0?)
+    const snrMax = 40, snrMin = -10, snrMaxEdge = 40.7, snrMinEdge = -10.7;
+    var sscale = d3.scaleLinear().domain([snrMin,snrMax]).range([0, width]); // snr (Eb/N0?)
     var cscale = d3.scaleLog   ().domain([0.5, 8]).range([height, 0]); // capacity (b/s/Hz)
     //.domain([schemes[0].rate, schemes[schemes.length-1].rate])
 
@@ -130,7 +131,7 @@ function SpectralEfficiencyPlot(sig) {
         .attr("dy","-0.3em")
         .style("text-anchor","middle")
    	.attr("fill", "white")
-        .text(pre + "SNR (dB)")
+        .text(pre + sig.snrLabel + " (dB)")
 
     // create y-axis label
     svgc.append("text")
@@ -189,6 +190,13 @@ function SpectralEfficiencyPlot(sig) {
         //console.log("update_plot   rate=" + sig.rate);
 
 	let SNRdB = sig.sinr;
+
+        // We constrain it to be in view.
+        if(SNRdB > snrMaxEdge)
+            SNRdB = snrMaxEdge;
+        else if(SNRdB < snrMinEdge)
+            SNRdB = snrMinEdge;
+
         let R = schemes[sig.mcs].rate;
 
         // update capacity value
