@@ -126,90 +126,82 @@ var functions = {
 
 function() {
 
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
 qfunc = globalUserData.qfunc; 
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
-//num_channels = 8
-console.log(num_channels)
+//console.log(num_channels)
 
 
-var len = qfunc.length;
+var len = qfunc.length; // Number of channels - It is fixed at 8
 var indices = new Array(len);
 for (var i = 0; i < len; ++i) indices[i] = i;
 
 
 decaying_constant  = globalUserData.decaying_constant;  // 
-//epsilon  = globalUserData.epsilon;  
 minimum_epsilon  = globalUserData.minimum_epsilon;
 
-//minimum_epsilon = 0.25;
-//decaying_constant = 0.99;  
-
-
+minimum_epsilon = 0.25; // This is the cut-off point. After this point, the Algo selects the best channels
+decaying_constant = 0.99;  // How fast should the exploration decay.
+learning_rate = 0.9;
+// At every time step  - epsilon = decaying_constant**countNumberOfIterations
+// When epsilon < minimum_epsilon; exploration stops
 
 
 
 if(init){
 
-
-
  	epsilon  = decaying_constant;
 	countNumberOfIterations = 0
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	ind1 = 0;
 	ind2 = globalUserData["ind2"]
 	randomNum2 = available_freq[ind2];
 	checkIfStopped = 1
-
-
-
 }
 else{
 
 	ind2 = globalUserData["ind2"]
 	randomNum2 = available_freq[ind2];
-	
 	prob_epsilon = Math.random();
 
 	
 	if ((epsilon > minimum_epsilon ) ){
 
-		available_freq = makeArr(start_freq, end_freq, num_channels)
+		//available_freq = makeArr(start_freq, end_freq, num_channels)
 		ind1 = getRandomInt(num_channels)
 		randomNum1 = available_freq[ind1]	
 
  	}
 	else{
-		indices.sort(function (a, b) { return (qfunc[a] > qfunc[b]) ? -1 : ((qfunc[a] < qfunc[b]) ? 1 : 0); });
-		slicedQfunc = indices.slice(0,4)
-		len_slicedQfunc = slicedQfunc.length
-		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)]
-		randomNum1 = available_freq[ind1slicedQfunc]	
-		epsilon = decaying_constant*epsilon;
+		indices.sort(function (a, b) { return (qfunc[a] > qfunc[b]) ? -1 : ((qfunc[a] < qfunc[b]) ? 1 : 0); }); // Sort the Q-values
+		slicedQfunc = indices.slice(0,4) // Get the best channels
+		len_slicedQfunc = slicedQfunc.length // Get the number of best channels
+		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
+		randomNum1 = available_freq[ind1slicedQfunc]	// Randomly select a channel from the best channels
+		epsilon = decaying_constant*epsilon; //decay epsilon value
 
 	}
 	if ((epsilon <= minimum_epsilon )  & (checkIfStopped == 1) ){
-		checkIfStopped = 0
-		console.log("Exploring Stopped")
-		console.log(countNumberOfIterations)
-		alert("Exploring Stopped");
+		checkIfStopped = 0 // Stop Exploration
+		//console.log("Exploring Stopped")
+		//console.log(countNumberOfIterations)
+		//alert("Exploring Stopped");
 	}
 	
 	console.log("Q function" + qfunc)
 
-	epsilon = decaying_constant**countNumberOfIterations;
-	countNumberOfIterations = countNumberOfIterations +1
+	epsilon = decaying_constant**countNumberOfIterations; //decay epsilon value
+	countNumberOfIterations = countNumberOfIterations +1 // Count Number of iterations
     freq2 = randomNum2;
     freq1 = randomNum1;
 	
 }
 
 if (freq1 == freq2){
-	qfunc[ind1] = qfunc[ind1] +0.9*(-1 + qfunc[ind1] );
+	qfunc[ind1] = qfunc[ind1] +learning_rate*(-1 + qfunc[ind1] );
 }
 	
 globalUserData.qfunc = qfunc;
