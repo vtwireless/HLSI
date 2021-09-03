@@ -123,7 +123,7 @@ var functions = {
     //
     //
 	
-    "Time-Based Interference - Probabilistic Channels ":
+    "Random Frequency-hopping Interference":
 
 function() {
 
@@ -137,13 +137,13 @@ available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
 
 
-sweepingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6]
+hoppingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6] // This represents a probability vector, i.e the sum must equal onerror
 
 
 if(init){
 
-	var sweepingVectorCum = [];
-	sweepingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
+	var hoppingVectorCum = [];
+	hoppingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
 	ind2 = sweepingVectorCum.findIndex(element => element > Math.random());
 	// This block probabilistic controls the hopper
 	globalUserData["ind2"] = ind2;

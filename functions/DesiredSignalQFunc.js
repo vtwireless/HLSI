@@ -132,6 +132,7 @@ end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; 
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
 qfunc = globalUserData.qfunc; 
 available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
+numberOfBestChannelsToUse = 4; //Number of channels to seelct as best channels
 
 //console.log(num_channels)
 
@@ -151,20 +152,19 @@ learning_rate = 0.9; // How fast should we learn
 // When epsilon < minimum_epsilon; exploration stops
 
 
-
 if(init){
 
  	epsilon  = decaying_constant;
 	countNumberOfIterations = 0
 	ind1 = 0;
 	ind2 = globalUserData["ind2"]
-	randomNum2 = available_freq[ind2];
+	nextFreq2 = available_freq[ind2];
 	checkIfStopped = 1
 }
 else{
 
 	ind2 = globalUserData["ind2"]
-	randomNum2 = available_freq[ind2];
+	nextFreq2 = available_freq[ind2];
 	prob_epsilon = Math.random();
 
 	
@@ -172,15 +172,15 @@ else{
 
 		//available_freq = makeArr(start_freq, end_freq, num_channels)
 		ind1 = getRandomInt(num_channels)
-		randomNum1 = available_freq[ind1]	
+		nextFreq1 = available_freq[ind1]	
 
  	}
 	else{
 		indices.sort(function (a, b) { return (qfunc[a] > qfunc[b]) ? -1 : ((qfunc[a] < qfunc[b]) ? 1 : 0); }); // Sort the Q-values
-		slicedQfunc = indices.slice(0,4) // Get the best channels
+		slicedQfunc = indices.slice(0,numberOfBestChannelsToUse) // Get the best channels
 		len_slicedQfunc = slicedQfunc.length // Get the number of best channels
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
-		randomNum1 = available_freq[ind1slicedQfunc]	// Randomly select a channel from the best channels
+		nextFreq1 = available_freq[ind1slicedQfunc]	// Randomly select a channel from the best channels
 		epsilon = decaying_constant*epsilon; //decay epsilon value
 
 	}
@@ -195,13 +195,13 @@ else{
 
 	epsilon = decaying_constant**countNumberOfIterations; //decay epsilon value
 	countNumberOfIterations = countNumberOfIterations +1 // Count Number of iterations
-    freq2 = randomNum2;
-    freq1 = randomNum1;
+    freq2 = nextFreq2;
+    freq1 = nextFreq1;
 	
 }
 
 if (freq1 == freq2){
-	qfunc[ind1] = qfunc[ind1] +learning_rate*(-1 + qfunc[ind1] );
+	qfunc[ind1] = qfunc[ind1] +learning_rate*(-1 + qfunc[ind1] ); // Update Q-Value Function
 }
 	
 globalUserData.qfunc = qfunc;

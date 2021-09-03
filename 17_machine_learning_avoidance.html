@@ -117,13 +117,13 @@ sync: sc
 
 
 
-var sc = new ScriptController([sig,interferer,globalUserData], {
+var sc = new ScriptController([sig,interferer], {
     //functionFiles: "functions/HoppingInteference.js",
     functionFiles: "functions/HoppingInteference.js",
     postfix: [ '1','2' ]
 });
 
-new ScriptController([sig,interferer,globalUserData], {
+new ScriptController([sig,interferer], {
     //functionFiles: "functions/HoppingInteference.js",
     functionFiles: "functions/DesiredSignalQFunc.js",
     postfix: [ '1','2' ],
