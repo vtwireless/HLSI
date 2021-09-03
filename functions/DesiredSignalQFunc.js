@@ -146,6 +146,7 @@ decaying_constant  = globalUserData.decaying_constant;  //
 minimum_epsilon  = globalUserData.minimum_epsilon;
 
 minimum_epsilon = 0.25; // This is the cut-off point. After this point, the Algo selects the best channels
+// After this value of epsilon is reached, the algorithms switched from exploration (learning) mode to channel selection mode
 decaying_constant = 0.99;  // How fast should the exploration decay.
 learning_rate = 0.9; // How fast should we learn
 // At every time step  - epsilon = decaying_constant**countNumberOfIterations
@@ -171,6 +172,7 @@ else{
 	if ((epsilon > minimum_epsilon ) ){
 
 		//available_freq = makeArr(start_freq, end_freq, num_channels)
+		// This the exploration phase, randomly select a channel
 		ind1 = getRandomInt(num_channels)
 		nextFreq1 = available_freq[ind1]	
 
