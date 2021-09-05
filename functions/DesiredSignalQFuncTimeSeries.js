@@ -264,7 +264,7 @@ else{
 }
 
 if (freq1 == freq2){
-	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] );
+	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] ); // Update Q-Value Function
 }
 
 qfunc[currentTimeForML] = deepCopyFunction(currentQfunc)
@@ -425,7 +425,7 @@ else{
 }
 
 if (freq1 == freq2){
-	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] );
+	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] ); // Update Q-Value Function
 }
 
 qfunc[currentTimeForML] = deepCopyFunction(currentQfunc)
