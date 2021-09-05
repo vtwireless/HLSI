@@ -137,23 +137,23 @@ available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
 
 
-hoppingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6] // This represents a probability vector, i.e the sum must equal onerror
+hoppingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6] // This represents a probability vector, i.e the sum must equal one
 
 
 if(init){
 
 	var hoppingVectorCum = [];
-	hoppingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
-	ind2 = sweepingVectorCum.findIndex(element => element > Math.random());
+	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
 	// This block probabilistic controls the hopper
 	globalUserData["ind2"] = ind2;
 
 
 }
 else{
-	var sweepingVectorCum = [];
-	sweepingVector.reduce(function(a,b,i) { return sweepingVectorCum[i] = a+b; },0);
-	ind2 = sweepingVectorCum.findIndex(element => element > Math.random());
+	var hoppingVectorCum = [];
+	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
 
 	randomNum2 = available_freq[ind2];
 	globalUserData["ind2"] = ind2;
