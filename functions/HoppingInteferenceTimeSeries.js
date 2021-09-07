@@ -124,7 +124,7 @@ var functions = {
 
 
 
-    "Random Frequency-hopping Interference":
+    "Frequency-hopping Interference with Periodic Hopping Sequence":
 
 function() {
 	
