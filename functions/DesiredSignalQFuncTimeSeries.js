@@ -370,7 +370,7 @@ return {  freq1: freq1 };
 
 
 
-    "Normal Q-Function - Contiguous Bandwidth":
+    "Time Aware Q-Function - Contiguous Bandwidth":
 
 function() {
 
