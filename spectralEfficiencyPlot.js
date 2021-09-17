@@ -172,7 +172,7 @@ function SpectralEfficiencyPlot(sig) {
         .attr("class", "stroke-light no-fill stroke-green-o dashed")
         .attr("d", linec);
 
-    // add operating ponit
+    // add operating point
     svgc.append('g')
         .selectAll("dot")
         .data( [{"x":0, "y":efficiency(0)}] )
@@ -181,7 +181,7 @@ function SpectralEfficiencyPlot(sig) {
         .attr("cx", function (d) { return sscale(d.x); } )
         .attr("cy", function (d) { return cscale(d.y); } )
         .attr("r", 5)
-        .attr("class", "stroke-light stroke-green-o")
+        .attr("class", "stroke-lightstroke-med stroke-green-o")
         .style("fill", "#66ff00");
 
 
@@ -205,7 +205,9 @@ function SpectralEfficiencyPlot(sig) {
             .attr("cx", function(d) { return sscale(d.x); })
             .attr("cy", function(d) { return cscale(R); })
             .attr("class", (sig.rate > 0.0) ?
-                "stroke-med stroke-green" :"stroke-med stroke-red");
+                "stroke-med stroke-green" :"stroke-med stroke-red")
+            .style("fill",  (sig.rate > 0.0) ? "#00FF00": "#FF0000");
+
     }
 
     sig.onChange("rate", update_plot);
