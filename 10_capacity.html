@@ -391,6 +391,8 @@ function update_plot(band,gain,modcod) {
       .attr("cx", function(d) { return sscale(d.x); })
       .attr("cy", function(d) { return cscale(schemes[mc].rate); })
       .attr("class", valid ? "stroke-med stroke-green" : "stroke-med stroke-red")
+      .style("fill", (rate > 0.0) ? "#00FF00": "#FF0000");
+
 }
 
 function toggle() {
