@@ -170,7 +170,7 @@ minimum_epsilon  = globalUserData.minimum_epsilon;
 
 minimum_epsilon = 0.25; // This is the cut-off point. After this point, the Algorithm selects the best channels
 // After this value of epsilon is reached, the algorithms switches from exploration (learning) mode to channel selection mode
-decaying_constant = 0.99;  // How fast should the exploration decay.
+decaying_constant = 0.999;  // How fast should the exploration decay.
 learning_rate = 0.9; // How fast should we learn
 // At every time step; epsilon = decaying_constant**countNumberOfIterations
 // When epsilon < minimum_epsilon; exploration stops
@@ -342,9 +342,14 @@ else{
 		slicedQfunc = indices.slice(0,numberOfBestChannelsToUse)  // Get the best channels
 		len_slicedQfunc = slicedQfunc.length // Get the number of best channels
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
+		ind1 = ind1slicedQfunc;
 		nextFreq1 = available_freq[ind1slicedQfunc]	 // Randomly select a channel from the best channels
 		epsilon = decaying_constant*epsilon; //decay epsilon value
 		//console.log(currentTimeForML,ind2,slicedQfunc,currentQfunc)
+		if (ind1 == 1){
+			console.log(ind1)
+			
+		}
 
 	}
 	if ((epsilon <= minimum_epsilon )  & (checkIfStopped == 1) ){
@@ -358,6 +363,7 @@ else{
     freq1 = nextFreq1;
 	
 }
+
 
 if (ind1 == ind2){
 	console.log(ind1,ind2)
@@ -454,6 +460,9 @@ if(init){
 	countNumberOfIterations = 0
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 	ind1 = 0;
+	ind1slicedQfunc1 = ind1;
+	ind1slicedQfunc2 = ind1;
+
 	ind2 = globalUserData["ind2"]
 	nextFreq2 = available_freq[ind2];
 	var saveIndArr = new Array(num_channels).fill(0);
@@ -476,6 +485,8 @@ else{
 
 		ind1 = getRandomInt(num_channels)
 		nextFreq1 = available_freq[ind1]	
+		ind1slicedQfunc1 = ind1;
+		ind1slicedQfunc2 = ind1;
 
  	}
 	else{
@@ -489,7 +500,7 @@ else{
 		for (var indSliced = 1; indSliced < numberOfBestChannelsToUse; ++indSliced){
 	
 			if (Math.abs(slicedQfunc[indSliced] - saveInd) == 1 ){
-				console.log("Previous: " + saveInd + " Next: " + indSliced )
+				//console.log("Previous: " + saveInd + " Next: " + indSliced )
 
 				break;
 			}
@@ -499,8 +510,13 @@ else{
 		len_slicedQfunc = slicedQfunc.length  // Get the number of best channels
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
 		
-		ind1slicedQfunc1 = slicedQfunc[saveInd];  		// Select available contiguous bandwidth 
-		ind1slicedQfunc2 = slicedQfunc[saveInd+1];  		// Select available contiguous bandwidth 
+		//ind1slicedQfunc1 = slicedQfunc[saveInd];  		// Select available contiguous bandwidth 
+		//ind1slicedQfunc2 = slicedQfunc[saveInd+1];  		// Select available contiguous bandwidth
+		ind1slicedQfunc1 = saveInd
+		ind1slicedQfunc2 = saveInd + 1
+
+		console.log(ind1slicedQfunc1,ind1slicedQfunc2,slicedQfunc)
+
 		nextFreq1_1 = available_freq[ind1slicedQfunc1]	 		// Select available contiguous bandwidth 
 		nextFreq1_2 = available_freq[ind1slicedQfunc2] 		// Select available contiguous bandwidth 
 		nextFreq1 = (nextFreq1_1 + nextFreq1_2)/2; 		// Select available contiguous bandwidth 
@@ -522,14 +538,18 @@ else{
 	
 }
 
-if (ind1 == ind2){
-	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] ); // Update Q-Value Function
+if (ind1slicedQfunc1 == ind2){
+	currentQfunc[ind1slicedQfunc1] = currentQfunc[ind1slicedQfunc1] +learning_rate*(-1 + currentQfunc[ind1slicedQfunc1] ); // Update Q-Value Function
+
+}
+if (ind1slicedQfunc2 == ind2){
+	currentQfunc[ind1slicedQfunc2] = currentQfunc[ind1slicedQfunc2] +learning_rate*(-1 + currentQfunc[ind1slicedQfunc2] ); // Update Q-Value Function
 }
 
 qfunc[currentTimeForML] = deepCopyFunction(currentQfunc)
 globalUserData.qfunc = qfunc;
 
-console.log(qfunc[3])
+//console.log(qfunc[3])
 return {  freq1: freq1, bw1:bw1 };
 },
 
