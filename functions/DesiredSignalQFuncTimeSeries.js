@@ -512,8 +512,8 @@ else{
 		
 		//ind1slicedQfunc1 = slicedQfunc[saveInd];  		// Select available contiguous bandwidth 
 		//ind1slicedQfunc2 = slicedQfunc[saveInd+1];  		// Select available contiguous bandwidth
-		ind1slicedQfunc1 = saveInd
-		ind1slicedQfunc2 = saveInd + 1
+		ind1slicedQfunc1 = saveInd   		// Select available contiguous bandwidth 
+		ind1slicedQfunc2 = saveInd + 1    		// Select available contiguous bandwidth 
 
 		console.log(ind1slicedQfunc1,ind1slicedQfunc2,slicedQfunc)
 
