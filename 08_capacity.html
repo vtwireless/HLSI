@@ -50,7 +50,8 @@
 'use strict';
 
 var sig = Signal(conf.sig0, '', {
-    bw_max: 38.0e6, // Hz
+    bw_min: 5.0e6, // Hz
+    bw_max: 38.0e6,// Hz
     gn_init: -20, // dB
     gn_min: -40, // dB
     mcs_init: 6 // array index int
