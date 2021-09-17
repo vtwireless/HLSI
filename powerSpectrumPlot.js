@@ -61,7 +61,7 @@ function PowerSpectrumPlot(opts = {}) {
 
 
     // filter semi-length(m), over-sampling rate(k), total length
-    const m = 40, // ! increasing this value squares off the signal
+    const m = 80, // ! increasing this value squares off the signal
         k = 20,
         n = 2 * k * m + 1;
     var bw = 0.2, // bw

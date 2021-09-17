@@ -28,7 +28,7 @@
 // bandwidth, and modulation scheme index), in addition to dependent
 // variables sig.rate and sig.sinr.
 //
-var sig = Signal(conf.sigIC_05);
+var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var noise = Signal(conf.noiseIC_05, "Noise")
 
 Slider(sig, 'freq');
