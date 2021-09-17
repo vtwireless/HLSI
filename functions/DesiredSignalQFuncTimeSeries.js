@@ -154,6 +154,7 @@ start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencie
 end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
 qfunc = globalUserData.qfunc; 
+//qfunc = new Array(num_channels).fill(0);
 available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 numberOfBestChannelsToUse = 4; //Number of channels to seelct as best channels
 
@@ -170,7 +171,7 @@ minimum_epsilon  = globalUserData.minimum_epsilon;
 
 minimum_epsilon = 0.25; // This is the cut-off point. After this point, the Algorithm selects the best channels
 // After this value of epsilon is reached, the algorithms switches from exploration (learning) mode to channel selection mode
-decaying_constant = 0.999;  // How fast should the exploration decay.
+decaying_constant = 0.99;  // How fast should the exploration decay.
 learning_rate = 0.9; // How fast should we learn
 // At every time step; epsilon = decaying_constant**countNumberOfIterations
 // When epsilon < minimum_epsilon; exploration stops
@@ -184,6 +185,8 @@ if(init){
 	ind2 = globalUserData["ind2"]
 	nextFreq2 = available_freq[ind2];
 	checkIfStopped = 1
+	globalUserData.qfunc = new Array(num_channels).fill(0);
+	qfunc = globalUserData.qfunc; 
 }
 else{
 
@@ -205,6 +208,8 @@ else{
 		slicedQfunc = indices.slice(0,numberOfBestChannelsToUse) // Get the best channels
 		len_slicedQfunc = slicedQfunc.length // Get the number of best channels
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
+		ind1 = ind1slicedQfunc;
+
 		nextFreq1 = available_freq[ind1slicedQfunc]	// Randomly select a channel from the best channels
 		epsilon = decaying_constant*epsilon; //decay epsilon value
 
@@ -225,10 +230,13 @@ else{
 	
 }
 
-if (freq1 == freq2){
+//if (freq1 == freq2){
+//	qfunc[ind1] = qfunc[ind1] +learning_rate*(-1 + qfunc[ind1] ); // Update Q-Value Function
+//}
+	
+if (ind1 == ind2){
 	qfunc[ind1] = qfunc[ind1] +learning_rate*(-1 + qfunc[ind1] ); // Update Q-Value Function
 }
-	
 globalUserData.qfunc = qfunc;
 
 
