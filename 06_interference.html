@@ -28,7 +28,7 @@
 // bandwidth, and modulation scheme index), in addition to dependent
 // variables sig.rate and sig.sinr.
 //
-var sig = Signal(conf.sigIC_05);
+var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 sig.gn = -10.0; // dB
 sig.bw = 12.0e6; // Hz
 // the interferer is a different/new signal so we use new Signal().

@@ -120,10 +120,10 @@ var conf = {
         freq_step: 0.01e6,
         freq_init: 1797.0e6,
 
-        bw_min: 0.5e6,
+        bw_min: 4.0e6,
         bw_max: 36.0e6,
         bw_step: 0.01e6,
-        bw_init: 1.8e6,
+        bw_init: 4.0e6,
 
         gn_min: -20.0,
         gn_max: 20.0,
