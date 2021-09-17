@@ -344,6 +344,7 @@ else{
 		ind1slicedQfunc = slicedQfunc[getRandomInt(len_slicedQfunc)] // Randomly select a channel from the best channels
 		nextFreq1 = available_freq[ind1slicedQfunc]	 // Randomly select a channel from the best channels
 		epsilon = decaying_constant*epsilon; //decay epsilon value
+		//console.log(currentTimeForML,ind2,slicedQfunc,currentQfunc)
 
 	}
 	if ((epsilon <= minimum_epsilon )  & (checkIfStopped == 1) ){
@@ -358,13 +359,15 @@ else{
 	
 }
 
-if (freq1 == freq2){
+if (ind1 == ind2){
+	console.log(ind1,ind2)
+
 	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] ); // Update Q-Value Function
 }
 
 qfunc[currentTimeForML] = deepCopyFunction(currentQfunc)
 globalUserData.qfunc = qfunc;
-
+//console.log(currentQfunc)
 return {  freq1: freq1 };
 },
 
@@ -519,7 +522,7 @@ else{
 	
 }
 
-if (freq1 == freq2){
+if (ind1 == ind2){
 	currentQfunc[ind1] = currentQfunc[ind1] +learning_rate*(-1 + currentQfunc[ind1] ); // Update Q-Value Function
 }
 

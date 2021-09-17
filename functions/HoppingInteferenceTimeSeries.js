@@ -105,6 +105,12 @@ function createEvenInteference(length) {
 	}
 	return arr;
 }
+
+function randomChoice(p) {
+    let rnd = p.reduce( (a, b) => a + b ) * Math.random();
+    return p.findIndex( a => (rnd -= a) < 0 );
+}
+
 //var sorted = qfunc.slice().sort(function(a,b){return b-a})
 //var ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 
@@ -208,6 +214,7 @@ globalUserData['timeScaleForML'] = timeScaleForML; // Get Time scale
 
 
 hoppingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6]
+hoppingVector = [0, .5, 0, 0, .5, 0, 0, 0];
 
 
 if(init){
@@ -244,10 +251,10 @@ if(init){
 		ind2 = hoppingVector[7]
 	}
 
-	var hoppingVectorCum = [];
-	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
-
+	//var hoppingVectorCum = [];
+	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	ind2 = randomChoice(hoppingVector)
 	
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = ind2
@@ -280,10 +287,12 @@ else{
 		ind2 = hoppingVector[7]
 	}
 	
-	var hoppingVectorCum = [];
-	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	//var hoppingVectorCum = [];
+	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	ind2 = randomChoice(hoppingVector)
 
+	///console.log("ind: ", ind2)
 	
 
 	randomNum2 = available_freq[ind2];
