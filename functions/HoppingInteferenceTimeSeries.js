@@ -124,7 +124,7 @@ var functions = {
 
 
 
-    "Frequency-hopping Interference with Periodic Hopping Sequence":
+    "Frequency hopping Interference with Periodic Hopping Sequence":
 
 function() {
 bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
