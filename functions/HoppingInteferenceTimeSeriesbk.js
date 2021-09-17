@@ -108,7 +108,6 @@ function createEvenInteference(length) {
 //var sorted = qfunc.slice().sort(function(a,b){return b-a})
 //var ranks = qfunc.map(function(v){ return sorted.indexOf(v)+1 });
 
-
 var functions = {
 
     // We need to convert the body of these functions to strings,
@@ -122,77 +121,92 @@ var functions = {
     // Or something like that.
     //
     //
-    "Time-Based Interference Controller":
+
+
+
+    "Frequency-hopping Interference with Periodic Hopping Sequence":
 
 function() {
-
-bw_margin = globalUserData.bw_margin; 
-//bw_margin = 2.5e6
-start_freq = freq_min2 + bw_margin;
-end_freq = freq_max2 - bw_margin;
+	
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-globalUserData['timeForML'] = globalUserData['timeForML'] + 1
-timeForML = globalUserData['timeForML']
-timeScaleForML = globalUserData['timeScaleForML'];
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
-//num_channels = 8
-//console.log(num_channels)
+globalUserData['timeForML'] = globalUserData['timeForML'] + 1 // Update Current Time
+timeForML = globalUserData['timeForML'] // Get current Time
+timeScaleForML = 8 // Set Time scale
+globalUserData['timeScaleForML'] = timeScaleForML; // Get Time scale
 
+hoppingVector = [0,1,2,3,4,5,6,7]
 
-var len = qfunc.length;
-var indices = new Array(len);
-for (var i = 0; i < len; ++i) indices[i] = i;
 
 if(init){
-
-	/**if ((timeForML % timeScaleForML  ) === 1){	
-		inteferenceIndex = createLowerInteference(num_channels)
+	qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+	globalUserData['qfunc'] = qfunc;
+	//hoppingVector = globalUserData['hoppingVector']
+	//globalUserData['hoppingVector'] = hoppingVector
+	
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = hoppingVector[0]
 	}
 	else if ((timeForML % timeScaleForML ) === 2){	
-		inteferenceIndex = createUpperInteference(num_channels)
+		ind2 = hoppingVector[1]
 	}
 	else if ((timeForML % timeScaleForML ) === 3){	
-		inteferenceIndex = createOddInteference(num_channels)
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
 	}
 	else if ((timeForML % timeScaleForML ) === 0){	
-		inteferenceIndex = createEvenInteference(num_channels)
-	}*/	
-	ind2 = getRandomInt(4)
-	globalUserData["ind2"] = ind2;
-	available_freq = makeArr(start_freq, end_freq, num_channels)
+		ind2 = hoppingVector[7]
+	}
 
+
+	globalUserData["ind2"] = ind2
 
 }
 else{
-	
-	if ((timeForML % timeScaleForML  ) === 1){	
-		inteferenceIndex = createLowerInteference(num_channels)
-		console.log("Hopping Multiple of 1")
 
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = hoppingVector[0]
 	}
 	else if ((timeForML % timeScaleForML ) === 2){	
-		inteferenceIndex = createUpperInteference(num_channels)
-		console.log("Hopping Multiple of 2")
-
+		ind2 = hoppingVector[1]
 	}
 	else if ((timeForML % timeScaleForML ) === 3){	
-		inteferenceIndex = createOddInteference(num_channels)
-		console.log("Hopping Multiple of 3")
-
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
 	}
 	else if ((timeForML % timeScaleForML ) === 0){	
-		inteferenceIndex = createEvenInteference(num_channels)
-		console.log("Hopping Multiple of 4")
+		ind2 = hoppingVector[7]
 	}
-
-	available_freq = makeArr(start_freq, end_freq, num_channels)
 	
-	ind2 = getRandomInt(4)
-	available_freq = available_freq
 
-	randomNum2 = available_freq[inteferenceIndex[ind2]];
-	globalUserData["ind2"] = inteferenceIndex[ind2];
-
+	randomNum2 = available_freq[ind2];
+	globalUserData["ind2"] = [ind2];
     freq2 = randomNum2;
 }
 
@@ -206,6 +220,117 @@ return { freq2: freq2, freq1: freq1 };
 },
 
 
+    "Probabilistic Frequency-hopping Interference":
+
+function() {
+
+
+
+bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
+start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
+num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
+
+globalUserData['timeForML'] = globalUserData['timeForML'] + 1 // Update Current Time
+timeForML = globalUserData['timeForML'] // Get current Time
+timeScaleForML = 8 // Set Time scale
+globalUserData['timeScaleForML'] = timeScaleForML; // Get Time scale
+
+
+hoppingVector = [0.1/6, 0.1/6, 0.1/6, 0.4, 0.5, 0.1/6, 0.1/6,0.1/6]
+
+
+if(init){
+
+	//qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+	//globalUserData['qfunc'] = qfunc;
+	qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
+	globalUserData['qfunc'] = qfunc;
+	//hoppingVector = globalUserData['hoppingVector']
+	//globalUserData['hoppingVector'] = hoppingVector
+	
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = hoppingVector[0]
+	}
+	else if ((timeForML % timeScaleForML ) === 2){	
+		ind2 = hoppingVector[1]
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = hoppingVector[7]
+	}
+
+	var hoppingVectorCum = [];
+	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+
+	
+	available_freq = makeArr(start_freq, end_freq, num_channels)
+	globalUserData["ind2"] = ind2
+
+}
+else{
+
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = hoppingVector[0]
+	}
+	else if ((timeForML % timeScaleForML ) === 2){	
+		ind2 = hoppingVector[1]
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = hoppingVector[7]
+	}
+	
+	var hoppingVectorCum = [];
+	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+
+	
+
+	randomNum2 = available_freq[ind2];
+	globalUserData["ind2"] = [ind2];
+    freq2 = randomNum2;
+}
+
+if(freq2 > freq_max2)
+    freq2 = freq_max2;
+else if(freq2 < freq_min2)
+    freq2 = freq_min2;
+
+
+return { freq2: freq2, freq1: freq1 };
+
+},
 
 };
 
