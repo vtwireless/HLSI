@@ -12,7 +12,7 @@
   <p><a href="index.html">[exercises]</a></p>
   <p>
     <label for="frequency">Frequency</label>
-    <input class="width-4" type="range" min="-0.45" max="0.45" value="0.0" id="frequency" step="0.001"
+    <input class="width-4" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.001"
         oninput="update_display(parseFloat(value))">
     <output for="frequency" id="fc">0.1</output>
   </p>
@@ -147,10 +147,13 @@ function update_display(freq) {
     let d  = Math.max(1,Math.sqrt(dx**2 + dy**2));
     let L  = 20*Math.log10(4*Math.PI*d/lambda);
     let g  = 16-L;
+    const bw = 0.1;
 
     // update generator
     generator.clear();
-    generator.add_tone(fc,g);
+    generator.add_signal(fc,    bw,    g   ); // user signal
+
+    //generator.add_tone(fc,g);
     generator.generate(-100);
     dataf = d3.range(0,nfft-1).map(function(i) { return {"y": generator.psd[i] } })
     pathf.datum(dataf).attr("d", linef);

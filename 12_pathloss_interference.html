@@ -22,7 +22,7 @@
   </p>
   <p>
     <label style="color: #62B9E4" for="frequency">Frequency</label>
-    <input class="width-4" type="range" min="-0.35" max="0.35" value="0.0" id="frequency" step="0.001"
+    <input class="width-4" type="range" min="-0.3" max="0.3" value="0.0" id="frequency" step="0.001"
         oninput="update_display(parseFloat(value))">
     <output for="frequency" id="fc"></output>
   </p>
@@ -42,8 +42,8 @@ var margin = {top: 10, right: 50, bottom: 50, left: 50}
 
 // options
 var fs=40e6, f0=1800e6;    // sample rate, center frequency
-var bw     = 0.23712234, fc     =  0.0,        gn     = 20;  // user values
-var bw_int = 0.04231945, fc_int = -0.07221980, gn_int = 20;  // interference values
+var bw     = 0.3912234, fc     =  0.0,        gn     = 20;  // user values
+var bw_int = 0.086, fc_int = -0.033, gn_int = 20;  // interference values
 var n0 = -80, sinr = 0, cap = 10;
 var xrange=1200, yrange=200; // range in meters
 var xmax  =1150, ymax  =180; // maximum values
@@ -185,8 +185,32 @@ function update_display(freq) {
     let S     = Math.pow(10.,(gn    -L0)/10); // received signal power (linear)
     let I     = Math.pow(10.,(gn_int-L1)/10); // received interference power (linear)
     let N     = bw * Math.pow(10.,n0/10.);  // noise power (linear)
+
+
+    // overlap will be the fraction of the interferer that overlaps.
+    let overlap;
+
+    let int_lower = fc_int - bw_int/2.0;
+    let int_upper = fc_int + bw_int/2.0;
+
+    let sig_lower = fc - bw/2.0;
+    let sig_upper = fc + bw/2.0;
+
+    if(int_lower > sig_upper || int_upper < sig_lower)
+        overlap = 0.0;
+    else {
+        // they overlap at least some.
+        if(int_lower < sig_lower)
+            int_lower = sig_lower;
+        if(int_upper > sig_upper)
+            int_upper = sig_upper;
+        overlap = (int_upper - int_lower)/bw;
+    }
+
+
+
     //console.log("S = " + 10*Math.log10(S) + ", I = " + 10*Math.log10(I) + ", N = " + 10*Math.log10(N));
-    let SINRdB= 10*Math.log10(S/(N+I));
+    let SINRdB= 10*Math.log10(S/(N+ overlap * I));
     document.querySelector('#sinr').value = d3.format(".2f")(SINRdB) + " dB";
 
     // compute and display capacity

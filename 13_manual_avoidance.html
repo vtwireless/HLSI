@@ -52,6 +52,8 @@
 
 var sig = Signal(conf.sig0, '', {
     bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
     gn_init: -10, // dB
     gn_min: -40, // dB
     mcs_init: 6 // array index int
