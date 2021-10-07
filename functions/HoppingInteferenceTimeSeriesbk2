@@ -1,0 +1,83 @@
+
+		ind2 = hoppingVector[1]
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = hoppingVector[7]
+	}
+
+	//var hoppingVectorCum = [];
+	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	ind2 = randomChoice(hoppingVector)
+	
+	available_freq = makeArr(start_freq, end_freq, num_channels)
+	globalUserData["ind2"] = ind2
+
+}
+else{
+
+	if ((timeForML % timeScaleForML  ) === 1){	
+		ind2 = hoppingVector[0]
+	}
+	else if ((timeForML % timeScaleForML ) === 2){	
+		ind2 = hoppingVector[1]
+	}
+	else if ((timeForML % timeScaleForML ) === 3){	
+		ind2 = hoppingVector[2]
+	}
+	else if ((timeForML % timeScaleForML ) === 4){	
+		ind2 = hoppingVector[3]
+	}
+	else if ((timeForML % timeScaleForML ) === 5){	
+		ind2 = hoppingVector[4]
+	}
+	else if ((timeForML % timeScaleForML ) === 6){	
+		ind2 = hoppingVector[5]
+	}
+	else if ((timeForML % timeScaleForML ) === 7){	
+		ind2 = hoppingVector[6]
+	}
+	else if ((timeForML % timeScaleForML ) === 0){	
+		ind2 = hoppingVector[7]
+	}
+	
+	//var hoppingVectorCum = [];
+	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	ind2 = randomChoice(hoppingVector)
+
+	///console.log("ind: ", ind2)
+	
+
+	randomNum2 = available_freq[ind2];
+	globalUserData["ind2"] = [ind2];
+    freq2 = randomNum2;
+}
+
+if(freq2 > freq_max2)
+    freq2 = freq_max2;
+else if(freq2 < freq_min2)
+    freq2 = freq_min2;
+
+
+return { freq2: freq2, freq1: freq1 };
+
+},
+
+};
+

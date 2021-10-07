@@ -218,20 +218,10 @@ hoppingVector = [0, .5, 0, 0, .5, 0, 0, 0];
 
 
 if(init){
-
-	//qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
-	//globalUserData['qfunc'] = qfunc;
 	qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
 	globalUserData['qfunc'] = qfunc;
-	//hoppingVector = globalUserData['hoppingVector']
-	//globalUserData['hoppingVector'] = hoppingVector
-	
-    var hoppingVectorCum = [];
 
-    hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-
-    ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
-	//ind2 = randomChoice(hoppingVector)
+	ind2 = randomChoice(hoppingVector)
 	
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = ind2
@@ -239,10 +229,7 @@ if(init){
 }
 else{
 
-	var hoppingVectorCum = [];
-
-	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	ind2 = randomChoice(hoppingVector)	
 
 	randomNum2 = available_freq[ind2];
 	globalUserData["ind2"] = [ind2];
