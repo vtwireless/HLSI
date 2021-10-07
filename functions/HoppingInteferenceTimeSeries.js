@@ -226,35 +226,12 @@ if(init){
 	//hoppingVector = globalUserData['hoppingVector']
 	//globalUserData['hoppingVector'] = hoppingVector
 	
-	if ((timeForML % timeScaleForML  ) === 1){	
-		ind2 = hoppingVector[0]
-	}
-	else if ((timeForML % timeScaleForML ) === 2){	
-		ind2 = hoppingVector[1]
-	}
-	else if ((timeForML % timeScaleForML ) === 3){	
-		ind2 = hoppingVector[2]
-	}
-	else if ((timeForML % timeScaleForML ) === 4){	
-		ind2 = hoppingVector[3]
-	}
-	else if ((timeForML % timeScaleForML ) === 5){	
-		ind2 = hoppingVector[4]
-	}
-	else if ((timeForML % timeScaleForML ) === 6){	
-		ind2 = hoppingVector[5]
-	}
-	else if ((timeForML % timeScaleForML ) === 7){	
-		ind2 = hoppingVector[6]
-	}
-	else if ((timeForML % timeScaleForML ) === 0){	
-		ind2 = hoppingVector[7]
-	}
+    var hoppingVectorCum = [];
 
-	//var hoppingVectorCum = [];
-	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
-	ind2 = randomChoice(hoppingVector)
+    hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+
+    ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
+	//ind2 = randomChoice(hoppingVector)
 	
 	available_freq = makeArr(start_freq, end_freq, num_channels)
 	globalUserData["ind2"] = ind2
@@ -262,38 +239,10 @@ if(init){
 }
 else{
 
-	if ((timeForML % timeScaleForML  ) === 1){	
-		ind2 = hoppingVector[0]
-	}
-	else if ((timeForML % timeScaleForML ) === 2){	
-		ind2 = hoppingVector[1]
-	}
-	else if ((timeForML % timeScaleForML ) === 3){	
-		ind2 = hoppingVector[2]
-	}
-	else if ((timeForML % timeScaleForML ) === 4){	
-		ind2 = hoppingVector[3]
-	}
-	else if ((timeForML % timeScaleForML ) === 5){	
-		ind2 = hoppingVector[4]
-	}
-	else if ((timeForML % timeScaleForML ) === 6){	
-		ind2 = hoppingVector[5]
-	}
-	else if ((timeForML % timeScaleForML ) === 7){	
-		ind2 = hoppingVector[6]
-	}
-	else if ((timeForML % timeScaleForML ) === 0){	
-		ind2 = hoppingVector[7]
-	}
-	
-	//var hoppingVectorCum = [];
-	//hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
-	//ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
-	ind2 = randomChoice(hoppingVector)
+	var hoppingVectorCum = [];
 
-	///console.log("ind: ", ind2)
-	
+	hoppingVector.reduce(function(a,b,i) { return hoppingVectorCum[i] = a+b; },0);
+	ind2 = hoppingVectorCum.findIndex(element => element > Math.random());
 
 	randomNum2 = available_freq[ind2];
 	globalUserData["ind2"] = [ind2];
