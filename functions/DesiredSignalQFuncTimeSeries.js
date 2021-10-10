@@ -262,42 +262,8 @@ timeForML = globalUserData['timeForML'] // Get current Time
 timeScaleForML = globalUserData['timeScaleForML']; // Get Time scale
 
 
-if ((timeForML % timeScaleForML  ) === 1){	
-	currentTimeForML=  0;
+currentTimeForML = [Math.round(timeForML % timeScaleForML)];
 
-}
-else if ((timeForML % timeScaleForML ) === 2){	
-	currentTimeForML=  1;
-}
-else if ((timeForML % timeScaleForML ) === 3){	
-	currentTimeForML=  2;
-}
-else if ((timeForML % timeScaleForML ) === 0){	
-	if (timeScaleForML === 8){
-		currentTimeForML=  7;
-	}
-	else {
-		currentTimeForML=  3;
-	}
-}
-else if ((timeForML % timeScaleForML  ) === 4){	
-	currentTimeForML=  3;
-
-}
-else if ((timeForML % timeScaleForML ) === 5){	
-	currentTimeForML=  4;
-}
-else if ((timeForML % timeScaleForML ) === 6){	
-	currentTimeForML=  5;
-}
-else if ((timeForML % timeScaleForML ) === 7){	
-	currentTimeForML=  6;
-}
-
-else	
-{
-	alert("Error")
-}
 	
 
 qfunc = globalUserData.qfunc; 
@@ -404,42 +370,8 @@ timeForML = globalUserData['timeForML'] // Get current Time
 timeScaleForML = globalUserData['timeScaleForML']; // Get Time scale
 numberOfBestChannelsToUse = 4;
 
+currentTimeForML = [Math.round(timeForML % timeScaleForML)];
 
-if ((timeForML % timeScaleForML  ) === 1){	
-	currentTimeForML=  0;
-
-}
-else if ((timeForML % timeScaleForML ) === 2){	
-	currentTimeForML=  1;
-}
-else if ((timeForML % timeScaleForML ) === 3){	
-	currentTimeForML=  2;
-}
-else if ((timeForML % timeScaleForML ) === 0){	
-	if (timeScaleForML === 8){
-		currentTimeForML=  7;
-	}
-	else {
-		currentTimeForML=  3;
-	}
-}
-else if ((timeForML % timeScaleForML  ) === 4){	
-	currentTimeForML=  3;
-}
-else if ((timeForML % timeScaleForML ) === 5){	
-	currentTimeForML=  4;
-}
-else if ((timeForML % timeScaleForML ) === 6){	
-	currentTimeForML=  5;
-}
-else if ((timeForML % timeScaleForML ) === 7){	
-	currentTimeForML=  6;
-}
-
-else	
-{
-	alert("Error")
-}
 	
 
 qfunc = globalUserData.qfunc; 
