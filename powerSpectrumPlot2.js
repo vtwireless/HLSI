@@ -169,7 +169,7 @@ function PowerSpectrumPlot(opts = {}) {
             // Note: if there was just one noise than n_gn is just that
             // one (noise.gn).
             generator.generate(n_gn);
-        } else 
+        } else
             // else default noise floor is used (-120db, see generator src)
             generator.generate();
 
@@ -195,4 +195,77 @@ function PowerSpectrumPlot(opts = {}) {
 
     // update_plot() will be called by the callbacks that are set just
     // above.
+    var margin = ({top: 10, right: 10, bottom: 30, left: 50})
+    var height = 500
+    var width = 200
+    var x = d3.scaleLinear()
+      .domain([0, 100]) //REPLACE THIS WITH A PROPER FREQUENCY VALUE
+      .range([margin.left, width - margin.right])
+    var y = d3.scaleLinear()
+      .domain(d3.extent(dataf)).nice()
+      .range([height - margin.bottom, margin.top])
+    var xAxis = (g, x) => g
+      .attr("transform", `translate(0,${height - margin.bottom})`)
+      .call(d3.axisBottom(x))
+    var yAxis = (g, y) => g
+      .attr("transform", `translate(${margin.left},0)`)
+      .call(d3.axisLeft(y))
+    var polyline = (data,x,y) => data.map((d,i) => x(i) + ',' + y(d)).join(' ') //data.map is not a function
+    var changepos = (line) => {
+      //console.log(line);
+      const displace1 = 10;
+      const displace2 = -5;
+      let arr = line.split(" ");
+      for (let i = 0; i < arr.length; i++) {
+        let nums = arr[i].split(",");
+        nums[0] = parseFloat(nums[0]) + displace1;
+        nums[1] = parseFloat(nums[1]) + displace2;
+        arr[i] = (nums[0] + ',' + nums[1])
+      }
+      return arr.join(' ')
+    }
+
+    const maxlinesgenerated = 20;
+
+    const svg = d3.create("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .property("value", {x:x})
+
+    const line = svg.append("polyline")
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1)
+        .attr("points", polyline(dataf,x,y));
+
+    const gx = svg.append("g")
+        .call(xAxis, x);
+
+    const gy = svg.append("g")
+        .call(yAxis, y);
+
+    var linescount = 0;
+
+    function draw() {
+      // console.log("here");
+      linescount++;
+      if (linescount > maxlinesgenerated) {
+        svg.select("polyline").remove();
+        linescount--;
+      }
+      //const data = dataf;
+      svg.selectAll("polyline").attr("points",function() { return changepos(d3.select(this).attr("points"));})
+      //console.log(linescount)
+      //console.log(d3.select(this).attr("points"))
+      svg.append("polyline")
+          .attr("fill", "none")
+          .attr("stroke", "steelblue")
+          .attr("stroke-width", 1)
+          .attr("points", polyline(dataf,x,y));
+    }
+
+    // draw every second
+    setInterval(draw, 1000);
+
+    return svg.node();
+
 }
