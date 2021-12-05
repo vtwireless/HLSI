@@ -194,14 +194,15 @@ function PowerSpectrumPlot(opts = {}) {
 
     // update_plot() will be called by the callbacks that are set just
     // above.
-    var margin = ({top: 10, right: 10, bottom: 30, left: 50})
-    var height = 500
-    var width = 200
+    var margin = ({top: 50, right: 100, bottom: 30, left: 50})
+    var height = 300
+    var width = 750
     var x = d3.scaleLinear()
-      .domain([0, 100]) //REPLACE THIS WITH A PROPER FREQUENCY VALUE
+      .domain([0, nfft]) //REPLACE THIS WITH A PROPER FREQUENCY VALUE
       .range([margin.left, width - margin.right])
     var y = d3.scaleLinear()
-      .domain(d3.extent(dataf.map(x => x['y']))).nice()
+      //.domain(d3.extent(dataf.map(x => x['y']))).nice()
+      .domain([-60,20])
       .range([height - margin.bottom, margin.top])
     var xAxis = (g, x) => g
       .attr("transform", `translate(0,${height - margin.bottom})`)
@@ -212,7 +213,7 @@ function PowerSpectrumPlot(opts = {}) {
     var polyline = (data,x,y) => data.map((d,i) => x(i) + ',' + y(d)).join(' ') //data.map is not a function
     var changepos = (line) => {
       //console.log(line);
-      const displace1 = 10;
+      const displace1 = 5;
       const displace2 = -5;
       let arr = line.split(" ");
       for (let i = 0; i < arr.length; i++) {
@@ -226,7 +227,8 @@ function PowerSpectrumPlot(opts = {}) {
 
     const maxlinesgenerated = 20;
 
-    const svg = svgf.append("svg")
+    const svg = d3.select("body").append("svg")
+        .attr("style","background-color: black")
         .attr("viewBox", [0, 0, width, height])
         .property("value", {x:x})
 
