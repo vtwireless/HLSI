@@ -103,7 +103,6 @@ function PowerSpectrumPlot(opts = {}) {
     var dataf = d3.range(0, nfft - 1).map(function (f) {
         return { y: 0 };
     });
-
     // create SVG objects
     var svgf = svg_create(fScale, pScale, null); // ! null was formerly parentElement
 
@@ -137,7 +136,7 @@ function PowerSpectrumPlot(opts = {}) {
         .attr("d", linef);
 
     function update_plot() {
-
+        console.log(dataf);
         generator.clear();
         // Iterate through signal array, calc values and pass to generator
         sigs.forEach(function (sig) {
@@ -202,7 +201,7 @@ function PowerSpectrumPlot(opts = {}) {
       .domain([0, 100]) //REPLACE THIS WITH A PROPER FREQUENCY VALUE
       .range([margin.left, width - margin.right])
     var y = d3.scaleLinear()
-      .domain(d3.extent(dataf)).nice()
+      .domain(d3.extent(dataf.map(x => x['y']))).nice()
       .range([height - margin.bottom, margin.top])
     var xAxis = (g, x) => g
       .attr("transform", `translate(0,${height - margin.bottom})`)
@@ -227,7 +226,7 @@ function PowerSpectrumPlot(opts = {}) {
 
     const maxlinesgenerated = 20;
 
-    const svg = d3.create("svg")
+    const svg = svgf.append("svg")
         .attr("viewBox", [0, 0, width, height])
         .property("value", {x:x})
 
@@ -235,7 +234,7 @@ function PowerSpectrumPlot(opts = {}) {
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1)
-        .attr("points", polyline(dataf,x,y));
+        .attr("points", polyline(dataf.map(x => x['y']),x,y));
 
     const gx = svg.append("g")
         .call(xAxis, x);
@@ -260,12 +259,9 @@ function PowerSpectrumPlot(opts = {}) {
           .attr("fill", "none")
           .attr("stroke", "steelblue")
           .attr("stroke-width", 1)
-          .attr("points", polyline(dataf,x,y));
+          .attr("points", polyline(dataf.map(x => x['y']),x,y));
     }
 
     // draw every second
     setInterval(draw, 1000);
-
-    return svg.node();
-
 }
