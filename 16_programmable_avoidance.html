@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" style="display: flex;">
 <head>
     <title>HLSI Ex 16</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
     <link rel=stylesheet type=text/css href=codemirror.min.css />
     <link rel=stylesheet type=text/css href=blackboard.min.css />
+    <link rel=stylesheet type=text/css href=sidebar.css />
     <style> 
         output {font-weight: bold;}
     </style>
@@ -14,7 +15,9 @@
     <script src=common.js></script>
     <script src=signal.js></script>
     <script src=sliders.js></script>
-    <script src=powerSpectrumPlot.js></script>
+    <!-- <script src=powerSpectrumPlot.js></script> -->
+    <script src=powerSpectrumPlot_2D.js></script>
+    <script src=powerSpectrumPlot_3D.js></script>
     <script src=spectralEfficiencyPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
@@ -23,29 +26,122 @@
     <script src=scriptController.js></script>
     <script src=throughputPlot.js></script>
     <script src=hoppingInterferer.js></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+
+    <style>
+      .cm-s-blackboard{
+        border: #d0d0d0 4px solid;
+        margin: 1%;
+        border-radius: 20px;
+      }
+
+      .CodeMirror {
+        /* font-family: Arial, monospace; */
+        font-size: 16px;
+      }
+
+
+      .argsTable tr:nth-child(even) {
+        background-color: #2b2b2b;
+        color: #ddd;
+      }
+      .argsTable tr:nth-child(odd) {
+        background-color: #3a3a3a;
+        color: #ddd;
+      }
+      .argsTable thead, .argsTable thead tr{
+        background: #1a1a1a !important;
+        color: #fff !important;
+      }
+
+      .argsTable td{
+        padding: 4px 5px;
+      }
+    </style>
+
 </head>
 
 
-<body>
-  <h2>Exercise 16 Programmable Interferer Avoidance</h2>
-  <p><a href="index.html">[exercises]</a></p>
+<body style="margin:0;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
   
+    
+    
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href=""><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_TN_programmable_avoidance.html" class="selected"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">Exercise 16 Programmable Interferer Avoidance</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
 
-  <p id=scriptController></p>
 
-  <p id=hoppingInterferer></p>
+  <div style="margin: 0% 2%; margin-top: 6%;">
+    <p id=scriptController style="margin-bottom: 2%;"></p>
 
-  <p id=capacityBanner></p>
+    <p id=hoppingInterferer></p>
 
-  <p>
-    <input type="range" id=freq />
-  </p>
-  <p>
-    <input type="range" id=bw />
-  </p>
-  <p>
-    <input type="range" id=mcs />
-  </p>
+    <p id=capacityBanner></p>
+
+    <p>
+      <input type="range" id=freq />
+    </p>
+    <p>
+      <input type="range" id=bw />
+    </p>
+    <p>
+      <input type="range" id=mcs />
+    </p>
+
+    <div style="display:inline-flex;">
+      <span style="font-size: 24px; margin-right: 8px;">3D</span>
+      <label class="switch">
+        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+        <span class="slider round"></span>
+      </label>
+    </div>
+
+  </div>
+  
+  
+  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
 
 </body>
 <script>
@@ -80,6 +176,15 @@ new ScriptController([ sig, interferer ], {
     functionFiles: 'functions/ex16_1_2.js'
 });
 
+function power_spectral_density_3d_checkbox_change(){
+  if (document.getElementById('psd_3d_checkbox').checked) 
+  {
+    PowerSpectrumPlot_3D();
+  } else {
+    PowerSpectrumPlot_2D();
+  }
+}
+
 
 HoppingInterferer(interferer, '#hoppingInterferer');
 
@@ -91,10 +196,9 @@ Slider(sig, 'mcs', '#mcs');
 
 CapacityBanner(sig, '#capacityBanner');
 
-PowerSpectrumPlot();
+PowerSpectrumPlot_2D();
 ThroughputPlot(sig);
 SpectralEfficiencyPlot(sig);
-
 
 </script>
 </html>

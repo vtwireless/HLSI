@@ -62,6 +62,7 @@ function ThroughputPlot(sig, interferers=[]) {
         .append("svg")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)
+        .attr("style", "margin-left:1%;")
         .append("g")
         .attr("transform", "translate(" +
             margin.left + "," + margin.top + ")");
