@@ -74,6 +74,7 @@ function SpectralEfficiencyPlot(sig) {
         .append("svg")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)
+        .attr("style", "margin-left:1%;")
         .attr("id", svg_id)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

@@ -568,6 +568,8 @@ editor.on('beforeChange', function (cm, change) {
             }
         );
 
+        editor.setSize('100%', 420);
+
         editor.on('change', function() {
             if(funcSelect.className !== 'edited')
                 funcSelect.className = 'edited';
