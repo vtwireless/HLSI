@@ -1,33 +1,84 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" style="display: flex;">
 <head>
   <title>11 - Path Loss</title>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width"/>
   <link rel="stylesheet" type="text/css" media="all" href="base.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
 </head>
 
-<body>
-  <h2>Exercise 11 - Path Loss</h2>
-  <p><a href="index.html">[exercises]</a></p>
-  <p>
-    <label for="frequency">Frequency</label>
-    <input class="width-4" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.001"
-        oninput="update_display(parseFloat(value))">
-    <output for="frequency" id="fc">0.1</output>
-  </p>
-  <p>
-    <label for="wavelength">Wavelength = </label>
-    <output for="wavelength" id="wl"></output>
-  </p>
-  <p>
-    <label for="distance">Distance = </label>
-    <output for="distance" id="ds"></output>
-  </p>
-  <p>
-    <label for="pathloss">Path Loss = </label>
-    <output for="pathloss" id="pl"></output>
-  </p>
+<body style="margin:0;">
+  <!-- <h2>Exercise 11 - Path Loss</h2>
+  <p><a href="index.html">[exercises]</a></p> -->
+
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html" class="selected"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href=""><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 11</span> Path Loss</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
+  
+  <div id="slider_1_parent" style="margin-left: 1%; margin-top:5%;">
+    <p>
+      <label for="frequency">Frequency</label>
+      <input class="width-4" type="range" min="-0.4" max="0.4" value="0.0" id="frequency" step="0.001"
+          oninput="update_display(parseFloat(value))">
+      <output for="frequency" id="fc">0.1</output>
+    </p>
+    <p>
+      <label for="wavelength">Wavelength = </label>
+      <output for="wavelength" id="wl"></output>
+    </p>
+    <p>
+      <label for="distance">Distance = </label>
+      <output for="distance" id="ds"></output>
+    </p>
+    <p>
+      <label for="pathloss">Path Loss = </label>
+      <output for="pathloss" id="pl"></output>
+    </p>
+  </div>
+  
 </body>
 
 <!-- Load in the javascript libraries -->

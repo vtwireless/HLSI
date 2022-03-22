@@ -153,6 +153,35 @@ div.clearLeft {
     border-radius: 50%;
   }
 
-  .stop1 { stop-color: red; }
-        .stop2 { stop-color: black; stop-opacity: 0; }
-        .stop3 { stop-color: blue; }
+.stop1 { stop-color: red; }
+.stop2 { stop-color: black; stop-opacity: 0; }
+.stop3 { stop-color: blue; }
+
+.cm-s-blackboard{
+border: #d0d0d0 4px solid;
+margin: 1%;
+border-radius: 20px;
+}
+
+.CodeMirror {
+/* font-family: Arial, monospace; */
+font-size: 16px;
+}
+
+
+.argsTable tr:nth-child(even) {
+background-color: #2b2b2b;
+color: #ddd;
+}
+.argsTable tr:nth-child(odd) {
+background-color: #3a3a3a;
+color: #ddd;
+}
+.argsTable thead, .argsTable thead tr{
+background: #1a1a1a !important;
+color: #fff !important;
+}
+
+.argsTable td{
+padding: 4px 5px;
+}

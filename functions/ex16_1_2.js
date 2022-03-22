@@ -96,6 +96,8 @@ function() {
         bw1 = bw_max1;
     else if(bw1 < bw_min1)
         bw1 = bw_min1;
+    else
+        bw1 = bw1-3e6; // Adding a guard band to prevent overlap
 
    return { freq1: freq1, bw1: bw1 };
 },
@@ -105,7 +107,7 @@ function() {
     "Changing freq1":
 function() {
     // freq1 is in Hz
-    freq1 += 0.04e6;
+    freq1 += 0.2e6;
     if(freq1 > freq_max1)
         freq1 = freq_min1;
 
@@ -244,7 +246,8 @@ function() {
     if(init)
         userData.freq1 = 919.5e6;
     else
-        userData.freq1 += -2.0e5 + 4e5*Math.random();
+        //userData.freq1 += -2.0e5 + 4e5*Math.random();
+		userData.freq1 = getRandomInt(1780, 1820)*1e6;
  
     // userData is automatically saved.
     return { freq1: userData.freq1 };
@@ -262,3 +265,8 @@ function() {
 
 };
 
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

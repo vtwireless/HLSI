@@ -18,7 +18,7 @@
  *              element.
  *
  */
-function Label(sig, par, opts = null) {
+function Label(sig, par, opts = null, append_to_id=null) {
 
     var output; // The HTML element that has a value to display
     var scale,
@@ -61,7 +61,14 @@ function Label(sig, par, opts = null) {
         output = document.createElement("OUTPUT");
         let p = document.createElement("p");
         p.appendChild(output);
-        document.body.appendChild(p);
+        // document.body.appendChild(p);
+
+        if(append_to_id !== null){
+            document.getElementById(append_to_id).appendChild(p);
+        }
+        else{
+            document.body.appendChild(p);
+        }
     }
 
     if(opts.prefix !== undefined)
