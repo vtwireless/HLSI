@@ -19,7 +19,7 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-function Slider(sig, parameter, n = null) {
+function Slider(sig, parameter, n = null, append_to_id=null) {
   {
     let gotPar = false;
 
@@ -42,8 +42,19 @@ function Slider(sig, parameter, n = null) {
     n = document.createElement("INPUT");
     n.type = "range";
     let p = document.createElement("p");
+    
+    
     p.appendChild(n);
-    document.body.appendChild(p);
+    
+    if(append_to_id !== null){
+      document.getElementById(append_to_id).appendChild(p);
+    }
+    else{
+      document.body.appendChild(p);
+    }
+    
+    
+    
   }
 
   if (n.type !== "range") {

@@ -169,7 +169,7 @@ function PowerSpectrumPlot_2D(opts = {}) {
         .attr("y", "50")
         .attr("width", "100")
         .attr("height", "200")
-        .attr("fill", "rgba(230,97,0, 0.2)")
+        .attr("fill", "rgba(230,97,0, 0.35)")
         .attr("stroke-width", "2")
         .attr("stroke", "rgba(230, 97, 0)")
         .attr("id", "interferer_bounding_box");
@@ -181,7 +181,7 @@ function PowerSpectrumPlot_2D(opts = {}) {
         .attr("y", "50")
         .attr("width", "100")
         .attr("height", "200")
-        .attr("fill", "rgba(93, 58, 155, 0.2)")
+        .attr("fill", "rgba(93, 58, 155, 0.35)")
         .attr("stroke-width", "2")
         .attr("stroke", "rgba(93, 58, 155)")
         .attr("id", "signal_bounding_box");

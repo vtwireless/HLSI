@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="en-US" style="display: flex;">
 <head>
     <title>HLSI Ex 17</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <link rel=stylesheet type=text/css href=sidebar.css />
     <link rel=stylesheet type=text/css href=codemirror.min.css />
     <link rel=stylesheet type=text/css href=blackboard.min.css />
     <style> 
@@ -23,29 +24,80 @@
     <script src=scriptController.js></script>
     <script src=throughputPlot.js></script>
     <script src=hoppingInterferer.js></script>
+
 </head>
 
 
-<body>
-  <h2>Exercise 17 Q-Learning Interferer Avoidance</h2>
-  <p><a href="index.html">[exercises]</a></p>
+<body style="margin:0;">
+  <!-- <h2>Exercise 17 Q-Learning Interferer Avoidance</h2>
+  <p><a href="index.html">[exercises]</a></p> -->
+
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href=""><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html" class="selected"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 17</span> Machine Learning Interferer Avoidance</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
+  
+  <div id="slider_1_parent" style="margin-left: 1%; margin-top:5%;">
+    <p id=scriptController></p>
+
+    <p id=hoppingInterferer></p>
+
+    <p id=capacityBanner></p>
+
+    <p>
+        <input type="range" id=freq />
+    </p>
+    <p>
+        <input type="range" id=bw />
+    </p>
+    <p>
+        <input type="range" id=mcs />
+    </p>
+  </div>
   
 
-  <p id=scriptController></p>
-
-  <p id=hoppingInterferer></p>
-
-  <p id=capacityBanner></p>
-
-  <p>
-    <input type="range" id=freq />
-  </p>
-  <p>
-    <input type="range" id=bw />
-  </p>
-  <p>
-    <input type="range" id=mcs />
-  </p>
+  
 
 </body>
 <script>
