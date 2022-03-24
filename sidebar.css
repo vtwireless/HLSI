@@ -11,7 +11,7 @@ body {
 
 
 .banner {
-    min-height: 5%;
+    /* min-height: 5%; */
     height: 7%;
     width: 100%;
     background-size: cover;
@@ -199,3 +199,22 @@ body {
 .menu-control:checked + .sidebar .sidebar__menu a {
     transform: translatex(0);
 }
+
+@media only screen and (min-width: 2000px){
+    .banner {
+        height: 5%;
+    }
+}
+
+
+@media only screen and (min-width: 3000px){
+    .banner {
+        height: 3%;
+    }
+}
+
+/* @media only screen and (min-width: 4000px){
+    .banner {
+    
+    }
+} */

@@ -71,7 +71,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 18</span> Machine Learning With Periodic Interferer Avoidance</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 18</span> Machine Learning With Periodic Interferer Avoidance</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -100,29 +100,17 @@
     <p id=hoppingInterferer></p>
 
     <p id=scriptController2></p>
-
-    
-
-    
-
-    <!-- <div style="display:inline-flex;">
-      <span style="font-size: 24px; margin-right: 8px;">3D</span>
-      <label class="switch">
-        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
-        <span class="slider round"></span>
-      </label>
-    </div> -->
   </div>
 
+  <div style="display:flex; margin-left: 1%;">
+    <span style="font-size: 24px; margin-right: 8px;">3D</span>
+    <label class="switch">
+      <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+      <span class="slider round"></span>
+    </label>
+  </div>
   <div style="float: left; margin-left: 1%;">
-    <div style="display:inline-flex;">
-      <span style="font-size: 24px; margin-right: 8px;">3D</span>
-      <label class="switch">
-        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
-        <span class="slider round"></span>
-      </label>
-    </div>
-    <div id="psd_svg_figure_parent">
+    <div id="psd_svg_figure_parent"> 
 
     </div>
   </div>
@@ -216,15 +204,6 @@ var sc = new ScriptController([sig,interferer], {
     functionFiles: "functions/HoppingInteferenceTimeSeries.js",
     postfix: [ '1','2' ]
 });
-
-function power_spectral_density_3d_checkbox_change(){
-  if (document.getElementById('psd_3d_checkbox').checked) 
-  {
-    PowerSpectrumPlot_3D();
-  } else {
-    PowerSpectrumPlot_2D();
-  }
-}
 
 
 new ScriptController([sig,interferer], {

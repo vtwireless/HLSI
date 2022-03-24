@@ -75,6 +75,7 @@ table.argsTable {
     margin: 12px;
     border-collapse: collapse;
     float: left;
+    margin-left: 24px;
 }
 
 th.ph1,th.ph2,th.ph3 {
