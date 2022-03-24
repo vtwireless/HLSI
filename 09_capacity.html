@@ -13,11 +13,14 @@
     <script src=common.js></script>
     <script src=signal.js></script>
     <script src=sliders.js></script>
-    <script src=powerSpectrumPlot.js></script>
+    <!-- <script src=powerSpectrumPlot.js></script> -->
+    <script src=powerSpectrumPlot_2D.js></script>
+    <script src=powerSpectrumPlot_3D.js></script>
     <script src=spectralEfficiencyPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
     <script src=capacityRunner.js></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
 </head>
 
 
@@ -61,7 +64,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 9</span> Information Capacity</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 9</span> Information Capacity</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -70,7 +73,7 @@
     </div>   
   </section>
   
-  <div id="slider_1_parent" style="margin-left: 1%; margin-top:5%; width: 100%;">
+  <div style="margin: 0% 2%; margin-top: 5%;">
     <p>
       Press the "Start" button to start the changing of signal
       parameters gain and bandwidth as time go on.
@@ -86,9 +89,17 @@
   
     <p id=capacityBanner>
     </p>
+
+    <div style="display:inline-flex;">
+      <span style="font-size: 24px; margin-right: 8px;">3D</span>
+      <label class="switch">
+        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+        <span class="slider round"></span>
+      </label>
+    </div>
   </div>
   
-  
+  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
 
 </body>
 <script>
@@ -114,16 +125,17 @@ const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
 const gn_min = sig.gn_min; // dB
 const gn_max = sig.gn_max; // dB
 
+console.log(gn_min, gn_max);
 // t is time in seconds.
 
 function Gain(t) {
 
     let phi = Math.PI * t / 20/*period in seconds*/;
     let gn = Math.sin(phi);
-    gn *= (gn_max - gn_min)*gn*gn*gn; // gn = Amp*gn*gn*gn*gn
+    gn *= (gn_max - gn_min)*gn*gn*gn*gn; // gn = Amp*gn*gn*gn*gn
     gn += gn_min;   // minimum value
+    console.log(t);
     return gn;
-
     /*return -25 + 13*Math.log10(0.001 +
             (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
         Math.exp(-0.05*t);*/
@@ -148,10 +160,22 @@ Slider(sig, 'mcs', '#mcs');
 
 CapacityBanner(sig, '#capacityBanner');
 
-PowerSpectrumPlot({ yMin: -45.0, yMax: 10.0});
+PowerSpectrumPlot_2D({ yMin: -45.0, yMax: 10.0}, true, false);
 SpectralEfficiencyPlot(sig);
 
-document.getElementById("svg-capaciZty_0").style.removeProperty('margin-left');
+// document.getElementById("svg-capaciZty_0").style.removeProperty('margin-left');
+document.getElementById('psd_3d_checkbox').click();
+document.getElementById('psd_3d_checkbox').click();
+
+
+function power_spectral_density_3d_checkbox_change(){
+    if (document.getElementById('psd_3d_checkbox').checked) 
+    {
+      PowerSpectrumPlot_3D({ yMin: -45.0, yMax: 10.0}, true, false);
+    } else {
+      PowerSpectrumPlot_2D({ yMin: -45.0, yMax: 10.0}, true, false);
+    }
+}
 
 </script>
 </html>

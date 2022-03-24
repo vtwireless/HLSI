@@ -15,7 +15,9 @@
     <script src=common.js></script>
     <script src=signal.js></script>
     <script src=sliders.js></script>
-    <script src=powerSpectrumPlot.js></script>
+    <!-- <script src=powerSpectrumPlot.js></script> -->
+    <script src=powerSpectrumPlot_2D.js></script>
+    <script src=powerSpectrumPlot_3D.js></script>
     <script src=spectralEfficiencyPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
@@ -24,6 +26,7 @@
     <script src=scriptController.js></script>
     <script src=throughputPlot.js></script>
     <script src=hoppingInterferer.js></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
 
 </head>
 
@@ -69,7 +72,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.25vw; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 17</span> Machine Learning Interferer Avoidance</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 17</span> Machine Learning Interferer Avoidance</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -78,27 +81,41 @@
     </div>   
   </section>
   
-  <div id="slider_1_parent" style="margin-left: 1%; margin-top:5%;">
+  <div style="margin: 0% 2%; margin-top: 5%;">
+    <p id=capacityBanner></p>
+
+    <p>
+      <input type="range" id=freq />
+    </p>
+    <p>
+      <input type="range" id=bw />
+    </p>
+    <p>
+      <input type="range" id=mcs />
+    </p>
+
+    
+
     <p id=scriptController></p>
 
     <p id=hoppingInterferer></p>
 
-    <p id=capacityBanner></p>
-
-    <p>
-        <input type="range" id=freq />
-    </p>
-    <p>
-        <input type="range" id=bw />
-    </p>
-    <p>
-        <input type="range" id=mcs />
-    </p>
+    <p id=scriptController2></p>
   </div>
   
+  <div style="display:flex; margin-left: 1%;">
+    <span style="font-size: 24px; margin-right: 8px;">3D</span>
+    <label class="switch">
+      <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+      <span class="slider round"></span>
+    </label>
+  </div>
+  <div style="float: left; margin-left: 1%;">
+    <div id="psd_svg_figure_parent"> 
 
+    </div>
+  </div>
   
-
 </body>
 <script>
 'use strict';
@@ -170,12 +187,14 @@ sync: sc
 
 
 var sc = new ScriptController([sig,interferer], {
+  element: '#scriptController',
     //functionFiles: "functions/HoppingInteference.js",
     functionFiles: "functions/HoppingInteference.js",
     postfix: [ '1','2' ]
 });
 
 new ScriptController([sig,interferer], {
+  element: '#scriptController2',
     //functionFiles: "functions/HoppingInteference.js",
     functionFiles: "functions/DesiredSignalQFunc.js",
     postfix: [ '1','2' ],
@@ -206,7 +225,7 @@ new ScriptController([sig,interferer], {
 */
 //HoppingInterferer(interferer, '#hoppingInterferer');
 
-console.log()
+// console.log()
 Slider(sig, 'freq', '#freq');
 Slider(sig, 'bw', '#bw');
 Slider(sig, 'mcs', '#mcs');
@@ -214,7 +233,7 @@ Slider(sig, 'mcs', '#mcs');
 
 CapacityBanner(sig, '#capacityBanner');
 
-PowerSpectrumPlot();
+PowerSpectrumPlot_2D();
 ThroughputPlot(sig);
 //SpectralEfficiencyPlot(sig);
 

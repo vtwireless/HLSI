@@ -244,11 +244,13 @@ function() {
  
     // Initialize / update userData.freq1, used to set freq1 (freq1 is in Hz)
     if(init)
-        userData.freq1 = 919.5e6;
+        userData.freq1 = 1780e6;
     else
-        //userData.freq1 += -2.0e5 + 4e5*Math.random();
-		userData.freq1 = getRandomInt(1780, 1820)*1e6;
- 
+        userData.freq1 += -2.0e5 + 4e6*Math.random();
+    
+    if(userData.freq1 > 1820e6)
+        userData.freq1 = 1780e6;
+        
     // userData is automatically saved.
     return { freq1: userData.freq1 };
 },

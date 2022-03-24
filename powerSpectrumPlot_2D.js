@@ -23,7 +23,7 @@
 //    yMin:  manimum y plot values in dB
 ///
 //
-function PowerSpectrumPlot_2D(opts = {}) {
+function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
     document.getElementById("psd_svg_figure_parent").innerHTML = "";
 
     if(typeof(opts.yMax) === 'undefined')
@@ -185,7 +185,11 @@ function PowerSpectrumPlot_2D(opts = {}) {
         .attr("stroke-width", "2")
         .attr("stroke", "rgba(93, 58, 155)")
         .attr("id", "signal_bounding_box");
-
+    
+    if(has_interferer === false){
+        interferer_label_f.attr("style", "display:none;");
+        interferer_box_f.attr("style", "display:none;");
+    }
    
 
     
@@ -276,13 +280,13 @@ function PowerSpectrumPlot_2D(opts = {}) {
         let interferer_label_new_coordinates = get_graph_label_coordinates(720, 320, cur_interferer_freq);
         interferer_label_f.attr("x", interferer_label_new_coordinates['x'])
         interferer_label_f.attr("y", interferer_label_new_coordinates['y']+5)
-        interferer_label_f.text(`Interferer (${cur_interferer_freq_exact}Hz)`);
+        interferer_label_f.text(`Interferer (${cur_interferer_freq_exact}MHz)`);
 
         cur_signal_freq_exact = Math.round(cur_signal_freq_exact/1000000);
         let signal_label_new_coordinates = get_graph_label_coordinates(720, 320, cur_signal_freq);
         signal_label_f.attr("x", signal_label_new_coordinates['x'])
         signal_label_f.attr("y", signal_label_new_coordinates['y']-8)
-        signal_label_f.text(`Signal (${cur_signal_freq_exact}Hz)`);
+        signal_label_f.text(`Signal (${cur_signal_freq_exact}MHz)`);
     }
 
     function get_graph_label_coordinates(graph_width, graph_height, fc){

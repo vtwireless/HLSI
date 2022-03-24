@@ -241,3 +241,11 @@ function prng_bbs()
     }
 }
 
+function power_spectral_density_3d_checkbox_change(){
+    if (document.getElementById('psd_3d_checkbox').checked) 
+    {
+      PowerSpectrumPlot_3D();
+    } else {
+      PowerSpectrumPlot_2D();
+    }
+}
