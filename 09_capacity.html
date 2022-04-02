@@ -52,7 +52,7 @@
         <a href="11_pathloss.html"><b>11</b> Path Loss</a>
         <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
         <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
-        <a href=""><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
         <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
         <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
         <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
@@ -76,7 +76,7 @@
   <div style="margin: 0% 2%; margin-top: 5%;">
     <p>
       Press the "Start" button to start the changing of signal
-      parameters gain and bandwidth as time go on.
+      amplitude as time go on.
       Move the "Mode Code" slider to keep data throughput.
     </p>
   
@@ -122,10 +122,13 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 const bw_amp = (sig.bw_max - sig.bw_min) * 0.5;
 const bw_avg = (sig.bw_max + sig.bw_min) * 0.5;
 
-const gn_min = sig.gn_min; // dB
-const gn_max = sig.gn_max; // dB
+// const gn_min = sig.gn_min; // dB
+// const gn_max = sig.gn_max; // dB
 
-console.log(gn_min, gn_max);
+const gn_min = 0.0; // dB
+const gn_max = 35.0; // dB
+
+// console.log(gn_min, gn_max);
 // t is time in seconds.
 
 function Gain(t) {
@@ -134,8 +137,8 @@ function Gain(t) {
     let gn = Math.sin(phi);
     gn *= (gn_max - gn_min)*gn*gn*gn*gn; // gn = Amp*gn*gn*gn*gn
     gn += gn_min;   // minimum value
-    console.log(t);
-    return gn;
+    // console.log(gn);
+    return -1*Math.abs(gn);
     /*return -25 + 13*Math.log10(0.001 +
             (0.5 + 0.5*Math.cos(2*Math.PI*0.02*t + 0.7))) *
         Math.exp(-0.05*t);*/

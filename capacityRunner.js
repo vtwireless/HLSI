@@ -205,7 +205,6 @@ function CapacityRunner(sig, func = null, parentElement = null, opts = null) {
 
 
     function StartStop() {
-
         if(isRunning) Stop();
         else Start();
     }

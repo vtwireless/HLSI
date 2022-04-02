@@ -210,6 +210,11 @@ body {
 @media only screen and (min-width: 3000px){
     .banner {
         height: 3%;
+        position: inherit !important;
+    }
+
+    body{
+        width: 100%;
     }
 }
 

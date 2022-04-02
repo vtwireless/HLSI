@@ -246,9 +246,9 @@ function() {
     if(init)
         userData.freq1 = 1780e6;
     else
-        userData.freq1 += -2.0e5 + 4e6*Math.random();
+        userData.freq1 += -2e6 + 4e6*Math.random();
     
-    if(userData.freq1 > 1820e6)
+    if((userData.freq1 > 1820e6 )|| (userData.freq1 < 1780e6))
         userData.freq1 = 1780e6;
         
     // userData is automatically saved.
