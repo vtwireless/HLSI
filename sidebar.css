@@ -204,6 +204,7 @@ body {
 @media only screen and (min-height: 1400px){
     .banner {
         height: 60px;
+        position: inherit !important;
     }
 }
 
