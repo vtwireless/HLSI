@@ -206,6 +206,10 @@ body {
         height: 60px;
         position: inherit !important;
     }
+
+    .content-section{
+        margin-top: 0%;
+    }
 }
 
 
@@ -220,6 +224,10 @@ body {
     .banner {
         height: 3%;
         position: inherit !important;
+    }
+
+    .content-section{
+        margin-top: 0%;
     }
 
     body{
