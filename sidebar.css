@@ -200,6 +200,14 @@ body {
     transform: translatex(0);
 }
 
+
+@media only screen and (min-height: 1400px){
+    .banner {
+        height: 60px;
+    }
+}
+
+
 @media only screen and (min-width: 2000px){
     .banner {
         height: 5%;
