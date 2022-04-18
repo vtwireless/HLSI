@@ -283,6 +283,28 @@ var conf = {
         // Other non-noise signals with get this bool set to false in the
         // Signal() constructor.
     },
+
+    signal_multi: {
+        mcs_init: 2,
+
+        freq_min: 1780.0e6,
+        freq_max: 1820.0e6,
+        freq_plot_min: 1780.0e6,
+        freq_plot_max: 1820.0e6,
+        freq_step: 0.01e6,
+        freq_init: 1800.0e6,
+
+        bw_min: 0.10e6,
+        bw_max: 36.0e6,
+        bw_step: 0.01e6,
+        bw_init: 0.150e6,
+
+        gn_min: -30.0,
+        gn_max: 0.0,
+        gn_step: 0.01,
+        gn_scale: 1.0,
+        gn_init: -14.0,
+    }
 };
 
 // We'll make sure we keep all conf data constant.
@@ -716,8 +738,8 @@ function Signal(sig, name = "", opts = null) {
                 set: function(val) {
                     let msg = "Code ERROR: signal " + name +
                         " cannot set " + key + " (" + val + ")";
-                    alert(msg);
-                    console.log(msg);
+                    // alert(msg);
+                    // console.log(msg);
                 },
 
                 // Make a getter:
