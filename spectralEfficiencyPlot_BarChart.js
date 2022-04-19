@@ -32,12 +32,22 @@ const SpectralEfficiencyPlot_BarChart = {
     generate_dataset: function(signal_list){
         let dataset = [];
         for(let i=0; i<signal_list.length; i++){
-            let R = schemes[signal_list[i].mcs].rate;
-            console.log(R, signal_list[i].rate);
-            // let R = schemes[signal_list[i].mcs].rate/(signal_list[i].bw/1e6);
+            // let R = schemes[signal_list[i].mcs].rate;
+            // console.log(signal_list[i].rate);
+            // let R = schemes[signal_list[i].mcs].rate/(signal_list[i].bw);
+            let R = signal_list[i].rate/(signal_list[i].bw);
+            // console.log(i, R, signal_list[i].rate, signal_list[i].bw);
             dataset.push(R);
         }
         return dataset;
+    },
+
+    get_total_throughput: function(signal_list){
+      let rate = 0;
+      for(let i=0; i<signal_list.length; i++){
+          rate += signal_list[i].rate;
+      }
+      return rate;
     },
 
     create_chart: function(canvas_id, labels, data){
@@ -95,7 +105,7 @@ const SpectralEfficiencyPlot_BarChart = {
                       },
                       title: {
                         display: true,
-                        text: 'bits / sec / MHz',
+                        text: 'bits / sec / Hz',
                         color: "#fff",
                       }
                     }
@@ -107,10 +117,10 @@ const SpectralEfficiencyPlot_BarChart = {
     update_plot: function() {
         let cur_dataset = SpectralEfficiencyPlot_BarChart.dataset;
         let new_dataset = SpectralEfficiencyPlot_BarChart.generate_dataset(SpectralEfficiencyPlot_BarChart.signal_list);
+        
+        // console.log(new_dataset);
 
-        console.log(new_dataset);
-
-        let total_rate = 0.0;
+        let total_rate = SpectralEfficiencyPlot_BarChart.get_total_throughput(SpectralEfficiencyPlot_BarChart.signal_list);
         let total_bw = 0.0;
         let max_freq = 0.0;
         let min_freq = 1000000000000;
@@ -134,7 +144,8 @@ const SpectralEfficiencyPlot_BarChart = {
         }
         // console.log(max_freq, min_freq);
         // let average_se = total_rate / total_bw;
-        let average_se = total_rate / ((max_freq - min_freq)/1e6);
+        // console.log(total_rate);
+        let average_se = total_rate / ((max_freq - min_freq));
         // console.log("AVG: ", average_se);
         SpectralEfficiencyPlot_BarChart.se_chart.data.datasets[0].data[4] = average_se;
         SpectralEfficiencyPlot_BarChart.se_chart.update();
