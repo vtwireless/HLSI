@@ -96,6 +96,8 @@ const SpectralEfficiencyPlot_BarChart = {
                     //   }
                     },
                     y: {
+                      min: 0.0,
+                      max: 8.0,
                       ticks: {
                         display: true,
                         color: "#fff"
