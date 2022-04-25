@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en-US" style="display: flex;">
+<head>
+    <title>HLSI Ex 20</title>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <link rel=stylesheet type=text/css href=codemirror.min.css />
+    <link rel=stylesheet type=text/css href=blackboard.min.css />
+    <link rel=stylesheet type=text/css href=sidebar.css />
+    <style> 
+        output {font-weight: bold;}
+
+        .argsTable{
+          height: 480px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          display: block;
+        }
+    </style>
+    <script src=d3.v5.min.js></script>
+    <script src=fft.js></script>
+    <script src=common.js></script>
+    <script src=signal.js></script>
+    <!-- <script src=sliders.js></script> -->
+    <script src=slidersMultiSignals.js></script>
+    <!-- <script src=powerSpectrumPlot.js></script> -->
+    <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
+    <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
+    <script src=spectralEfficiencyPlot_BarChart.js></script>
+    <script src=label.js></script>
+    <script src=capacityBanner.js></script>
+    <!-- <script src=throughputPlot.js></script> -->
+    <script src=codemirror.min.js></script>
+    <script src=codeMirror_javascript.js></script>
+    <script src=scriptController.js></script>
+    <script src=throughputPlotMultiSignals.js></script>
+    <script src=hoppingInterferer.js></script>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <style>
+      input.slider_bw{
+        width: auto;
+      }
+    </style>
+</head>
+
+
+<body style="margin:0;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html" class="selected"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 20</span> RF Front End - Spectrum Sharing [ENTER TITLE]</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
+  
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
+    <p id=scriptController style="margin-bottom: 2%;"></p>
+  
+    <p id=capacityBanner style="display: none;">
+    </p>
+
+    
+
+    <div style="display:inline-flex;">
+      <span style="font-size: 24px; margin-right: 8px;">3D</span>
+      <label class="switch">
+        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div style="width: 30%; display:inline-flex; margin-left:1%;">
+      <div style="display: inline-flex;">
+        <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 1</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(0,176,240,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 2</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(36,124,76,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 3</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(255,192,0,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 4</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+
+  <div style="width: 720px; height: 320px; display: inline-block;">
+      <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+  </div>
+  
+  
+</body>
+<script>
+'use strict';
+
+
+var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1785.0e6
+});
+
+var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1795.0e6
+});
+
+var sig3 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1805.0e6
+});
+
+var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1815.0e6
+});
+
+// sig1['name'] = "comm_link_1";
+// sig2['name'] = "comm_link_2";
+// sig3['name'] = "comm_link_3";
+// sig4['name'] = "comm_link_4";
+
+// var interferer = new Signal(conf.sig0, 'interferer', {
+//     bw_max: 38.0e6, // Hz
+//     bw_init: 2.5e6, // Hz
+//     gn_init: -12, // dB
+//     gn_min: -40, // dB
+//     freq_init: 1785.0e6 // Hz
+// });
+
+
+// var noise = Signal(conf.noise, "Noise", { gn_init: -40})
+
+new ScriptController([ sig1, sig2, sig3, sig4 ], { 
+    element: '#scriptController',
+    functionFiles: 'functions/ex20_functions.js'
+});
+
+// Slider(sig1, 'freq', '#freq1');
+// Slider(sig1, 'bw', '#bw1');
+// Slider(sig1, 'gn', '#gn1');
+// Slider(sig1, 'mcs', '#mcs1');
+
+// Slider(sig2, 'freq', '#freq2');
+// Slider(sig2, 'bw', '#bw2');
+// Slider(sig2, 'gn', '#gn2');
+// Slider(sig2, 'mcs', '#mcs2');
+
+// Slider(sig3, 'freq', '#freq3');
+// Slider(sig3, 'bw', '#bw3');
+// Slider(sig3, 'gn', '#gn3');
+// Slider(sig3, 'mcs', '#mcs3');
+
+// Slider(sig4, 'freq', '#freq4');
+// Slider(sig4, 'bw', '#bw4');
+// Slider(sig4, 'gn', '#gn4');
+// Slider(sig4, 'mcs', '#mcs4');
+
+// HoppingInterferer(interferer, '#hoppingInterferer');
+CapacityBanner(sig1, '#capacityBanner');
+
+PowerSpectrumPlot_2D();
+ThroughputPlot([sig1, sig2, sig3, sig4]);
+
+// document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
+//       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
+//   </div>`
+
+
+SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
+</script>
+</html>
