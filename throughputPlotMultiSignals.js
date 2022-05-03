@@ -23,6 +23,41 @@
 //
 //
 var signal_list = [];
+// var total_data_rate_signal = {rate: 0.0};
+
+var total_data_rate_signal = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    'name': 'total_rate'
+});
+
+for (let key in Signal.env) {
+    if(Signal.env[key]['name']=="total_rate"){
+        delete Signal.env[key];
+        break;
+    }
+}
+
+
+total_data_rate_signal.onChange = function(par, callback) {
+    if(typeof total_data_rate_signal._callbacks[par] !== "undefined") {
+        total_data_rate_signal._callbacks[par].push(callback);
+        // Trigger the first call.  Clearly there is a change in value
+        // from an "unknown" that the user of this had before the
+        // onChange() call.
+        callback(total_data_rate_signal, total_data_rate_signal['_' + par]);
+    } else
+        console.log("ERROR: you can't add a '" + par +
+            "' callback to signal " + total_data_rate_signal.name);
+};
+// var total_data_rate_signal = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+//     bw_max: 0, // Hz
+//     bw_min: 0,  // Hz
+//     bw_init: 0, // Hz
+//     gn_init: 0, // dB
+//     gn_min: 0, // dB
+//     mcs_init: 0, // array index int
+//     freq_init: 0
+// });
+
 function ThroughputPlot(signals, interferers=[]) {
     
     
@@ -94,7 +129,7 @@ function ThroughputPlot(signals, interferers=[]) {
         .call(d3.axisBottom(tscale));
 
     var rtickvalues = [ 100e3, 400e3,1e6,2e6,4e6,10e6,
-        20e6,40e6,100e6,200e6,400e6]
+        20e6,40e6,100e6,200e6,400e6];
     svgr.append("g")
         .attr("class", "y axis")
         .call(d3.axisLeft(rscale)
@@ -138,7 +173,7 @@ function ThroughputPlot(signals, interferers=[]) {
         .text(pre + "Data Rate (bits/second)");
     
     // let stroke_colors = ["#f00", "#0f0", "#00f", "#fff"];
-    var signal_colors_stroke = ["rgba(163,36,36)", "rgba(0,176,240)", "rgba(36,124,76)", "rgba(255,192,0)"];
+    var signal_colors_stroke = ["rgba(163,36,36)", "rgba(0,176,240)", "rgba(36,124,76)", "rgba(255,192,0)", "rgba(255,255,255)"];
     for(let i=0; i<signal_list.length; i++){
         signal_list[i].datar = d3.range(0,num_steps).map(function(f) { return {"y":1} });
         signal_list[i].liner = d3.line()
@@ -152,6 +187,16 @@ function ThroughputPlot(signals, interferers=[]) {
             .attr("style", `stroke:${signal_colors_stroke[i]};`)
             .attr("d", signal_list[i].liner);
     }
+    total_data_rate_signal.datar = d3.range(0,num_steps).map(function(f) { return {"y":1} });
+    total_data_rate_signal.liner = d3.line()
+    .x(function(d, i) { return tscale(-plot_period*(num_steps-i));   })
+    .y(function(d, i) { return rscale(d.y); });
+    total_data_rate_signal.pathr = svgr.append("path")
+        .attr("clip-path",`url(#clipr)`)
+        .datum(total_data_rate_signal.datar)
+        .attr("class", "stroke-med no-fill stroke-red")
+        .attr("style", `stroke:${signal_colors_stroke[signal_colors_stroke.length-1]};`)
+        .attr("d", total_data_rate_signal.liner);
     
 
 
@@ -164,6 +209,7 @@ function ThroughputPlot(signals, interferers=[]) {
     var count = 0;
 
     function update_plot() {
+        let total_rate = 0.0;
         for(let i=0; i<signal_list.length; i++){
             // A rate of 0 is not something we can plot on a log scale.
             // Log10(0) is minus infinity, and it makes all other values
@@ -172,6 +218,8 @@ function ThroughputPlot(signals, interferers=[]) {
             if(r < 0.1)
                 // The rate is not this, but it's not plotted anyway.
                 r = 0.1;
+            
+            total_rate += r;
 
             // update historical plot
             // console.log(r);
@@ -180,6 +228,9 @@ function ThroughputPlot(signals, interferers=[]) {
             signal_list[i].datar.shift();
             signal_list[i].pathr.datum(signal_list[i].datar).attr("d", signal_list[i].liner);
         }
+        total_data_rate_signal.datar.push({"y": total_rate});
+        total_data_rate_signal.datar.shift();
+        total_data_rate_signal.pathr.datum(total_data_rate_signal.datar).attr("d", total_data_rate_signal.liner);
         
     }
 
@@ -192,4 +243,8 @@ function ThroughputPlot(signals, interferers=[]) {
             signal_list[i].rate = r;
         });
     }
+    total_data_rate_signal.onChange('rate', function(obj, r) {
+        // We got a new rate in bits/second (bits/s).
+        total_data_rate_signal.rate = r;
+    });
 }

@@ -215,6 +215,11 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
     var signal_colors_fill = ["rgba(163,36,36, 0.35)", "rgba(0,176,240, 0.35)", "rgba(36,124,76, 0.35)", "rgba(255,192,0, 0.35)"];
     var signal_colors_stroke = ["rgba(163,36,36)", "rgba(0,176,240)", "rgba(36,124,76)", "rgba(255,192,0)"];
     var signal_colors_label = ["rgba(263,136,136)", "rgba(100,236,250)", "rgba(136,224,176)", "rgba(255,192,100)"];
+    
+    var interferer_colors_fill = "rgba(220, 96, 255, 0.35)";
+    var interferer_colors_stroke = "rgba(220, 96, 255)";
+    var interferer_colors_label = "rgba(220, 96, 255, 0.0)";
+    
     let signal_color_i = 0;
     Object.keys(Signal.env).forEach(function(key) {
         let color_fill = signal_colors_fill[signal_color_i%signal_colors_fill.length];
@@ -245,6 +250,12 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
             .text(`Signal (${0.0}Hz)`);
 
         sig.signal_label_f = signal_label_f;
+
+        if(sig['name']=='interferer'){
+            signal_box_f.attr("fill", interferer_colors_fill).attr("stroke", interferer_colors_stroke);
+            signal_label_f.attr("fill", interferer_colors_label)
+            return;
+        }
         
         signal_color_i+=1;
     });

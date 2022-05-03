@@ -2,6 +2,7 @@
 // Works well with parentElement being an existing <p> that gets its'
 // innerHTML over written.
 //
+HoppingInterferer.hopping_behaviour = "random";
 function HoppingInterferer(interferer, parentElement = null, opts = null) {
 
     // Generate a unique id for HTML element ids.
@@ -45,9 +46,18 @@ console.log("parentElement.innerHTML=" + parentElement.innerHTML);
     var label = getElement('#hr'); // output label
 
     function Hop() {
-
-        interferer.freq = interferer.freq_min +
+        if(HoppingInterferer.hopping_behaviour == "periodic"){
+            interferer.freq += 2e6;
+            if(interferer.freq >= interferer.freq_max){
+                interferer.freq = interferer.freq_min
+            }
+        }
+        else{
+            // console.log(interferer.freq);
+            interferer.freq = interferer.freq_min +
             Math.random() * (interferer.freq_max - interferer.freq_min);
+        }
+        
     }
 
     hopRateSlider.value = hopRate;

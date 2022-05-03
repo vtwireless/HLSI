@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US" style="display: flex;">
 <head>
-    <title>HLSI Ex 19</title>
+    <title>HLSI Ex 21</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
     <link rel=stylesheet type=text/css href=sidebar.css />
@@ -66,9 +66,9 @@
         <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
         <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
         <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
-        <a href="19_rf_front_end_spectrum_sharing.html" class="selected"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
         <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
-        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"  class="selected"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
       </nav>
       
       <label for="menu-control" class="sidebar__close"></label>
@@ -76,7 +76,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 19</span> RF Front End - Spectrum Sharing</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 21</span> RF Front End - Spectrum Sharing with Interferer</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -86,8 +86,28 @@
   </section>
   
   <div class="content-section" style="margin: 0% 2%; margin-top: 8%;">
-    <!-- <p id=hoppingInterferer>
-    </p> -->
+
+
+    <fieldset style="display: inline-flex; margin-bottom: 15px;">
+      <legend>Interferer Behaviour</legend>
+      
+      <p id=hoppingInterferer>
+      
+      </p>
+      <div style="display: inline-flex; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; margin-left: 15px;">
+        <div>
+          <input type="radio" id="random" name="hopping_behaviour" value="random" onclick="on_hopping_behaviour_radio_button_change(value);" checked>
+          <label for="random">Random</label>
+        </div>
+    
+        <div>
+          <input type="radio" id="periodic" name="hopping_behaviour" value="periodic" onclick="on_hopping_behaviour_radio_button_change(value);">
+          <label for="periodic">Periodic</label>
+        </div>
+      </div>
+  </fieldset>
+
+    
   
     <p id=capacityBanner style="display: none;">
     </p>
@@ -205,6 +225,14 @@
 <script>
 'use strict';
 
+var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 2.5e6, // Hz
+    gn_init: -12, // dB
+    gn_min: -40, // dB
+    freq_init: 1785.0e6 // Hz
+});
+
 
 var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -282,7 +310,7 @@ Slider(sig4, 'bw', '#bw4');
 Slider(sig4, 'gn', '#gn4');
 Slider(sig4, 'mcs', '#mcs4');
 
-// HoppingInterferer(interferer, '#hoppingInterferer');
+HoppingInterferer(interferer, '#hoppingInterferer');
 CapacityBanner(sig1, '#capacityBanner');
 
 PowerSpectrumPlot_2D();
@@ -294,5 +322,11 @@ ThroughputPlot([sig1, sig2, sig3, sig4]);
 
 
 SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
+
+
+function on_hopping_behaviour_radio_button_change(new_hopping_behaviour){
+  HoppingInterferer.hopping_behaviour = new_hopping_behaviour;
+}
+
 </script>
 </html>

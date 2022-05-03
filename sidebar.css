@@ -168,7 +168,18 @@ body {
 .sidebar__menu a:nth-child(18) {
     transition-delay: 0.35s;
 }
-
+.sidebar__menu a:nth-child(19) {
+    transition-delay: 0.37s;
+}
+.sidebar__menu a:nth-child(20) {
+    transition-delay: 0.39s;
+}
+.sidebar__menu a:nth-child(21) {
+    transition-delay: 0.41s;
+}
+.sidebar__menu a:nth-child(22) {
+    transition-delay: 0.43s;
+}
 
 .sidebar__menu a.selected {
     border-bottom: #d8baff 3px solid;
