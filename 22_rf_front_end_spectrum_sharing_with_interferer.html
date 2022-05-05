@@ -1,12 +1,21 @@
 <!DOCTYPE html>
 <html lang="en-US" style="display: flex;">
 <head>
-    <title>HLSI Ex 19</title>
+    <title>HLSI Ex 22</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+    <link rel=stylesheet type=text/css href=codemirror.min.css />
+    <link rel=stylesheet type=text/css href=blackboard.min.css />
     <link rel=stylesheet type=text/css href=sidebar.css />
     <style> 
         output {font-weight: bold;}
+
+        .argsTable{
+          height: 480px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          display: block;
+        }
     </style>
     <script src=d3.v5.min.js></script>
     <script src=fft.js></script>
@@ -21,6 +30,9 @@
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
     <!-- <script src=throughputPlot.js></script> -->
+    <script src=codemirror.min.js></script>
+    <script src=codeMirror_javascript.js></script>
+    <script src=scriptController.js></script>
     <script src=throughputPlotMultiSignals.js></script>
     <script src=hoppingInterferer.js></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
@@ -66,10 +78,10 @@
         <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
         <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
         <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
-        <a href="19_rf_front_end_spectrum_sharing.html" class="selected"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
         <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
         <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
-        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"  class="selected"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
       </nav>
       
       <label for="menu-control" class="sidebar__close"></label>
@@ -77,7 +89,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 19</span> RF Front End - Spectrum Sharing</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 22</span> RF Front End - Spectrum Sharing - Automatic Frequency Assignment</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -87,77 +99,34 @@
   </section>
   
   <div class="content-section" style="margin: 0% 2%; margin-top: 8%;">
-    <!-- <p id=hoppingInterferer>
-    </p> -->
+    
+    <fieldset style="display: inline-flex; margin-bottom: 15px;">
+      <legend>Interferer Behaviour</legend>
+      
+      <p id=hoppingInterferer>
+      
+      </p>
+      <div style="display: inline-flex; margin-block-start: 1em; margin-block-end: 1em; margin-inline-start: 0px; margin-inline-end: 0px; margin-left: 15px;">
+        <div>
+          <input type="radio" id="random" name="hopping_behaviour" value="random" onclick="on_hopping_behaviour_radio_button_change(value);" checked>
+          <label for="random">Random</label>
+        </div>
+    
+        <div>
+          <input type="radio" id="periodic" name="hopping_behaviour" value="periodic" onclick="on_hopping_behaviour_radio_button_change(value);">
+          <label for="periodic">Periodic</label>
+        </div>
+      </div>
+  </fieldset>
+
+    
+    
+    
+    <p id=scriptController style="margin-bottom: 2%;"></p>
   
     <p id=capacityBanner style="display: none;">
     </p>
 
-    <div style="display: inline-flex; width: 100%;">
-      <div style="width: 25%;">
-        <div style="font-size: 110%; color: #ff6b6b">Comm Link 1</div>
-        <p>
-          <input type="range" id=freq1 />
-        </p>
-        <p>
-          <input type="range" id=bw1 />
-        </p>
-        <p>
-          <input type="range" id=gn1 />
-        </p>
-        <p>
-          <input type="range" id=mcs1 />
-        </p>
-      </div>
-
-      <div style="width: 25%;">
-        <div style="font-size: 110%; color: #b5ebff">Comm Link 2</div>
-        <p>
-          <input type="range" id=freq2 />
-        </p>
-        <p>
-          <input type="range" id=bw2 />
-        </p>
-        <p>
-          <input type="range" id=gn2 />
-        </p>
-        <p>
-          <input type="range" id=mcs2 />
-        </p>
-      </div>
-
-      <div style="width: 25%;">
-        <div style="font-size: 110%; color: #afffd3">Comm Link 3</div>
-        <p>
-          <input type="range" id=freq3 />
-        </p>
-        <p>
-          <input type="range" id=bw3 />
-        </p>
-        <p>
-          <input type="range" id=gn3 />
-        </p>
-        <p>
-          <input type="range" id=mcs3 />
-        </p>
-      </div>
-
-      <div style="width: 25%;">
-        <div style="font-size: 110%; color: #ffe699">Comm Link 4</div>
-        <p>
-          <input type="range" id=freq4 />
-        </p>
-        <p>
-          <input type="range" id=bw4 />
-        </p>
-        <p>
-          <input type="range" id=gn4 />
-        </p>
-        <p>
-          <input type="range" id=mcs4 />
-        </p>
-      </div>
-    </div>
     
 
     <div style="display:inline-flex;">
@@ -196,16 +165,18 @@
       <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
   </div>
   
-  <div style="margin-left:2%;">
-    <div style="display: inline-flex;">
-      <div style="width: 28px; height: 3px; background:rgba(255,255,255,255); margin-top: 8px; margin-right: 5px;"></div>
-      <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Total Data Throughput</div>
-    </div>
-  </div>
+  
 </body>
 <script>
 'use strict';
 
+var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 2.5e6, // Hz
+    gn_init: -12, // dB
+    gn_min: -40, // dB
+    freq_init: 1785.0e6 // Hz
+});
 
 var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -263,27 +234,32 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
 // var noise = Signal(conf.noise, "Noise", { gn_init: -40})
 
-Slider(sig1, 'freq', '#freq1');
-Slider(sig1, 'bw', '#bw1');
-Slider(sig1, 'gn', '#gn1');
-Slider(sig1, 'mcs', '#mcs1');
+new ScriptController([ sig1, sig2, sig3, sig4 ], { 
+    element: '#scriptController',
+    functionFiles: 'functions/ex20_functions.js'
+});
 
-Slider(sig2, 'freq', '#freq2');
-Slider(sig2, 'bw', '#bw2');
-Slider(sig2, 'gn', '#gn2');
-Slider(sig2, 'mcs', '#mcs2');
+// Slider(sig1, 'freq', '#freq1');
+// Slider(sig1, 'bw', '#bw1');
+// Slider(sig1, 'gn', '#gn1');
+// Slider(sig1, 'mcs', '#mcs1');
 
-Slider(sig3, 'freq', '#freq3');
-Slider(sig3, 'bw', '#bw3');
-Slider(sig3, 'gn', '#gn3');
-Slider(sig3, 'mcs', '#mcs3');
+// Slider(sig2, 'freq', '#freq2');
+// Slider(sig2, 'bw', '#bw2');
+// Slider(sig2, 'gn', '#gn2');
+// Slider(sig2, 'mcs', '#mcs2');
 
-Slider(sig4, 'freq', '#freq4');
-Slider(sig4, 'bw', '#bw4');
-Slider(sig4, 'gn', '#gn4');
-Slider(sig4, 'mcs', '#mcs4');
+// Slider(sig3, 'freq', '#freq3');
+// Slider(sig3, 'bw', '#bw3');
+// Slider(sig3, 'gn', '#gn3');
+// Slider(sig3, 'mcs', '#mcs3');
 
-// HoppingInterferer(interferer, '#hoppingInterferer');
+// Slider(sig4, 'freq', '#freq4');
+// Slider(sig4, 'bw', '#bw4');
+// Slider(sig4, 'gn', '#gn4');
+// Slider(sig4, 'mcs', '#mcs4');
+
+HoppingInterferer(interferer, '#hoppingInterferer');
 CapacityBanner(sig1, '#capacityBanner');
 
 PowerSpectrumPlot_2D();
@@ -295,5 +271,9 @@ ThroughputPlot([sig1, sig2, sig3, sig4]);
 
 
 SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
+
+function on_hopping_behaviour_radio_button_change(new_hopping_behaviour){
+  HoppingInterferer.hopping_behaviour = new_hopping_behaviour;
+}
 </script>
 </html>
