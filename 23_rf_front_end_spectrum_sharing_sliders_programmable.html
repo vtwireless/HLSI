@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en-US" style="display: flex;">
 <head>
-    <title>HLSI Ex 20</title>
+    <title>HLSI Ex 23</title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
     <link rel=stylesheet type=text/css href=codemirror.min.css />
@@ -79,10 +79,10 @@
         <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
         <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
         <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
-        <a href="20_rf_front_end_spectrum_sharing.html" class="selected"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
         <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
         <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
-        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html" class="selected"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
       </nav>
       
       <label for="menu-control" class="sidebar__close"></label>
@@ -90,7 +90,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 20</span> RF Front End - Spectrum Sharing - Automatic Frequency Assignment</div>
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Exercise 23</span> RF Front End - Spectrum Sharing - Both Manual and Automatic Frequency Assignment</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -105,6 +105,71 @@
     <p id=capacityBanner style="display: none;">
     </p>
 
+    <div style="display: inline-flex; width: 100%;">
+      <div style="width: 25%;">
+        <div style="font-size: 110%; color: #ff6b6b">Comm Link 1</div>
+        <p>
+          <input type="range" id=freq1 />
+        </p>
+        <p>
+          <input type="range" id=bw1 />
+        </p>
+        <p>
+          <input type="range" id=gn1 />
+        </p>
+        <p>
+          <input type="range" id=mcs1 />
+        </p>
+      </div>
+
+      <div style="width: 25%;">
+        <div style="font-size: 110%; color: #b5ebff">Comm Link 2</div>
+        <p>
+          <input type="range" id=freq2 />
+        </p>
+        <p>
+          <input type="range" id=bw2 />
+        </p>
+        <p>
+          <input type="range" id=gn2 />
+        </p>
+        <p>
+          <input type="range" id=mcs2 />
+        </p>
+      </div>
+
+      <div style="width: 25%;">
+        <div style="font-size: 110%; color: #afffd3">Comm Link 3</div>
+        <p>
+          <input type="range" id=freq3 />
+        </p>
+        <p>
+          <input type="range" id=bw3 />
+        </p>
+        <p>
+          <input type="range" id=gn3 />
+        </p>
+        <p>
+          <input type="range" id=mcs3 />
+        </p>
+      </div>
+
+      <div style="width: 25%;">
+        <div style="font-size: 110%; color: #ffe699">Comm Link 4</div>
+        <p>
+          <input type="range" id=freq4 />
+        </p>
+        <p>
+          <input type="range" id=bw4 />
+        </p>
+        <p>
+          <input type="range" id=gn4 />
+        </p>
+        <p>
+          <input type="range" id=mcs4 />
+        </p>
+      </div>
+    </div>
     
 
     <div style="display:inline-flex;">
@@ -201,6 +266,26 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 //     gn_min: -40, // dB
 //     freq_init: 1785.0e6 // Hz
 // });
+
+Slider(sig1, 'freq', '#freq1');
+Slider(sig1, 'bw', '#bw1');
+Slider(sig1, 'gn', '#gn1');
+Slider(sig1, 'mcs', '#mcs1');
+
+Slider(sig2, 'freq', '#freq2');
+Slider(sig2, 'bw', '#bw2');
+Slider(sig2, 'gn', '#gn2');
+Slider(sig2, 'mcs', '#mcs2');
+
+Slider(sig3, 'freq', '#freq3');
+Slider(sig3, 'bw', '#bw3');
+Slider(sig3, 'gn', '#gn3');
+Slider(sig3, 'mcs', '#mcs3');
+
+Slider(sig4, 'freq', '#freq4');
+Slider(sig4, 'bw', '#bw4');
+Slider(sig4, 'gn', '#gn4');
+Slider(sig4, 'mcs', '#mcs4');
 
 
 // var noise = Signal(conf.noise, "Noise", { gn_init: -40})
