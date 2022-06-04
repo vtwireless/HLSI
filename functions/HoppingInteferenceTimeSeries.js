@@ -134,61 +134,36 @@ var functions = {
 
 function() {
 bw_margin = globalUserData.bw_margin;  //Defines the bandwidth margin; Please Keep Constant
-
 start_freq = freq_min2 + bw_margin;   //Defines the eligible range of frequencies; Please Keep Constant
-
 end_freq = freq_max2 - bw_margin;  //Defines the eligible range of frequencies; Please Keep Constant
-
 num_channels  = globalUserData.num_channels; // Defines the number of channels; Please keep constant
-
 available_freq = makeArr(start_freq, end_freq, num_channels) // Create Channels
 
- 
-
 globalUserData['timeForML'] = globalUserData['timeForML'] + 1 // Update Current Time
-
 timeForML = globalUserData['timeForML'] // Get current Time
 
 timeScaleForML = 8 // Set Time scale
-
 globalUserData['timeScaleForML'] = timeScaleForML; // Get Time scale
 
- 
 
-hoppingVector = [0,1,2,3,4,5,6,7]
+hoppingVector = [0,1,2,3,4,5,6,7] // Frequency channels to be occupied during consecutive time slots
 
- 
-
- 
 
 if(init){
-
                qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0))
-
                globalUserData['qfunc'] = qfunc;
-
 }
-
  
 
 ind2 = hoppingVector[Math.round(timeForML % timeScaleForML)];
-
 globalUserData["ind2"] = ind2
-
 freq2 = available_freq[ind2];
 
- 
 
 if(freq2 > freq_max2)
-
     freq2 = freq_max2;
-
 else if(freq2 < freq_min2)
-
     freq2 = freq_min2;
-
- 
-
  
 
 return { freq2: freq2, freq1: freq1 };
