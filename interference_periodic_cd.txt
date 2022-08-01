@@ -1,0 +1,53 @@
+/*
+Primary Author: Allan Guo (Duke University)
+Secondary Authors: Ansh Gwash (Virginia Tech), Lina Nayvelt (Duke), Rhea Saxena (Virginia Tech), Davidson Zhu (Duke)
+Acknowledgements to original developer(s) of this module for developing the original code
+This code is developed for the VT online "Hands-on Learning for Radio Frequency Spectrum Innovation" (HLSI) tutorials
+Exercise 18: https://vtwireless.github.io/HLSI/18_machine_learning_time_based_avoidance.html
+To implement the code, paste into top Function Callback code box. This code controls a periodic interference signal.
+*/
+
+num_channels = 8; //number of channels considered
+bw_margin = 20000000/num_channels; // one-half the bandwidth of a channel, in Hz
+bw_margin = (freq_max2 - freq_min2) / num_channels / 2; // one-half the bandwidth of a channel, in Hz
+
+start_freq = freq_min2 + bw_margin; //center frequency of lowest channel   
+end_freq = freq_max2 - bw_margin; //center frequency of highest channel
+available_freq = makeArr(start_freq, end_freq, num_channels) //array of center frequencies of channels
+
+globalUserData['timeForML'] = globalUserData['timeForML'] + 1 // Update Current Time
+timeForML = globalUserData['timeForML'] // Get current Time
+timeScaleForML = 8 // Set Time scale (number of time slots in repeating sequence)
+globalUserData['timeScaleForML'] = timeScaleForML; // Save Time scale to globalUserData for future use.
+
+// Hopping vector has size equal to number of channels.
+hoppingVector = [0,1,2,3,4,5,6,7]; // sequence of channels to which the interferer hops during each consecutive 
+								   // set of timeScaleForML time slots.
+
+if(init){
+  //initialization:  Initializing Q-function here for use in Data Signal Controller callback
+               globalUserData['timeForML'] = 0;
+               timeForML = 0;
+               //qfunc here is three dimensional matrix. axis 0 accounts for the timescale, axis 1 accounts for the starting channel in which data signal is 
+               //transmitted through, and axis 2 accounts for bandwidth of transmitted signal
+               //Note that this qfunc is not a conventonal qlearning matrix since it is three-dimensional, but it is straightforward to convert into a 2d one, 
+               //though other parts of code will need to be updated.
+               qfunc = Array(globalUserData['timeScaleForML']).fill(0).map(x => Array(num_channels).fill(0).map(x => Array(num_channels).fill(0)));
+               globalUserData['qfunc'] = qfunc; // Save qfunc to globalUserData for future use.
+}
+
+ind2 = hoppingVector[Math.round(timeForML % timeScaleForML)]; // index of interferer frequency for current time slot
+
+globalUserData["ind2"] = ind2 // Save to globalUserData for future use.
+
+freq2 = available_freq[ind2]; // Get interferer frequency for current time slot.
+
+//Part of original code that forces interferer frequency to be within the displayed bandwidth, commented out
+/*
+if(freq2 > freq_max2)
+    freq2 = freq_max2;
+else if(freq2 < freq_min2)
+    freq2 = freq_min2;
+*/
+ 
+return { freq2: freq2};
