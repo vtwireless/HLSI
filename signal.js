@@ -411,6 +411,11 @@ function Signal(sig, name = "", opts = null) {
     // environment.
     obj.interferers = [];
 
+    // receiver filter bandwidth multiplier constant for calculating SINR in case of
+    // ideal receiver filter with wider bandwidth than the received signal
+    // defaults to 1 (i.e. equal to the signal bandwidth)
+    obj.bandwidthMultiplier = 1;
+
     // 1) Add this object to the environment of all other signals as
     // an interferer, and 2) add the other signals to this ones' list
     // of interferers.
@@ -550,19 +555,51 @@ function Signal(sig, name = "", opts = null) {
         // would still be arbitrary.  I think there may be a missing
         // independent parameter/variable in the signal model, maybe
         // sample rate.
-        var bw_max = obj.freq_plot_max - obj.freq_plot_min;
+        
+        // var bw_max = obj.freq_plot_max - obj.freq_plot_min;
 
         // A noise signal does not have a rate.
         if(obj.is_noise) return;
 
         // We will calculate the next/new rate:
         var new_rate = 0.0;
-        // and sinr:
+        obj.calculateSINR();
+        
+        if(obj._sinr >= conf.schemes[obj._mcs].SNR)
+            new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+
+        // if the new rate and old rate are the same we do not
+        // trigger rate events. 
+        if(obj._rate !== new_rate) {
+
+            obj._rate = new_rate;
+
+            // trigger "rate" change callbacks:
+            obj._callbacks.rate.forEach(function(callback) {
+                //console.log("CALLING: " + callback);
+                callback(obj, obj._rate);
+            });
+        }
+
+    }
+
+
+    // We need to access this checkSetRate() function from other signals
+    // as we create more signals, so we can have the other signals effect
+    // this "rate" and "sinr".
+    obj.checkSetRate = checkSetRate;
+    
+
+    // calculates SINR for the signal of interest considering interferer power due to all other signals
+    // including noise
+    obj.calculateSINR = function() {
+
+        var bw_max = obj.freq_plot_max - obj.freq_plot_min;
         var new_sinr = 0.0;
 
         // The end points of the obj signal band.
-        var bmin = obj._freq - 0.5 * obj._bw;
-        var bmax = obj._freq + 0.5 * obj._bw;
+        var bmin = obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw;
+        var bmax = obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw;
 
         function PowerSpectralDensity(gn) {
             // There is an arbitrary multiplicative constant that will
@@ -583,8 +620,8 @@ function Signal(sig, name = "", opts = null) {
             if(!i.is_noise &&
                 (
                     // Do they NOT overlap?
-                    (obj._freq - 0.5*obj._bw) >= (i._freq + 0.5*i._bw) ||
-                    (obj._freq + 0.5*obj._bw) <= (i._freq - 0.5*i._bw)
+                    (obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw) >= (i._freq + 0.5*i._bw) ||
+                    (obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw) <= (i._freq - 0.5*i._bw)
                 ))
                 // This interferer (i) is not currently interfering.  It
                 // does not overlap the signal (obj).
@@ -603,7 +640,7 @@ function Signal(sig, name = "", opts = null) {
             if(i.is_noise) {
                 // Noise overlaps the whole signal.  This is wrong.  The
                 // bw_max number is a fug.
-                ip += obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                ip += obj.bandwidthMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
                 let min = i._freq - 0.5 * i._bw;
                 if(min < bmin)
@@ -624,12 +661,8 @@ function Signal(sig, name = "", opts = null) {
         // sinr (signal to interferer and noise ratio) in dB.
         //
         new_sinr = obj._gn - 10*Math.log10(ip);
-
-        //console.log(" ip=" + ip + " sinr=" + new_sinr);
-
-
-        if(new_sinr >= conf.schemes[obj._mcs].SNR)
-            new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+        
+        // console.log(" ip=" + ip + " sinr=" + new_sinr);
 
         // Tricky:
         let have_change = (obj._sinr !== new_sinr);
@@ -638,18 +671,6 @@ function Signal(sig, name = "", opts = null) {
         if(have_change)
             obj._sinr = new_sinr;
 
-        // if the new rate and old rate are the same we do not
-        // trigger rate events. 
-        if(obj._rate !== new_rate) {
-
-            obj._rate = new_rate;
-
-            // trigger "rate" change callbacks:
-            obj._callbacks.rate.forEach(function(callback) {
-                //console.log("CALLING: " + callback);
-                callback(obj, obj._rate);
-            });
-        }
 
         // Now this is way we needed that stupid have_change flag:
         if(have_change) {
@@ -662,14 +683,21 @@ function Signal(sig, name = "", opts = null) {
                 callback(obj, obj._sinr);
             });
         }
-    }
+
+    };
 
 
-    // We need to access this checkSetRate() function from other signals
-    // as we create more signals, so we can have the other signals effect
-    // this "rate" and "sinr".
-    obj.checkSetRate = checkSetRate;
-
+    // trigger callbacks for all signals - (i.e. trigger only sinr and rate calculations 
+    // and update plot callbacks)
+    obj.triggerCallbacks = function() {
+        
+        obj._callbacks['bw'].forEach(function(callback) {
+            if (callback != undefined && callback.name === 'checkSetRate' ||
+                callback.name === 'update_plot') {
+                callback(obj, obj._bw);
+            }
+        });
+    };
 
     // Set up setters for the 3 independent varying variables/parameters,
     // "freq", "bw", "gn", and "mcs".  "rate" is dependent variable so

@@ -239,7 +239,7 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 // });
 
 
-// var noise = Signal(conf.noise, "Noise", { gn_init: -40})
+var noise = Signal(conf.noise, "Noise", { gn_init: -40})
 
 new ScriptController([ sig1, sig2, sig3, sig4 ], { 
     element: '#scriptController',

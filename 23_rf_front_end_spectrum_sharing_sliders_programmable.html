@@ -28,6 +28,7 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
     <script src=signal.js></script>
     <!-- <script src=sliders.js></script> -->
     <script src=slidersMultiSignals.js></script>
+    <script src=modeController.js></script>
     <!-- <script src=powerSpectrumPlot.js></script> -->
     <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
     <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
@@ -110,6 +111,13 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
     <p id=capacityBanner style="display: none;">
     </p>
 
+    <p><label for="mode">Select mode:</label> &nbsp;
+      <select id="mode" onchange="onModeChange()">
+        <option value="m0">Beginner</option>
+        <option value="m1">Advanced</option>
+      </select>
+    </p>
+
     <div style="display: inline-flex; width: 100%;">
       <div style="width: 25%;">
         <div style="font-size: 110%; color: #ff6b6b">Comm Link 1</div>
@@ -117,13 +125,13 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
           <input type="range" id=freq1 />
         </p>
         <p>
-          <input type="range" id=bw1 />
+          <input type="range" id=bw1 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=gn1 />
+          <input type="range" id=gn1 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=mcs1 />
+          <input type="range" id=mcs1 style="display: none;" />
         </p>
       </div>
 
@@ -133,13 +141,13 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
           <input type="range" id=freq2 />
         </p>
         <p>
-          <input type="range" id=bw2 />
+          <input type="range" id=bw2 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=gn2 />
+          <input type="range" id=gn2 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=mcs2 />
+          <input type="range" id=mcs2 style="display: none;" />
         </p>
       </div>
 
@@ -149,13 +157,13 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
           <input type="range" id=freq3 />
         </p>
         <p>
-          <input type="range" id=bw3 />
+          <input type="range" id=bw3 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=gn3 />
+          <input type="range" id=gn3 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=mcs3 />
+          <input type="range" id=mcs3 style="display: none;" />
         </p>
       </div>
 
@@ -165,13 +173,13 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
           <input type="range" id=freq4 />
         </p>
         <p>
-          <input type="range" id=bw4 />
+          <input type="range" id=bw4 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=gn4 />
+          <input type="range" id=gn4 style="display: none;" />
         </p>
         <p>
-          <input type="range" id=mcs4 />
+          <input type="range" id=mcs4 style="display: none;" />
         </p>
       </div>
     </div>
@@ -293,7 +301,7 @@ Slider(sig4, 'gn', '#gn4');
 Slider(sig4, 'mcs', '#mcs4');
 
 
-// var noise = Signal(conf.noise, "Noise", { gn_init: -40})
+var noise = Signal(conf.noise, "Noise", { gn_init: -40})
 
 new ScriptController([ sig1, sig2, sig3, sig4 ], { 
     element: '#scriptController',

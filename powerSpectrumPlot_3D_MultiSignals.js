@@ -226,6 +226,11 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
         let color_stroke = signal_colors_stroke[signal_color_i%signal_colors_stroke.length];
         let color_label = signal_colors_label[signal_color_i%signal_colors_stroke.length];
         let sig = Signal.env[key];
+
+        if (sig.is_noise) {
+            return;
+        }
+        
         var signal_box_f = svg
         .append("rect")
         .attr("clip-path", "url(#clipf)")
@@ -274,6 +279,7 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
 
             sig.cur_signal_freq = fc;
             sig.cur_signal_bw = bw;
+            sig.cur_signal_bw_ideal_filter = (sig.bw * sig.bandwidthMultiplier) / df;
             sig.cur_signal_freq_exact = sig._freq;
 
             //console.log("fc=" + fc + " bw=" + bw + " gn=" + gn);
@@ -281,7 +287,7 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
             generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
             //generator.add_signal(fc, bw, gn);
 
-            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, sig.cur_signal_bw);
+            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, sig.cur_signal_bw_ideal_filter);
             sig.signal_box_f.attr("x", signal_bounding_box_new_coordinates['x']);
             sig.signal_box_f.attr("y", signal_bounding_box_new_coordinates['y']);
             sig.signal_box_f.attr("width", signal_bounding_box_new_coordinates['width']);
