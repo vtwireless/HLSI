@@ -620,8 +620,8 @@ function Signal(sig, name = "", opts = null) {
             if(!i.is_noise &&
                 (
                     // Do they NOT overlap?
-                    (obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw) >= (i._freq + 0.5*i._bw) ||
-                    (obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw) <= (i._freq - 0.5*i._bw)
+                    (obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw) >= (i._freq + 0.5 * i._bw * i.bandwidthMultiplier) ||
+                    (obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw) <= (i._freq - 0.5 * i._bw * i.bandwidthMultiplier)
                 ))
                 // This interferer (i) is not currently interfering.  It
                 // does not overlap the signal (obj).
@@ -642,16 +642,16 @@ function Signal(sig, name = "", opts = null) {
                 // bw_max number is a fug.
                 ip += obj.bandwidthMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
-                let min = i._freq - 0.5 * i._bw;
+                let min = i._freq - 0.5 * (i.bandwidthMultiplier * i._bw);
                 if(min < bmin)
                     min = bmin;
-                let max = i._freq + 0.5 * i._bw;
+                let max = i._freq + 0.5 * (i.bandwidthMultiplier * i._bw);
                 if(max > bmax)
                     max = bmax;
                 // partial overlap for non-noise.
                 let b = max - min;
 
-                ip += b * PowerSpectralDensity(i._gn)/i._bw;
+                ip += b * PowerSpectralDensity(i._gn)/ (i.bandwidthMultiplier * i._bw);
             }
         });
 

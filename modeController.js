@@ -6,7 +6,7 @@ function onModeChange() {
     let mode = document.getElementById("mode").value;
 
     // beginner mode
-    if (mode === 'm0') {
+    if (mode === 'beginner') {
         // show only frequeny sliders in beginner mode
         document.getElementById("bw1").style.display = "none";
         document.getElementById("gn1").style.display = "none";
@@ -24,7 +24,7 @@ function onModeChange() {
         document.getElementById("gn4").style.display = "none";
         document.getElementById("mcs4").style.display = "none";
 
-    } else if (mode === 'm1') {
+    } else if (mode === 'advanced') {
 
         // show only frequeny sliders in beginner mode
         document.getElementById("bw1").style.display = "initial";

@@ -113,8 +113,8 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
 
     <p><label for="mode">Select mode:</label> &nbsp;
       <select id="mode" onchange="onModeChange()">
-        <option value="m0">Beginner</option>
-        <option value="m1">Advanced</option>
+        <option id="beginner" value="beginner">Beginner</option>
+        <option id="advanced" value="advanced">Advanced</option>
       </select>
     </p>
 
@@ -225,6 +225,19 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
 </body>
 <script>
 'use strict';
+
+// function to listen to url changes
+window.onload = function () {
+    const urlParams = new URLSearchParams(location.search);
+
+    for (const [key, value] of urlParams) {
+      let val = value.toLowerCase();
+      if (key == 'mode' && ['beginner', 'advanced'].includes(val)) {
+        document.getElementById(val).selected = "selected";
+        onModeChange();
+      }
+    }
+};
 
 
 var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
