@@ -236,9 +236,21 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
 
         sig.signal_label_f = signal_label_f;
 
+        var signal_label_recv_p = svgf
+            .append("text")
+            .attr("clip-path", "url(#clipf)")
+            .attr("x", "200")
+            .attr("y", "150")
+            .attr("fill", color_label)
+            // .attr("id", "signal_label")
+            .text(`Signal (${0.0})`);
+
+        sig.signal_label_recv_p = signal_label_recv_p;
+
         if(sig['name']=='interferer'){
             signal_box_f.attr("fill", interferer_colors_fill).attr("stroke", interferer_colors_stroke);
             signal_label_f.attr("fill", interferer_colors_label)
+            signal_label_recv_p.attr("fill", interferer_colors_label)
             return;
         }
         
@@ -280,8 +292,13 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             let signal_label_new_coordinates = get_graph_label_coordinates(720, 320, sig.cur_signal_freq);
             sig.signal_label_f.attr("x", signal_label_new_coordinates['x']+8*sig_i);
             sig.signal_label_f.attr("y", signal_label_new_coordinates['y']-8);
+
+            sig.signal_label_recv_p.attr("x", signal_label_new_coordinates['x']+8*sig_i + 10);
+            sig.signal_label_recv_p.attr("y", signal_label_new_coordinates['y']-8 - 75);
+
             // sig.signal_label_f.text(`Comm Link ${sig_i+1} (${sig.cur_signal_freq_exact}MHz)`);
             sig.signal_label_f.text(`${sig.cur_signal_freq_exact}MHz`);
+            sig.signal_label_recv_p.text(`RP : ${sig.receiverPerformance}`);
 
             sig_i+=1;
         });

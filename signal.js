@@ -416,6 +416,9 @@ function Signal(sig, name = "", opts = null) {
     // defaults to 1 (i.e. equal to the signal bandwidth)
     obj.bandwidthMultiplier = 1;
 
+    // Receiver Performance Metric to quantify the impact of nonlinearity and adjacent channel signals.
+    obj.receiverPerformance = 1;
+
     // 1) Add this object to the environment of all other signals as
     // an interferer, and 2) add the other signals to this ones' list
     // of interferers.
@@ -565,6 +568,9 @@ function Signal(sig, name = "", opts = null) {
         var new_rate = 0.0;
         obj.calculateSINR();
         
+        // calculate Receiver Performance metric
+        obj.calculateReceiverPerformance();
+        
         if(obj._sinr >= conf.schemes[obj._mcs].SNR)
             new_rate = obj._bw * conf.schemes[obj._mcs].rate;
 
@@ -573,7 +579,7 @@ function Signal(sig, name = "", opts = null) {
         if(obj._rate !== new_rate) {
 
             obj._rate = new_rate;
-
+            
             // trigger "rate" change callbacks:
             obj._callbacks.rate.forEach(function(callback) {
                 //console.log("CALLING: " + callback);
@@ -592,14 +598,21 @@ function Signal(sig, name = "", opts = null) {
 
     // calculates SINR for the signal of interest considering interferer power due to all other signals
     // including noise
-    obj.calculateSINR = function() {
+    // params:
+    //      1. bwMultiplier used for sinr calculation (if null then take the object's bandwidthMultiplier)
+    //      2. setSINR -- if false do not set the new_sinr on object
+    obj.calculateSINR = function(bwMultiplier = null, setSINR = true) {
+
+        if (bwMultiplier === null) {
+            bwMultiplier = obj.bandwidthMultiplier;
+        }
 
         var bw_max = obj.freq_plot_max - obj.freq_plot_min;
         var new_sinr = 0.0;
 
         // The end points of the obj signal band.
-        var bmin = obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw;
-        var bmax = obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw;
+        var bmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+        var bmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
 
         function PowerSpectralDensity(gn) {
             // There is an arbitrary multiplicative constant that will
@@ -620,8 +633,8 @@ function Signal(sig, name = "", opts = null) {
             if(!i.is_noise &&
                 (
                     // Do they NOT overlap?
-                    (obj._freq - 0.5 * obj.bandwidthMultiplier * obj._bw) >= (i._freq + 0.5 * i._bw * i.bandwidthMultiplier) ||
-                    (obj._freq + 0.5 * obj.bandwidthMultiplier * obj._bw) <= (i._freq - 0.5 * i._bw * i.bandwidthMultiplier)
+                    (obj._freq - 0.5 * bwMultiplier * obj._bw) >= (i._freq + 0.5 * i._bw) ||
+                    (obj._freq + 0.5 * bwMultiplier * obj._bw) <= (i._freq - 0.5 * i._bw)
                 ))
                 // This interferer (i) is not currently interfering.  It
                 // does not overlap the signal (obj).
@@ -640,18 +653,18 @@ function Signal(sig, name = "", opts = null) {
             if(i.is_noise) {
                 // Noise overlaps the whole signal.  This is wrong.  The
                 // bw_max number is a fug.
-                ip += obj.bandwidthMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                ip += bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
-                let min = i._freq - 0.5 * (i.bandwidthMultiplier * i._bw);
+                let min = i._freq - 0.5 * i._bw;
                 if(min < bmin)
                     min = bmin;
-                let max = i._freq + 0.5 * (i.bandwidthMultiplier * i._bw);
+                let max = i._freq + 0.5 * i._bw;
                 if(max > bmax)
                     max = bmax;
                 // partial overlap for non-noise.
                 let b = max - min;
 
-                ip += b * PowerSpectralDensity(i._gn)/ (i.bandwidthMultiplier * i._bw);
+                ip += b * PowerSpectralDensity(i._gn)/ i._bw;
             }
         });
 
@@ -664,27 +677,50 @@ function Signal(sig, name = "", opts = null) {
         
         // console.log(" ip=" + ip + " sinr=" + new_sinr);
 
-        // Tricky:
-        let have_change = (obj._sinr !== new_sinr);
-        // We need to set obj._sinr in case the users "rate" onChange
-        // callback gets that value.
-        if(have_change)
-            obj._sinr = new_sinr;
+        if (setSINR) {
+
+            let have_change = (obj._sinr !== new_sinr);
+            // We need to set obj._sinr in case the users "rate" onChange
+            // callback gets that value.
+            if(have_change)
+                obj._sinr = new_sinr;
 
 
-        // Now this is way we needed that stupid have_change flag:
-        if(have_change) {
+            // Now this is way we needed that stupid have_change flag:
+            if(have_change) {
 
-            //console.log("sinr=" + new_sinr);
+                //console.log("sinr=" + new_sinr);
 
-            // trigger "sinr" change callbacks:
-            obj._callbacks.sinr.forEach(function(callback) {
-                //console.log("CALLING: " + callback);
-                callback(obj, obj._sinr);
-            });
+                // trigger "sinr" change callbacks:
+                obj._callbacks.sinr.forEach(function(callback) {
+                    //console.log("CALLING: " + callback);
+                    callback(obj, obj._sinr);
+                });
+            }
         }
+        
+        return new_sinr;
 
     };
+
+    // calculates SINR for nonlinear model using double convolution method
+    obj.calcNonlinearSINR = function() {
+
+        
+    };
+
+
+    // calculates the Receiver Performance Metric based on capacity in ideal and non-ideal filter cases
+    obj.calculateReceiverPerformance = function() {
+        
+        let idealSinr = obj.bandwidthMultiplier != 1 ? obj.calculateSINR(1, false) : obj._sinr;
+        
+        let idealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, idealSinr/10.));
+        let nonIdealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, obj._sinr/10.));
+
+        obj.receiverPerformance = +(nonIdealCapacity / idealCapacity).toFixed(2);
+
+    }
 
 
     // trigger callbacks for all signals - (i.e. trigger only sinr and rate calculations 
