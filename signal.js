@@ -419,6 +419,13 @@ function Signal(sig, name = "", opts = null) {
     // Receiver Performance Metric to quantify the impact of nonlinearity and adjacent channel signals.
     obj.receiverPerformance = 1;
 
+    // flag to indicate whether we are calculating SINR for nonlinear model
+    // defaults to false, true when the Nonlinear mode is selected
+    obj.nonlinearModel = false;
+
+    // iip3 Point of the signal 
+    obj.iip3Point = null;
+
     // 1) Add this object to the environment of all other signals as
     // an interferer, and 2) add the other signals to this ones' list
     // of interferers.
@@ -566,7 +573,12 @@ function Signal(sig, name = "", opts = null) {
 
         // We will calculate the next/new rate:
         var new_rate = 0.0;
-        obj.calculateSINR();
+
+        if (!obj.nonlinearModel) {
+            obj.calculateSINR();
+        } else {
+            obj.calcNonlinearSINR();
+        }
         
         // calculate Receiver Performance metric
         obj.calculateReceiverPerformance();
@@ -667,14 +679,14 @@ function Signal(sig, name = "", opts = null) {
                 ip += b * PowerSpectralDensity(i._gn)/ i._bw;
             }
         });
-
+    
         // ip is now the current interferer power summed for all
         // interferers including any noise interferers.
 
         // sinr (signal to interferer and noise ratio) in dB.
         //
         new_sinr = obj._gn - 10*Math.log10(ip);
-        
+       
         // console.log(" ip=" + ip + " sinr=" + new_sinr);
 
         if (setSINR) {
@@ -704,9 +716,184 @@ function Signal(sig, name = "", opts = null) {
     };
 
     // calculates SINR for nonlinear model using double convolution method
-    obj.calcNonlinearSINR = function() {
-
+    obj.calcNonlinearSINR = function(bwMultiplier = null, setSINR = true) {
         
+        var new_sinr = 0.0;
+        // discretize the frequency : Frequency bin width == Minimum Signal bandwidth
+        let freq_bin_width = obj.bw_min;
+        let freq_arr_len = (obj.freq_plot_max - obj.freq_plot_min)/freq_bin_width;
+        let freq_arr = Array(freq_arr_len).fill(0);
+        let p_noise = 0.0;
+
+        // integrate the entire power and then populate the particular frequency array 
+        // with that particular power value
+        for (let i=0; i < freq_arr_len; i++) {
+            // sum the power of all overlapping signals.
+            // Call it ip (interferer power) is a sum of linear power.
+            var ip = 0.0;
+            let freq_bin_min = obj.freq_plot_min + (freq_bin_width * (i));
+            let freq_bin_max = obj.freq_plot_min + (freq_bin_width * (i + 1));
+
+            if (bwMultiplier === null) {
+                bwMultiplier = obj.bandwidthMultiplier;
+            }
+    
+            var bw_max = obj.freq_plot_max - obj.freq_plot_min;
+        
+            // The end points of the obj signal band.
+            var bmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+            var bmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+
+            // if the desired signal does not fall within the current frequency bin range
+            // then ip = 0, meaning its a don't care condition
+            if (bmin >= freq_bin_max || bmax <= freq_bin_min) {
+                freq_arr[i] = ip;
+                continue;
+            }
+    
+            function PowerSpectralDensity(gn) {
+                return Math.pow(10.0, gn/10.0);
+            }
+
+            obj.interferers.forEach(function(i) {
+ 
+                // i is interferer signal.
+                if(!i.is_noise &&
+                    (   // if they don't overlap then return
+                        (bmin >= i._freq + 0.5 * i._bw) || (bmax <= i._freq - 0.5 * i._bw)
+                    ))
+                    return;
+    
+                // Compute the band overlap in Hz, b.
+                if(i.is_noise) {
+                    // Noise overlaps the whole signal. 
+                    p_noise = bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                    ip += p_noise;
+                } else {
+                    // first, calculate the overlap between object and the interferer
+                    // range of overlap will be min and max
+                    let min = i._freq - 0.5 * i._bw;
+                    if(min < bmin)
+                        min = bmin;
+                    let max = i._freq + 0.5 * i._bw;
+                    if(max > bmax)
+                        max = bmax;
+                    
+                    // second calculate the overlap between overlap range and the frequency bin range
+                    if (min < freq_bin_min)
+                        min = freq_bin_min
+                    
+                    if (max > freq_bin_max)
+                        max = freq_bin_max 
+
+                    let b = max - min;
+                    ip += b * PowerSpectralDensity(i._gn)/ i._bw;
+                }
+            });
+    
+            freq_arr[i] = ip;
+        }
+
+        let p_sig_nonzero = freq_arr.reduce((a, c) => {
+            if (c !== 0) {
+              a.count++;
+              a.sum += c;
+            }
+            
+            return a;
+          }, {count: 0, sum: 0});
+        
+        // p_sig: received power level for the desired signal
+        let p_sig = p_sig_nonzero.sum;
+        let p_sig_len = p_sig_nonzero.count;
+
+        // Nonlinearity - Third order approximation
+        // Perform Double convolution:  x(f) conv x(f) conv x(f)
+        const convolve = (vec1, vec2) => {
+            if (vec1.length === 0 || vec2.length === 0) {
+              throw new Error("Vectors can not be empty!");
+            }
+            const volume = vec1;
+            const kernel = vec2;
+            let displacement = 0;
+            const convVec = [];
+          
+            for (let i = 0; i < volume.length; i++) {
+              for (let j = 0; j < kernel.length; j++) {
+                if (displacement + j !== convVec.length) {
+                  convVec[displacement + j] =
+                    convVec[displacement + j] + volume[i] * kernel[j];
+                } else {
+                  convVec.push(volume[i] * kernel[j]);
+                }
+              }
+              displacement++;
+            }
+          
+            return convVec;
+        };
+       
+        // double convolution
+        let conv1_arr = convolve(freq_arr, freq_arr);
+        let interference_arr = convolve(conv1_arr, freq_arr);
+        
+        // pick 'n' frequencies (within the preselector bw) starting from the center of the resulting array
+        let result_interference = [];
+        let sum_ip = 0.0;
+        let middle = Math.round((interference_arr.length - 1) / 2);
+        let i = middle, j = middle;
+        let count = 0;
+        while (i >= 0 || j < interference_arr.length) {
+            if (interference_arr[i] > 0) {
+                sum_ip += interference_arr[i];
+                result_interference.push(interference_arr[i]);
+                count ++;
+            } 
+            
+            if (interference_arr[j] > 0) {
+                sum_ip += interference_arr[j];
+                result_interference.push(interference_arr[j]);
+                count ++;
+            }
+
+            i -= 1;
+            j += 1;
+
+            if (count === p_sig_len) break;
+        }
+
+        // power due to adjacent channel interference caused due to nonlinear distortion of the RF front-end 
+        let p_adj = sum_ip / 10 ** (2 * obj.iip3Point / 10);
+       
+        // new_sinr = obj._gn - 10 * Math.log10(p_sig - (p_adj + p_noise));
+        new_sinr = obj._gn - 10 * Math.log10(p_adj + p_sig);
+      
+        // console.log("sinr = " + new_sinr)
+
+        if (setSINR) {
+
+            let have_change = (obj._sinr !== new_sinr);
+            // We need to set obj._sinr in case the users "rate" onChange
+            // callback gets that value.
+            if(have_change)
+                obj._sinr = new_sinr;
+
+
+            // Now this is way we needed that stupid have_change flag:
+            if(have_change) {
+
+                //console.log("sinr=" + new_sinr);
+
+                // trigger "sinr" change callbacks:
+                obj._callbacks.sinr.forEach(function(callback) {
+                    //console.log("CALLING: " + callback);
+                    callback(obj, obj._sinr);
+                });
+            }
+        }
+        
+        return new_sinr;
+
     };
 
 
