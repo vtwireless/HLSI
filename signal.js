@@ -900,7 +900,8 @@ function Signal(sig, name = "", opts = null) {
     // calculates the Receiver Performance Metric based on capacity in ideal and non-ideal filter cases
     obj.calculateReceiverPerformance = function() {
         
-        let idealSinr = obj.bandwidthMultiplier != 1 ? obj.calculateSINR(1, false) : obj._sinr;
+        let idealSinr = (obj.bandwidthMultiplier != 1 || obj.nonlinearModel) ? 
+            obj.calculateSINR(1, false) : obj._sinr;
         
         let idealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, idealSinr/10.));
         let nonIdealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, obj._sinr/10.));
