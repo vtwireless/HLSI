@@ -623,8 +623,8 @@ function Signal(sig, name = "", opts = null) {
         var new_sinr = 0.0;
 
         // The end points of the obj signal band.
-        var bmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
-        var bmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+        var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+        var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
 
         function PowerSpectralDensity(gn) {
             // There is an arbitrary multiplicative constant that will
@@ -635,8 +635,8 @@ function Signal(sig, name = "", opts = null) {
         }
 
         // sum the power of all overlapping signals.
-        // Call it ip (interferer power) is a sum of linear power.
-        var ip = 0.0;
+        // Call it ccip (interferer power) is a sum of linear power.
+        var ccip = 0.0;
         //
         obj.interferers.forEach(function(i) {
 
@@ -653,42 +653,40 @@ function Signal(sig, name = "", opts = null) {
                 return;
 
             // The power (of interest) is proportional to the overlap in
-            // frequency space.  Call it "b".  More overlap, more
+            // frequency space.  Call it "overlap_in_freq_bin".  More overlap, more
             // interfering power.
             //
-            // They overlap (b in Hz), so add to interferer power (ip), be
+            // They overlap (overlap_in_freq_bin in Hz), so add to interferer power (ccip), be
             // it noise with full overlap or regular signal with partial
             // overlap.  This is power within a multiplicative constant.
             // We assume it's the same constant for all signals.
             //
-            // Compute the band overlap in Hz, b.
+            // Compute the band overlap in Hz, overlap_in_freq_bin.
             if(i.is_noise) {
                 // Noise overlaps the whole signal.  This is wrong.  The
                 // bw_max number is a fug.
-                ip += bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                ccip += bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
-                let min = i._freq - 0.5 * i._bw;
-                if(min < bmin)
-                    min = bmin;
-                let max = i._freq + 0.5 * i._bw;
-                if(max > bmax)
-                    max = bmax;
+                let overlap_min = i._freq - 0.5 * i._bw;
+                if(overlap_min < obj_fmin)
+                    overlap_min = obj_fmin;
+                let overlap_max = i._freq + 0.5 * i._bw;
+                if(overlap_max > obj_fmax)
+                    overlap_max = obj_fmax;
                 // partial overlap for non-noise.
-                let b = max - min;
+                let overlap_in_freq_bin = overlap_max - overlap_min;
 
-                ip += b * PowerSpectralDensity(i._gn)/ i._bw;
+                ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
             }
         });
     
-        // ip is now the current interferer power summed for all
+        // ccip is now the current interferer power summed for all
         // interferers including any noise interferers.
 
         // sinr (signal to interferer and noise ratio) in dB.
         //
-        new_sinr = obj._gn - 10*Math.log10(ip);
+        new_sinr = obj._gn - 10*Math.log10(ccip);
        
-        // console.log(" ip=" + ip + " sinr=" + new_sinr);
-
         if (setSINR) {
 
             let have_change = (obj._sinr !== new_sinr);
@@ -700,9 +698,6 @@ function Signal(sig, name = "", opts = null) {
 
             // Now this is way we needed that stupid have_change flag:
             if(have_change) {
-
-                //console.log("sinr=" + new_sinr);
-
                 // trigger "sinr" change callbacks:
                 obj._callbacks.sinr.forEach(function(callback) {
                     //console.log("CALLING: " + callback);
@@ -728,9 +723,9 @@ function Signal(sig, name = "", opts = null) {
         // integrate the entire power and then populate the particular frequency array 
         // with that particular power value
         for (let i=0; i < freq_arr_len; i++) {
-            // sum the power of all overlapping signals.
-            // Call it ip (interferer power) is a sum of linear power.
-            var ip = 0.0;
+            // sum the power of all overlapping signals (co-channel interference)
+            // Co-channel interference power is a sum of linear power
+            var ccip = 0.0;
             let freq_bin_min = obj.freq_plot_min + (freq_bin_width * (i));
             let freq_bin_max = obj.freq_plot_min + (freq_bin_width * (i + 1));
 
@@ -740,14 +735,14 @@ function Signal(sig, name = "", opts = null) {
     
             var bw_max = obj.freq_plot_max - obj.freq_plot_min;
         
-            // The end points of the obj signal band.
-            var bmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
-            var bmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+            // The frequencies min and max of the signal of interest
+            var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+            var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
 
             // if the desired signal does not fall within the current frequency bin range
-            // then ip = 0, meaning its a don't care condition
-            if (bmin >= freq_bin_max || bmax <= freq_bin_min) {
-                freq_arr[i] = ip;
+            // then ccip = 0, meaning its a don't care condition
+            if (obj_fmin >= freq_bin_max || obj_fmax <= freq_bin_min) {
+                freq_arr[i] = ccip;
                 continue;
             }
     
@@ -760,41 +755,41 @@ function Signal(sig, name = "", opts = null) {
                 // i is interferer signal.
                 if(!i.is_noise &&
                     (   // if they don't overlap then return
-                        (bmin >= i._freq + 0.5 * i._bw) || (bmax <= i._freq - 0.5 * i._bw)
+                        (obj_fmin >= i._freq + 0.5 * i._bw) || (obj_fmax <= i._freq - 0.5 * i._bw)
                     ))
                     return;
     
-                // Compute the band overlap in Hz, b.
+                // Compute the band overlap in Hz, overlap_in_freq_bin.
                 if(i.is_noise) {
                     // Noise overlaps the whole signal. 
                     p_noise = bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
-                    ip += p_noise;
+                    ccip += p_noise;
                 } else {
                     // first, calculate the overlap between object and the interferer
-                    // range of overlap will be min and max
-                    let min = i._freq - 0.5 * i._bw;
-                    if(min < bmin)
-                        min = bmin;
-                    let max = i._freq + 0.5 * i._bw;
-                    if(max > bmax)
-                        max = bmax;
+                    // range of overlap will be overlap_min and overlap_max
+                    let overlap_min = i._freq - 0.5 * i._bw;
+                    if(overlap_min < obj_fmin)
+                        overlap_min = obj_fmin;
+                    let overlap_max = i._freq + 0.5 * i._bw;
+                    if(overlap_max > obj_fmax)
+                        overlap_max = obj_fmax;
                     
                     // second calculate the overlap between overlap range and the frequency bin range
-                    if (min < freq_bin_min)
-                        min = freq_bin_min
+                    if (overlap_min < freq_bin_min && overlap_max > freq_bin_min)
+                        overlap_min = freq_bin_min
                     
-                    if (max > freq_bin_max)
-                        max = freq_bin_max 
+                    if (overlap_max > freq_bin_max && overlap_min < freq_bin_max)
+                        overlap_max = freq_bin_max 
 
-                    let b = max - min;
-                    ip += b * PowerSpectralDensity(i._gn)/ i._bw;
+                    let overlap_in_freq_bin = overlap_max - overlap_min;
+                    ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
                 }
             });
     
-            freq_arr[i] = ip;
+            freq_arr[i] = ccip;
         }
 
-        let p_sig_nonzero = freq_arr.reduce((a, c) => {
+        let p_int_nonzero = freq_arr.reduce((a, c) => {
             if (c !== 0) {
               a.count++;
               a.sum += c;
@@ -803,9 +798,9 @@ function Signal(sig, name = "", opts = null) {
             return a;
           }, {count: 0, sum: 0});
         
-        // p_sig: received power level for the desired signal
-        let p_sig = p_sig_nonzero.sum;
-        let p_sig_len = p_sig_nonzero.count;
+        // p_int: power level at receiver from interfering signal from other signals in the entire frequency band
+        let p_int = p_int_nonzero.sum;
+        let p_int_len = p_int_nonzero.count;
 
         // Nonlinearity - Third order approximation
         // Perform Double convolution:  x(f) conv x(f) conv x(f)
@@ -859,16 +854,13 @@ function Signal(sig, name = "", opts = null) {
             i -= 1;
             j += 1;
 
-            if (count === p_sig_len) break;
+            if (count === p_int_len) break;
         }
 
         // power due to adjacent channel interference caused due to nonlinear distortion of the RF front-end 
         let p_adj = sum_ip / 10 ** (2 * obj.iip3Point / 10);
        
-        // new_sinr = obj._gn - 10 * Math.log10(p_sig - (p_adj + p_noise));
-        new_sinr = obj._gn - 10 * Math.log10(p_adj + p_sig);
-      
-        // console.log("sinr = " + new_sinr)
+        new_sinr = obj._gn - 10 * Math.log10(p_adj + p_int);
 
         if (setSINR) {
 
@@ -878,15 +870,11 @@ function Signal(sig, name = "", opts = null) {
             if(have_change)
                 obj._sinr = new_sinr;
 
-
             // Now this is way we needed that stupid have_change flag:
             if(have_change) {
 
-                //console.log("sinr=" + new_sinr);
-
                 // trigger "sinr" change callbacks:
                 obj._callbacks.sinr.forEach(function(callback) {
-                    //console.log("CALLING: " + callback);
                     callback(obj, obj._sinr);
                 });
             }
