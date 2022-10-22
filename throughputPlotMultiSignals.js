@@ -96,11 +96,11 @@ function ThroughputPlot(signals, interferers=[]) {
     // historical rate plot
     //
     
-    var svgr = d3.select("body")
+    var svgr = d3.select("#throughput-multisignal")
         .append("svg")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)
-        .attr("style", "margin-left:1%; float: left;")
+        .attr("style", "float: right;")
         .append("g")
         .attr("transform", "translate(" +
             margin.left + "," + margin.top + ")");

@@ -24,6 +24,7 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
     <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
     <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
     <script src=spectralEfficiencyPlot_BarChart.js></script>
+    <script src=sinrPlot_BarChart.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
     <!-- <script src=throughputPlot.js></script> -->
@@ -224,18 +225,21 @@ Link 3; Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent
     </div>
   </div>
 
-  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%; margin-top: 1.5%;"></div>
 
-  <div style="width: 720px; height: 320px; display: inline-block;">
-      <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+
+  <div style="display: inline-block; margin-left: 1%;" id="throughput-multisignal">
+    <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Total Data Throughput</div>
   </div>
-  
-  <div style="margin-left:2%;">
-    <div style="display: inline-flex;">
-      <div style="width: 28px; height: 3px; background:rgba(255,255,255,255); margin-top: 8px; margin-right: 5px;"></div>
-      <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Total Data Throughput</div>
-    </div>
+
+<div style="display: inline-flex;">
+  <div style="width: 720px; height: 320px; margin-top: 1%;">
+    <canvas id="sinr-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
   </div>
+
+  <div style="width: 720px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
+    <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+</div>
 </body>
 <script>
 'use strict';
@@ -341,13 +345,14 @@ Slider(sig4, 'mcs', '#mcs4');
 HoppingInterferer(interferer, '#hoppingInterferer');
 CapacityBanner(sig1, '#capacityBanner');
 
-PowerSpectrumPlot_2D();
 ThroughputPlot([sig1, sig2, sig3, sig4]);
+PowerSpectrumPlot_2D();
 
-// document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
-//       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
-//   </div>`
+  // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
+  //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
+  //   </div>`
 
+SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4"]);
 
 SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
 
