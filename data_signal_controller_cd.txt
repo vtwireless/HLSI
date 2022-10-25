@@ -1,0 +1,139 @@
+/*
+Primary Author: Allan Guo (Duke University)
+Secondary Authors: Ansh Gwash (Virginia Tech), Lina Nayvelt (Duke), Rhea Saxena (Virginia Tech), Davidson Zhu (Duke)
+Acknowledgements to original developer(s) of this module for developing the original code
+This code is developed for the VT online "Hands-on Learning for Radio Frequency Spectrum Innovation" (HLSI) tutorials
+Exercise 18: https://vtwireless.github.io/HLSI/18_machine_learning_time_based_avoidance.html
+To implement the code, paste into bottom Function Callback code box. 
+This code cannot be used with the default interference control codes in the top Function Callback code box. 
+Corresponding interference control codes for this implementation have been provided for reference.
+*/
+
+num_channels = 8; // User configurable number of channels
+bw_margin = 20000000/num_channels; // Calculates associated bandwidth
+bw_margin = (freq_max2 - freq_min2) / num_channels / 2; // one-half the bandwidth of a channel, in Hz
+start_freq = freq_min2 + bw_margin;   // Defines the eligible range of frequencies; Please Keep Constant
+end_freq = freq_max2 - bw_margin;  // Defines the eligible range of frequencies; Please Keep Constant
+bw_error = 5000000; // Error of bandwidth overflow, derived experimentally
+
+qfunc = globalUserData.qfunc;  // Get qfunction 
+available_freq = makeArr(start_freq, end_freq, num_channels) // Create center frequencies of channels
+
+
+timeForML = globalUserData['timeForML'] // Get current Time
+timeScaleForML = 8; // User configurable time-scale
+currentTimeForML = [Math.round(timeForML % timeScaleForML)]; // figures out which time slot the system is in
+
+currentQfunc = deepCopyFunction(qfunc[currentTimeForML]); // Gets part of qfunction associated with current time slot
+
+
+minimum_epsilon = 0.005; // After this value of epsilon is reached, the algorithm switches from exploration (learning) 
+						 // mode to channel selection mode.
+decaying_constant = 0.99;  // How fast should the exploration decay.
+learning_rate = 0.9; // How fast should we learn
+// At every time step; epsilon = decaying_constant**countNumberOfIterations
+// When epsilon < minimum_epsilon; exploration stops.
+
+ind2 = globalUserData["ind2"] // Get index of current interferer frequency saved by interference controller callback.
+nextFreq2 = available_freq[ind2]; // Current center frequency of interference signal
+
+
+if(init){
+
+ 	epsilon = decaying_constant;
+	countNumberOfIterations = 0
+	checkIfStopped = 1
+	//storeBw1 = bw1;
+    start_channel = 0
+    bwInd = 0
+
+}
+else{
+  
+	if ((epsilon > minimum_epsilon ) ){
+       // This the exploration phase, this snippet randomly selects a starting channel and bandwidth     
+      
+	   start_channel = getRandomInt(num_channels) // Randomly select the lowest frequency channel that will be used.
+       bwInd = getRandomInt(8-start_channel) // Randomly select a signal bandwidth such that the signal uses one, 
+	                                         // some, or all of the channels from start_channel through num-channels.     
+ 	}
+	else{
+	    // If no longer in the exploration phase, use the Q-function to select the best frequency-bandwidth combination.
+	   currentQfunc = deepCopyFunction(qfunc[currentTimeForML]);  // Get Q-function for the current time slot.
+      
+       //Select best channel and bandwidth by looping over currentQfunc
+       start_channel = 0; // Initial channel index
+       bwInd = 0; // Initial data signal bandwidth index
+       best_val = currentQfunc[start_channel][bwInd]; // Q-value for best known combination of start channel and bandwidth
+      
+       for (i = 0; i < num_channels; i++) { // Step through channels
+         for (j = 0; j < num_channels - i; j++) { // Step through bandwidths
+           val = currentQfunc[i][j];  // Q-value for current combination of channel and bandwidth
+           if (val > best_val) {  // Update best_val if the current channel-bandwidth combination has a higher Q-value
+								  // than the previous best channel-bandwidth combination.
+             start_channel = i;
+             bwInd = j;
+             best_val = val;
+           }
+         }
+       }    
+	}
+    //Determines whether to end exploring phase
+	if ((epsilon <= minimum_epsilon ) & (checkIfStopped == 1) ){
+		checkIfStopped = 0
+		alert("Exploring Stopped");
+	}
+	
+    //Updates parameters
+	nextFreq1 = (available_freq[start_channel] + available_freq[start_channel + bwInd])/2;  // Center frequency for available contiguous bandwidth 
+	epsilon = decaying_constant**countNumberOfIterations; //decay epsilon value
+	countNumberOfIterations = countNumberOfIterations +1 // Count Number of iterations
+    freq1 = nextFreq1;  // Next center frequency for data signal = center frequency for available contiguous bandwidth
+    bw1 =  (1 + bwInd)*(40000000/num_channels) - bw_error;  // Next bandwidth for data signal
+    bw1 =  (1 + bwInd)*((freq_max2 - freq_min2) / num_channels) - bw_error;  // Next bandwidth for data signal
+}
+
+// Update Q-values:
+
+//The following section is more "conventional" q-learning.
+//If there is interference, penalize, else reward
+
+if (start_channel <= ind2 && ind2 <= start_channel + bwInd) { // Penalize if interfering signal channel is within the data signal bandwidth.
+  currentQfunc[start_channel][bwInd] = currentQfunc[start_channel][bwInd] +learning_rate*(-1 + currentQfunc[start_channel][bwInd]);
+} else { // Reward if interfering signal channel is not within the data signal bandwidth (e.g., there is no interference).
+         // Greater data signal bandwidth results in a greater reward, so larger bandwidths will be selected if they are likely to be available.
+  currentQfunc[start_channel][bwInd] = currentQfunc[start_channel][bwInd] +learning_rate*(bwInd + currentQfunc[start_channel][bwInd]);
+}
+
+
+// Alternative code to update Q-values:
+
+//The below commented out code updates the qvalues for all states and actions in currentQfunc.
+//In this sense it isn't "conventional" qlearning. However this yields more learning per iteration.
+
+/*
+//Looping over i loops over the start_channels; looping over j loops over bwInd
+for (i = 0; i < ind2 + 1; i++) {
+ //These states do not overlap with the interference, thus reward
+ for (j = 0; j < ind2 - i; j++) {
+  currentQfunc[i][j] = currentQfunc[i][j] +learning_rate*((j/(num_channels - 1))**10 + currentQfunc[i][j]); // Update Q-Value Function 
+ }
+ //These states overlap with the interference, thus penalize
+ for (j = ind2 - i; j < num_channels - i; j++) {
+   currentQfunc[i][j] = currentQfunc[i][j] +learning_rate*(-4 + currentQfunc[i][j])
+ }
+}
+for (i = ind2 + 1; i < num_channels + 1; i++) {
+  //These states don't interfere with the interference
+  for (j = 0; j < num_channels - i; j++) {
+    currentQfunc[i][j] = currentQfunc[i][j] +learning_rate*((j/(num_channels - 1))**10 + currentQfunc[i][j]);
+  }
+}
+*/
+
+
+//Update qfunc
+qfunc[currentTimeForML] = deepCopyFunction(currentQfunc) // Update the Q-function for the current time slot to include the calculated Q-values.
+globalUserData.qfunc = qfunc; // Save the Q-function array for future use.
+
+return {freq1: freq1, bw1:bw1}; // Set the data signal frequency and bandwidth.

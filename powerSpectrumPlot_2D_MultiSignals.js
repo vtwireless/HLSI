@@ -206,6 +206,11 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         let color_stroke = signal_colors_stroke[signal_color_i%signal_colors_stroke.length];
         let color_label = signal_colors_label[signal_color_i%signal_colors_stroke.length];
         let sig = Signal.env[key];
+
+        if (sig.is_noise) {
+            return;
+        }
+        
         var signal_box_f = svgf
         .append("rect")
         .attr("clip-path", "url(#clipf)")
@@ -231,9 +236,21 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
 
         sig.signal_label_f = signal_label_f;
 
+        var signal_label_recv_p = svgf
+            .append("text")
+            .attr("clip-path", "url(#clipf)")
+            .attr("x", "200")
+            .attr("y", "150")
+            .attr("fill", color_label)
+            // .attr("id", "signal_label")
+            .text(`Signal (${0.0})`);
+
+        sig.signal_label_recv_p = signal_label_recv_p;
+
         if(sig['name']=='interferer'){
             signal_box_f.attr("fill", interferer_colors_fill).attr("stroke", interferer_colors_stroke);
             signal_label_f.attr("fill", interferer_colors_label)
+            signal_label_recv_p.attr("fill", interferer_colors_label)
             return;
         }
         
@@ -255,6 +272,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             
             sig.cur_signal_freq = fc;
             sig.cur_signal_bw = bw;
+            sig.cur_signal_bw_ideal_filter = (sig.bw * sig.bandwidthMultiplier) / df;
             sig.cur_signal_freq_exact = sig._freq;
             
             
@@ -264,7 +282,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
             //generator.add_signal(fc, bw, gn);
 
-            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, sig.cur_signal_bw);
+            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, sig.cur_signal_bw_ideal_filter);
             sig.signal_box_f.attr("x", signal_bounding_box_new_coordinates['x']);
             sig.signal_box_f.attr("y", signal_bounding_box_new_coordinates['y']);
             sig.signal_box_f.attr("width", signal_bounding_box_new_coordinates['width']);
@@ -274,8 +292,13 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             let signal_label_new_coordinates = get_graph_label_coordinates(720, 320, sig.cur_signal_freq);
             sig.signal_label_f.attr("x", signal_label_new_coordinates['x']+8*sig_i);
             sig.signal_label_f.attr("y", signal_label_new_coordinates['y']-8);
+
+            sig.signal_label_recv_p.attr("x", signal_label_new_coordinates['x']+8*sig_i + 10);
+            sig.signal_label_recv_p.attr("y", signal_label_new_coordinates['y']-8 - 75);
+
             // sig.signal_label_f.text(`Comm Link ${sig_i+1} (${sig.cur_signal_freq_exact}MHz)`);
             sig.signal_label_f.text(`${sig.cur_signal_freq_exact}MHz`);
+            sig.signal_label_recv_p.text(`RP : ${sig.receiverPerformance}`);
 
             sig_i+=1;
         });
@@ -356,7 +379,18 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         
         let bw_offset = graph_width*signal_bw;
         let fc_added = 0.5+fc;
-        let new_x = -5 + graph_width*fc_added - (bw_offset/2);
+        let new_x = 0;
+
+        if (fc >= 0 && fc <= 0.125) {
+            new_x = -4 + graph_width*fc_added - (bw_offset/2);
+        } else if (fc >= 0.125) {
+            new_x = -1.5 + graph_width*fc_added - (bw_offset/2);
+        } else if (fc <= 0 && fc >= -0.125) {
+            new_x = -5 + graph_width*fc_added - (bw_offset/2);
+        } else if (fc <= -0.125) {
+            new_x = -8.5 + graph_width*fc_added - (bw_offset/2);
+        }
+
         let new_width = bw_offset+20;
         
         let bounding_box_coordinates = {x:new_x, y:50, width:new_width, height:200};

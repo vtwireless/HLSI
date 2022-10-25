@@ -73,7 +73,7 @@ function CapacityBanner(sig, parentElement = null) {
         func: function() {
 
             let r = sig.rate;
-
+           
             if(r <= 0) {
                 rate.className = 'red';
                 return "0 b/s";
@@ -84,6 +84,11 @@ function CapacityBanner(sig, parentElement = null) {
             let [scale,units] = scale_units(r,1.0);
             let percent = 100.0 * r/(sig.bw *
                 Math.log2(1 + Math.pow(10.0, sig.sinr/10.0)));
+
+            if (percent > 100) {
+                rate.className = 'red';
+                return "0 b/s";
+            }
 
             return d3.format(".2f")(r*scale) + " " +
                 units + "b/s (" +

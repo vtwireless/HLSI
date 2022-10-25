@@ -411,6 +411,21 @@ function Signal(sig, name = "", opts = null) {
     // environment.
     obj.interferers = [];
 
+    // receiver filter bandwidth multiplier constant for calculating SINR in case of
+    // ideal receiver filter with wider bandwidth than the received signal
+    // defaults to 1 (i.e. equal to the signal bandwidth)
+    obj.bandwidthMultiplier = 1;
+
+    // Receiver Performance Metric to quantify the impact of nonlinearity and adjacent channel signals.
+    obj.receiverPerformance = 1;
+
+    // flag to indicate whether we are calculating SINR for nonlinear model
+    // defaults to false, true when the Nonlinear mode is selected
+    obj.nonlinearModel = false;
+
+    // iip3 Point of the signal 
+    obj.iip3Point = null;
+
     // 1) Add this object to the environment of all other signals as
     // an interferer, and 2) add the other signals to this ones' list
     // of interferers.
@@ -550,19 +565,66 @@ function Signal(sig, name = "", opts = null) {
         // would still be arbitrary.  I think there may be a missing
         // independent parameter/variable in the signal model, maybe
         // sample rate.
-        var bw_max = obj.freq_plot_max - obj.freq_plot_min;
+        
+        // var bw_max = obj.freq_plot_max - obj.freq_plot_min;
 
         // A noise signal does not have a rate.
         if(obj.is_noise) return;
 
         // We will calculate the next/new rate:
         var new_rate = 0.0;
-        // and sinr:
+
+        if (!obj.nonlinearModel) {
+            obj.calculateSINR();
+        } else {
+            obj.calcNonlinearSINR();
+        }
+        
+        // calculate Receiver Performance metric
+        obj.calculateReceiverPerformance();
+        
+        if(obj._sinr >= conf.schemes[obj._mcs].SNR)
+            new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+
+        // if the new rate and old rate are the same we do not
+        // trigger rate events. 
+        if(obj._rate !== new_rate) {
+
+            obj._rate = new_rate;
+            
+            // trigger "rate" change callbacks:
+            obj._callbacks.rate.forEach(function(callback) {
+                //console.log("CALLING: " + callback);
+                callback(obj, obj._rate);
+            });
+        }
+
+    }
+
+
+    // We need to access this checkSetRate() function from other signals
+    // as we create more signals, so we can have the other signals effect
+    // this "rate" and "sinr".
+    obj.checkSetRate = checkSetRate;
+    
+
+    // calculates SINR for the signal of interest considering interferer power due to all other signals
+    // including noise
+    // params:
+    //      1. bwMultiplier used for sinr calculation (if null then take the object's bandwidthMultiplier)
+    //      2. setSINR -- if false do not set the new_sinr on object
+    obj.calculateSINR = function(bwMultiplier = null, setSINR = true) {
+
+        if (bwMultiplier === null) {
+            bwMultiplier = obj.bandwidthMultiplier;
+        }
+
+        var bw_max = obj.freq_plot_max - obj.freq_plot_min;
         var new_sinr = 0.0;
 
         // The end points of the obj signal band.
-        var bmin = obj._freq - 0.5 * obj._bw;
-        var bmax = obj._freq + 0.5 * obj._bw;
+        var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+        var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
 
         function PowerSpectralDensity(gn) {
             // There is an arbitrary multiplicative constant that will
@@ -573,8 +635,8 @@ function Signal(sig, name = "", opts = null) {
         }
 
         // sum the power of all overlapping signals.
-        // Call it ip (interferer power) is a sum of linear power.
-        var ip = 0.0;
+        // Call it ccip (interferer power) is a sum of linear power.
+        var ccip = 0.0;
         //
         obj.interferers.forEach(function(i) {
 
@@ -583,93 +645,271 @@ function Signal(sig, name = "", opts = null) {
             if(!i.is_noise &&
                 (
                     // Do they NOT overlap?
-                    (obj._freq - 0.5*obj._bw) >= (i._freq + 0.5*i._bw) ||
-                    (obj._freq + 0.5*obj._bw) <= (i._freq - 0.5*i._bw)
+                    (obj._freq - 0.5 * bwMultiplier * obj._bw) >= (i._freq + 0.5 * i._bw) ||
+                    (obj._freq + 0.5 * bwMultiplier * obj._bw) <= (i._freq - 0.5 * i._bw)
                 ))
                 // This interferer (i) is not currently interfering.  It
                 // does not overlap the signal (obj).
                 return;
 
             // The power (of interest) is proportional to the overlap in
-            // frequency space.  Call it "b".  More overlap, more
+            // frequency space.  Call it "overlap_in_freq_bin".  More overlap, more
             // interfering power.
             //
-            // They overlap (b in Hz), so add to interferer power (ip), be
+            // They overlap (overlap_in_freq_bin in Hz), so add to interferer power (ccip), be
             // it noise with full overlap or regular signal with partial
             // overlap.  This is power within a multiplicative constant.
             // We assume it's the same constant for all signals.
             //
-            // Compute the band overlap in Hz, b.
+            // Compute the band overlap in Hz, overlap_in_freq_bin.
             if(i.is_noise) {
                 // Noise overlaps the whole signal.  This is wrong.  The
                 // bw_max number is a fug.
-                ip += obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                ccip += bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
             } else {
-                let min = i._freq - 0.5 * i._bw;
-                if(min < bmin)
-                    min = bmin;
-                let max = i._freq + 0.5 * i._bw;
-                if(max > bmax)
-                    max = bmax;
+                let overlap_min = i._freq - 0.5 * i._bw;
+                if(overlap_min < obj_fmin)
+                    overlap_min = obj_fmin;
+                let overlap_max = i._freq + 0.5 * i._bw;
+                if(overlap_max > obj_fmax)
+                    overlap_max = obj_fmax;
                 // partial overlap for non-noise.
-                let b = max - min;
+                let overlap_in_freq_bin = overlap_max - overlap_min;
 
-                ip += b * PowerSpectralDensity(i._gn)/i._bw;
+                ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
             }
         });
-
-        // ip is now the current interferer power summed for all
+    
+        // ccip is now the current interferer power summed for all
         // interferers including any noise interferers.
 
         // sinr (signal to interferer and noise ratio) in dB.
         //
-        new_sinr = obj._gn - 10*Math.log10(ip);
+        new_sinr = obj._gn - 10*Math.log10(ccip);
+       
+        if (setSINR) {
 
-        //console.log(" ip=" + ip + " sinr=" + new_sinr);
+            let have_change = (obj._sinr !== new_sinr);
+            // We need to set obj._sinr in case the users "rate" onChange
+            // callback gets that value.
+            if(have_change)
+                obj._sinr = new_sinr;
 
 
-        if(new_sinr >= conf.schemes[obj._mcs].SNR)
-            new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+            // Now this is way we needed that stupid have_change flag:
+            if(have_change) {
+                // trigger "sinr" change callbacks:
+                obj._callbacks.sinr.forEach(function(callback) {
+                    //console.log("CALLING: " + callback);
+                    callback(obj, obj._sinr);
+                });
+            }
+        }
+        
+        return new_sinr;
 
-        // Tricky:
-        let have_change = (obj._sinr !== new_sinr);
-        // We need to set obj._sinr in case the users "rate" onChange
-        // callback gets that value.
-        if(have_change)
-            obj._sinr = new_sinr;
+    };
 
-        // if the new rate and old rate are the same we do not
-        // trigger rate events. 
-        if(obj._rate !== new_rate) {
+    // calculates SINR for nonlinear model using double convolution method
+    obj.calcNonlinearSINR = function(bwMultiplier = null, setSINR = true) {
+        
+        var new_sinr = 0.0;
+        // discretize the frequency : Frequency bin width == Minimum Signal bandwidth
+        let freq_bin_width = obj.bw_min;
+        let freq_arr_len = (obj.freq_plot_max - obj.freq_plot_min)/freq_bin_width;
+        let freq_arr = Array(freq_arr_len).fill(0);
+        let p_noise = 0.0;
 
-            obj._rate = new_rate;
+        // integrate the entire power and then populate the particular frequency array 
+        // with that particular power value
+        for (let i=0; i < freq_arr_len; i++) {
+            // sum the power of all overlapping signals (co-channel interference)
+            // Co-channel interference power is a sum of linear power
+            var ccip = 0.0;
+            let freq_bin_min = obj.freq_plot_min + (freq_bin_width * (i));
+            let freq_bin_max = obj.freq_plot_min + (freq_bin_width * (i + 1));
 
-            // trigger "rate" change callbacks:
-            obj._callbacks.rate.forEach(function(callback) {
-                //console.log("CALLING: " + callback);
-                callback(obj, obj._rate);
+            if (bwMultiplier === null) {
+                bwMultiplier = obj.bandwidthMultiplier;
+            }
+    
+            var bw_max = obj.freq_plot_max - obj.freq_plot_min;
+        
+            // The frequencies min and max of the signal of interest
+            var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+            var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+
+            // if the desired signal does not fall within the current frequency bin range
+            // then ccip = 0, meaning its a don't care condition
+            if (obj_fmin >= freq_bin_max || obj_fmax <= freq_bin_min) {
+                freq_arr[i] = ccip;
+                continue;
+            }
+    
+            function PowerSpectralDensity(gn) {
+                return Math.pow(10.0, gn/10.0);
+            }
+
+            obj.interferers.forEach(function(i) {
+ 
+                // i is interferer signal.
+                if(!i.is_noise &&
+                    (   // if they don't overlap then return
+                        (obj_fmin >= i._freq + 0.5 * i._bw) || (obj_fmax <= i._freq - 0.5 * i._bw)
+                    ))
+                    return;
+    
+                // Compute the band overlap in Hz, overlap_in_freq_bin.
+                if(i.is_noise) {
+                    // Noise overlaps the whole signal. 
+                    p_noise = bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                    ccip += p_noise;
+                } else {
+                    // first, calculate the overlap between object and the interferer
+                    // range of overlap will be overlap_min and overlap_max
+                    let overlap_min = i._freq - 0.5 * i._bw;
+                    if(overlap_min < obj_fmin)
+                        overlap_min = obj_fmin;
+                    let overlap_max = i._freq + 0.5 * i._bw;
+                    if(overlap_max > obj_fmax)
+                        overlap_max = obj_fmax;
+                    
+                    // second calculate the overlap between overlap range and the frequency bin range
+                    if (overlap_min < freq_bin_min && overlap_max > freq_bin_min)
+                        overlap_min = freq_bin_min
+                    
+                    if (overlap_max > freq_bin_max && overlap_min < freq_bin_max)
+                        overlap_max = freq_bin_max 
+
+                    let overlap_in_freq_bin = overlap_max - overlap_min;
+                    ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
+                }
             });
+    
+            freq_arr[i] = ccip;
         }
 
-        // Now this is way we needed that stupid have_change flag:
-        if(have_change) {
+        let p_int_nonzero = freq_arr.reduce((a, c) => {
+            if (c !== 0) {
+              a.count++;
+              a.sum += c;
+            }
+            
+            return a;
+          }, {count: 0, sum: 0});
+        
+        // p_int: power level at receiver from interfering signal from other signals in the entire frequency band
+        let p_int = p_int_nonzero.sum;
+        let p_int_len = p_int_nonzero.count;
 
-            //console.log("sinr=" + new_sinr);
+        // Nonlinearity - Third order approximation
+        // Perform Double convolution:  x(f) conv x(f) conv x(f)
+        const convolve = (vec1, vec2) => {
+            if (vec1.length === 0 || vec2.length === 0) {
+              throw new Error("Vectors can not be empty!");
+            }
+            const volume = vec1;
+            const kernel = vec2;
+            let displacement = 0;
+            const convVec = [];
+          
+            for (let i = 0; i < volume.length; i++) {
+              for (let j = 0; j < kernel.length; j++) {
+                if (displacement + j !== convVec.length) {
+                  convVec[displacement + j] =
+                    convVec[displacement + j] + volume[i] * kernel[j];
+                } else {
+                  convVec.push(volume[i] * kernel[j]);
+                }
+              }
+              displacement++;
+            }
+          
+            return convVec;
+        };
+       
+        // double convolution
+        let conv1_arr = convolve(freq_arr, freq_arr);
+        let interference_arr = convolve(conv1_arr, freq_arr);
+        
+        // pick 'n' frequencies (within the preselector bw) starting from the center of the resulting array
+        let result_interference = [];
+        let sum_ip = 0.0;
+        let middle = Math.round((interference_arr.length - 1) / 2);
+        let i = middle, j = middle;
+        let count = 0;
+        while (i >= 0 || j < interference_arr.length) {
+            if (interference_arr[i] > 0) {
+                sum_ip += interference_arr[i];
+                result_interference.push(interference_arr[i]);
+                count ++;
+            } 
+            
+            if (interference_arr[j] > 0) {
+                sum_ip += interference_arr[j];
+                result_interference.push(interference_arr[j]);
+                count ++;
+            }
 
-            // trigger "sinr" change callbacks:
-            obj._callbacks.sinr.forEach(function(callback) {
-                //console.log("CALLING: " + callback);
-                callback(obj, obj._sinr);
-            });
+            i -= 1;
+            j += 1;
+
+            if (count === p_int_len) break;
         }
+
+        // power due to adjacent channel interference caused due to nonlinear distortion of the RF front-end 
+        let p_adj = sum_ip / 10 ** (2 * obj.iip3Point / 10);
+       
+        new_sinr = obj._gn - 10 * Math.log10(p_adj + p_int);
+
+        if (setSINR) {
+
+            let have_change = (obj._sinr !== new_sinr);
+            // We need to set obj._sinr in case the users "rate" onChange
+            // callback gets that value.
+            if(have_change)
+                obj._sinr = new_sinr;
+
+            // Now this is way we needed that stupid have_change flag:
+            if(have_change) {
+
+                // trigger "sinr" change callbacks:
+                obj._callbacks.sinr.forEach(function(callback) {
+                    callback(obj, obj._sinr);
+                });
+            }
+        }
+        
+        return new_sinr;
+
+    };
+
+
+    // calculates the Receiver Performance Metric based on capacity in ideal and non-ideal filter cases
+    obj.calculateReceiverPerformance = function() {
+        
+        let idealSinr = (obj.bandwidthMultiplier != 1 || obj.nonlinearModel) ? 
+            obj.calculateSINR(1, false) : obj._sinr;
+        
+        let idealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, idealSinr/10.));
+        let nonIdealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, obj._sinr/10.));
+
+        obj.receiverPerformance = +(nonIdealCapacity / idealCapacity).toFixed(2);
+
     }
 
 
-    // We need to access this checkSetRate() function from other signals
-    // as we create more signals, so we can have the other signals effect
-    // this "rate" and "sinr".
-    obj.checkSetRate = checkSetRate;
-
+    // trigger callbacks for all signals - (i.e. trigger only sinr and rate calculations 
+    // and update plot callbacks)
+    obj.triggerCallbacks = function() {
+        
+        obj._callbacks['bw'].forEach(function(callback) {
+            if (callback != undefined && callback.name === 'checkSetRate' ||
+                callback.name === 'update_plot') {
+                callback(obj, obj._bw);
+            }
+        });
+    };
 
     // Set up setters for the 3 independent varying variables/parameters,
     // "freq", "bw", "gn", and "mcs".  "rate" is dependent variable so
