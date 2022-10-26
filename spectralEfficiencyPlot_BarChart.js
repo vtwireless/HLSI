@@ -152,5 +152,12 @@ const SpectralEfficiencyPlot_BarChart = {
         SpectralEfficiencyPlot_BarChart.se_chart.data.datasets[0].data[4] = average_se;
         SpectralEfficiencyPlot_BarChart.se_chart.update();
         SpectralEfficiencyPlot_BarChart.dataset = new_dataset;
+    },
+
+    remove_plot: function() {
+      SpectralEfficiencyPlot_BarChart.se_chart.destroy();
+      SpectralEfficiencyPlot_BarChart.dataset = [];
+      SpectralEfficiencyPlot_BarChart.signal_list = [];
     }
+
 }

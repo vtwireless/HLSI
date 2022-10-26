@@ -147,5 +147,11 @@ const SinrPlot_BarChart = {
        
         SinrPlot_BarChart.sinr_chart.update();
         SinrPlot_BarChart.dataset = new_dataset;
+    },
+
+    remove_plot: function() {
+      SinrPlot_BarChart.sinr_chart.destroy();
+      SinrPlot_BarChart.dataset = [];
+      SinrPlot_BarChart.signal_list = [];
     }
 }
