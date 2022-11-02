@@ -16,7 +16,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       font-weight: bold;
     }
 
-        /* Style the tab */
+    /* Style the tab */
     .tab {
       overflow: hidden;
       border: 1px solid #ccc;
@@ -37,7 +37,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       transition: 0.3s;
       font-size: 17px;
       color: white;
-      width: 5vw; 
+      width: 5vw;
     }
 
     /* Change background color of buttons on hover */
@@ -63,8 +63,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
   <script src=spectralEfficiencyPlot_BarChart.js></script>
   <script src=sinrPlot_BarChart.js></script>
+  <script src="averageThroughputPlot_BarChart.js"></script>
   <script src=label.js></script>
   <script src=capacityBanner.js></script>
+  <script src=capacityRunner_multisignal.js></script>
   <!-- <script src=throughputPlot.js></script> -->
   <script src=throughputPlotMultiSignals.js></script>
   <script src=hoppingInterferer.js></script>
@@ -75,6 +77,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <style>
     input.slider_bw {
       width: auto;
+    }
+
+    .timer {
+      margin-left: 2rem;
+      display: none;
     }
   </style>
 </head>
@@ -120,7 +127,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           Interferer</a>
         <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual
           and Programmable</a>
-        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options menu</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options
+          menu</a>
 
       </nav>
 
@@ -145,10 +153,17 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <div class="content-section" style="margin: 0% 2%; margin-top: 4.1%;">
     <!-- <p id=hoppingInterferer>
     </p> -->
-    <div class="tab">
-      <button class="tablinks" onclick="onTabChange(event, 'normal')">Normal</button>
-      <button class="tablinks" onclick="onTabChange(event, 'timer')">Timer</button>
+    <div style="display: inline-flex;">
+      <div class="tab">
+        <button class="tablinks" onclick="onTabChange(event, 'normal')">Normal</button>
+        <button class="tablinks" onclick="onTabChange(event, 'timer')">Timer</button>
+      </div>
+
+      <div class="timer" id="timer">
+        <p id=capacityRunner></p>
+      </div>
     </div>
+
 
     <p id=capacityBanner style="display: none;">
     </p>
@@ -194,7 +209,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </div>
         <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
           <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_1" type="text" value="0" oninput="this.value = this.value
+          <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
+            oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
         <p>
@@ -220,7 +236,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </div>
         <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
           <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_2" type="text" value="0" oninput="this.value = this.value
+          <input style="width: 3.5rem;" id="iip3_2" type="text" value="0"
+            oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
         <p>
@@ -246,7 +263,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </div>
         <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
           <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_3" type="text" value="0" oninput="this.value = this.value
+          <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
+            oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
         <p>
@@ -272,7 +290,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </div>
         <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
           <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_4" type="text" value="0" oninput="this.value = this.value
+          <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
+            oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
         <p>
@@ -325,33 +344,29 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
 
   <div style="display: inline-block; margin-left: 1%;" id="throughput-multisignal">
-    <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Total Data Throughput</div>
+    <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Data Throughput History</div>
   </div>
 
-<div id="parent_div" style="display: inline-flex;">
-  <div id="left_div" style="position: absolute; left: 0px">
-    <div id="sinr_only" style="width: 720px; height: 320px; margin-top: 1%;">
-      <canvas id="sinr-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
-    </div>
+  <div id="parent_div" style="position: relative;">
+    <div id="left_div" style="position: absolute; left: 0px; margin-top: 1%;">
+      <div style="display: inline-flex;" id="both_plots">
+        <div id="sinr_both" style="width: 360px; height: 320px; margin-top: 1%;">
+          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+        </div>
 
-    <div style="display: none;" id="both_plots">
-      <div id="sinr_both" style="width: 360px; height: 320px; margin-top: 1%;">
-        <canvas id="sinr-bar-chart-mini" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
-      </div>
-
-      <div id="se_both" style="width: 360px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
-        <canvas id="spectral-efficiency-bar-chart-mini" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+        <div id="se_both" style="width: 360px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div id="right_div">
-    <div id="se_only" style="width: 720px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
-      <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+    <div style="display: none;" id="right_div">
+      <div id="avg_throughput" style="width: 720px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
+        <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+      </div>
     </div>
   </div>
-</div>
- 
+
 </body>
 <script>
   'use strict';
@@ -457,66 +472,30 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     }
 
     if (tabName === 'timer') {
-      document.getElementById("sinr_only").setAttribute("style", "display: none");
-      document.getElementById("se_only").setAttribute("style", "display: none");
-      document.getElementById("both_plots").style.display = "inline-flex";
-      document.getElementById("left_div").setAttribute("style", "position: absolute; left: 0px; top: 48rem");
+      document.getElementById("timer").style.display = "initial";
 
-      SinrPlot_BarChart.remove_plot();
-      SpectralEfficiencyPlot_BarChart.remove_plot();
-      document.getElementById("sinr-bar-chart").remove();
-      document.getElementById("spectral-efficiency-bar-chart").remove();
-      let sinr_mini = document.getElementById("sinr-bar-chart-mini");
-      if (sinr_mini != null) {
-        document.getElementById("sinr-bar-chart-mini").remove();
+      if (document.getElementById("avg-throughput-bar-chart") !== null) {
+        AverageThroughputPlot_BarChart.remove_plot();
+        document.getElementById("avg-throughput-bar-chart").remove();
       }
-      let se_mini = document.getElementById("spectral-efficiency-bar-chart-mini");
-      if (se_mini != null) {
-        document.getElementById("spectral-efficiency-bar-chart-mini").remove();
-      }
-      
-      const sinr_node = document.createElement("canvas");
-      sinr_node.id = "sinr-bar-chart-mini";
-      sinr_node.setAttribute("style", "width: 100%; height: 100%; margin-top:-25px;");
 
-      const se_node = document.createElement("canvas");
-      se_node.id = "spectral-efficiency-bar-chart-mini";
-      se_node.setAttribute("style", "width: 100%; height: 100%; margin-top:-25px;");
+      const avgT_node = document.createElement("canvas");
+      avgT_node.id = "avg-throughput-bar-chart";
+      avgT_node.setAttribute("style", "width: 100%; height: 100%; margin-top:-25px;");
 
-      document.getElementById("sinr_both").appendChild(sinr_node);
-      document.getElementById("se_both").appendChild(se_node);
+      document.getElementById("avg_throughput").appendChild(avgT_node);
+      let avgThroughput_chart = AverageThroughputPlot_BarChart.init([sig1, sig2, sig3, sig4], "avg-throughput-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
 
-      SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart-mini", 
-      ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4"]);
-      SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart-mini", 
-      ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
-      
+      CapacityRunner([sig1, sig2, sig3, sig4], '#capacityRunner', avgThroughput_chart);
+      document.getElementById("right_div").style.display = "initial";
+      document.getElementById("right_div").style.position = "absolute";
+      document.getElementById("right_div").style.marginTop = "1%";
     } else {
-      document.getElementById("both_plots").setAttribute("style", "display: none");
-      document.getElementById("sinr_only").style.display = "inline-flex";
-      document.getElementById("se_only").removeAttribute("style");
+      document.getElementById("timer").style.display = "none";
 
-      SinrPlot_BarChart.remove_plot();
-      SpectralEfficiencyPlot_BarChart.remove_plot();
-     
-      document.getElementById("sinr-bar-chart-mini").remove();
-      document.getElementById("spectral-efficiency-bar-chart-mini").remove();
-
-      const sinr_node = document.createElement("canvas");
-      sinr_node.id = "sinr-bar-chart";
-      sinr_node.setAttribute("style", "width: 45rem; height: 20rem; margin-top:-25px;");
-
-      const se_node = document.createElement("canvas");
-      se_node.id = "spectral-efficiency-bar-chart";
-      se_node.setAttribute("style", "width: 45rem; height: 20rem; margin-top:-25px;");
-
-      document.getElementById("sinr_only").appendChild(sinr_node);
-      document.getElementById("se_only").appendChild(se_node);
-
-      SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", 
-      ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4"]);
-      SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", 
-      ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
+      AverageThroughputPlot_BarChart.remove_plot();
+      document.getElementById("avg-throughput-bar-chart").remove();
+      document.getElementById("right_div").style.display = "none";
     }
 
     evt.currentTarget.className += " active";
@@ -731,11 +710,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
- 
-  SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4"]);
-  SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
 
-  
+  SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
+  SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4", "Average Total"]);
+
 </script>
 
 </html>

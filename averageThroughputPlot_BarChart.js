@@ -1,0 +1,146 @@
+'use strict';
+
+
+//
+// sig:
+//
+//   is the signal that we are getting the Spectral Efficiency Plot for
+//
+//
+//
+//
+var schemes = conf.schemes;
+
+const AverageThroughputPlot_BarChart = {
+  dataset: [],
+  signal_list: [],
+  avgThroughput_chart: null,
+
+  init: function (signal_list, canvas_id, labels) {
+    this.signal_list = signal_list;
+    let data = this.generate_dataset(this.signal_list);
+    this.dataset = data;
+    this.create_chart(canvas_id, labels, data);
+    this.update_plot();
+
+    return this;
+  },
+
+  generate_dataset: function (signal_list) {
+    let dataset = [];
+    for (let i = 0; i < signal_list.length; i++) {
+      let R = signal_list[i].rate;
+      dataset.push(R);
+    }
+    return dataset;
+  },
+
+  get_total_throughput: function (signal_list) {
+    let rate = 0;
+    for (let i = 0; i < signal_list.length; i++) {
+      rate += signal_list[i].rate;
+    }
+    return rate;
+  },
+
+  create_chart: function (canvas_id, labels, data) {
+    this.avgThroughput_chart = new Chart(document.getElementById(canvas_id), {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Data Rate (bits/sec)",
+            backgroundColor: ["rgb(200,56,56)", "rgb(0,176,240)", "rgb(36,124,76)", "rgb(255,192,0)", "#8e5ea2"],
+            data: data
+          }
+        ]
+      },
+      options: {
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: 'Average Data Throughput',
+            color: "#fff"
+          },
+          datalabels: {
+            anchor: 'end',
+            align: 'top',
+            formatter: Math.round,
+            font: {
+              weight: 'bold'
+            }
+          }
+        },
+
+        scales: {
+          x: {
+            ticks: {
+              color: "#fff"
+            },
+            grid: {
+              color: "#666"
+            },
+            //   title: {
+            //     display: true,
+            //     text: 'Your Title',
+            //     color: "#fff"
+            //   }
+          },
+          y: {
+            type: 'logarithmic',
+            min: 100e3,
+            max: 400e6,
+            ticks: {
+              display: true,
+              color: "#fff",
+              callback:
+                function (value) {
+                  var val = [100e3, 400e3, 1e6, 2e6, 4e6, 10e6, 20e6, 40e6,
+                    100e6, 200e6, 400e6].includes(value) ? value : undefined;
+                  if (val == undefined) return undefined;
+                  let [s, u] = scale_units(val);
+                  return val * s + u;
+                }
+            },
+            grid: {
+              color: "#666"
+            },
+            title: {
+              display: true,
+              text: 'bits / sec',
+              color: "#fff",
+            }
+          }
+        }
+      }
+    });
+  },
+
+  update_plot: function (data_bits = null) {
+
+    if (data_bits == null) {
+      for (let i = 0; i < signal_list.length; i++) {
+        AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[i] = 0;
+      }
+      return;
+    }
+
+    var bits = data_bits.bits_list;
+
+    for (let i = 0; i < bits.length; i++) {
+      let dataRate = bits[i] / data_bits.timeElapsed;
+      AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[i] = dataRate;
+    }
+
+    AverageThroughputPlot_BarChart.avgThroughput_chart.update();
+  },
+
+  remove_plot: function () {
+    AverageThroughputPlot_BarChart.avgThroughput_chart.destroy();
+    AverageThroughputPlot_BarChart.dataset = [];
+    AverageThroughputPlot_BarChart.signal_list = [];
+  }
+
+}
