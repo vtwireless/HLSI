@@ -109,11 +109,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
         }
     }
 
-    innerHTML += `<br><label style="font-weight: bold;">Performance score: </label>\
-    `;
-    innerHTML += `<output id="perf_score${id}" style="color: #FFFF00;"></output>\ &nbsp; \
-    `;
-
+    if (pu_mode != null && pu_mode.value != null) {
+        innerHTML += `<br><label style="font-weight: bold;">Performance score: </label>\
+        `;
+        innerHTML += `<output id="perf_score${id}" style="color: #FFFF00;"></output>\ &nbsp; \
+        `;
+    }
+   
     if (pu_mode != null && pu_mode.value != null) {
         innerHTML += `<br><label style="font-weight: bold;">Outage Events: </label>\
             `;
@@ -201,9 +203,10 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
             getElement(outage_el).value = d3.format(",")(signal_outages[i].toFixed(2));
         }
 
-        getElement('#perf_score').value = d3.format(",")(perf_score);
-
         if (pu_mode != null && pu_mode.value != null) {
+
+            getElement('#perf_score').value = d3.format(",")(perf_score);
+
             if (signal_list.length === 5) {
                 for (let i = 0; i < signal_list.length-1; i++) { 
                     var outage_events_el = '#outage_events_sig' + (i + 1);

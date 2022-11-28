@@ -52,7 +52,7 @@ const AverageThroughputPlot_BarChart = {
         scales: {x, y} } = chart;
 
         ctx.save();
-        ctx.strokeStyle = 'red';
+        ctx.strokeStyle = 'yellow';
         ctx.setLineDash([10, 20]);
         if (threshold)
           ctx.strokeRect(left, y.getPixelForValue(threshold * 1e6), width, 0);
