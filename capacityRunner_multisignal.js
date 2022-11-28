@@ -248,8 +248,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                 signal_outages[i] += dt;
             else {
                 signal_bits[i] += Math.round(signal_prevRates[i] * dt);
-                total_bits += signal_bits[i];
             }
+        }
+
+        var sum_total = 0;
+        for (let i = 0; i < signal_list.length; i++) {
+            sum_total += signal_bits[i];
+            total_bits = sum_total;
         }
 
         for (let i = 0; i < signal_list.length; i++) {
