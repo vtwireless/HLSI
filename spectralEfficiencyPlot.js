@@ -70,7 +70,7 @@ function SpectralEfficiencyPlot(sig) {
     // We need a unique DOM HTML element ID.
     var svg_id = "svg-capaciZty_" + SpectralEfficiencyPlot.plotId++;
 
-    var svgc = d3.select("body")
+    var svgc = d3.select("#spectral_efficiency_parent")
         .append("svg")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)

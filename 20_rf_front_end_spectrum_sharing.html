@@ -34,8 +34,11 @@ dependent ACI-based SINR
     <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
     <script src=spectralEfficiencyPlot_BarChart.js></script>
     <script src=sinrPlot_BarChart.js></script>
+    <script src="averageThroughputPlot_BarChart.js"></script>
+    <script src=timer.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
+    <script src=capacityRunner_multisignal.js></script>
     <!-- <script src=throughputPlot.js></script> -->
     <script src=codemirror.min.js></script>
     <script src=codeMirror_javascript.js></script>
@@ -47,6 +50,73 @@ dependent ACI-based SINR
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
     <style>
+       .grid-container-main {
+        display: grid;
+        grid-template-columns: auto auto;
+        padding: 2px;
+        width: 75vw;
+      }
+      
+      .grid-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        padding: 2px;
+      }
+
+      .grid-item {
+        padding: 2px;
+        font-size: 30px;
+        text-align: center;
+      }
+  
+      /* Style the tab */
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: black;
+        width: fit-content;
+        border: groove;
+        border-radius: 8px;
+        height: 3rem;
+      }
+  
+      /* Style the buttons inside the tab */
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 17px;
+        color: white;
+        /* width: 5vw; */
+      }
+  
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: lightgray;
+        color: black;
+      }
+  
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: darkkhaki;
+        color: black;
+      }
+  
+      .timer {
+        margin-left: 2rem;
+        display: none;
+        width: 60vw;
+        justify-content: start;
+      }
+
+      .throughput-heading {
+        font-size: 1rem;
+      }
+
       input.slider_bw{
         width: auto;
       }
@@ -107,7 +177,18 @@ dependent ACI-based SINR
     </div>   
   </section>
   
-  <div class="content-section" style="margin: 0% 2%; margin-top: 8%;">
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
+    <div style="display: inline-flex;">
+      <div class="tab">
+        <button class="tablinks" onclick="onTabChange(event, 'normal', signalList)">Normal</button>
+        <button class="tablinks" onclick="onTabChange(event, 'timer', signalList)">Timer</button>
+      </div>
+
+      <div class="timer" id="timer">
+        <p id=capacityRunner></p>
+      </div>
+    </div>
+
     <p id=scriptController style="margin-bottom: 2%;"></p>
   
     <p id=capacityBanner style="display: none;">
@@ -145,20 +226,35 @@ dependent ACI-based SINR
     </div>
   </div>
 
-  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%; margin-top: 1.5%;"></div>
+  <div class="grid-container-main">
+    <div class="grid-item">
+      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+    </div>
 
+    <div class="grid-item">
+      <div class="grid-container">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+        <div class="grid-item">
+          <div id="avg_throughput" style="width: 360px; height: 320px;">
+            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <div style="display: inline-block; margin-left: 1%;" id="throughput-multisignal">
-    <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Total Data Throughput</div>
-  </div>
+    <div class="grid-item">
+      <div id="throughput-multisignal" style="width: 720px;">
+        <div class="throughput-heading">Data Throughput History</div>
+      </div>
+    </div>
 
-<div style="display: inline-flex;">
-  <div style="width: 720px; height: 320px; margin-top: 1%;">
-    <canvas id="sinr-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
-  </div>
-
-  <div style="width: 720px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
-    <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+    <div class="grid-item">
+      <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+        <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+      </div>
+    </div>
   </div>
   
   
@@ -223,6 +319,8 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -40})
 
+var signalList = [sig1, sig2, sig3, sig4];
+
 new ScriptController([ sig1, sig2, sig3, sig4 ], { 
     element: '#scriptController',
     functionFiles: 'functions/ex20_functions.js'
@@ -249,6 +347,7 @@ new ScriptController([ sig1, sig2, sig3, sig4 ], {
 // Slider(sig4, 'mcs', '#mcs4');
 
 // HoppingInterferer(interferer, '#hoppingInterferer');
+var funcs = null;
 CapacityBanner(sig1, '#capacityBanner');
 
 ThroughputPlot([sig1, sig2, sig3, sig4]);
@@ -258,9 +357,9 @@ PowerSpectrumPlot_2D();
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4"]);
+SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
 
-SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Comm Link 1", "Comm Link 2", "Comm Link 3", "Comm Link 4", "Average Total"]);
+SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4", "Average Total"]);
 
 </script>
 </html>

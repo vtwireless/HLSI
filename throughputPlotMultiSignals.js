@@ -58,7 +58,7 @@ total_data_rate_signal.onChange = function(par, callback) {
 //     freq_init: 0
 // });
 
-function ThroughputPlot(signals, interferers=[]) {
+function ThroughputPlot(signals, interferers=[], threshold = null) {
     
     
     // if(!Array.isArray(interferers))
@@ -83,6 +83,7 @@ function ThroughputPlot(signals, interferers=[]) {
 
     // Time between plotting points:
     var plot_period = 0.1; // in seconds
+    var runTime = 60.0;
 
     var interval = setInterval(update_plot, plot_period * 1000);
 
@@ -98,6 +99,7 @@ function ThroughputPlot(signals, interferers=[]) {
     
     var svgr = d3.select("#throughput-multisignal")
         .append("svg")
+        .attr("id", "throughput-multisignal-plot")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)
         .attr("style", "float: right;")
@@ -148,7 +150,18 @@ function ThroughputPlot(signals, interferers=[]) {
     svgr.append("g").attr("class","grid")
         .call(d3.axisLeft(rscale).tickFormat("")
             .tickSize(-width).tickValues(rtickvalues));
-
+    
+    if (threshold) {
+        svgr.append("line")
+        .attr("x1", 0)
+        .attr("x2", width)
+        .attr("y1", rscale(threshold * 1e6))
+        .attr("y2", rscale(threshold * 1e6))
+        .attr("stroke-width", 3)
+        .attr("stroke", "yellow")
+        .attr("stroke-dasharray", "8,8");
+    } 
+   
     // create x-axis axis label
     svgr.append("text")
         .attr("transform","translate("+(width/2)+","+
@@ -209,6 +222,24 @@ function ThroughputPlot(signals, interferers=[]) {
     var count = 0;
 
     function update_plot() {
+
+        if (ThroughputPlot.timerMode && ThroughputPlot.timeLeft > 0) {
+
+            ThroughputPlot.timeLeft -= plot_period;
+
+            if (ThroughputPlot.timeLeft < 0.0)
+                ThroughputPlot.timeLeft = 0.0;
+
+            if (ThroughputPlot.timeLeft === 0.0 && ThroughputPlot.timerMode 
+                && ThroughputPlot.isRunning) {
+                clearTimeout(interval);
+            }
+
+            if (ThroughputPlot.stopClick) {
+                clearTimeout(interval);
+            }
+        }
+      
         let total_rate = 0.0;
         for(let i=0; i<signal_list.length; i++){
             // A rate of 0 is not something we can plot on a log scale.
@@ -248,3 +279,8 @@ function ThroughputPlot(signals, interferers=[]) {
         total_data_rate_signal.rate = r;
     });
 }
+
+ThroughputPlot.timerMode = false;
+ThroughputPlot.isRunning = false;
+ThroughputPlot.stopClick = false;
+ThroughputPlot.timeLeft = -1;

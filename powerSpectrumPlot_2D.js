@@ -150,7 +150,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         .attr("y", "50")
         .attr("fill", "rgb(255, 161, 93)")
         .attr("id", "interferer_label")
-        .text(`Interferer (${0.0}Hz)`);
+        .text(`PrimaryUser (${0.0}Hz)`);
     
     var signal_label_f = svgf
         .append("text")
@@ -281,13 +281,13 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         let interferer_label_new_coordinates = get_graph_label_coordinates(720, 320, cur_interferer_freq);
         interferer_label_f.attr("x", interferer_label_new_coordinates['x'])
         interferer_label_f.attr("y", interferer_label_new_coordinates['y']+5)
-        interferer_label_f.text(`Interferer (${cur_interferer_freq_exact}MHz)`);
+        interferer_label_f.text(`PrimaryUser (${cur_interferer_freq_exact}MHz)`);
 
         cur_signal_freq_exact = Math.round(cur_signal_freq_exact/1000000);
         let signal_label_new_coordinates = get_graph_label_coordinates(720, 320, cur_signal_freq);
         signal_label_f.attr("x", signal_label_new_coordinates['x'])
-        signal_label_f.attr("y", signal_label_new_coordinates['y']-8)
-        signal_label_f.text(`Signal (${cur_signal_freq_exact}MHz)`);
+        signal_label_f.attr("y", signal_label_new_coordinates['y']-16)
+        signal_label_f.text(`UserSignal (${cur_signal_freq_exact}MHz)`);
     }
 
     function get_graph_label_coordinates(graph_width, graph_height, fc){

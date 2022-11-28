@@ -24,6 +24,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       width: fit-content;
       border: groove;
       border-radius: 8px;
+      height: 3rem;
     }
 
     /* Style the buttons inside the tab */
@@ -65,6 +66,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src=sinrPlot_BarChart.js></script>
   <script src="averageThroughputPlot_BarChart.js"></script>
   <script src=label.js></script>
+  <script src=timer.js></script>
   <script src=capacityBanner.js></script>
   <script src=capacityRunner_multisignal.js></script>
   <!-- <script src=throughputPlot.js></script> -->
@@ -75,14 +77,76 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
   <style>
-    input.slider_bw {
-      width: auto;
-    }
+    .grid-container-main {
+        display: grid;
+        grid-template-columns: auto auto;
+        padding: 2px;
+        width: 75vw;
+      }
+      
+      .grid-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        padding: 2px;
+      }
 
-    .timer {
-      margin-left: 2rem;
-      display: none;
-    }
+      .grid-item {
+        padding: 2px;
+        font-size: 30px;
+        text-align: center;
+      }
+  
+      /* Style the tab */
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: black;
+        width: fit-content;
+        border: groove;
+        border-radius: 8px;
+        height: 3rem;
+      }
+  
+      /* Style the buttons inside the tab */
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 17px;
+        color: white;
+        /* width: 5vw; */
+      }
+  
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: lightgray;
+        color: black;
+      }
+  
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: darkkhaki;
+        color: black;
+      }
+  
+      .timer {
+        margin-left: 2rem;
+        display: none;
+        width: 60vw;
+        justify-content: start;
+      }
+
+      .throughput-heading {
+        font-size: 1rem;
+      }
+
+      input.slider_bw{
+        width: auto;
+      }
   </style>
 </head>
 
@@ -150,15 +214,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     </div>
   </section>
 
-  <div class="content-section" style="margin: 0% 2%; margin-top: 4.1%;">
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
     <!-- <p id=hoppingInterferer>
     </p> -->
     <div style="display: inline-flex;">
       <div class="tab">
-        <button class="tablinks" onclick="onTabChange(event, 'normal')">Normal</button>
-        <button class="tablinks" onclick="onTabChange(event, 'timer')">Timer</button>
+        <button class="tablinks" onclick="onTabChange(event, 'normal', signalList)">Normal</button>
+        <button class="tablinks" onclick="onTabChange(event, 'timer', signalList)">Timer</button>
       </div>
-
+      
       <div class="timer" id="timer">
         <p id=capacityRunner></p>
       </div>
@@ -340,29 +404,33 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     </div>
   </div>
 
-  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%; margin-top: 1.5%;"></div>
+  <div class="grid-container-main">
+    <div class="grid-item">
+      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+    </div>
 
-
-  <div style="display: inline-block; margin-left: 1%;" id="throughput-multisignal">
-    <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Data Throughput History</div>
-  </div>
-
-  <div id="parent_div" style="position: relative;">
-    <div id="left_div" style="position: absolute; left: 0px; margin-top: 1%;">
-      <div style="display: inline-flex;" id="both_plots">
-        <div id="sinr_both" style="width: 360px; height: 320px; margin-top: 1%;">
-          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+    <div class="grid-item">
+      <div class="grid-container">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
         </div>
-
-        <div id="se_both" style="width: 360px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
-          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas>
+        <div class="grid-item">
+          <div id="avg_throughput" style="width: 360px; height: 320px;">
+            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+          </div>
         </div>
       </div>
     </div>
 
-    <div style="display: none;" id="right_div">
-      <div id="avg_throughput" style="width: 720px; height: 320px; margin-top: 1%; float: right; margin-left: 1%;">
-        <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+    <div class="grid-item">
+      <div id="throughput-multisignal" style="width: 720px;">
+        <div class="throughput-heading">Data Throughput History</div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+        <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
       </div>
     </div>
   </div>
@@ -425,7 +493,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //     freq_init: 1785.0e6 // Hz
   // });
 
-
+  var signalList = [sig1, sig2, sig3, sig4];
   var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
 
   Slider(sig1, 'freq', '#freq1');
@@ -463,43 +531,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       }
     }
   };
-
-  function onTabChange(evt, tabName) {
-    var i, tabcontent, tablinks;
-    tablinks = document.getElementsByClassName("tablinks");
-    for (i = 0; i < tablinks.length; i++) {
-      tablinks[i].className = tablinks[i].className.replace(" active", "");
-    }
-
-    if (tabName === 'timer') {
-      document.getElementById("timer").style.display = "initial";
-
-      if (document.getElementById("avg-throughput-bar-chart") !== null) {
-        AverageThroughputPlot_BarChart.remove_plot();
-        document.getElementById("avg-throughput-bar-chart").remove();
-      }
-
-      const avgT_node = document.createElement("canvas");
-      avgT_node.id = "avg-throughput-bar-chart";
-      avgT_node.setAttribute("style", "width: 100%; height: 100%; margin-top:-25px;");
-
-      document.getElementById("avg_throughput").appendChild(avgT_node);
-      let avgThroughput_chart = AverageThroughputPlot_BarChart.init([sig1, sig2, sig3, sig4], "avg-throughput-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
-
-      CapacityRunner([sig1, sig2, sig3, sig4], '#capacityRunner', avgThroughput_chart);
-      document.getElementById("right_div").style.display = "initial";
-      document.getElementById("right_div").style.position = "absolute";
-      document.getElementById("right_div").style.marginTop = "1%";
-    } else {
-      document.getElementById("timer").style.display = "none";
-
-      AverageThroughputPlot_BarChart.remove_plot();
-      document.getElementById("avg-throughput-bar-chart").remove();
-      document.getElementById("right_div").style.display = "none";
-    }
-
-    evt.currentTarget.className += " active";
-  }
 
   function onModeChange() {
     let mode = document.getElementById("mode").value;
@@ -704,15 +735,17 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
 
-  ThroughputPlot([sig1, sig2, sig3, sig4]);
+  ThroughputPlot(signalList);
   PowerSpectrumPlot_2D();
+
+  var funcs = null;
 
   // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-  SinrPlot_BarChart.init([sig1, sig2, sig3, sig4], "sinr-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
-  SpectralEfficiencyPlot_BarChart.init([sig1, sig2, sig3, sig4], "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4", "Average Total"]);
+  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
+  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4", "Average Total"]);
 
 </script>
 

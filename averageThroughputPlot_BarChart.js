@@ -16,11 +16,11 @@ const AverageThroughputPlot_BarChart = {
   signal_list: [],
   avgThroughput_chart: null,
 
-  init: function (signal_list, canvas_id, labels) {
+  init: function (signal_list, canvas_id, labels, threshold = null, backgroundColors = null) {
     this.signal_list = signal_list;
     let data = this.generate_dataset(this.signal_list);
     this.dataset = data;
-    this.create_chart(canvas_id, labels, data);
+    this.create_chart(canvas_id, labels, data, threshold, backgroundColors);
     this.update_plot();
 
     return this;
@@ -43,7 +43,24 @@ const AverageThroughputPlot_BarChart = {
     return rate;
   },
 
-  create_chart: function (canvas_id, labels, data) {
+  create_chart: function (canvas_id, labels, data, threshold, backgroundColors) {
+     // thresholdLine plugin block
+     this.thresholdLine = {
+      id: 'thresholdLine',
+      beforeDatasetsDraw(chart, args, options) {
+        const { ctx, chartArea: { top, right, bottom, left, width, height },
+        scales: {x, y} } = chart;
+
+        ctx.save();
+        ctx.strokeStyle = 'red';
+        ctx.setLineDash([10, 20]);
+        if (threshold)
+          ctx.strokeRect(left, y.getPixelForValue(threshold * 1e6), width, 0);
+        ctx.restore();
+      }
+
+    }
+
     this.avgThroughput_chart = new Chart(document.getElementById(canvas_id), {
       type: 'bar',
       data: {
@@ -51,7 +68,14 @@ const AverageThroughputPlot_BarChart = {
         datasets: [
           {
             label: "Data Rate (bits/sec)",
-            backgroundColor: ["rgb(200,56,56)", "rgb(0,176,240)", "rgb(36,124,76)", "rgb(255,192,0)", "#8e5ea2"],
+            barThickness: 50,
+            maxBarThickness: 70,
+            backgroundColor: function() {
+              if (backgroundColors) {
+                return backgroundColors;
+              }
+              return ["rgb(200,56,56)", "rgb(0,176,240)","rgb(36,124,76)","rgb(255,192,0)","#8e5ea2"];
+            },
             data: data
           }
         ]
@@ -114,7 +138,8 @@ const AverageThroughputPlot_BarChart = {
             }
           }
         }
-      }
+      },
+      plugins: [this.thresholdLine]
     });
   },
 
@@ -124,6 +149,7 @@ const AverageThroughputPlot_BarChart = {
       for (let i = 0; i < signal_list.length; i++) {
         AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[i] = 0;
       }
+      AverageThroughputPlot_BarChart.avgThroughput_chart.update();
       return;
     }
 
@@ -138,9 +164,11 @@ const AverageThroughputPlot_BarChart = {
   },
 
   remove_plot: function () {
-    AverageThroughputPlot_BarChart.avgThroughput_chart.destroy();
-    AverageThroughputPlot_BarChart.dataset = [];
-    AverageThroughputPlot_BarChart.signal_list = [];
+    if (AverageThroughputPlot_BarChart.avgThroughput_chart != null) {
+      AverageThroughputPlot_BarChart.avgThroughput_chart.destroy();
+      AverageThroughputPlot_BarChart.dataset = [];
+      AverageThroughputPlot_BarChart.signal_list = [];
+    }
   }
 
 }
