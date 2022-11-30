@@ -7,13 +7,22 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 <html lang="en-US" style="display: flex;">
 
 <head>
-  <title>HLSI Ex 25</title>
+  <title>HLSI Ex 26</title>
   <meta charset="UTF-8" />
   <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
   <link rel=stylesheet type=text/css href=sidebar.css />
+  <link rel=stylesheet type=text/css href=codemirror.min.css />
+  <link rel=stylesheet type=text/css href=blackboard.min.css />
   <style>
     output {
       font-weight: bold;
+    }
+
+    .argsTable{
+      height: 480px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: block;
     }
 
     /* Style the tab */
@@ -52,6 +61,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       background-color: darkkhaki;
       color: black;
     }
+
+    .modes {
+      display: flex;
+      flex-direction: row;
+    }
   </style>
   <script src=d3.v5.min.js></script>
   <script src=fft.js></script>
@@ -69,6 +83,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src=timer.js></script>
   <script src=capacityBanner.js></script>
   <script src=capacityRunner_multisignal.js></script>
+  <script src=scriptController.js></script>
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
   <!-- <script src=throughputPlot.js></script> -->
   <script src=throughputPlotMultiSignals.js></script>
   <script src=hoppingInterferer.js></script>
@@ -144,6 +161,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         font-size: 1rem;
       }
 
+      .linkinputs {
+        width: 100%;
+        margin-top: -1.5%;
+        display: flex;
+        flex-direction: row;
+      }
+
       input.slider_bw{
         width: auto;
       }
@@ -195,7 +219,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           menu</a>
         <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR Calculations Programmable
         </a>
-
       </nav>
 
       <label for="menu-control" class="sidebar__close"></label>
@@ -205,7 +228,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     <div
       style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">
-      <span style="color: #ddd;">Exercise 25</span> Spectrum Sharing -- SINR Calculations Menu
+      <span style="color: #ddd;">Exercise 26</span> Spectrum Sharing -- SINR Calculations Programmable
     </div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span
@@ -234,42 +257,51 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     <p id=capacityBanner style="display: none;">
     </p>
 
-    <p><label for="mode">Select mode:</label> &nbsp;
-      <select id="mode" onchange="onModeChange()">
-        <option id="beginner" value="beginner">Beginner</option>
-        <option id="advanced" value="advanced">Advanced</option>
-      </select>
-    </p>
-
-    <div style="padding-bottom: 0.5rem">
-      <div style="display: inline-block;">
-        <label for="strategy">Select SINR calculation option:</label> &nbsp;
-        <select id="strategy" onchange="onCategoryChange()">
-          <option id="default" value="" selected disabled hidden>Select SINR calculation option...</option>
-          <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
-          <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
-          <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
-          <option value="a3" disabled>Non-ideal filter</option>
-          <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
-        </select>
+    <div class="modes">
+      <div>
+        <p><label for="mode">Select mode:</label> &nbsp;
+          <select id="mode" onchange="onModeChange()">
+            <option id="beginner" value="beginner">Beginner</option>
+            <option id="advanced" value="advanced">Advanced</option>
+          </select>
+        </p>
       </div>
-
-      <div id="multiplierDiv" style="display: none;">
-        <label style="margin-left: 2rem;" for="strategy">BW mult.:</label> &nbsp;
-        <input style="width: 5rem;" id="multiplier" type="text" value="1" oninput="this.value = this.value
-        .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+     
+      <div class="modes" style="margin-left: 2rem;">
+        <p>
+          <label for="strategy">Select SINR calculation option:</label> &nbsp;
+          <select id="strategy" onchange="onCategoryChange()">
+            <option id="default" value="" selected disabled hidden>Select SINR calculation option...</option>
+            <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
+            <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
+            <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
+            <option value="a3" disabled>Non-ideal filter</option>
+            <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
+          </select>
+        
+  
+          <div id="multiplierDiv" style="display: none;">
+            <p>
+              <label style="margin-left: 2rem;" for="strategy">BW mult.:</label> &nbsp;
+              <input style="width: 5rem;" id="multiplier" type="text" value="1" oninput="this.value = this.value
+              .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+            </p>
+          </div>
+    
+          <div style="margin-left: 2rem;">
+            <p>
+              <input id="apply" type="button" value="Apply Selection" onclick="calculateSINR()">
+            </p>
+          </div>
+        </p>
       </div>
+   </div>
 
-      <div style="display: inline-block; margin-left: 2rem;">
-        <input id="apply" type="button" value="Apply Selection" onclick="calculateSINR()">
-      </div>
-    </div>
-
-    <div style="display: inline-flex; width: 100%;">
+    <div class = "linkinputs">
       <div style="width: 25%;">
-        <div style="font-size: 110%; color: #ff6b6b">Comm Link 1</div>
         <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <label for="strategy">BW mult.</label> &nbsp;
+          <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
           <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
         </div>
@@ -279,24 +311,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
-        <p>
-          <input type="range" id=freq1 />
-        </p>
-        <p>
-          <input type="range" id=bw1 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn1 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs1 style="display: none;" />
-        </p>
       </div>
 
       <div style="width: 25%;">
-        <div style="font-size: 110%; color: #b5ebff">Comm Link 2</div>
         <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <label for="strategy">BW mult.</label> &nbsp;
+          <div style="font-size: 110%; color: #b5ebff; display: inline-block;">Link 2</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
           <input style="width: 3.5rem;" id="multiplier2" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
         </div>
@@ -306,24 +326,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
-        <p>
-          <input type="range" id=freq2 />
-        </p>
-        <p>
-          <input type="range" id=bw2 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn2 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs2 style="display: none;" />
-        </p>
       </div>
 
       <div style="width: 25%;">
-        <div style="font-size: 110%; color: #afffd3">Comm Link 3</div>
         <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <label for="strategy">BW mult.</label> &nbsp;
+          <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
           <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
         </div>
@@ -333,24 +341,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
-        <p>
-          <input type="range" id=freq3 />
-        </p>
-        <p>
-          <input type="range" id=bw3 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn3 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs3 style="display: none;" />
-        </p>
       </div>
 
       <div style="width: 25%;">
-        <div style="font-size: 110%; color: #ffe699">Comm Link 4</div>
         <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <label for="strategy">BW mult.</label> &nbsp;
+          <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
           <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
         </div>
@@ -360,22 +356,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
-        <p>
-          <input type="range" id=freq4 />
-        </p>
-        <p>
-          <input type="range" id=bw4 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn4 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs4 style="display: none;" />
-        </p>
       </div>
     </div>
 
-
+   
+    <p id=scriptController style="margin-bottom: 2%;"></p>
+    
     <div style="display:inline-flex;">
       <span style="font-size: 24px; margin-right: 8px;">3D</span>
       <label class="switch">
@@ -498,26 +484,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   var signalList = [sig1, sig2, sig3, sig4];
   var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
 
-  Slider(sig1, 'freq', '#freq1');
-  Slider(sig1, 'bw', '#bw1');
-  Slider(sig1, 'gn', '#gn1');
-  Slider(sig1, 'mcs', '#mcs1');
-
-  Slider(sig2, 'freq', '#freq2');
-  Slider(sig2, 'bw', '#bw2');
-  Slider(sig2, 'gn', '#gn2');
-  Slider(sig2, 'mcs', '#mcs2');
-
-  Slider(sig3, 'freq', '#freq3');
-  Slider(sig3, 'bw', '#bw3');
-  Slider(sig3, 'gn', '#gn3');
-  Slider(sig3, 'mcs', '#mcs3');
-
-  Slider(sig4, 'freq', '#freq4');
-  Slider(sig4, 'bw', '#bw4');
-  Slider(sig4, 'gn', '#gn4');
-  Slider(sig4, 'mcs', '#mcs4');
-
   // HoppingInterferer(interferer, '#hoppingInterferer');
   CapacityBanner(sig1, '#capacityBanner');
 
@@ -545,23 +511,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("multiplierDiv").style.display = "none";
       document.getElementById("default").selected = "selected";
 
-      // show only frequeny sliders in beginner mode
-      document.getElementById("bw1").style.display = "none";
-      document.getElementById("gn1").style.display = "none";
-      document.getElementById("mcs1").style.display = "none";
-
-      document.getElementById("bw2").style.display = "none";
-      document.getElementById("gn2").style.display = "none";
-      document.getElementById("mcs2").style.display = "none";
-
-      document.getElementById("bw3").style.display = "none";
-      document.getElementById("gn3").style.display = "none";
-      document.getElementById("mcs3").style.display = "none";
-
-      document.getElementById("bw4").style.display = "none";
-      document.getElementById("gn4").style.display = "none";
-      document.getElementById("mcs4").style.display = "none";
-
       Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
         element.style.display = "none";
       });
@@ -576,23 +525,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
       document.getElementById("nonlinear").disabled = false;
-
-      // show only frequeny sliders in beginner mode
-      document.getElementById("bw1").style.display = "initial";
-      document.getElementById("gn1").style.display = "initial";
-      document.getElementById("mcs1").style.display = "initial";
-
-      document.getElementById("bw2").style.display = "initial";
-      document.getElementById("gn2").style.display = "initial";
-      document.getElementById("mcs2").style.display = "initial";
-
-      document.getElementById("bw3").style.display = "initial";
-      document.getElementById("gn3").style.display = "initial";
-      document.getElementById("mcs3").style.display = "initial";
-
-      document.getElementById("bw4").style.display = "initial";
-      document.getElementById("gn4").style.display = "initial";
-      document.getElementById("mcs4").style.display = "initial";
 
     }
 
@@ -736,6 +668,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     sig4.triggerCallbacks();
 
   }
+
+  var functionFiles = 'functions/ex26_functions.js';
+  new ScriptController([ sig1, sig2, sig3, sig4 ], { 
+    element: '#scriptController',
+    functionFiles: functionFiles
+  });
 
   ThroughputPlot(signalList);
   PowerSpectrumPlot_2D();

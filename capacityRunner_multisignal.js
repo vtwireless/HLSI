@@ -427,6 +427,10 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
             if (document.getElementById("hoppingInterferer")) {
                 HoppingInterferer(interferer, '#hoppingInterferer');
             }
+
+            if (document.getElementById("scriptController") != null) {
+                ScriptController.stopClick = false;
+            }
         }
 
         Reset();
@@ -450,6 +454,7 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
         ThroughputPlot.stopClick = true;
         ThroughputPlot.isRunning = false;
         HoppingInterferer.stopClick = true;
+        ScriptController.stopClick = true;
         getElement('#start').value = "Start";
     }
 

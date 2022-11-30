@@ -503,6 +503,11 @@ editor.on('beforeChange', function (cm, change) {
 
     function callUserFunction() {
 
+        if (ScriptController.stopClick) {
+            Stop();
+            return;
+        }
+
         if(!running)
             // The timer popped after we set the flag.
             return;
@@ -641,3 +646,4 @@ editor.on('beforeChange', function (cm, change) {
 
 // Used to create unique object IDs.
 ScriptController.count = 0;
+ScriptController.stopClick = false;

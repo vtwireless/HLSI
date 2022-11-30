@@ -92,9 +92,13 @@ function onTabChange(evt, tabName, signals) {
         }
       }
 
-      if (document.getElementById("hoppingInterferer")) {
+      if (document.getElementById("hoppingInterferer") != null) {
         HoppingInterferer.stopClick = false;
         HoppingInterferer(interferer, '#hoppingInterferer');
+      }
+
+      if (document.getElementById("scriptController") != null) {
+        ScriptController.stopClick = false;
       }
      
       if (document.getElementById("avg-throughput-bar-chart") !== null) {
