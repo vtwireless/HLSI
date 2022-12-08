@@ -287,8 +287,8 @@ var conf = {
     signal_multi: {
         mcs_init: 2,
 
-        freq_min: 1780.0e6,
-        freq_max: 1820.0e6,
+        freq_min: 1782.5e6,
+        freq_max: 1817.5e6,
         freq_plot_min: 1780.0e6,
         freq_plot_max: 1820.0e6,
         freq_step: 0.01e6,
@@ -359,6 +359,7 @@ function Signal(sig, name = "", opts = null) {
 
     var obj = false;
     var called_with_new = false;
+    let pu_mode = document.getElementById("pu_mode");
 
     try {
         if(typeof(this) !== "undefined") {
@@ -640,6 +641,10 @@ function Signal(sig, name = "", opts = null) {
         //
         obj.interferers.forEach(function(i) {
 
+            if (i['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
+                return;
+            }
+
             //
             // i is interferer signal.
             if(!i.is_noise &&
@@ -751,7 +756,11 @@ function Signal(sig, name = "", opts = null) {
             }
 
             obj.interferers.forEach(function(i) {
- 
+                
+                if (i['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
+                    return;
+                }
+
                 // i is interferer signal.
                 if(!i.is_noise &&
                     (   // if they don't overlap then return
@@ -993,6 +1002,10 @@ function Signal(sig, name = "", opts = null) {
         //
         // First interferers effect "rate":
         obj.interferers.forEach(function(interferer) {
+            if (interferer['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
+                return;
+            }
+
             if(interferer.is_noise)
                 // Only the noise gain has an effect on this signal
                 // rate.
@@ -1042,6 +1055,10 @@ function Signal(sig, name = "", opts = null) {
     // Add a 'rate' callback checkSetRate() trigger to all other signals
     // that are not noise.
     obj.interferers.forEach(function(signal) {
+        if (signal['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
+            return;
+        }
+
         if(signal.is_noise)
             // noise has no "rate"
             return;

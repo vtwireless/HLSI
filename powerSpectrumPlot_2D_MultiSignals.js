@@ -37,6 +37,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
     var freq_plot_min = 1.0e32; // large number that we change
     var freq_plot_max = -1.0;   // small number that we change
 
+    let pu_mode = document.getElementById("pu_mode");
     // We'll display spectrum from all signals in Signal.env;
     
 
@@ -49,6 +50,10 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
 
         if(sig.is_noise) {
             noises.push(sig);
+            return;
+        }
+
+        if (sig['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
             return;
         }
 
@@ -208,6 +213,10 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         let sig = Signal.env[key];
 
         if (sig.is_noise) {
+            return;
+        }
+        
+        if (sig['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
             return;
         }
         

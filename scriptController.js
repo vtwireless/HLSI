@@ -233,6 +233,22 @@ function ScriptController(sigs, opts = null) {
     runCheckbox.type = "checkbox";
     runCheckbox.checked = false;
 
+    var minimizeBtn = document.createElement('button');
+    minimizeBtn.className = "minimizeBtn";
+    minimizeBtn.innerHTML = `<i style="color:white" class="gg-minimize-alt"></i>`;
+    p.appendChild(minimizeBtn);
+    let minimizeFlag = false;
+    minimizeBtn.onclick = function(e) {
+        let editorDivId = e.path[1].id !== "" ? e.path[1].id : e.path[2].id;
+        let editorId = editorDivId === "scriptController2" ? 1 : 0;
+        minimizeFlag = !minimizeFlag;
+
+        let editorCode = document.getElementsByClassName("CodeMirror cm-s-blackboard");
+        minimizeFlag ? argsTable.setAttribute("style", "height:70px") : argsTable.setAttribute("style", "height:320px");
+        minimizeFlag ? editorCode[editorId].setAttribute("style", "height:50px") : 
+            editorCode[editorId].setAttribute("style", "height:420px");
+    };
+
     var editorDiv = document.createElement('div');
     editorDiv.className = 'editor';
     p.appendChild(editorDiv);
@@ -242,8 +258,19 @@ function ScriptController(sigs, opts = null) {
     // TODO: add the function declaration.
     let argsStr;
     argsStr = argList.toString().replace(/\,/g , ', ');
-    funcDeclareSpan.appendChild(document.createTextNode(
-        "Function Callback(" + argsStr + "){"));
+    if (opts && opts.customLabels) {
+        if (sigs.length === 1 && p.id === "scriptController2") {
+            funcDeclareSpan.appendChild(document.createTextNode(
+                "INTERFERER Controller (" + argsStr + "){"));
+        } else {
+            funcDeclareSpan.appendChild(document.createTextNode(
+                "SIGNAL Controller (" + argsStr + "){"));
+        }
+    } else {
+        funcDeclareSpan.appendChild(document.createTextNode(
+            "Function Callback(" + argsStr + "){"));
+    }
+   
     editorDiv.appendChild(funcDeclareSpan);
 
     var textArea = document.createElement('textarea');
@@ -574,6 +601,8 @@ editor.on('beforeChange', function (cm, change) {
         );
 
         editor.setSize('100%', 420);
+        
+        //editor.setAttribute('class', 'editorCode');
 
         editor.on('change', function() {
             if(funcSelect.className !== 'edited')

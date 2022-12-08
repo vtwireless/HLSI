@@ -251,6 +251,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
           <option value="a3" disabled>Non-ideal filter</option>
           <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
+          <option id="ideal3" value="a5" disabled>Nonlinear front end - preselector bandwidth over entire frequency range</option>
         </select>
       </div>
 
@@ -541,6 +542,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     if (mode === 'beginner') {
       document.getElementById("ideal1").disabled = true;
       document.getElementById("ideal2").disabled = true;
+      document.getElementById("ideal3").disabled = true;
       document.getElementById("nonlinear").disabled = true;
       document.getElementById("multiplierDiv").style.display = "none";
       document.getElementById("default").selected = "selected";
@@ -575,6 +577,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
+      document.getElementById("ideal3").disabled = false;
       document.getElementById("nonlinear").disabled = false;
 
       // show only frequeny sliders in beginner mode
@@ -620,7 +623,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     }
 
     // nonlinear frontend model
-    if (selection == 'a4') {
+    if (selection == 'a4' || selection == 'a5') {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
         sig1.nonlinearModel = true;
@@ -710,7 +713,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     }
 
     // nonlinear frontend receiver filter 
-    if (selection == 'a4') {
+    if (selection == 'a4' || selection == 'a5') {
       let iip3_1 = document.getElementById("iip3_1").value;
       let iip3_2 = document.getElementById("iip3_2").value;
       let iip3_3 = document.getElementById("iip3_3").value;
@@ -727,6 +730,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       } else {
         return;
       }
+    }
+
+    // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
+    // occupying the enter frequency range
+    if (selection == 'a5') {
+      sig1.bandwidthMultiplier = 9.8;
+      sig2.bandwidthMultiplier = 9.8;
+      sig3.bandwidthMultiplier = 9.8;
+      sig4.bandwidthMultiplier = 9.8;
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)

@@ -52,7 +52,21 @@ function onModeChange() {
 function onPUModeChange() {
     let pu_mode = document.getElementById("pu_mode").value;
 
-    if (pu_mode === 'interference') {
+    if (pu_mode === 'interference' || pu_mode === 'noninterferer') {
+        // re-draw the PSD plots
+        if (document.getElementById("pu_mode").options.length > 3) {
+            PowerSpectrumPlot_2D();
+            calculateSINR();
+        }
+
+        if (document.getElementById("scriptController2") != null) {
+            if (pu_mode === 'noninterferer') {
+                document.getElementById("scriptController2").style.display = "none";
+            } else {
+                document.getElementById("scriptController2").style.display = "initial";
+            }
+        } 
+        
         document.getElementById("sinr_thresholdDiv").style.display = "none";
         document.getElementById("rate_thresholdDiv").style.display = "none";
 
@@ -83,6 +97,16 @@ function onPUModeChange() {
         }
        
     } else if (pu_mode === 'radar_primary_user' || pu_mode === 'comms_primary_user') {
+        // re-draw the PSD plots
+        if (document.getElementById("pu_mode").options.length > 3) {
+            PowerSpectrumPlot_2D();
+            calculateSINR();
+        }
+
+        if (document.getElementById("scriptController2") != null) {
+            document.getElementById("scriptController2").style.display = "initial";  
+        } 
+        
         document.getElementById("sinr_thresholdDiv").style.display = "initial";
         document.getElementById("rate_thresholdDiv").style.display = "initial";
 

@@ -41,6 +41,7 @@ function onTabChange(evt, tabName, signals) {
       if(document.getElementById("pu_mode") !== null) {
         switch(pu_mode) {
           case 'interference':
+          case 'noninterferer': 
           case 'radar_primary_user':
             if (signals.length === 2) {
               avgThroughput_chart = AverageThroughputPlot_BarChart.init(signals, "avg-throughput-bar-chart",
