@@ -239,7 +239,8 @@ function ScriptController(sigs, opts = null) {
     p.appendChild(minimizeBtn);
     let minimizeFlag = false;
     minimizeBtn.onclick = function(e) {
-        let editorDivId = e.path[1].id !== "" ? e.path[1].id : e.path[2].id;
+        var path = e.path || (e.composedPath && e.composedPath());
+        let editorDivId = path[1].id !== "" ? path[1].id : path[2].id;
         let editorId = editorDivId === "scriptController2" ? 1 : 0;
         minimizeFlag = !minimizeFlag;
 
