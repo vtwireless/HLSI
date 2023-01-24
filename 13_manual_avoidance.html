@@ -25,6 +25,7 @@ simulation that freezes at end of timed simulation
   <script src=powerSpectrumPlot_2D.js></script>
   <script src=powerSpectrumPlot_3D.js></script>
   <script src=spectralEfficiencyPlot.js></script>
+  <script src=scriptController.js></script>
   <script src=sinrPlot_BarChart.js></script>
   <script src="averageThroughputPlot_BarChart.js"></script>
   <script src="modeController.js"></script>
@@ -100,6 +101,12 @@ simulation that freezes at end of timed simulation
       display: flex;
       flex-direction: row;
     }
+
+    @media screen and (max-width: 4000px) {
+    .grid-container {
+      width: 25%;
+    }
+}
   </style>
 </head>
 

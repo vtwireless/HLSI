@@ -12,6 +12,25 @@ the ongoing or most recent simulation interval
     <link rel=stylesheet type=text/css href=sidebar.css />
     <style> 
         output {font-weight: bold;}
+
+        .grid-container {
+          display: grid;
+          grid-template-columns: auto auto;
+          padding: 2px;
+        }
+
+        .grid-item {
+          padding: 2px;
+          font-size: 30px;
+          text-align: center;
+        }
+
+        @media screen and (max-width: 4000px) {
+        .grid-container {
+          width: 25%;
+        }
+      }
+
     </style>
     <script src=d3.v5.min.js></script>
     <script src=fft.js></script>
@@ -22,6 +41,7 @@ the ongoing or most recent simulation interval
     <script src=powerSpectrumPlot_2D.js></script>
     <script src=powerSpectrumPlot_3D.js></script>
     <script src=spectralEfficiencyPlot.js></script>
+    <script src=throughputPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
     <script src=capacityRunner.js></script>
@@ -111,7 +131,24 @@ the ongoing or most recent simulation interval
     </div>
   </div>
   
-  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+  <div class="grid-container">
+    <div class="grid-item">
+      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+    </div>
+
+    <div class="grid-item">
+      <div id="spectral_efficiency_parent"></div>
+    </div>
+
+    <div class="grid-item">
+      <div id="throughput_history_parent"></div>
+    </div>
+
+    <div class="grid-item">
+     
+    </div>
+    </div>
+  </div>
 
 </body>
 <script>
@@ -191,6 +228,9 @@ function power_spectral_density_3d_checkbox_change(){
       PowerSpectrumPlot_2D({ yMin: -45.0, yMax: 10.0}, true, false);
     }
 }
+
+ThroughputPlot(sig);
+
 
 </script>
 </html>
