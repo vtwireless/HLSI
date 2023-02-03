@@ -166,6 +166,11 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
     var prev_pu_sinr;
     var prev_sig_sinr;
     var signal_prevSinr = [];
+
+    // array that holds a flag indicating the previous state of a signal - i.e. if it was in an outage condition
+    var sig_prevState = Array(signal_list.length).fill(false);;    
+
+    var pu_prevState = false;
     var timeLeft = runTime; // seconds
 
     var total_bits = 0; // total number of bits in bits
@@ -289,8 +294,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                     if ((prev_pu_sinr === null || prev_pu_sinr !== primary_user.sinr)
                         && sinr_threshold && sinr_threshold.value) {
                         if (primary_user.sinr < Number(sinr_threshold.value)) {
-                            pu_outageEvents += 1;
-                            prev_pu_sinr = primary_user.sinr;
+                            if(!pu_prevState) {
+                                pu_outageEvents += 1;
+                                prev_pu_sinr = primary_user.sinr;
+                                pu_prevState = true;
+                            }
+                        } else {
+                            pu_prevState = false;
                         }
                     }
 
@@ -300,8 +310,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                             if ((signal_prevSinr[i] === null || signal_prevSinr[i] !== signal_list[i].sinr)
                                 && sinr_threshold && sinr_threshold.value) {
                                 if (signal_list[i].sinr < Number(sinr_threshold.value)) {
-                                    signal_outageEvents[i] += 1;
-                                    signal_prevSinr[i] = signal_list[i].sinr;
+                                    if (!sig_prevState[i]) {
+                                        signal_outageEvents[i] += 1;
+                                        signal_prevSinr[i] = signal_list[i].sinr;
+                                        sig_prevState[i] = true;
+                                    }
+                                } else {
+                                    sig_prevState[i] = false;
                                 }
                             }
                         }
@@ -309,8 +324,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                         if ((prev_sig_sinr === null || prev_sig_sinr !== signal_list[0].sinr)
                             && sinr_threshold && sinr_threshold.value) {
                             if (signal_list[0].sinr < Number(sinr_threshold.value)) {
-                                sig_outageEvents += 1;
-                                prev_sig_sinr = signal_list[0].sinr;
+                                if (!sig_prevState[0]) {
+                                    sig_outageEvents += 1;
+                                    prev_sig_sinr = signal_list[0].sinr;
+                                    sig_prevState[0] = true;
+                                }
+                            } else {
+                                sig_prevState[0] = false;
                             }
                         }
                     }
@@ -319,14 +339,18 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                     var rate_threshold = document.getElementById("rate_threshold");
                     var primary_user = signal_list.length === 5 ? signal_list[4] : signal_list[1];
                     // PU Outage Events based on the Data Rate threshold
-                    var pu_dataRate = signal_list.length === 5 ? (signal_bits[1] / data_bits.timeElapsed)
-                        : (signal_bits[4] / data_bits.timeElapsed);
-                    var sig_dataRate = signal_bits[0] / data_bits.timeElapsed;
+                    var pu_dataRate = signal_list.length === 5 ? signal_list[4].rate : signal_list[1].rate;
+                    var sig_dataRate = signal_list[0].rate;
                     if ((prev_pu_sinr === null || prev_pu_sinr !== primary_user.sinr)
                         && rate_threshold && rate_threshold.value) {
                         if (pu_dataRate < Number(rate_threshold.value) * 1e6) {
-                            pu_outageEvents += 1;
-                            prev_pu_sinr = primary_user.sinr;
+                            if (!pu_prevState) {
+                                pu_outageEvents += 1;
+                                prev_pu_sinr = primary_user.sinr;
+                                pu_prevState = true;
+                            }
+                        } else {
+                            pu_prevState = false;
                         }
                     }
 
@@ -335,9 +359,14 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                         for (let i = 0; i < signal_list.length - 1; i++) {
                             if ((signal_prevSinr[i] === null || signal_prevSinr[i] !== signal_list[i].sinr)
                                 && rate_threshold && rate_threshold.value) {
-                                if ((signal_bits[i] / data_bits.timeElapsed) < Number(rate_threshold.value) * 1e6) {
-                                    signal_outageEvents[i] += 1;
-                                    signal_prevSinr[i] = signal_list[i].sinr;
+                                if ((signal_list[i].rate) < Number(rate_threshold.value) * 1e6) {
+                                    if (!sig_prevState[i]) {
+                                        signal_outageEvents[i] += 1;
+                                        signal_prevSinr[i] = signal_list[i].sinr;
+                                        sig_prevState[i] = true;
+                                    }
+                                } else {
+                                    sig_prevState[i] = false;
                                 }
                             }
                         }
@@ -345,8 +374,13 @@ function CapacityRunner_MultiSignal(signal_list, parentElement = null, avgThroug
                         if ((prev_sig_sinr === null || prev_sig_sinr !== signal_list[0].sinr)
                             && rate_threshold && rate_threshold.value) {
                             if (sig_dataRate < Number(rate_threshold.value) * 1e6) {
-                                sig_outageEvents += 1;
-                                prev_sig_sinr = signal_list[0].sinr;
+                                if (!sig_prevState[0]) {
+                                    sig_outageEvents += 1;
+                                    prev_sig_sinr = signal_list[0].sinr;
+                                    sig_prevState[0] = true;
+                                }
+                            } else {
+                                sig_prevState[0] = false;
                             }
                         }
                     }

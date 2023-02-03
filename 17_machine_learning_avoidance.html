@@ -128,10 +128,18 @@ timed simulation
         background-color: darkkhaki;
       }
 
-      @media screen and (max-width: 4000px) {
-        .grid-container {
-          width: 25%;
+      @media screen and (max-width: 1000px) {
+      .grid-container {
+        width: 25%;
+        grid-template-columns: none;
       }
+    }
+
+    @media screen and (min-width: 1500px) {
+      .grid-container {
+        width: 25%;
+        grid-template-columns: auto auto;
+      } 
     }
     </style>
 
@@ -223,7 +231,7 @@ timed simulation
       </div>
       <div id="rate_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="rate_threshold">Data Rate Threshold (M bits/sec)</label> &nbsp;
-        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="4"
+        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="2"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div>

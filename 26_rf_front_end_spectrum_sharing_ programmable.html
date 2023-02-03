@@ -106,22 +106,28 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   <style>
     .grid-container-main {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-        width: 75vw;
+        display: flex;
+        flex-direction: column;
       }
       
-      .grid-container {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-      }
-
       .grid-item {
         padding: 2px;
         font-size: 30px;
-        text-align: center;
+      }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: row;
       }
   
       /* Style the tab */
@@ -189,9 +195,26 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         height: 2rem;
       }
 
-      @media screen and (max-width: 4000px) {
-        .grid-container {
-          width: 25%;
+      @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
       }
     }
   </style>
@@ -298,8 +321,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
             <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
             <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
-            <option value="a3" disabled>Non-ideal filter</option>
             <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
+            <option id="ideal3" value="a5" disabled>Nonlinear front end - preselector bandwidth over entire frequency range</option>
           </select>
         
   
@@ -399,7 +422,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       </div>
       <div id="rate_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="rate_threshold">Data Rate Threshold (M bits/sec)</label> &nbsp;
-        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="4"
+        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="2"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div>
@@ -444,34 +467,40 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   </div>
 
   <div class="grid-container-main">
-    <div class="grid-item">
-      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
-    </div>
-
-    <div class="grid-item">
-      <div class="grid-container">
-        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
-        </div>
-        <div class="grid-item">
-          <div id="avg_throughput" style="width: 360px; height: 320px;">
-            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-container">
+          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <div class="grid-item">
+            <div id="avg_throughput" style="width: 360px; height: 320px;">
+              <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+            </div>
           </div>
         </div>
       </div>
     </div>
+   
 
-    <div class="grid-item">
-      <div id="throughput-multisignal" style="width: 720px;">
-        <div class="throughput-heading">Data Throughput History</div>
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="throughput-multisignal" style="width: 720px;">
+          <div class="throughput-heading">Data Throughput History</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
       </div>
     </div>
-
-    <div class="grid-item">
-      <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-        <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
-      </div>
-    </div>
+   
   </div>
 
 </body>
@@ -558,6 +587,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     if (mode === 'beginner') {
       document.getElementById("ideal1").disabled = true;
       document.getElementById("ideal2").disabled = true;
+      document.getElementById("ideal3").disabled = true;
       document.getElementById("nonlinear").disabled = true;
       document.getElementById("multiplierDiv").style.display = "none";
       document.getElementById("default").selected = "selected";
@@ -575,6 +605,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
+      document.getElementById("ideal3").disabled = false;
       document.getElementById("nonlinear").disabled = false;
 
     }
@@ -603,7 +634,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     }
 
     // nonlinear frontend model
-    if (selection == 'a4') {
+    if (selection == 'a4' || selection == 'a5') {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
         sig1.nonlinearModel = true;
@@ -693,7 +724,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     }
 
     // nonlinear frontend receiver filter 
-    if (selection == 'a4') {
+    if (selection == 'a4' || selection == 'a5') {
       let iip3_1 = document.getElementById("iip3_1").value;
       let iip3_2 = document.getElementById("iip3_2").value;
       let iip3_3 = document.getElementById("iip3_3").value;
@@ -710,6 +741,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       } else {
         return;
       }
+    }
+
+    // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
+    // occupying the enter frequency range
+    if (selection == 'a5') {
+      sig1.bandwidthMultiplier = -Infinity;
+      sig2.bandwidthMultiplier = -Infinity;
+      sig3.bandwidthMultiplier = -Infinity;
+      sig4.bandwidthMultiplier = -Infinity;
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)

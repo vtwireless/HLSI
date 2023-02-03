@@ -40,22 +40,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     <style>
       .grid-container-main {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-        width: 75vw;
+        display: flex;
+        flex-direction: column;
       }
       
-      .grid-container {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-      }
-
       .grid-item {
         padding: 2px;
         font-size: 30px;
-        text-align: center;
       }
   
       /* Style the tab */
@@ -80,7 +71,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         transition: 0.3s;
         font-size: 17px;
         color: white;
-        /* width: 5vw; */
       }
   
       /* Change background color of buttons on hover */
@@ -114,6 +104,44 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       input.slider_bw{
         width: auto;
       }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: row;
+      }
+    
+    @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
     </style>
 </head>
 
@@ -294,6 +322,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   </div>
 
   <div class="grid-container-main">
+    <div class="grid-container-item">
     <div class="grid-item">
       <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
     </div>
@@ -310,7 +339,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </div>
       </div>
     </div>
+  </div>
 
+    <div class="grid-container-item">
     <div class="grid-item">
       <div id="throughput-multisignal" style="width: 720px;">
         <div class="throughput-heading">Data Throughput History</div>
@@ -322,6 +353,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
       </div>
     </div>
+  </div>
   </div>
 
 <script>

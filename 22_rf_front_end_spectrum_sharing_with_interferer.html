@@ -53,22 +53,13 @@ ACI vs. receiver-dependent ACI-based SINR
 
     <style>
      .grid-container-main {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-        width: 75vw;
+        display: flex;
+        flex-direction: column;
       }
       
-      .grid-container {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-      }
-
       .grid-item {
         padding: 2px;
         font-size: 30px;
-        text-align: center;
       }
   
       /* Style the tab */
@@ -93,7 +84,6 @@ ACI vs. receiver-dependent ACI-based SINR
         transition: 0.3s;
         font-size: 17px;
         color: white;
-        /* width: 5vw; */
       }
   
       /* Change background color of buttons on hover */
@@ -114,19 +104,57 @@ ACI vs. receiver-dependent ACI-based SINR
         width: 60vw;
         justify-content: start;
       }
-
-      .throughput-heading {
-        font-size: 1rem;
-      }
-
+  
       .PU_controls {
         display: flex;
         flex-direction: row;
       }
 
+      .throughput-heading {
+        font-size: 1rem;
+      }
+
       input.slider_bw{
         width: auto;
       }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: row;
+      }
+    
+    @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
 
       .argsTable{
         height: 320px;
@@ -228,7 +256,7 @@ ACI vs. receiver-dependent ACI-based SINR
       </div>
       <div id="rate_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="rate_threshold">Data Rate Threshold (M bits/sec)</label> &nbsp;
-        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="4"
+        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="2"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div>
@@ -297,34 +325,40 @@ ACI vs. receiver-dependent ACI-based SINR
   </div>
 
   <div class="grid-container-main">
-    <div class="grid-item">
-      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
-    </div>
-
-    <div class="grid-item">
-      <div class="grid-container">
-        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
-        </div>
-        <div class="grid-item">
-          <div id="avg_throughput" style="width: 360px; height: 320px;">
-            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-container">
+          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <div class="grid-item">
+            <div id="avg_throughput" style="width: 360px; height: 320px;">
+              <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+            </div>
           </div>
         </div>
       </div>
     </div>
+   
 
-    <div class="grid-item">
-      <div id="throughput-multisignal" style="width: 720px;">
-        <div class="throughput-heading">Data Throughput History</div>
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="throughput-multisignal" style="width: 720px;">
+          <div class="throughput-heading">Data Throughput History</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
       </div>
     </div>
-
-    <div class="grid-item">
-      <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-        <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
-      </div>
-    </div>
+   
   </div>
   
   

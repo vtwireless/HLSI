@@ -79,22 +79,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   <style>
     .grid-container-main {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-        width: 75vw;
+        display: flex;
+        flex-direction: column;
       }
       
-      .grid-container {
-        display: grid;
-        grid-template-columns: auto auto;
-        padding: 2px;
-      }
-
       .grid-item {
         padding: 2px;
         font-size: 30px;
-        text-align: center;
       }
   
       /* Style the tab */
@@ -119,7 +110,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         transition: 0.3s;
         font-size: 17px;
         color: white;
-        /* width: 5vw; */
       }
   
       /* Change background color of buttons on hover */
@@ -140,6 +130,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         width: 60vw;
         justify-content: start;
       }
+  
+      .PU_controls {
+        display: flex;
+        flex-direction: row;
+      }
 
       .throughput-heading {
         font-size: 1rem;
@@ -148,6 +143,44 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       input.slider_bw{
         width: auto;
       }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: row;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: row;
+      }
+    
+    @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item{
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 
@@ -250,7 +283,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
           <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
           <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
-          <option value="a3" disabled>Non-ideal filter</option>
           <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
           <option id="ideal3" value="a5" disabled>Nonlinear front end - preselector bandwidth over entire frequency range</option>
         </select>
@@ -409,34 +441,40 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   </div>
 
   <div class="grid-container-main">
-    <div class="grid-item">
-      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
-    </div>
-
-    <div class="grid-item">
-      <div class="grid-container">
-        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
-        </div>
-        <div class="grid-item">
-          <div id="avg_throughput" style="width: 360px; height: 320px;">
-            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-container">
+          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <div class="grid-item">
+            <div id="avg_throughput" style="width: 360px; height: 320px;">
+              <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+            </div>
           </div>
         </div>
       </div>
     </div>
+    
 
-    <div class="grid-item">
-      <div id="throughput-multisignal" style="width: 720px;">
-        <div class="throughput-heading">Data Throughput History</div>
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="throughput-multisignal" style="width: 720px;">
+          <div class="throughput-heading">Data Throughput History</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
       </div>
     </div>
-
-    <div class="grid-item">
-      <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-        <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
-      </div>
-    </div>
+   
   </div>
 
 </body>
@@ -736,10 +774,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
     // occupying the enter frequency range
     if (selection == 'a5') {
-      sig1.bandwidthMultiplier = 9.8;
-      sig2.bandwidthMultiplier = 9.8;
-      sig3.bandwidthMultiplier = 9.8;
-      sig4.bandwidthMultiplier = 9.8;
+      sig1.bandwidthMultiplier = -Infinity;
+      sig2.bandwidthMultiplier = -Infinity;
+      sig3.bandwidthMultiplier = -Infinity;
+      sig4.bandwidthMultiplier = -Infinity;
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)

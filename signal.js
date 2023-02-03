@@ -744,6 +744,11 @@ function Signal(sig, name = "", opts = null) {
             var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
             var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
 
+            if (bwMultiplier === -Infinity) {
+                obj_fmin = obj.freq_plot_min;
+                obj_fmax = obj.freq_plot_max;
+            }
+
             // if the desired signal does not fall within the current frequency bin range
             // then ccip = 0, meaning its a don't care condition
             if (obj_fmin >= freq_bin_max || obj_fmax <= freq_bin_min) {
@@ -771,7 +776,12 @@ function Signal(sig, name = "", opts = null) {
                 // Compute the band overlap in Hz, overlap_in_freq_bin.
                 if(i.is_noise) {
                     // Noise overlaps the whole signal. 
-                    p_noise = bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                    if (bwMultiplier === -Infinity) {
+                        p_noise = obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                    } else {
+                        p_noise = bwMultiplier * obj._bw * PowerSpectralDensity(i._gn)/bw_max;
+                    }
+                  
                     ccip += p_noise;
                 } else {
                     // first, calculate the overlap between object and the interferer
