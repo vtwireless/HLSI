@@ -37,6 +37,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
     var freq_plot_min = 1.0e32; // large number that we change
     var freq_plot_max = -1.0;   // small number that we change
 
+    let pu_mode = document.getElementById("pu_mode");
     // We'll display spectrum from all signals in Signal.env;
     
 
@@ -49,6 +50,10 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
 
         if(sig.is_noise) {
             noises.push(sig);
+            return;
+        }
+
+        if (sig['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
             return;
         }
 
@@ -211,6 +216,10 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             return;
         }
         
+        if (sig['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
+            return;
+        }
+        
         var signal_box_f = svgf
         .append("rect")
         .attr("clip-path", "url(#clipf)")
@@ -272,7 +281,12 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             
             sig.cur_signal_freq = fc;
             sig.cur_signal_bw = bw;
-            sig.cur_signal_bw_ideal_filter = (sig.bw * sig.bandwidthMultiplier) / df;
+            if (sig.bandwidthMultiplier === -Infinity) {
+                sig.cur_signal_bw_ideal_filter = 1;
+            } else {
+                sig.cur_signal_bw_ideal_filter = (sig.bw * sig.bandwidthMultiplier) / df;
+            }
+            
             sig.cur_signal_freq_exact = sig._freq;
             
             
@@ -282,7 +296,8 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
             generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
             //generator.add_signal(fc, bw, gn);
 
-            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, sig.cur_signal_bw_ideal_filter);
+            let signal_bounding_box_new_coordinates = get_bounding_box_coordinates(750, 320, sig.cur_signal_freq, 
+                sig.cur_signal_bw_ideal_filter, sig.bandwidthMultiplier);
             sig.signal_box_f.attr("x", signal_bounding_box_new_coordinates['x']);
             sig.signal_box_f.attr("y", signal_bounding_box_new_coordinates['y']);
             sig.signal_box_f.attr("width", signal_bounding_box_new_coordinates['width']);
@@ -373,7 +388,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         return label_coordinates;
     }
 
-    function get_bounding_box_coordinates(graph_width, graph_height, fc, signal_bw){
+    function get_bounding_box_coordinates(graph_width, graph_height, fc, signal_bw, sig_bwMultiplier = null){
         graph_width = graph_width-40-100;
         graph_height = graph_height*0.6;
         
@@ -392,6 +407,11 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         }
 
         let new_width = bw_offset+20;
+        
+        if (sig_bwMultiplier === -Infinity) {
+            new_x = 0;
+            new_width = graph_width+20;
+        }
         
         let bounding_box_coordinates = {x:new_x, y:50, width:new_width, height:200};
         return bounding_box_coordinates;

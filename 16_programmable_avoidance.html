@@ -13,6 +13,7 @@ recent timed simulation that freezes at end of timed simulation)
     <link rel=stylesheet type=text/css href=codemirror.min.css />
     <link rel=stylesheet type=text/css href=blackboard.min.css />
     <link rel=stylesheet type=text/css href=sidebar.css />
+    <link href='https://css.gg/minimize-alt.css' rel='stylesheet'>
     <style> 
         output {font-weight: bold;}
     </style>
@@ -25,14 +26,114 @@ recent timed simulation that freezes at end of timed simulation)
     <script src=powerSpectrumPlot_2D.js></script>
     <script src=powerSpectrumPlot_3D.js></script>
     <script src=spectralEfficiencyPlot.js></script>
+    <script src=sinrPlot_BarChart.js></script>
+    <script src="averageThroughputPlot_BarChart.js"></script>
+    <script src="modeController.js"></script>
     <script src=label.js></script>
+    <script src=timer.js></script>
     <script src=capacityBanner.js></script>
     <script src=codemirror.min.js></script>
     <script src=codeMirror_javascript.js></script>
     <script src=scriptController.js></script>
-    <script src=throughputPlot.js></script>
+    <script src=capacityRunner_multisignal.js></script>
+    <script src=throughputPlotMultiSignals.js></script>
     <script src=hoppingInterferer.js></script>
     <script src="https://unpkg.com/d3-simple-slider"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <style>
+      .grid-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        padding: 2px;
+      }
+  
+      .grid-item {
+        padding: 2px;
+        font-size: 30px;
+        text-align: center;
+      }
+  
+      /* Style the tab */
+      .tab {
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: black;
+        width: fit-content;
+        border: groove;
+        border-radius: 8px;
+        height: 3rem;
+      }
+  
+      /* Style the buttons inside the tab */
+      .tab button {
+        background-color: inherit;
+        float: left;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        transition: 0.3s;
+        font-size: 17px;
+        color: white;
+        /* width: 5vw; */
+      }
+  
+      /* Change background color of buttons on hover */
+      .tab button:hover {
+        background-color: lightgray;
+        color: black;
+      }
+  
+      /* Create an active/current tablink class */
+      .tab button.active {
+        background-color: darkkhaki;
+        color: black;
+      }
+  
+      .timer {
+        margin-left: 2rem;
+        display: none;
+        width: 60vw;
+        justify-content: start;
+      }
+  
+      .PU_controls {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .argsTable{
+        height: 320px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: block;
+      }
+
+      .minimizeBtn {
+        background-color: black; padding: 10px; border: groove; border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .minimizeBtn:hover {
+        background-color: darkkhaki;
+      }
+
+      @media screen and (max-width: 1000px) {
+      .grid-container {
+        width: 25%;
+        grid-template-columns: none;
+      }
+    }
+
+    @media screen and (min-width: 1500px) {
+      .grid-container {
+        width: 25%;
+        grid-template-columns: auto auto;
+      } 
+    }
+    </style>
 
 </head>
 
@@ -74,6 +175,7 @@ recent timed simulation that freezes at end of timed simulation)
         <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
         <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
         <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR Calculations Programmable</a>
       </nav>
       
       <label for="menu-control" class="sidebar__close"></label>
@@ -91,7 +193,42 @@ recent timed simulation that freezes at end of timed simulation)
   </section>
 
 
-  <div class="content-section" style="margin: 0% 2%; margin-top: 8%;">
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
+    <div style="display: inline-flex;">
+      <div class="tab">
+        <button class="tablinks" onclick="onTabChange(event, 'normal', signalList)">Normal</button>
+        <button class="tablinks" onclick="onTabChange(event, 'timer', signalList)">Timer</button>
+      </div>
+
+      <div class="timer" id="timer">
+        <p id=capacityRunner></p>
+      </div>
+    </div>
+    <div class="PU_controls">
+      <p><label for="pu_mode">Type of co-existing signal:</label> &nbsp;
+        <select id="pu_mode" onchange="onPUModeChange()">
+          <option id="interference" value="interference">Interference</option>
+          <option id="radar_primary_user" value="radar_primary_user">Radar Primary User</option>
+          <option id="comms_primary_user" value="comms_primary_user">Comms Primary User</option>
+        </select>
+      </p>
+      <div id="sinr_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="sinr_threshold">SINR Threshold (dB)</label> &nbsp;
+        <input style="width: 3.5rem;" id="sinr_threshold" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+      </div>
+      <div id="rate_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="rate_threshold">Data Rate Threshold (M bits/sec)</label> &nbsp;
+        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="2"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+      </div>
+      <div class="applyDiv" style="margin-top: 1rem; margin-left: 1rem;">
+        <input id="apply" type="button" value="Apply" onclick="onPUModeChange()">
+      </div>
+    </div>
+
     <p id=scriptController style="margin-bottom: 2%;"></p>
 
     <p id=hoppingInterferer></p>
@@ -119,7 +256,32 @@ recent timed simulation that freezes at end of timed simulation)
   </div>
   
   
-  <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+  <div class="grid-container">
+    <div class="grid-item">
+      <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+    </div>
+
+    <div class="grid-item">
+      <div class="grid-container">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+        <div class="grid-item">
+          <div id="avg_throughput" style="width: 360px; height: 320px;">
+            <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-item">
+      <div id="throughput-multisignal" style="width: 720px;"></div>
+    </div>
+
+    <div class="grid-item">
+      <div id="spectral_efficiency_parent" style="width: 720px;"></div>
+    </div>
+  </div>
 
 </body>
 <script>
@@ -147,7 +309,7 @@ var interferer = new Signal(conf.sig0, 'interferer', {
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -40});
 
-
+var signalList = [sig, interferer];
 
 new ScriptController([ sig, interferer ], { 
     element: '#scriptController',
@@ -162,12 +324,14 @@ Slider(sig, 'freq', '#freq');
 Slider(sig, 'bw', '#bw');
 Slider(sig, 'mcs', '#mcs');
 
-
+var funcs = null;
 CapacityBanner(sig, '#capacityBanner');
 
 PowerSpectrumPlot_2D();
-ThroughputPlot(sig);
+ThroughputPlot([sig]);
 SpectralEfficiencyPlot(sig);
+
+SinrPlot_BarChart.init([sig], "sinr-bar-chart", ["User Signal"], null, ["rgb(48, 25, 72)", "rgba(230,97,0)"]);
 
 </script>
 </html>

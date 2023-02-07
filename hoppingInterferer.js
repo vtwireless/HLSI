@@ -36,7 +36,7 @@ function HoppingInterferer(interferer, parentElement = null, opts = null) {
 
     parentElement.innerHTML = innerHTML;
 
-console.log("parentElement.innerHTML=" + parentElement.innerHTML);
+// console.log("parentElement.innerHTML=" + parentElement.innerHTML);
 
 
     var hopRate = 0.5; // Hz
@@ -46,6 +46,14 @@ console.log("parentElement.innerHTML=" + parentElement.innerHTML);
     var label = getElement('#hr'); // output label
 
     function Hop() {
+        if (HoppingInterferer.stopClick) {
+            hopRate = 0.0;
+            hopRateSlider.value = hopRate;
+            UpdateLabel(hopRate);
+            clearInterval(itimer);
+            return;
+        }
+
         if(HoppingInterferer.hopping_behaviour == "periodic"){
             interferer.freq += 2e6;
             if(interferer.freq >= interferer.freq_max){
@@ -77,6 +85,10 @@ console.log("parentElement.innerHTML=" + parentElement.innerHTML);
 
         clearInterval(itimer);
 
+        if (HoppingInterferer.stopClick) {
+            hopRate = 0.0;
+        }
+
         if(hopRate < 0.01)
             return;
         itimer = setInterval(Hop, 1000.0/hopRate);
@@ -91,3 +103,4 @@ console.log("parentElement.innerHTML=" + parentElement.innerHTML);
 
 
  HoppingInterferer.count = 0;
+ HoppingInterferer.stopClick = false;

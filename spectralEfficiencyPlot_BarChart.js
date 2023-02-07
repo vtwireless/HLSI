@@ -58,6 +58,8 @@ const SpectralEfficiencyPlot_BarChart = {
             datasets: [
                 {
                     label: "Spectral Efficiency (bytes/sec/Hz)",
+                    barThickness: 50,
+                    maxBarThickness: 70,
                     backgroundColor: ["rgb(200,56,56)", "rgb(0,176,240)","rgb(36,124,76)","rgb(255,192,0)","#8e5ea2"],
                     data: data
                 }
@@ -152,5 +154,12 @@ const SpectralEfficiencyPlot_BarChart = {
         SpectralEfficiencyPlot_BarChart.se_chart.data.datasets[0].data[4] = average_se;
         SpectralEfficiencyPlot_BarChart.se_chart.update();
         SpectralEfficiencyPlot_BarChart.dataset = new_dataset;
+    },
+
+    remove_plot: function() {
+      SpectralEfficiencyPlot_BarChart.se_chart.destroy();
+      SpectralEfficiencyPlot_BarChart.dataset = [];
+      SpectralEfficiencyPlot_BarChart.signal_list = [];
     }
+
 }

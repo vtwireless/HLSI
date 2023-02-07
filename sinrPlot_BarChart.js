@@ -16,11 +16,11 @@ const SinrPlot_BarChart = {
     signal_list: [],
     sinr_chart: null,
 
-    init: function(signal_list, canvas_id, labels){
+    init: function(signal_list, canvas_id, labels, threshold = null, backgroundColors = null){
         this.signal_list = signal_list;
         let data = this.generate_dataset(this.signal_list);
         this.dataset = data;
-        this.create_chart(canvas_id, labels, data);
+        this.create_chart(canvas_id, labels, data, threshold, backgroundColors);
         for(let i=0; i<this.signal_list.length; i++){
             this.signal_list[i].onChange("freq", this.update_plot);
             this.signal_list[i].onChange("rate", this.update_plot);
@@ -47,7 +47,23 @@ const SinrPlot_BarChart = {
       return rate;
     },
 
-    create_chart: function(canvas_id, labels, data){
+    create_chart: function(canvas_id, labels, data, threshold, backgroundColors){
+        // thresholdLine plugin block
+        this.thresholdLine = {
+          id: 'thresholdLine',
+          beforeDatasetsDraw(chart, args, options) {
+            const { ctx, chartArea: { top, right, bottom, left, width, height },
+            scales: {x, y} } = chart;
+
+            ctx.save();
+            ctx.strokeStyle = 'yellow';
+            ctx.setLineDash([10, 20]);
+            ctx.strokeRect(left, y.getPixelForValue(threshold), width, 0);
+            ctx.restore();
+          }
+
+        }
+
         this.sinr_chart = new Chart(document.getElementById(canvas_id), {
             type: 'bar',
             data: {
@@ -55,7 +71,14 @@ const SinrPlot_BarChart = {
             datasets: [
                 {
                     label: "SINR (dB)",
-                    backgroundColor: ["rgb(200,56,56)", "rgb(0,176,240)","rgb(36,124,76)","rgb(255,192,0)","#8e5ea2"],
+                    barThickness: 50,
+                    maxBarThickness: 70,
+                    backgroundColor: function() {
+                      if (backgroundColors) {
+                        return backgroundColors;
+                      }
+                      return ["rgb(200,56,56)", "rgb(0,176,240)","rgb(36,124,76)","rgb(255,192,0)","#8e5ea2"];
+                    },
                     data: data
                 }
             ]
@@ -109,7 +132,8 @@ const SinrPlot_BarChart = {
                       }
                     }
                   }
-            }
+            },
+            plugins: [this.thresholdLine]
         });
     },
 
@@ -147,5 +171,11 @@ const SinrPlot_BarChart = {
        
         SinrPlot_BarChart.sinr_chart.update();
         SinrPlot_BarChart.dataset = new_dataset;
+    },
+
+    remove_plot: function() {
+      SinrPlot_BarChart.sinr_chart.destroy();
+      SinrPlot_BarChart.dataset = [];
+      SinrPlot_BarChart.signal_list = [];
     }
 }

@@ -58,8 +58,9 @@ function ThroughputPlot(sig, interferers=[]) {
     // historical rate plot
     //
     var datar = d3.range(0,num_steps).map(function(f) { return {"y":1} })
-    var svgr = d3.select("body")
+    var svgr = d3.select("#throughput_history_parent")
         .append("svg")
+        .attr("id", "throughput_history")
         .attr("width",  width  + margin.left + margin.right)
         .attr("height", height + margin.top +  margin.bottom)
         .attr("style", "margin-left:1%;")
