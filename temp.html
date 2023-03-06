@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+	    <script type='text/javascript' src='./x3dom/x3dom.js'></script>
+        <link rel='stylesheet' type='text/css' href='./x3dom/x3dom.css'></link>
+
+      
+	 </head>
+    <body>
+	
+	                        <div style="margin-top: 5px;" id="x3dModelWindow">
+                            <!--Put x3d model right here-->
+                            <x3d width='1920' height='1080'> 
+                                <scene>
+								<background skyColor='.2 .2 1' groundColor='.2 .2 .2'></background>
+                                    <navigationInfo type='"examine" "fly" "all' id="navType"></navigationInfo>
+
+
+						 <viewpoint description='Top View' position="0 250 0" orientation="1 0 0 -1.578" centerOfRotation="0 0 0"></viewpoint>
+<!-- 
+							 <orthoviewpoint description='top ortho View'  position="0 800 0" orientation="1 0 0 -1.578" centerOfRotation="0 0 0"></orthoviewpoint>
+-->
+							 <viewpoint description='Ground Level' position="0 2 10" centerOfRotation="0 0 0"></viewpoint>
+	
+
+		<!-- antenna models  will be movable -->
+
+
+
+					<transform DEF='ant_1' translation='60 1 -80' >
+						 <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true" ></inline>
+					<viewpoint></viewpoint>
+						</transform>
+					<transform  DEF='ant_2' translation='-60 5.5 -60' scale="50 50 50">
+						 <inline id="x3dModel2" mapDEFtoID="true" url="./models/Cubical_Quad.x3d" render="true" ></inline>
+						 <viewpoint></viewpoint>	</transform>
+					<transform  DEF='ant_3' translation='-20 5 20' scale="5 5 5" orientation="0 1 0 1.578">
+						 <inline id="x3dModel3" mapDEFtoID="true" url="./models/Ass_yagi_croisée_435_MHz.x3d" render="true" ></inline>
+						 <viewpoint></viewpoint>	</transform>
+					<transform  DEF='ant_4' translation='20 5 -20' scale="5 5 5">
+						 <inline id="x3dModel4" mapDEFtoID="true" url="./models/35-Elements_Yagi-Antenna.x3d" render="true" ></inline>
+						 <viewpoint></viewpoint>	</transform>
+					<transform  DEF='ant_5' translation='-20 6 -20' scale="10 10 10" orientation="0 1 0 -1.578">
+						 <inline id="x3dModel5" mapDEFtoID="true" url="./models/3L-Tape-Measure-Yagi-Assy.x3d" render="true" ></inline>
+						 <viewpoint></viewpoint>	</transform>
+
+		<!-- world elements-->
+
+						<transform translation='0 .5 0'>
+							<shape>
+							<appearance>
+							<material diffuseColor='1 0 0'></material></appearance>
+							  <box size='1 1 1'></box>
+							</shape>
+						</transform>
+						<transform translation='0 -.5 0'>
+							<shape>
+							<appearance>
+							<material diffuseColor='.2 .2 .2'></material></appearance>
+							  <box size='200 1 200'></box>
+							</shape>
+						</transform>
+
+						<transform translation='100 2 100'>
+						<shape DEF="corner">
+							<appearance>
+							<material diffuseColor='1 0 0'></material></appearance>
+							  <box size='1 4 1'></box>
+							</shape>
+						</transform>
+
+						
+						<transform translation='-100 2 -100'>
+							<shape USE="corner">
+							</shape>
+						</transform>
+
+						<transform translation='-100 2 100'>
+							<shape USE="corner">
+							</shape>
+						</transform>
+
+						<transform translation='100 2 -100'>
+							<shape USE="corner">
+							</shape>
+						</transform>
+								
+
+							  
+							   </scene> 
+                            </x3d>   
+                        </div>
+	
+	  </body>
+</html>

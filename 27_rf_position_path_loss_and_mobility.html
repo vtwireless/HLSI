@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<!--
+To Do: Add Guard Bands w/ flashing "too-close" indicator, Guard Band menu with options 
+for fixed, receiver-dependent, e.g., lower minimum for Links 1, 2, and 4, higher for Link 3; 
+Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-based SINR
+-->
+<html lang="en-US" style="display: flex;">
+
+<head>
+  <title>HLSI Ex 27</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
+  <link rel=stylesheet type=text/css href=codemirror.min.css />
+  <link rel=stylesheet type=text/css href=blackboard.min.css />
+  <link rel='stylesheet' type='text/css' href='./x3dom/x3dom.css'>
+  </link>
+  <link href='https://css.gg/minimize-alt.css' rel='stylesheet'>
+  <style>
+    output {
+      font-weight: bold;
+    }
+
+    .argsTable {
+      height: 320px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: block;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: black;
+      width: fit-content;
+      border: groove;
+      border-radius: 8px;
+      height: 3rem;
+    }
+
+    /* Style the buttons inside the tab */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+      color: white;
+      width: 5vw;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: lightgray;
+      color: black;
+    }
+
+    .minimizeBtn {
+      background-color: black;
+      padding: 10px;
+      border: groove;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .minimizeBtn:hover {
+      background-color: darkkhaki;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: darkkhaki;
+      color: black;
+    }
+
+    .modes {
+      display: flex;
+      flex-direction: row;
+    }
+  </style>
+  <script src=d3.v5.min.js></script>
+  <script src=fft.js></script>
+  <script src=common.js></script>
+  <script src=signal.js></script>
+  <!-- <script src=sliders.js></script> -->
+  <script src=slidersMultiSignals.js></script>
+  <!-- <script src=powerSpectrumPlot.js></script> -->
+  <script type='text/javascript' src='./x3dom/x3dom.js'></script>
+  <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
+  <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
+  <script src=spectralEfficiencyPlot_BarChart.js></script>
+  <script src=sinrPlot_BarChart.js></script>
+  <script src="averageThroughputPlot_BarChart.js"></script>
+  <script src="modeController.js"></script>
+  <script src=label.js></script>
+  <script src=timer.js></script>
+  <script src=capacityBanner.js></script>
+  <script src=capacityRunner_multisignal.js></script>
+  <script src=scriptController.js></script>
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <!-- <script src=throughputPlot.js></script> -->
+  <script src=throughputPlotMultiSignals.js></script>
+  <script src=hoppingInterferer.js></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+  <!--small script that implements the dragging functionality-->
+  <script>
+    var lastMouseX = -1;
+    var lastMouseY = -1;
+
+    var draggedTransformNode = null;
+
+    //vectors in 3D world space, associated to mouse x/y movement on the screen
+    var draggingUpVec = null;
+    var draggingRightVec = null;
+
+    var unsnappedDragPos = null;
+
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    var mouseMoved = function (event) {
+      //offsetX / offsetY polyfill for FF
+      var target = event.target || event.srcElement;
+      var rect = target.getBoundingClientRect();
+      event.offsetX = event.clientX - rect.left;
+      event.offsetY = event.clientY - rect.top;
+
+      if (lastMouseX === -1) {
+        lastMouseX = event.offsetX;
+      }
+      if (lastMouseY === -1) {
+        lastMouseY = event.offsetY;
+      }
+
+      if (draggedTransformNode) {
+        dragObject(event.offsetX - this.lastMouseX, event.offsetY - this.lastMouseY);
+      }
+
+      lastMouseX = event.offsetX;
+      lastMouseY = event.offsetY;
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    var startDragging = function (transformNode) {
+      //disable navigation during dragging
+      document.getElementById("navType").setAttribute("type", '"NONE"');
+
+      draggedTransformNode = transformNode;
+      unsnappedDragPos = new x3dom.fields.SFVec3f.parse(transformNode.getAttribute("translation"));
+
+
+      //compute the dragging vectors in world coordinates
+      //(since navigation is disabled, those will not change until dragging has been finished)
+
+      //get the viewer's 3D local frame
+      var x3dElem = document.getElementById("x3dElement");
+      var vMatInv = x3dElem.runtime.viewMatrix().inverse();
+      var viewDir = vMatInv.multMatrixVec(new x3dom.fields.SFVec3f(0.0, 0.0, -1.0));
+
+      //use the viewer's up-vector and right-vector
+      draggingUpVec = vMatInv.multMatrixVec(new x3dom.fields.SFVec3f(0.0, 1.0, 0.0));;
+      draggingRightVec = viewDir.cross(this.draggingUpVec);
+
+
+      //project a world unit to the screen to get its size in pixels            
+      var x3dElem = document.getElementById("x3dElement");
+      var p1 = x3dElem.runtime.calcCanvasPos(unsnappedDragPos.x, unsnappedDragPos.y, unsnappedDragPos.z);
+      var p2 = x3dElem.runtime.calcCanvasPos(unsnappedDragPos.x + draggingRightVec.x,
+        unsnappedDragPos.y + draggingRightVec.y,
+        unsnappedDragPos.z + draggingRightVec.z)
+      var magnificationFactor = 1.0 / Math.abs(p1[0] - p2[0]);
+
+      //scale up vector and right vector accordingly            
+      draggingUpVec = draggingUpVec.multiply(magnificationFactor);
+      draggingRightVec = draggingRightVec.multiply(magnificationFactor);
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    var dragObject = function (dx, dy) {
+      //scale up vector and right vector accordingly            
+      var offsetUp = draggingUpVec.multiply(-dy);
+      var offsetRight = draggingRightVec.multiply(dx);
+
+      unsnappedDragPos = unsnappedDragPos.add(offsetUp).add(offsetRight);
+
+      var snappedDragPos;
+      draggedTransformNode.setAttribute("translation", unsnappedDragPos.toString());
+
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    var stopDragging = function () {
+      draggedTransformNode = null;
+      draggingUpVec = null;
+      draggingRightVec = null;
+      unsnappedDragPos = null;
+
+      //re-enable navigation after dragging
+      document.getElementById("navType").setAttribute("type", '"EXAMINE" "ANY"');
+    };        
+  </script>
+
+  <style>
+    .grid-container-main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-item {
+      padding: 2px;
+      font-size: 30px;
+    }
+
+    .grid-container-item {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .grid-item {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .grid-container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      border: 1px solid #ccc;
+      background-color: black;
+      width: fit-content;
+      border: groove;
+      border-radius: 8px;
+      height: 3rem;
+    }
+
+    /* Style the buttons inside the tab */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      font-size: 17px;
+      color: white;
+      /* width: 5vw; */
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: lightgray;
+      color: black;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: darkkhaki;
+      color: black;
+    }
+
+    .timer {
+      margin-left: 2rem;
+      display: none;
+      width: 60vw;
+      justify-content: start;
+    }
+
+    .throughput-heading {
+      font-size: 1rem;
+    }
+
+    .linkinputs {
+      width: 100%;
+      margin-top: -1.5%;
+      display: flex;
+      flex-direction: row;
+    }
+
+    input.slider_bw {
+      width: auto;
+    }
+
+    .PU_controls {
+      display: flex;
+      flex-direction: row;
+      height: 2rem;
+    }
+
+    @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+
+<body style="margin:0;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+
+    <input type="checkbox" id="menu-control" class="menu-control">
+
+    <aside class="sidebar" style="z-index: 10;">
+
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer
+          Avoidance</a>
+        <a href="19_rf_front_end_spectrum_sharing.html" class="selected"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with
+          Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with
+          Interferer</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual
+          and Programmable</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options
+          menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR
+          Calculations Programmable
+        </a>
+        <a href="27_rf_position_path_loss_and_mobility.html"><b>27</b> RFFE Spectrum Sharing -- Position, Path Loss, and
+          Mobility
+        </a>
+      </nav>
+
+      <label for="menu-control" class="sidebar__close"></label>
+
+
+    </aside>
+
+    <div
+      style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">
+      <span style="color: #ddd;">Exercise 27</span> RFFE Spectrum Sharing -- Position, Path Loss, and Mobility
+    </div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span
+        style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>
+  </section>
+
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
+    <!-- <p id=hoppingInterferer>
+    </p> -->
+    <div style="display: inline-flex;">
+      <div class="tab">
+        <button class="tablinks" onclick="onTabChange(event, 'normal', signalList)">Normal</button>
+        <button class="tablinks" onclick="onTabChange(event, 'timer', signalList)">Timer</button>
+      </div>
+
+      <div class="timer" id="timer">
+        <p id=capacityRunner></p>
+      </div>
+    </div>
+
+
+    <p id=capacityBanner style="display: none;">
+    </p>
+
+    <div class="modes">
+      <div>
+        <p><label for="mode">Select mode:</label> &nbsp;
+          <select id="mode" onchange="onModeChange()">
+            <option id="beginner" value="beginner">Beginner</option>
+            <option id="advanced" value="advanced">Advanced</option>
+          </select>
+        </p>
+      </div>
+
+      <div class="modes" style="margin-left: 2rem;">
+        <p>
+          <label for="strategy">Select SINR calculation option:</label> &nbsp;
+          <select id="strategy" onchange="onCategoryChange()">
+            <option id="default" value="" selected disabled hidden>Select SINR calculation option...</option>
+            <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
+            <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
+            <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
+            <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
+            <option id="ideal3" value="a5" disabled>Nonlinear front end - preselector bandwidth over entire frequency
+              range</option>
+          </select>
+
+
+        <div id="multiplierDiv" style="display: none;">
+          <p>
+            <label style="margin-left: 2rem;" for="strategy">BW mult.:</label> &nbsp;
+            <input style="width: 5rem;" id="multiplier" type="text" value="1" oninput="this.value = this.value
+              .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+          </p>
+        </div>
+
+        <div style="margin-left: 2rem;">
+          <p>
+            <input id="apply" type="button" value="Apply Selection" onclick="calculateSINR()">
+          </p>
+        </div>
+        </p>
+      </div>
+    </div>
+
+    <div class="linkinputs">
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #b5ebff; display: inline-block;">Link 2</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier2" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_2" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+    </div>
+
+    <div class="PU_controls">
+      <p><label for="pu_mode">Type of co-existing signal:</label> &nbsp;
+        <select id="pu_mode" onchange="onPUModeChange()">
+          <option id="noninterferer" value="noninterferer">Non-Interferer</option>
+          <option id="interference" value="interference">Interferer</option>
+          <option id="radar_primary_user" value="radar_primary_user">Radar Primary User</option>
+          <option id="comms_primary_user" value="comms_primary_user">Comms Primary User</option>
+        </select>
+      </p>
+      <div id="sinr_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="sinr_threshold">SINR Threshold (dB)</label> &nbsp;
+        <input style="width: 3.5rem;" id="sinr_threshold" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+      </div>
+      <div id="rate_thresholdDiv" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="rate_threshold">Data Rate Threshold (M bits/sec)</label> &nbsp;
+        <input style="width: 3.5rem;" id="rate_threshold" type="text" value="2"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+      </div>
+      <div class="applyDiv" style="margin-top: 1rem; margin-left: 1rem;">
+        <input id="apply" type="button" value="Apply" onclick="onPUModeChange()">
+      </div>
+    </div>
+
+
+    <p id=scriptController style="margin-bottom: 2%;"></p>
+
+    <p id=scriptController2></p>
+
+    <div style="display:inline-flex;">
+      <span style="font-size: 24px; margin-right: 8px;">3D</span>
+      <label class="switch">
+        <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    <div style="width: 30%; display:inline-flex; margin-left:1%;">
+      <div style="display: inline-flex;">
+        <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 1</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(0,176,240,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 2</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(36,124,76,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 3</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(255,192,0,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Comm Link 4</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="x3dModelWindow">
+    <!--Put x3d model right here-->
+    <x3d id='x3dElement' width='1520px' height='720px' onmouseup="stopDragging();" onmousemove="mouseMoved(event);">
+      <scene>
+        <background skyColor='.2 .2 1' groundColor='.2 .2 .2'></background>
+        <navigationInfo id="navType" type='"examine" "fly" "all'></navigationInfo>
+
+
+        <viewpoint description='Top View' position="0 250 0" orientation="1 0 0 -1.578" centerOfRotation="0 0 0">
+        </viewpoint>
+        <!-- 
+            <orthoviewpoint description='top ortho View'  position="0 800 0" orientation="1 0 0 -1.578" centerOfRotation="0 0 0"></orthoviewpoint>
+            -->
+        <viewpoint description='Ground Level' position="0 2 10" centerOfRotation="0 0 0"></viewpoint>
+
+
+        <!-- antenna models  will be movable -->
+
+
+
+        <transform DEF='ant_1' translation='30 5 -50' onmousedown='startDragging(this);'>
+          <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
+          </inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_1' translation='30 5 50' onmousedown='startDragging(this);'>
+          <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
+          </inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_1' translation='-30 5 -50' onmousedown='startDragging(this);'>
+          <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
+          </inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_1' translation='-30 5 50' onmousedown='startDragging(this);'>
+          <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
+          </inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <!-- <transform DEF='ant_2' translation='-60 5.5 -60' scale="50 50 50"> -->
+        <!-- <inline id="x3dModel2" mapDEFtoID="true" url="./models/Cubical_Quad.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_3' translation='-20 5 20' scale="5 5 5" orientation="0 1 0 1.578">
+          <inline id="x3dModel3" mapDEFtoID="true" url="./models/Ass_yagi_croisée_435_MHz.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform> -->
+        <transform DEF='ant_4' translation='18 5 -60' scale="10 5 5" onmousedown='startDragging(this);'>
+          <inline id="x3dModel4" mapDEFtoID="true" url="./models/35-Elements_Yagi-Antenna.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_4' translation='18 5 40' scale="10 5 5" onmousedown='startDragging(this);'>
+          <inline id="x3dModel4" mapDEFtoID="true" url="./models/35-Elements_Yagi-Antenna.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_4' translation='-40 5 -60' scale="10 5 5" onmousedown='startDragging(this);'>
+          <inline id="x3dModel4" mapDEFtoID="true" url="./models/35-Elements_Yagi-Antenna.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <transform DEF='ant_4' translation='-40 5 40' scale="10 5 5" onmousedown='startDragging(this);'>
+          <inline id="x3dModel4" mapDEFtoID="true" url="./models/35-Elements_Yagi-Antenna.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform>
+        <!-- <transform DEF='ant_5' translation='-20 6 -20' scale="10 10 10" orientation="0 1 0 -1.578">
+          <inline id="x3dModel5" mapDEFtoID="true" url="./models/3L-Tape-Measure-Yagi-Assy.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform> -->
+
+        <!-- Moving body -->
+        <!-- <transform DEF='ant_6' translation='50 1 60' scale="10 10 10">
+          <inline id="x3dModel6" mapDEFtoID="true" url="./models/MovingBody.x3d" render="true"></inline>
+          <viewpoint></viewpoint>
+        </transform> -->
+
+        <!-- world elements-->
+
+        <transform translation='0 .5 0'>
+          <shape>
+            <appearance>
+              <material diffuseColor='1 0 0'></material>
+            </appearance>
+            <box size='1 1 1'></box>
+          </shape>
+        </transform>
+        <transform translation='0 -.5 0'>
+          <shape>
+            <appearance>
+              <material diffuseColor='.2 .2 .2'></material>
+            </appearance>
+            <box size='200 1 200'></box>
+          </shape>
+        </transform>
+
+        <transform translation='100 2 100'>
+          <shape DEF="corner">
+            <appearance>
+              <material diffuseColor='1 0 0'></material>
+            </appearance>
+            <box size='1 4 1'></box>
+          </shape>
+        </transform>
+
+
+        <transform translation='-100 2 -100'>
+          <shape USE="corner">
+          </shape>
+        </transform>
+
+        <transform translation='-100 2 100'>
+          <shape USE="corner">
+          </shape>
+        </transform>
+
+        <transform translation='100 2 -100'>
+          <shape USE="corner">
+          </shape>
+        </transform>
+
+
+
+      </scene>
+    </x3d>
+
+    <!-- <x3d width='500px' height='400px'> 
+      <background skyColor='.2 .2 1' groundColor='.2 .2 .2'></background>
+        <navigationInfo type='"examine" "fly" "all' id="navType"></navigationInfo>
+
+
+        <viewpoint description='Top View' position="0 250 0" orientation="1 0 0 -1.578" centerOfRotation="0 0 0">
+        </viewpoint>
+        <viewpoint description='Ground Level' position="0 2 10" centerOfRotation="0 0 0"></viewpoint>
+      <scene>
+        <inline id="x3dModel6" nameSpaceName="x3dModel6" mapDEFtoID="true" url="./models/MovingBody.x3d" render="true">
+      </scene> 
+    </x3d> -->
+
+  </div>
+
+  <div class="grid-container-main">
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+      </div>
+
+      <div class="grid-item">
+        <div class="grid-container">
+          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          </div>
+          <div class="grid-item">
+            <div id="avg_throughput" style="width: 360px; height: 320px;">
+              <!-- <canvas id="avg-throughput-bar-chart" style="width: 100%; height: 100%; margin-top:-25px;"></canvas> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="throughput-multisignal" style="width: 720px;">
+          <div class="throughput-heading">Data Throughput History</div>
+        </div>
+      </div>
+
+      <div class="grid-item">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+<script>
+  'use strict';
+
+
+  var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1785.0e6
+  });
+
+  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1795.0e6
+  });
+
+  var sig3 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1805.0e6
+  });
+
+  var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1815.0e6
+  });
+
+  // sig1['name'] = "comm_link_1";
+  // sig2['name'] = "comm_link_2";
+  // sig3['name'] = "comm_link_3";
+  // sig4['name'] = "comm_link_4";
+
+  var interferer = new Signal(conf.sig0, 'interferer', {
+    bw_max: 38.0e6, // Hz
+    bw_init: 2.5e6, // Hz
+    gn_init: -12, // dB
+    gn_min: -40, // dB
+    freq_init: 1785.0e6 // Hz
+  });
+
+  var signalList = [sig1, sig2, sig3, sig4];
+  var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
+
+  // HoppingInterferer(interferer, '#hoppingInterferer');
+  CapacityBanner(sig1, '#capacityBanner');
+
+  // function to listen to url changes
+  window.onload = function () {
+    const urlParams = new URLSearchParams(location.search);
+
+    for (const [key, value] of urlParams) {
+      let val = value.toLowerCase();
+      if (key == 'mode' && ['beginner', 'advanced'].includes(val)) {
+        document.getElementById(val).selected = "selected";
+        onModeChange();
+      }
+    }
+  };
+
+  function onModeChange() {
+    let mode = document.getElementById("mode").value;
+
+    // beginner mode
+    if (mode === 'beginner') {
+      document.getElementById("ideal1").disabled = true;
+      document.getElementById("ideal2").disabled = true;
+      document.getElementById("ideal3").disabled = true;
+      document.getElementById("nonlinear").disabled = true;
+      document.getElementById("multiplierDiv").style.display = "none";
+      document.getElementById("default").selected = "selected";
+
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "none";
+      });
+
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "none";
+      });
+
+      calculateSINR();
+
+    } else if (mode === 'advanced') {
+      document.getElementById("ideal1").disabled = false;
+      document.getElementById("ideal2").disabled = false;
+      document.getElementById("ideal3").disabled = false;
+      document.getElementById("nonlinear").disabled = false;
+
+    }
+
+  }
+
+  function onCategoryChange() {
+    let selection = document.getElementById("strategy").value;
+
+    // ideal receiver filter with equal bandwidth multiplier for all signals
+    if (selection == 'a1') {
+      document.getElementById("multiplierDiv").style.display = "inline-block";
+    } else {
+      document.getElementById("multiplierDiv").style.display = "none";
+    }
+
+    // ideal receiver filter with unequal bandwidth multipliers 
+    if (selection == 'a2' || selection == 'a4') {
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "inline-block";
+      });
+    } else {
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "none";
+      });
+    }
+
+    // nonlinear frontend model
+    if (selection == 'a4' || selection == 'a5') {
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "inline-block";
+        sig1.nonlinearModel = true;
+        sig2.nonlinearModel = true;
+        sig3.nonlinearModel = true;
+        sig4.nonlinearModel = true;
+      });
+    } else {
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "none";
+      });
+      sig1.nonlinearModel = false;
+      sig2.nonlinearModel = false;
+      sig3.nonlinearModel = false;
+      sig4.nonlinearModel = false;
+
+      sig1.iip3Point = null;
+      sig2.iip3Point = null;
+      sig3.iip3Point = null;
+      sig4.iip3Point = null;
+    }
+
+  }
+
+  // applies sinr calculation selection and triggers callbacks to calculate SINR
+  function calculateSINR() {
+
+    let selection = document.getElementById("strategy").value;
+
+    if (selection == '') {
+      sig1.bandwidthMultiplier = 1;
+      sig2.bandwidthMultiplier = 1;
+      sig3.bandwidthMultiplier = 1;
+      sig4.bandwidthMultiplier = 1;
+
+      sig1.nonlinearModel = false;
+      sig2.nonlinearModel = false;
+      sig3.nonlinearModel = false;
+      sig4.nonlinearModel = false;
+      sig1.iip3Point = null;
+      sig2.iip3Point = null;
+      sig3.iip3Point = null;
+      sig4.iip3Point = null;
+    }
+
+    // ideal receiver filter with wider bandwidth than the received signal
+    if (selection == 'a0') {
+      sig1.bandwidthMultiplier = 1;
+      sig2.bandwidthMultiplier = 1;
+      sig3.bandwidthMultiplier = 1;
+      sig4.bandwidthMultiplier = 1;
+    }
+
+    // ideal receiver filter with equal bandwidth multiplier for all signals
+    if (selection == 'a1') {
+      let bwMultiplier = document.getElementById("multiplier").value;
+      if (bwMultiplier && bwMultiplier.length > 0) {
+        let bw_m = Number(bwMultiplier);
+
+        sig1.bandwidthMultiplier = bw_m;
+        sig2.bandwidthMultiplier = bw_m;
+        sig3.bandwidthMultiplier = bw_m;
+        sig4.bandwidthMultiplier = bw_m;
+      } else {
+        return;
+      }
+    }
+
+    // ideal receiver filter with unequal bandwidth multipliers 
+    if (selection == 'a2' || selection == 'a4') {
+      let bwMultiplier1 = document.getElementById("multiplier1").value;
+      let bwMultiplier2 = document.getElementById("multiplier2").value;
+      let bwMultiplier3 = document.getElementById("multiplier3").value;
+      let bwMultiplier4 = document.getElementById("multiplier4").value;
+
+      if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
+        bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
+        bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+
+        sig1.bandwidthMultiplier = Number(bwMultiplier1);
+        sig2.bandwidthMultiplier = Number(bwMultiplier2);
+        sig3.bandwidthMultiplier = Number(bwMultiplier3);
+        sig4.bandwidthMultiplier = Number(bwMultiplier4);
+      } else {
+        return;
+      }
+    }
+
+    // nonlinear frontend receiver filter 
+    if (selection == 'a4' || selection == 'a5') {
+      let iip3_1 = document.getElementById("iip3_1").value;
+      let iip3_2 = document.getElementById("iip3_2").value;
+      let iip3_3 = document.getElementById("iip3_3").value;
+      let iip3_4 = document.getElementById("iip3_4").value;
+
+      if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
+        iip3_1.length > 0 && iip3_2.length > 0 &&
+        iip3_3.length > 0 && iip3_4.length > 0) {
+
+        sig1.iip3Point = Number(iip3_1);
+        sig2.iip3Point = Number(iip3_2);
+        sig3.iip3Point = Number(iip3_3);
+        sig4.iip3Point = Number(iip3_4);
+      } else {
+        return;
+      }
+    }
+
+    // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
+    // occupying the enter frequency range
+    if (selection == 'a5') {
+      sig1.bandwidthMultiplier = -Infinity;
+      sig2.bandwidthMultiplier = -Infinity;
+      sig3.bandwidthMultiplier = -Infinity;
+      sig4.bandwidthMultiplier = -Infinity;
+    }
+
+    // trigger callbacks for all signals - (sinr and rate calculations and update plots)
+    sig1.triggerCallbacks();
+    sig2.triggerCallbacks();
+    sig3.triggerCallbacks();
+    sig4.triggerCallbacks();
+
+  }
+
+
+  sync: sc
+
+  var sc = new ScriptController([sig1, sig2, sig3, sig4], {
+    element: '#scriptController',
+    functionFiles: "functions/ex26_functions.js",
+    customLabels: true,
+  });
+
+
+  var sc2 = new ScriptController([interferer], {
+    element: '#scriptController2',
+    functionFiles: "functions/ex26_functions_interferer.js",
+    customLabels: true,
+    sync: sc
+  });
+
+  window.addEventListener('load', (event) => {
+    if (document.getElementById("scriptController2") != null) {
+      document.getElementById("scriptController2").style.display = "none";
+    }
+  });
+
+  ThroughputPlot(signalList);
+  PowerSpectrumPlot_2D();
+
+  var funcs = null;
+
+  // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
+  //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
+  //   </div>`
+
+  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4"]);
+  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Link 3", "Link 4", "Average Total"]);
+
+</script>
+
+</html>
