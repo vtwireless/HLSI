@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<!--
+To Do: Add Guard Bands w/ flashing "too-close" indicator, Guard Band menu with options 
+for fixed, receiver-dependent, e.g., lower minimum for Links 1, 2, and 4, higher for Link 3; 
+Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-based SINR
+-->
+<html lang="en-US" style="display: flex;">
+
+<head>
+  <title>HLSI Ex 27</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
+  <link rel=stylesheet type=text/css href=codemirror.min.css />
+  <link rel=stylesheet type=text/css href=blackboard.min.css />
+  <link rel='stylesheet' type='text/css' href='./x3dom/x3dom.css'>
+  </link>
+  <link href='https://css.gg/minimize-alt.css' rel='stylesheet'>
+  <style>
+    output {
+      font-weight: bold;
+    }
+
+    .modes {
+      display: flex;
+      flex-direction: row;
+    }
+  </style>
+  <script src=d3.v5.min.js></script>
+  <script src=fft.js></script>
+  <script src=common.js></script>
+  <script src=signal.js></script>
+  <!-- <script src=sliders.js></script> -->
+  <script src=slidersMultiSignals.js></script>
+  <!-- <script src=powerSpectrumPlot.js></script> -->
+  <script type='text/javascript' src='./x3dom/x3dom.js'></script>
+  <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
+  <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
+  <script src=spectralEfficiencyPlot_BarChart.js></script>
+  <script src=sinrPlot_BarChart.js></script>
+  <script src="averageThroughputPlot_BarChart.js"></script>
+  <script src="modeController.js"></script>
+  <script src=label.js></script>
+  <script src=timer.js></script>
+  <script src=capacityBanner.js></script>
+  <script src=capacityRunner_multisignal.js></script>
+  <script src=scriptController.js></script>
+  <script src=codemirror.min.js></script>
+  <script src=codeMirror_javascript.js></script>
+  <!-- <script src=throughputPlot.js></script> -->
+  <script src=throughputPlotMultiSignals.js></script>
+  <script src=spatialMobility.js></script>
+  <script src=hoppingInterferer.js></script>
+  <script src="https://unpkg.com/d3-simple-slider"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+  <style>
+    .grid-container-main {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-item {
+      padding: 2px;
+      font-size: 30px;
+    }
+
+    .grid-container-item {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .grid-item {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .grid-container {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .throughput-heading {
+      font-size: 1rem;
+    }
+
+    .linkinputs {
+      width: 100%;
+      margin-top: -1.5%;
+      display: flex;
+      flex-direction: row;
+    }
+
+    input.slider_bw {
+      width: auto;
+    }
+
+    .PU_controls {
+      display: flex;
+      flex-direction: row;
+      height: 2rem;
+    }
+
+    @media screen and (max-width: 1500px) {
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+        padding: 2px;
+      }
+
+      .grid-container-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-item {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .grid-container {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+
+<body style="margin:0;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+
+    <input type="checkbox" id="menu-control" class="menu-control">
+
+    <aside class="sidebar" style="z-index: 10;">
+
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer
+          Avoidance</a>
+        <a href="19_rf_front_end_spectrum_sharing.html" class="selected"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with
+          Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with
+          Interferer</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual
+          and Programmable</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options
+          menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR
+          Calculations Programmable
+        </a>
+        <a href="27_rf_position_path_loss_and_mobility_basic_controls.html"><b>27</b> RFFE Spectrum Sharing -- Position,
+          Path Loss, and
+          Mobility -- Basic Controls
+        </a>
+        <a href="28_rf_position_path_loss_and_mobility.html"><b>28</b> RFFE Spectrum Sharing -- Position, Path Loss, and
+          Mobility
+        </a>
+      </nav>
+
+      <label for="menu-control" class="sidebar__close"></label>
+
+
+    </aside>
+
+    <div
+      style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">
+      <span style="color: #ddd;">Exercise 27</span> RFFE Spectrum Sharing -- Position, Path Loss, and Mobility -- Basic
+      Controls
+    </div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span
+        style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>
+  </section>
+
+  <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
+    <!-- <p id=hoppingInterferer>
+    </p> -->
+    
+    <p id=capacityBanner style="display: none;">
+    </p>
+
+    <div class="modes">
+      <div>
+        <p><label for="mode">Select mode:</label> &nbsp;
+          <select id="mode" onchange="onModeChange()">
+            <option id="beginner" value="beginner">Beginner</option>
+            <option id="advanced" value="advanced">Advanced</option>
+          </select>
+        </p>
+      </div>
+
+      <div class="modes" style="margin-left: 2rem;">
+        <p>
+          <label for="strategy">Select SINR calculation option:</label> &nbsp;
+          <select id="strategy" onchange="onCategoryChange()">
+            <option id="default" value="" selected disabled hidden>Select SINR calculation option...</option>
+            <option value="a0">Ideal filter with bandwidth equal to signal bandwidth</option>
+            <option id="ideal1" value="a1" disabled>Ideal filter - equal excess bandwidth</option>
+            <option id="ideal2" value="a2" disabled>Ideal filter - unequal excess bandwidth</option>
+            <option id="nonlinear" value="a4" disabled>Nonlinear front end</option>
+            <option id="ideal3" value="a5" disabled>Nonlinear front end - preselector bandwidth over entire frequency
+              range</option>
+          </select>
+
+
+        <div id="multiplierDiv" style="display: none;">
+          <p>
+            <label style="margin-left: 2rem;" for="strategy">BW mult.:</label> &nbsp;
+            <input style="width: 5rem;" id="multiplier" type="text" value="1" oninput="this.value = this.value
+              .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+          </p>
+        </div>
+
+        <div style="margin-left: 2rem;">
+          <p>
+            <input id="apply" type="button" value="Apply Selection" onclick="calculateSINR()">
+          </p>
+        </div>
+        </p>
+      </div>
+    </div>
+
+    <div class="linkinputs">
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+
+        <p>
+          <input type="range" id=freq1 />
+        </p>
+        <p>
+          <input type="range" id=bw1 style="display: none;" />
+        </p>
+        <p>
+          <input type="range" id=gn1 style="display: none;" />
+        </p>
+        <p>
+          <input type="range" id=mcs1 style="display: none;" />
+        </p>
+      </div>
+      
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #b5ebff; display: inline-block;">Link 2</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier2" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_2" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+
+        <p>
+          <input type="range" id=freq2 />
+        </p>
+        <p>
+          <input type="range" id=bw2 style="display: none;" />
+        </p>
+        <p>
+          <input type="range" id=gn2 style="display: none;" />
+        </p>
+        <p>
+          <input type="range" id=mcs2 style="display: none;" />
+        </p>
+      </div>
+      </div>
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+
+      <div style="width: 25%;">
+        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+          <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
+          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+          <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+        </div>
+        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+          <label for="strategy">IIP3</label> &nbsp;
+          <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
+            oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+        </div>
+      </div>
+    </div>
+
+    <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
+      <div style="display: inline-flex;">
+        <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Transmitter</div>
+      </div>
+
+      <div style="display: inline-flex; margin-left: 10px;">
+        <div style="width: 28px; height: 15px; background:rgba(0,176,240,255);"></div>
+        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Receiver</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div style="display: inline-flex; margin-left: 2em; font-size: large;">
+      <p><label for="antenna_pattern">Type of Antenna Pattern:</label> &nbsp;
+        <select id="antenna_pattern" onchange="onAntennaPatternChange()">
+          <option id="omnidirectional" value="omnidirectional">Omnidirectional</option>
+          <option id="cardioid" value="cardioid">Cardioid</option>
+          <option id="cardioid" value="cardioid">Keyhole pattern</option>
+          <option id="cardioid" value="cardioid">Pattern with side lobe</option>
+        </select>
+      </p> &nbsp; &nbsp; &nbsp;
+
+      <p><label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
+        <label id="rec_trans_dist" for="rec_trans_dist"></label>
+      </p> &nbsp; &nbsp; &nbsp;
+
+      <p><label for="rec_trans_dist_label">Rotation Angle (degrees) :  </label> &nbsp;
+        <label id="angleX" for="angleX"></label> &nbsp;
+        <label id="angleY" for="angleY"></label> &nbsp;
+        <label id="angleZ" for="angleZ"></label> &nbsp;
+        <label id="theta" for="theta"></label> &nbsp;
+        <label id="phi" for="phi"></label> &nbsp;
+      </p>
+      
+    </div>
+  </div>
+
+  <div id="x3dModelWindow">
+
+    <x3d id='x3dElement' showStat='false' showLog='false' width='1520px' height='720px'>
+      <scene DEF='scene'>
+        <viewpoint position="13.71854 10.00018 18.01263" orientation="-0.96475 0.63173 0.00059 0.751072"></viewpoint>
+
+
+
+        <!-- Transmitter and Antenna -->
+        <transform id="transmitterTranslation">
+
+          <transform DEF='ant_1' translation='0 -2 0' scale='1 0.5 1'>
+            <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
+            </inline>
+            <viewpoint></viewpoint>
+          </transform>
+
+          <matrixTransform id="transmitterRotation">
+            <transform translation='0 3 0' scale='0.4 0.4 0.4'>
+              <shape>
+                <Appearance>
+                  <Material diffuseColor="0 0.6902 0.9412" />
+                </Appearance>
+                <Cone bottomradius='5' height='8' />
+              </shape>
+              <shape>
+                <appearance>
+                  <material diffuseColor='1 0 0'></material>
+                  <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
+                </appearance>
+                <cylinder height='50' radius='0.1'></cylinder>
+              </shape>
+            </transform>
+          </matrixTransform>
+        </transform>
+
+        <!-- EXAMPLE GROUND PLANE, FOR BETTER ORIENTATION -->
+        <transform translation='0 -5.5 0' rotation='1 0 0 -1.57'>
+          <shape>
+            <appearance>
+              <material diffuseColor='0.7 0.7 0.7'></material>
+            </appearance>
+            <box solid='true' size='26 16 2'></box>
+          </shape>
+        </transform>
+
+
+        <transform id="receiver" translation='12 5 0' rotation='1 0 0 -1.57'>
+          <shape>
+            <appearance>
+              <material diffuseColor='1 0 0'></material>
+            </appearance>
+            <box size='1 1 1'></box>
+          </shape>
+        </transform>
+
+        <!-- TRANSLATION GIZMO (CONTAINING PLANE SENSOR AND SENSOR GEOMETRY) -->
+        <group>
+          <planeSensor id="transmitterPlane" autoOffset='true' axisRotation='1 0 0 -1.57' minPosition='-12 0'
+            maxPosition='12 0' onoutputchange='processTranslationGizmoEvent(event)'>
+          </planeSensor>
+
+          <transform id='translationHandleTransform'>
+            <transform translation='0 -5.5 8' rotation='0 1 0 1.57'>
+              <transform translation='0 0 1.5' rotation='1 0 0 1.57'>
+                <shape DEF='CONE_CAP'>
+                  <appearance DEF='CYAN_MAT'>
+                    <material diffuseColor='1 1 0'></material>
+                  </appearance>
+                  <cone height='1'></cone>
+                </shape>
+              </transform>
+              <transform rotation='1 0 0 -1.57'>
+                <shape>
+                  <appearance USE='CYAN_MAT'></appearance>
+                  <cylinder></cylinder>
+                </shape>
+              </transform>
+              <transform translation='0 0 -1.5' rotation='1 0 0 -1.57'>
+                <shape USE='CONE_CAP'></shape>
+              </transform>
+            </transform>
+          </transform>
+        </group>
+
+        <!-- BEGIN OF ROTATION GIZMO (CONTAINING CYLINDER SENSORS AND SENSOR GEOMETRY) -->
+        <transform id='rotationHandleTransform'>
+
+          <!-- Rotation Handle X -->
+          <group>
+            <cylinderSensor autoOffset='false' axisRotation='0 0 1 -1.57'
+              onoutputchange='processRotationGizmoEvent(event);'>
+            </cylinderSensor>
+
+            <transform>
+              <transform scale='2.5 5 5'>
+                <shape>
+                  <appearance DEF='RED_APP'>
+                    <material diffuseColor='1 0.3 0.3'></material>
+                  </appearance>
+                  <indexedtriangleset solid="true" normalpervertex="true"
+                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
+                    <coordinate
+                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
+                    <normal
+                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
+                  </indexedtriangleset>
+                </shape>
+              </transform>
+            </transform>
+          </group>
+
+          <!-- Rotation Handle Y -->
+          <group>
+            <cylinderSensor autoOffset='false' onoutputchange='processRotationGizmoEvent(event);'>
+            </cylinderSensor>
+
+            <transform>
+              <transform scale='2.5 5.05 5.05' rotation='0 0 1 -1.57'>
+                <shape>
+                  <appearance DEF='GREEN_APP'>
+                    <material diffuseColor='0.3 1 0.3'></material>
+                  </appearance>
+                  <indexedtriangleset solid="true" normalpervertex="true"
+                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
+                    <coordinate
+                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
+                    <normal
+                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
+                  </indexedtriangleset>
+                </shape>
+              </transform>
+            </transform>
+          </group>
+
+          <!-- Rotation Handle Z -->
+          <group>
+            <cylinderSensor autoOffset='false' axisRotation='1 0 0 -1.57'
+              onoutputchange='processRotationGizmoEvent(event);'>
+            </cylinderSensor>
+
+            <transform>
+              <transform scale='2.5 5.1 5.1' rotation='0 1 0 -1.57'>
+                <shape>
+                  <appearance DEF='BLUE_APP'>
+                    <material diffuseColor='0.3 0.3 1'></material>
+                  </appearance>
+                  <indexedtriangleset solid="true" normalpervertex="true"
+                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
+                    <coordinate
+                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
+                    <normal
+                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
+                  </indexedtriangleset>
+                </shape>
+              </transform>
+            </transform>
+          </group>
+
+        </transform>
+        <!-- END OF ROTATION GIZMO -->
+
+      </scene>
+    </x3d>
+
+  </div>
+
+  <div class="grid-container-main">
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div id="throughput-multisignal" style="width: 720px;">
+          <div class="throughput-heading">Data Throughput History</div>
+        </div>
+      </div>
+
+      <div class="grid-item">
+        <div class="grid-container">
+          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-container-item">
+      <div class="grid-item">
+        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+<script>
+  'use strict';
+
+
+  var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1785.0e6
+  });
+
+  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1795.0e6
+  });
+
+  // sig1['name'] = "comm_link_1";
+  // sig2['name'] = "comm_link_2";
+  // sig3['name'] = "comm_link_3";
+  // sig4['name'] = "comm_link_4";
+
+  var signalList = [sig1, sig2];
+  var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
+
+  Slider(sig1, 'freq', '#freq1');
+  Slider(sig1, 'bw', '#bw1');
+  Slider(sig1, 'gn', '#gn1');
+  Slider(sig1, 'mcs', '#mcs1');
+
+  Slider(sig2, 'freq', '#freq2');
+  Slider(sig2, 'bw', '#bw2');
+  Slider(sig2, 'gn', '#gn2');
+  Slider(sig2, 'mcs', '#mcs2');
+
+  var receiverPos = new Position(0, 0, 0);
+  var translatorPos = new Position(0, 0, 0);
+
+  // HoppingInterferer(interferer, '#hoppingInterferer');
+  CapacityBanner(sig1, '#capacityBanner');
+
+  // function to listen to url changes
+  window.onload = function () {
+    const urlParams = new URLSearchParams(location.search);
+
+    for (const [key, value] of urlParams) {
+      let val = value.toLowerCase();
+      if (key == 'mode' && ['beginner', 'advanced'].includes(val)) {
+        document.getElementById(val).selected = "selected";
+        onModeChange();
+      }
+    }
+  };
+
+  function onModeChange() {
+    let mode = document.getElementById("mode").value;
+
+    // beginner mode
+    if (mode === 'beginner') {
+      document.getElementById("ideal1").disabled = true;
+      document.getElementById("ideal2").disabled = true;
+      document.getElementById("ideal3").disabled = true;
+      document.getElementById("nonlinear").disabled = true;
+      document.getElementById("multiplierDiv").style.display = "none";
+      document.getElementById("default").selected = "selected";
+
+      document.getElementById("bw1").style.display = "none";
+      document.getElementById("gn1").style.display = "none";
+      document.getElementById("mcs1").style.display = "none";
+
+      document.getElementById("bw2").style.display = "none";
+      document.getElementById("gn2").style.display = "none";
+      document.getElementById("mcs2").style.display = "none";
+
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "none";
+      });
+
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "none";
+      });
+
+      calculateSINR();
+
+    } else if (mode === 'advanced') {
+      document.getElementById("ideal1").disabled = false;
+      document.getElementById("ideal2").disabled = false;
+      document.getElementById("ideal3").disabled = false;
+      document.getElementById("nonlinear").disabled = false;
+
+      document.getElementById("bw1").style.display = "initial";
+      document.getElementById("gn1").style.display = "initial";
+      document.getElementById("mcs1").style.display = "initial";
+
+      document.getElementById("bw2").style.display = "initial";
+      document.getElementById("gn2").style.display = "initial";
+      document.getElementById("mcs2").style.display = "initial";
+
+    }
+
+  }
+
+  function onAntennaPatternChange() {
+
+  }
+
+  function onCategoryChange() {
+    let selection = document.getElementById("strategy").value;
+
+    // ideal receiver filter with equal bandwidth multiplier for all signals
+    if (selection == 'a1') {
+      document.getElementById("multiplierDiv").style.display = "inline-block";
+    } else {
+      document.getElementById("multiplierDiv").style.display = "none";
+    }
+
+    // ideal receiver filter with unequal bandwidth multipliers 
+    if (selection == 'a2' || selection == 'a4') {
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "inline-block";
+      });
+    } else {
+      Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
+        element.style.display = "none";
+      });
+    }
+
+    // nonlinear frontend model
+    if (selection == 'a4' || selection == 'a5') {
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "inline-block";
+        sig1.nonlinearModel = true;
+        sig2.nonlinearModel = true;
+      
+      });
+    } else {
+      Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
+        element.style.display = "none";
+      });
+      sig1.nonlinearModel = false;
+      sig2.nonlinearModel = false;
+      
+
+      sig1.iip3Point = null;
+      sig2.iip3Point = null;
+     
+    }
+
+  }
+
+  // applies sinr calculation selection and triggers callbacks to calculate SINR
+  function calculateSINR() {
+
+    let selection = document.getElementById("strategy").value;
+
+    if (selection == '') {
+      sig1.bandwidthMultiplier = 1;
+      sig2.bandwidthMultiplier = 1;
+    
+      sig1.nonlinearModel = false;
+      sig2.nonlinearModel = false;
+    
+      sig1.iip3Point = null;
+      sig2.iip3Point = null;
+     
+    }
+
+    // ideal receiver filter with wider bandwidth than the received signal
+    if (selection == 'a0') {
+      sig1.bandwidthMultiplier = 1;
+      sig2.bandwidthMultiplier = 1;
+   
+    }
+
+    // ideal receiver filter with equal bandwidth multiplier for all signals
+    if (selection == 'a1') {
+      let bwMultiplier = document.getElementById("multiplier").value;
+      if (bwMultiplier && bwMultiplier.length > 0) {
+        let bw_m = Number(bwMultiplier);
+
+        sig1.bandwidthMultiplier = bw_m;
+        sig2.bandwidthMultiplier = bw_m;
+       
+      } else {
+        return;
+      }
+    }
+
+    // ideal receiver filter with unequal bandwidth multipliers 
+    if (selection == 'a2' || selection == 'a4') {
+      let bwMultiplier1 = document.getElementById("multiplier1").value;
+      let bwMultiplier2 = document.getElementById("multiplier2").value;
+      let bwMultiplier3 = document.getElementById("multiplier3").value;
+      let bwMultiplier4 = document.getElementById("multiplier4").value;
+
+      if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
+        bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
+        bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+
+        sig1.bandwidthMultiplier = Number(bwMultiplier1);
+        sig2.bandwidthMultiplier = Number(bwMultiplier2);
+     
+      } else {
+        return;
+      }
+    }
+
+    // nonlinear frontend receiver filter 
+    if (selection == 'a4' || selection == 'a5') {
+      let iip3_1 = document.getElementById("iip3_1").value;
+      let iip3_2 = document.getElementById("iip3_2").value;
+    
+
+      if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
+        iip3_1.length > 0 && iip3_2.length > 0 &&
+        iip3_3.length > 0 && iip3_4.length > 0) {
+
+        sig1.iip3Point = Number(iip3_1);
+        sig2.iip3Point = Number(iip3_2);
+       
+      } else {
+        return;
+      }
+    }
+
+    // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
+    // occupying the enter frequency range
+    if (selection == 'a5') {
+      sig1.bandwidthMultiplier = -Infinity;
+      sig2.bandwidthMultiplier = -Infinity;
+    
+    }
+
+    // trigger callbacks for all signals - (sinr and rate calculations and update plots)
+    sig1.triggerCallbacks();
+    sig2.triggerCallbacks();
+   
+
+  }
+
+  window.addEventListener('load', (event) => {
+    if (document.getElementById("scriptController2") != null) {
+      document.getElementById("scriptController2").style.display = "none";
+    }
+  });
+
+  ThroughputPlot(signalList);
+
+  var funcs = null;
+
+  // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
+  //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
+  //   </div>`
+
+  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1", "Link 2"]);
+  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Average Total"]);
+
+  var currentGizmoRotation = new x3dom.fields.SFMatrix4f();
+  var currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
+
+  /*
+     * Callback function, invoked on translation gizmo output.
+     */
+  function processTranslationGizmoEvent(event) {
+    var sensorToWorldMatrix, translationValue;
+
+    if (event.fieldName === 'translation_changed') {
+      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
+      sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
+
+      // console.log(event.value);
+
+      translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
+
+      translatorPos.x = translationValue.x;
+      translatorPos.y = translationValue.y;
+      translatorPos.z = translationValue.z;
+      // console.log(translatorPos);
+
+      calcDistance(receiverPos, translatorPos);
+
+      //transform the affected sensor geometry
+      document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
+      document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
+
+      //transform the affected element
+      document.getElementById('transmitterTranslation').setFieldValue('translation', translationValue);
+    }
+  }
+
+  /*
+   * Callback function, invoked on rotation gizmo output.
+   */
+  function processRotationGizmoEvent(event) {
+    var sensorToWorldMatrix, rotationMatrixWorld;
+
+    if (event.fieldName === 'rotation_changed') {
+      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
+      sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
+      rotationMatrixWorld = sensorToWorldMatrix.mult(event.value.toMatrix());
+
+      //create an offset that applies the current rotation in world coordinates,
+      //but doesn't change the orientation of the coordinate system
+      currentGizmoRotationOffset = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
+
+      applyRotationGizmoTransformations();
+    }
+
+    if (event.fieldName === 'isActive' && event.value === false) {
+      //incorporate the current rotation offset, interpreted globally, into the stored rotation value
+      currentGizmoRotation = currentGizmoRotationOffset.mult(currentGizmoRotation);
+
+      //reset current rotation offset to zero rotation
+      currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
+
+      applyRotationGizmoTransformations();
+    }
+  }
+
+  /*
+   * Applies the current transformations, computed from the rotation gizmo output, to the scene
+   */
+  function applyRotationGizmoTransformations() {
+    var transmitterRotationNode = document.getElementById('transmitterRotation');
+
+    //incorporate the current rotation offset, interpreted globally, into the stored rotation value
+    var transformMatrix = currentGizmoRotationOffset.mult(currentGizmoRotation);
+
+    // get the rotation angles in radians
+    var angles = transformMatrix.getEulerAngles();
+
+    // convert angles from radians to degrees
+    var angleX = ((angles[0] * (180 / Math.PI)) + 360) % 360;
+    var angleY = ((angles[1] * (180 / Math.PI)) + 360) % 360;
+    var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
+    var thetaPhi = anglesToThetaPhi(angleX, angleY, angleZ);
+
+    // Print rotation angles in degrees
+    document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+    document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+    document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+    document.getElementById('theta').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
+    document.getElementById('phi').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+
+    //set matrix value in column major format, as required by the MatrixTransform node
+    transmitterRotationNode.setFieldValue("matrix", transformMatrix.transpose());
+
+  }
+
+  function anglesToThetaPhi(xDeg, yDeg, zDeg) {
+    const x = xDeg * Math.PI / 180;
+    const y = yDeg * Math.PI / 180;
+    const z = zDeg * Math.PI / 180;
+    
+    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) * 
+      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) + 
+      Math.cos(x) * Math.cos(y) * Math.sin(z));
+    theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
+    theta = theta * 180 / Math.PI; // Convert radians to degrees
+    theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
+    
+    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) * 
+      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) * 
+      Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
+    phi = (phi >= 0) ? phi : (phi + (2 * Math.PI)); // Convert negative values to positive
+    phi = phi * 180 / Math.PI; // Convert radians to degrees
+    phi = (phi >= 0) ? phi : (phi + 360); // Restrict the range to 0-360 degrees
+    
+    return [theta, phi];
+  }
+
+
+
+
+  window.onload = function () {
+    getCoordinatesFromX3D("receiver");
+    const transmitterNode = document.getElementById("transmitterPlane");
+    const axisRotationAttr = transmitterNode.getAttribute("axisRotation");
+    // console.log(axisRotationAttr);
+
+    // calcDistance()
+
+  };
+
+  function getCoordinatesFromX3D(objectName) {
+
+    const transformNode = document.getElementById(objectName);
+    if (!transformNode) {
+      console.error(`Object "${objectName}" not found in X3D file.`);
+      return null;
+    }
+
+    // Get the translation attribute of the Transform node
+    const translationAttr = transformNode.getAttribute("translation");
+
+    // Parse the translation attribute string into an array of coordinates
+    const coordinates = translationAttr.split(" ").map(parseFloat);
+    // console.log(coordinates);
+    receiverPos.x = coordinates[0];
+    receiverPos.y = coordinates[1];
+    receiverPos.z = coordinates[2];
+    //console.log(receiverPos);
+
+    // Return the coordinates as an object with x, y, and z properties
+    return { x: coordinates[0], y: coordinates[1], z: coordinates[2] };
+  }
+
+  function calcDistance(P1, P2) {
+    // P1 = (x1, y1, z1); P2 = (x2, y2, z2)
+    var a = P2.x - P1.x;
+    var b = P2.y - P1.y;
+    var c = P2.z - P1.z;
+
+    var distance = Math.sqrt(a * a + b * b + c * c);
+    // console.log(distance);
+    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+
+  }
+</script>
+
+</html>
