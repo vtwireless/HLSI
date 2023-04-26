@@ -390,8 +390,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <transform id="transmitterTranslation">
 
           <transform DEF='ant_1' translation='0 -2 0' scale='1 0.5 1'>
-            <inline id="x3dModel1" nameSpaceName="x3dModel1" mapDEFtoID="true" url="./models/model1.x3d" render="true">
-            </inline>
+            <shape>
+              <Appearance>
+                <Material diffuseColor="0 0.6902 0.9412" />
+              </Appearance>
+              <cylinder bottomradius='5' height='8'></cylinder>
+            </shape>
             <viewpoint></viewpoint>
           </transform>
 

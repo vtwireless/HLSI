@@ -718,10 +718,24 @@ function Signal(sig, name = "", opts = null) {
     // calculates SINR for nonlinear model using double convolution method
     obj.calcNonlinearSINR = function(bwMultiplier = null, setSINR = true) {
         
+        if (bwMultiplier === null) {
+            bwMultiplier = obj.bandwidthMultiplier;
+        }
+
         var new_sinr = 0.0;
-        // discretize the frequency : Frequency bin width == Minimum Signal bandwidth
-        let freq_bin_width = obj.bw_min;
-        let freq_arr_len = (obj.freq_plot_max - obj.freq_plot_min)/freq_bin_width;
+        // discretize the frequency : Frequency bin width == 100 kHz 
+        var freq_bin_width = 1e5;
+         // The end points of the obj signal band (or the signal of interest)
+        var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
+        var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+
+        // last SINR calculation scenario
+        if (bwMultiplier === -Infinity) {
+            obj_fmin = obj.freq_plot_min;
+            obj_fmax = obj.freq_plot_max;
+        }
+
+        let freq_arr_len = Math.ceil((obj_fmax - obj_fmin)/freq_bin_width);
         let freq_arr = Array(freq_arr_len).fill(0);
         let p_noise = 0.0;
 
@@ -731,35 +745,26 @@ function Signal(sig, name = "", opts = null) {
             // sum the power of all overlapping signals (co-channel interference)
             // Co-channel interference power is a sum of linear power
             var ccip = 0.0;
-            let freq_bin_min = obj.freq_plot_min + (freq_bin_width * (i));
-            let freq_bin_max = obj.freq_plot_min + (freq_bin_width * (i + 1));
+            // set min and max of the current bin
+            let freq_bin_min = obj_fmin + (freq_bin_width * (i));
+            let freq_bin_max = obj_fmin + (freq_bin_width * (i + 1));
 
-            if (bwMultiplier === null) {
-                bwMultiplier = obj.bandwidthMultiplier;
+            // edge case for last bin
+            // 1 ---- 5.5
+            // 1-2, 2-3, 3-4, 4-5, 5-5.5
+            if ((i === freq_arr_len - 1) && (obj_fmax - freq_bin_min) < freq_bin_width) {
+                freq_bin_max = obj_fmax;
             }
-    
-            var bw_max = obj.freq_plot_max - obj.freq_plot_min;
-        
-            // The frequencies min and max of the signal of interest
-            var obj_fmin = obj._freq - 0.5 * bwMultiplier * obj._bw;
-            var obj_fmax = obj._freq + 0.5 * bwMultiplier * obj._bw;
+            
+            // assume that noise singal is prevalent throughout the preselector filter 
+            var bw_max = obj_fmax - obj_fmin;
 
-            if (bwMultiplier === -Infinity) {
-                obj_fmin = obj.freq_plot_min;
-                obj_fmax = obj.freq_plot_max;
-            }
-
-            // if the desired signal does not fall within the current frequency bin range
-            // then ccip = 0, meaning its a don't care condition
-            if (obj_fmin >= freq_bin_max || obj_fmax <= freq_bin_min) {
-                freq_arr[i] = ccip;
-                continue;
-            }
-    
+            // helper function to convert gain to linear domain
             function PowerSpectralDensity(gn) {
                 return Math.pow(10.0, gn/10.0);
             }
 
+            // loop through interferers and calculate ccip 
             obj.interferers.forEach(function(i) {
                 
                 if (i['name']==='interferer' && pu_mode != null && pu_mode.value === 'noninterferer') {
@@ -768,7 +773,7 @@ function Signal(sig, name = "", opts = null) {
 
                 // i is interferer signal.
                 if(!i.is_noise &&
-                    (   // if they don't overlap then return
+                    (   // if the interferer and desired signal don't overlap then return (don't care condition)
                         (obj_fmin >= i._freq + 0.5 * i._bw) || (obj_fmax <= i._freq - 0.5 * i._bw)
                     ))
                     return;
@@ -784,42 +789,27 @@ function Signal(sig, name = "", opts = null) {
                   
                     ccip += p_noise;
                 } else {
-                    // first, calculate the overlap between object and the interferer
+                    // first, calculate the overlap between the interferer and the current bin
                     // range of overlap will be overlap_min and overlap_max
                     let overlap_min = i._freq - 0.5 * i._bw;
-                    if(overlap_min < obj_fmin)
-                        overlap_min = obj_fmin;
+                    if(overlap_min < freq_bin_min)
+                        overlap_min = freq_bin_min;
                     let overlap_max = i._freq + 0.5 * i._bw;
-                    if(overlap_max > obj_fmax)
-                        overlap_max = obj_fmax;
-                    
-                    // second calculate the overlap between overlap range and the frequency bin range
-                    if (overlap_min < freq_bin_min && overlap_max > freq_bin_min)
-                        overlap_min = freq_bin_min
-                    
-                    if (overlap_max > freq_bin_max && overlap_min < freq_bin_max)
-                        overlap_max = freq_bin_max 
-
+                    if(overlap_max > freq_bin_max)
+                        overlap_max = freq_bin_max;
+                    // partial overlap for non-noise.
                     let overlap_in_freq_bin = overlap_max - overlap_min;
+    
                     ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
+
                 }
             });
-    
+            // set the ccip for the current bin
             freq_arr[i] = ccip;
+
         }
 
-        let p_int_nonzero = freq_arr.reduce((a, c) => {
-            if (c !== 0) {
-              a.count++;
-              a.sum += c;
-            }
-            
-            return a;
-          }, {count: 0, sum: 0});
-        
-        // p_int: power level at receiver from interfering signal from other signals in the entire frequency band
-        let p_int = p_int_nonzero.sum;
-        let p_int_len = p_int_nonzero.count;
+        // console.log("Initial freq arr for : "  + obj.name + " : " + freq_arr);
 
         // Nonlinearity - Third order approximation
         // Perform Double convolution:  x(f) conv x(f) conv x(f)
@@ -852,34 +842,19 @@ function Signal(sig, name = "", opts = null) {
         let interference_arr = convolve(conv1_arr, freq_arr);
         
         // pick 'n' frequencies (within the preselector bw) starting from the center of the resulting array
-        let result_interference = [];
-        let sum_ip = 0.0;
-        let middle = Math.round((interference_arr.length - 1) / 2);
-        let i = middle, j = middle;
-        let count = 0;
-        while (i >= 0 || j < interference_arr.length) {
-            if (interference_arr[i] > 0) {
-                sum_ip += interference_arr[i];
-                result_interference.push(interference_arr[i]);
-                count ++;
-            } 
-            
-            if (interference_arr[j] > 0) {
-                sum_ip += interference_arr[j];
-                result_interference.push(interference_arr[j]);
-                count ++;
-            }
-
-            i -= 1;
-            j += 1;
-
-            if (count === p_int_len) break;
-        }
+        const start = Math.floor((interference_arr.length - freq_arr_len) / 2);
+        const centerValues = interference_arr.slice(start, start + freq_arr_len).filter(val => val >= 0);
+        const sum_ip = centerValues.reduce((acc, val) => acc + val, 0);
+       
+        // console.log("Resulting center N values : " + centerValues);
 
         // power due to adjacent channel interference caused due to nonlinear distortion of the RF front-end 
+        let p_int = freq_arr.filter(val => val >= 0).reduce((acc, val) => acc + val, 0);
         let p_adj = sum_ip / 10 ** (2 * obj.iip3Point / 10);
-       
         new_sinr = obj._gn - 10 * Math.log10(p_adj + p_int);
+        // console.log(obj.name + " Sum IP: " + sum_ip + ", p_adj: " + p_adj + ", p_int: " + p_int + ", New SINR : " + new_sinr);
+        // if (sum_ip < 0) 
+        //     console.log("Final arr: " + interference_arr);
 
         if (setSINR) {
 
