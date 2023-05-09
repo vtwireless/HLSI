@@ -40,6 +40,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src=sinrPlot_BarChart.js></script>
   <script src="averageThroughputPlot_BarChart.js"></script>
   <script src="modeController.js"></script>
+  <script src="patterns_matlab.js"></script>
   <script src=label.js></script>
   <script src=timer.js></script>
   <script src=capacityBanner.js></script>
@@ -306,75 +307,95 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <input type="range" id=mcs2 style="display: none;" />
         </p>
       </div>
-      </div>
+    </div>
 
-      <div style="width: 25%;">
-        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
-          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-          <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
+    <div style="width: 25%;">
+      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+        <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
+        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+        <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-        </div>
-        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-          <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
-            oninput="this.value = this.value
-          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-        </div>
       </div>
-
-      <div style="width: 25%;">
-        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
-          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-          <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
-          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-        </div>
-        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-          <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
-            oninput="this.value = this.value
+      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="strategy">IIP3</label> &nbsp;
+        <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
+          oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-        </div>
       </div>
     </div>
 
-    <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
-      <div style="display: inline-flex;">
-        <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
-        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Transmitter</div>
+    <div style="width: 25%;">
+      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+        <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
+        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+        <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
+          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
       </div>
-
-      <div style="display: inline-flex; margin-left: 10px;">
-        <div style="width: 28px; height: 15px; background:rgba(0,176,240,255);"></div>
-        <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Receiver</div>
+      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="strategy">IIP3</label> &nbsp;
+        <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
+          oninput="this.value = this.value
+          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div>
     </div>
+  </div>
+
+  <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
+    <div style="display: inline-flex;">
+      <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
+      <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Transmitter</div>
+    </div>
+
+    <div style="display: inline-flex; margin-left: 10px;">
+      <div style="width: 28px; height: 15px; background:rgba(0,176,240,255);"></div>
+      <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Receiver</div>
+    </div>
+  </div>
   </div>
 
   <div>
     <div style="display: inline-flex; margin-left: 2em; font-size: large;">
       <p><label for="antenna_pattern">Type of Antenna Pattern:</label> &nbsp;
-        <select id="antenna_pattern" onchange="onAntennaPatternChange()">
-          <option id="omnidirectional" value="omnidirectional">Omnidirectional</option>
-          <option id="cardioid" value="cardioid">Cardioid</option>
-          <option id="cardioid" value="cardioid">Keyhole pattern</option>
-          <option id="cardioid" value="cardioid">Pattern with side lobe</option>
+        <select id="antenna_pattern">
+          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+          <option id="halfwave" value="halfwave">Half-wave dipole</option>
+          <option id="sdipole" value="sdipole">Small dipole</option>
+          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
         </select>
       </p> &nbsp; &nbsp; &nbsp;
-
-      <p><label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
-        <label id="rec_trans_dist" for="rec_trans_dist"></label>
-      </p> &nbsp; &nbsp; &nbsp;
-
-      <p><label for="rec_trans_dist_label">Rotation Angle (degrees) :  </label> &nbsp;
-        <label id="angleX" for="angleX"></label> &nbsp;
-        <label id="angleY" for="angleY"></label> &nbsp;
-        <label id="angleZ" for="angleZ"></label> &nbsp;
-        <label id="theta" for="theta"></label> &nbsp;
-        <label id="phi" for="phi"></label> &nbsp;
+      <p>
+        <label for="theta">Theta (0-180)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="theta" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        <label for="phi">Phi (0-360)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="phi" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        
+        <input id="apply" type="button" value="Apply" onclick="updatePathLoss()">  &nbsp; &nbsp;
       </p>
-      
+    </div>
+    <div>
+      <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
+        <label for="path_loss">Path Loss (dB) : </label> &nbsp;
+          <label id="path_loss" for="path_loss"></label>
+         &nbsp; &nbsp; &nbsp;
+       <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
+          <label id="power_rx_db" for="power_rx_db"></label>
+        &nbsp; &nbsp; &nbsp;
+        <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
+          <label id="rec_trans_dist" for="rec_trans_dist"></label>
+        &nbsp; &nbsp; &nbsp;
+  
+        <label for="rec_trans_dist_label">Rotation Angle (degrees) : </label> &nbsp;
+          <label id="angleX" for="angleX"></label> &nbsp;
+          <label id="angleY" for="angleY"></label> &nbsp;
+          <label id="angleZ" for="angleZ"></label> &nbsp;
+          <label id="thetaAngle" for="theta"></label> &nbsp;
+          <label id="phiAngle" for="phi"></label> &nbsp;
+      </div>
     </div>
   </div>
 
@@ -579,7 +600,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 <script>
   'use strict';
 
-
+  // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
     bw_min: 4.0e6,  // Hz
@@ -590,6 +611,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     freq_init: 1785.0e6
   });
 
+  // Transmitter (Red signal)
   var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
     bw_min: 4.0e6,  // Hz
@@ -599,6 +621,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     mcs_init: 6, // array index int
     freq_init: 1795.0e6
   });
+
+  let distance_tx_rx = 0;
 
   // sig1['name'] = "comm_link_1";
   // sig2['name'] = "comm_link_2";
@@ -685,9 +709,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
 
-  function onAntennaPatternChange() {
-
-  }
 
   function onCategoryChange() {
     let selection = document.getElementById("strategy").value;
@@ -864,6 +885,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       calcDistance(receiverPos, translatorPos);
 
+      // update path loss
+      // updatePathLoss();
+
       //transform the affected sensor geometry
       document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
       document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
@@ -924,8 +948,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
     document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('theta').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
-    document.getElementById('phi').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
+    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+
+    // update path loss
+    // updatePathLoss();
 
     //set matrix value in column major format, as required by the MatrixTransform node
     transmitterRotationNode.setFieldValue("matrix", transformMatrix.transpose());
@@ -936,22 +963,31 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     const x = xDeg * Math.PI / 180;
     const y = yDeg * Math.PI / 180;
     const z = zDeg * Math.PI / 180;
-    
-    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) * 
-      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) + 
-      Math.cos(x) * Math.cos(y) * Math.sin(z));
+
+    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) *
+      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) +
+    Math.cos(x) * Math.cos(y) * Math.sin(z));
     theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
     theta = theta * 180 / Math.PI; // Convert radians to degrees
     theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
-    
-    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) * 
-      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) * 
-      Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
+
+    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) *
+      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) *
+        Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
     phi = (phi >= 0) ? phi : (phi + (2 * Math.PI)); // Convert negative values to positive
     phi = phi * 180 / Math.PI; // Convert radians to degrees
     phi = (phi >= 0) ? phi : (phi + 360); // Restrict the range to 0-360 degrees
-    
+
     return [theta, phi];
+  }
+
+  // Updates the Path Loss
+  function updatePathLoss() {
+    let pattern = document.getElementById("antenna_pattern").value;
+    let theta = document.getElementById("theta").value;
+    let phi = document.getElementById("phi").value;
+    calculatePathLoss(sig1, sig2, theta, phi, distance_tx_rx, pattern);
+      
   }
 
 
@@ -963,7 +999,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     const axisRotationAttr = transmitterNode.getAttribute("axisRotation");
     // console.log(axisRotationAttr);
 
-    // calcDistance()
+    let transmitterObj = document.getElementById("transmitterPlane");
+    let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(transmitterObj.getAttribute("axisRotation"));
+    // let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
+
+    calcDistance(receiverPos, new Position(0, 0, 0));
 
   };
 
@@ -997,6 +1037,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var c = P2.z - P1.z;
 
     var distance = Math.sqrt(a * a + b * b + c * c);
+    distance_tx_rx = distance;
     // console.log(distance);
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
