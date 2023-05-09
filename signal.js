@@ -616,6 +616,7 @@ function Signal(sig, name = "", opts = null) {
     //      2. setSINR -- if false do not set the new_sinr on object
     obj.calculateSINR = function(bwMultiplier = null, setSINR = true) {
 
+        let result = [];
         if (bwMultiplier === null) {
             bwMultiplier = obj.bandwidthMultiplier;
         }
@@ -684,6 +685,8 @@ function Signal(sig, name = "", opts = null) {
                 ccip += overlap_in_freq_bin * PowerSpectralDensity(i._gn)/ i._bw;
             }
         });
+
+        console.log("ccip linear" + ccip);
     
         // ccip is now the current interferer power summed for all
         // interferers including any noise interferers.
@@ -711,7 +714,9 @@ function Signal(sig, name = "", opts = null) {
             }
         }
         
-        return new_sinr;
+        result.push(ccip);
+        result.push(new_sinr);
+        return result;
 
     };
 
@@ -849,12 +854,14 @@ function Signal(sig, name = "", opts = null) {
         // console.log("Resulting center N values : " + centerValues);
 
         // power due to adjacent channel interference caused due to nonlinear distortion of the RF front-end 
-        let p_int = freq_arr.filter(val => val >= 0).reduce((acc, val) => acc + val, 0);
-        let p_adj = sum_ip / 10 ** (2 * obj.iip3Point / 10);
-        new_sinr = obj._gn - 10 * Math.log10(p_adj + p_int);
-        // console.log(obj.name + " Sum IP: " + sum_ip + ", p_adj: " + p_adj + ", p_int: " + p_int + ", New SINR : " + new_sinr);
-        // if (sum_ip < 0) 
-        //     console.log("Final arr: " + interference_arr);
+        // let p_int = freq_arr.filter(val => val >= 0).reduce((acc, val) => acc + val, 0);
+        let p_adj = sum_ip / 10 ** (obj.iip3Point / 10);
+        let sig_ccip = obj.calculateSINR(null, false)[0];
+        new_sinr = obj._gn - 10 * Math.log10(p_adj + sig_ccip);
+
+        console.log(obj.name + " Sum IP: " + sum_ip + ", p_adj: " + p_adj + ", p_int: " + sig_ccip + ", New SINR : " + new_sinr);
+        if (sum_ip < 0) 
+            console.log("Final arr: " + interference_arr);
 
         if (setSINR) {
 
@@ -883,7 +890,7 @@ function Signal(sig, name = "", opts = null) {
     obj.calculateReceiverPerformance = function() {
         
         let idealSinr = (obj.bandwidthMultiplier != 1 || obj.nonlinearModel) ? 
-            obj.calculateSINR(1, false) : obj._sinr;
+            obj.calculateSINR(1, false)[1] : obj._sinr;
         
         let idealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, idealSinr/10.));
         let nonIdealCapacity = obj._bw * Math.log2(1 + Math.pow(10.0, obj._sinr/10.));

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Antenna Pattern Visualization</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.16.4/math.min.js"></script>
+
+</head>
+
+<body>
+    <h1>Antenna Pattern Visualization</h1>
+
+    <div id="plot"></div>
+
+    <!-- Create canvas elements for the two patterns -->
+    <canvas id="canvas-v" width="500" height="500"></canvas>
+    <canvas id="canvas-h" width="500" height="500"></canvas>
+
+    <script>
+        let thetaresolution = 10;
+        let phiresolution = 10;
+        let fvert = [];
+        let fhoriz = [];
+
+        function halfwave(thetares, phires) {
+            if (90 % thetares !== 0) {
+                console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // vertical polarization
+            let fh = fv.slice(); // horizontal polarization
+
+            for (let k = 0; k < thetadim; k++) {
+                let theta = (Math.PI * thetares * k) / 180;
+                for (let m = 0; m < phidim; m++) {
+                    let phi = (Math.PI * phires * m) / 180;
+                    if (k === 0 || k === thetadim - 1) {
+                        fv[k][m] = 0;
+                    } else {
+                        fv[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
+                    }
+                }
+            }
+
+            fvert = fv;
+            fhoriz = fh;
+
+        }
+
+        halfwave(thetaresolution, phiresolution);
+
+        function threepat() {
+            console.log(fvert);
+            console.log(fhoriz);
+            let s = fvert.length;
+            if (s !== fhoriz.length) {
+                console.log('Error! Different size vert. and horiz. pattern files.');
+                return;
+            }
+
+            let thetadim = s[0];
+            let phidim = s[1];
+            let thetares = 180 / (thetadim - 1);
+            let phires = 360 / (phidim - 1);
+
+            let xv = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+            let yv = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+            let zv = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+            let xh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+            let yh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+            let zh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
+
+            for (let k = 0; k < thetadim; k++) {
+                let theta = k * thetares * Math.PI / 180;
+                for (let m = 0; m < phidim; m++) {
+                    let phi = m * phires * Math.PI / 180;
+                    let rv = Math.abs(fvert[k][m]);
+                    xv[k][m] = rv * Math.sin(theta) * Math.cos(phi);
+                    yv[k][m] = rv * Math.sin(theta) * Math.sin(phi);
+                    zv[k][m] = rv * Math.cos(theta);
+                    let rh = Math.abs(fhoriz[k][m]);
+                    xh[k][m] = rh * Math.sin(theta) * Math.cos(phi);
+                    yh[k][m] = rh * Math.sin(theta) * Math.sin(phi);
+                    zh[k][m] = rh * Math.cos(theta);
+                }
+            }
+
+            // determine the maximum coordinate value
+            var maxcoordv = Math.max(
+                Math.max(
+                    Math.max.apply(null, xv.map(x => Math.max.apply(null, x))),
+                    Math.max.apply(null, yv.map(x => Math.max.apply(null, x)))
+                ),
+                Math.max.apply(null, zv.map(x => Math.max.apply(null, x)))
+            );
+            var maxcoordh = Math.max(
+                Math.max(
+                    Math.max.apply(null, xh.map(x => Math.max.apply(null, x))),
+                    Math.max.apply(null, yh.map(x => Math.max.apply(null, x)))
+                ),
+                Math.max.apply(null, zh.map(x => Math.max.apply(null, x)))
+            );
+            var mc = Math.ceil(Math.max(maxcoordv, maxcoordh) * 2) / 2;
+
+            plotSurface(xv, yv, zv, fvert, "Vertical Polarization Pattern");
+
+            // set the axis limits
+            let axisLimits = [-mc, mc, -mc, mc, -mc, mc];
+            plotSurface(xh, yh, zh, fhoriz, "Horizontal Polarization Pattern", axisLimits);
+        }
+
+        // plot a surface
+        function plotSurface(x, y, z, f, title, axisLimits) {
+            let trace = {
+                x: x.map(row => [...row]),
+                y: y.map(row => [...row]),
+                z: z.map(row => [...row]),
+                surfacecolor: f.map(row => [...row]),
+                type: 'surface'
+            };
+
+            let layout = {
+                title: title,
+                scene: {
+                    xaxis: { title: 'x' },
+                    yaxis: { title: 'y' },
+                    zaxis: { title: 'z' }
+                }
+            };
+
+            if (axisLimits) {
+                layout.scene.xaxis.range = [axisLimits[0], axisLimits[1]];
+                layout.scene.yaxis.range = [axisLimits[2], axisLimits[3]];
+                layout.scene.zaxis.range = [axisLimits[4], axisLimits[5]];
+            }
+
+            Plotly.newPlot(document.getElementById('plot'), [trace], layout);
+        }
+
+        // Call the threepat function 
+        threepat();
+
+        // Define a function to render the pattern surface to a canvas element
+        function renderToCanvas(canvas, surface) {
+            // Get the canvas context and clear the canvas
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Define some parameters for the rendering
+            var alpha = 1.0;  // opacity of the surface
+            var hueStart = 0.6;  // starting hue for color map (blue-green)
+            var hueEnd = 0.2;  // ending hue for color map (red-orange)
+            var saturation = 1.0;  // saturation of the color map
+            var lightness = 0.5;  // lightness of the color map
+
+            // Define a function to map a value to a color in HSL space
+            function valueToColor(value, max) {
+                // Normalize the value to the range [0, 1]
+                var normValue = value / max;
+
+                // Map the value to a hue in the range [hueEnd, hueStart]
+                var hue = hueEnd + normValue * (hueStart - hueEnd);
+
+                // Convert the HSL color to RGB
+                var rgb = hslToRgb(hue, saturation, lightness);
+
+                // Set the alpha value and return the color string
+                return 'rgba(' + rgb.join(',') + ',' + alpha + ')';
+            }
+
+            // Iterate over each vertex in the surface and render it as a polygon
+            for (var i = 0; i < surface.vertices.length; i++) {
+                // Get the vertex and its associated value
+                var vertex = surface.vertices[i];
+                var value = surface.values[i];
+
+                // Map the value to a color
+                var color = valueToColor(value, surface.maxValue);
+
+                // Begin a new path at the vertex and render a polygon with its neighbors
+                ctx.beginPath();
+                ctx.moveTo(vertex.x, vertex.y);
+                for (var j = 0; j < vertex.neighbors.length; j++) {
+                    var neighbor = vertex.neighbors[j];
+                    ctx.lineTo(neighbor.x, neighbor.y);
+                }
+
+                // Close the polygon and fill it with the mapped color
+                ctx.closePath();
+                ctx.fillStyle = color;
+                ctx.fill();
+            }
+        }
+
+        function getSurfaceData(patternName) {
+            // Replace this with your own code to fetch the pattern data based on the pattern name
+            var surface = {
+                vertices: [],  // array of vertex objects with x, y, and neighbors properties
+                values: [],    // array of values associated with each vertex
+                maxValue: 0    // maximum value in the values array
+            };
+            return surface;
+        }
+
+
+        // Get the pattern surfaces and render them to the canvases
+        var surfaceV = getSurfaceData('Vertical Polarization Pattern');
+        renderToCanvas(document.getElementById('canvas-v'), surfaceV);
+
+        // var surfaceH = getSurfaceData('Horizontal Polarization Pattern');
+        // renderToCanvas(document.getElementById('canvas-h'), surfaceH);
+    </script>
+</body>
+
+</html>
