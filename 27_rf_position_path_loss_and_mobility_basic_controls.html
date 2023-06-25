@@ -34,6 +34,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <script src=slidersMultiSignals.js></script>
   <!-- <script src=powerSpectrumPlot.js></script> -->
   <script type='text/javascript' src='./x3dom/x3dom.js'></script>
+  <script src=powerSpectrumPlot_2D.js></script>
+  <script src=powerSpectrumPlot_3D.js></script>
   <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
   <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
   <script src=spectralEfficiencyPlot_BarChart.js></script>
@@ -293,10 +295,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
-
-        <p>
-          <input type="range" id=freq2 />
-        </p>
         <p>
           <input type="range" id=bw2 style="display: none;" />
         </p>
@@ -592,6 +590,19 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
         </div>
       </div>
+
+      <div style="display:inline-flex;">
+        <span style="font-size: 24px; margin-right: 8px;">3D</span>
+        <label class="switch">
+          <input id="psd_3d_checkbox" type="checkbox" onclick="power_spectral_density_3d_checkbox_change();">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="grid-item">
+        <div id="psd_svg_figure_parent" style="float: left; margin-left: 1%;"></div>
+      </div>
+
     </div>
 
   </div>
@@ -611,17 +622,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     freq_init: 1785.0e6
   });
 
-  // Transmitter (Red signal)
-  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    bw_max: 38.0e6, // Hz
-    bw_min: 4.0e6,  // Hz
-    bw_init: 4.0e6, // Hz
-    gn_init: -10, // dB
-    gn_min: -40, // dB
-    mcs_init: 6, // array index int
-    freq_init: 1795.0e6
-  });
-
   let distance_tx_rx = 0;
 
   // sig1['name'] = "comm_link_1";
@@ -629,18 +629,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   // sig3['name'] = "comm_link_3";
   // sig4['name'] = "comm_link_4";
 
-  var signalList = [sig1, sig2];
+  var signalList = [sig1];
   var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
 
   Slider(sig1, 'freq', '#freq1');
   Slider(sig1, 'bw', '#bw1');
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
-
-  Slider(sig2, 'freq', '#freq2');
-  Slider(sig2, 'bw', '#bw2');
-  Slider(sig2, 'gn', '#gn2');
-  Slider(sig2, 'mcs', '#mcs2');
 
   var receiverPos = new Position(0, 0, 0);
   var translatorPos = new Position(0, 0, 0);
@@ -736,7 +731,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
         sig1.nonlinearModel = true;
-        sig2.nonlinearModel = true;
       
       });
     } else {
@@ -744,12 +738,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         element.style.display = "none";
       });
       sig1.nonlinearModel = false;
-      sig2.nonlinearModel = false;
       
 
-      sig1.iip3Point = null;
-      sig2.iip3Point = null;
-     
+      sig1.iip3Point = null;     
     }
 
   }
@@ -761,20 +752,16 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     if (selection == '') {
       sig1.bandwidthMultiplier = 1;
-      sig2.bandwidthMultiplier = 1;
     
       sig1.nonlinearModel = false;
-      sig2.nonlinearModel = false;
     
       sig1.iip3Point = null;
-      sig2.iip3Point = null;
      
     }
 
     // ideal receiver filter with wider bandwidth than the received signal
     if (selection == 'a0') {
       sig1.bandwidthMultiplier = 1;
-      sig2.bandwidthMultiplier = 1;
    
     }
 
@@ -785,7 +772,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         let bw_m = Number(bwMultiplier);
 
         sig1.bandwidthMultiplier = bw_m;
-        sig2.bandwidthMultiplier = bw_m;
        
       } else {
         return;
@@ -804,7 +790,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
 
         sig1.bandwidthMultiplier = Number(bwMultiplier1);
-        sig2.bandwidthMultiplier = Number(bwMultiplier2);
      
       } else {
         return;
@@ -822,7 +807,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         iip3_3.length > 0 && iip3_4.length > 0) {
 
         sig1.iip3Point = Number(iip3_1);
-        sig2.iip3Point = Number(iip3_2);
        
       } else {
         return;
@@ -833,13 +817,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     // occupying the enter frequency range
     if (selection == 'a5') {
       sig1.bandwidthMultiplier = -Infinity;
-      sig2.bandwidthMultiplier = -Infinity;
     
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)
     sig1.triggerCallbacks();
-    sig2.triggerCallbacks();
    
 
   }
@@ -858,8 +840,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1", "Link 2"]);
-  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Average Total"]);
+  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1"]);
+  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1"]);
 
   var currentGizmoRotation = new x3dom.fields.SFMatrix4f();
   var currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
@@ -986,8 +968,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let pattern = document.getElementById("antenna_pattern").value;
     let theta = document.getElementById("theta").value;
     let phi = document.getElementById("phi").value;
-    calculatePathLoss(sig1, sig2, theta, phi, distance_tx_rx, pattern);
-      
+    calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
   }
 
 
@@ -1042,6 +1023,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   }
+  PowerSpectrumPlot_2D();
 </script>
 
 </html>

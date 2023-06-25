@@ -123,9 +123,9 @@ const Position = class {
 // distance: the distance from the receiver antenna to the transmitter
 // fvert(theta,phi) and fhoriz(theta,phi): the complex antenna pattern values at the given spherical coordinates
 // pattern: selected antenna pattern string
-function calculatePathLoss(receiverSig, transmitterSig, theta, phi, distance, pattern) {
+function calculatePathLoss(sig, theta, phi, distance, pattern) {
     // compute wavelength in meters
-    let lambda = 299.792458e6 / (receiverSig["_freq"]);
+    let lambda = 299.792458e6 / (sig["_freq"]);
 
     // convert the normalized antenna pattern values in fvert and fhoriz to dB
     // uncomment these lines when transmitter antenna angle will be controllable
@@ -141,9 +141,9 @@ function calculatePathLoss(receiverSig, transmitterSig, theta, phi, distance, pa
     let fhoriz_tx_dB = -300;
 
     // effective isotropic radiated power at antenna of the transmitter
-    let eirp_vert_dB = transmitterSig._gn + fvert_tx_dB;
-    let eirp_horiz_dB = transmitterSig._gn + fhoriz_tx_dB;
-    console.log("Transmitter gain: " + transmitterSig._gn);
+    let eirp_vert_dB = sig._gn + fvert_tx_dB;
+    let eirp_horiz_dB = sig._gn + fhoriz_tx_dB;
+    console.log("Transmitter gain: " + sig._gn);
     console.log("eirp vert dB: " + eirp_vert_dB);
     console.log("eirp horiz dB: " + eirp_horiz_dB);
     
