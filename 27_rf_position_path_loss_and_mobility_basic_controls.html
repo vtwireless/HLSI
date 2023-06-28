@@ -296,6 +296,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
         </div>
         <p>
+          <input type="range" id=gn2 />
+        </p>
+        <div type = "text"
+        id="slider_1_parent"
+        ></div>
+
+        <!-- <p>
           <input type="range" id=bw2 style="display: none;" />
         </p>
         <p>
@@ -303,7 +310,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </p>
         <p>
           <input type="range" id=mcs2 style="display: none;" />
-        </p>
+        </p> -->
       </div>
     </div>
 
@@ -636,6 +643,18 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   Slider(sig1, 'bw', '#bw1');
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
+  Slider(noise,'gn', '#gn2');
+
+  Label(
+      sig1,
+      "sinr",
+      {
+        prefix: "Signal-to-Noise Ratio: SNR = ",
+      },
+      "slider_1_parent"
+    );
+
+
 
   var receiverPos = new Position(0, 0, 0);
   var translatorPos = new Position(0, 0, 0);
@@ -672,6 +691,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("gn1").style.display = "none";
       document.getElementById("mcs1").style.display = "none";
 
+      document.getElementById("gn2").style.display = "initial";
+      document.getElementById("slider_1_parent").style.display = "inline";
+
       Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
         element.style.display = "none";
       });
@@ -691,6 +713,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("bw1").style.display = "initial";
       document.getElementById("gn1").style.display = "initial";
       document.getElementById("mcs1").style.display = "initial";
+      document.getElementById("gn2").style.display = "initial";
 
     }
 
