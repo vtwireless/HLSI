@@ -192,7 +192,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     <div
       style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">
-      <span style="color: #ddd;">Exercise 27</span> In Progress - RFFE Spectrum Sharing -- Position, Path Loss, and Mobility -- Basic
+      <span style="color: #ddd;">Exercise 27</span> In Progress - RFFE Spectrum Sharing -- Position, Path Loss, and
+      Mobility -- Basic
       Controls
     </div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
@@ -207,7 +208,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
     <!-- <p id=hoppingInterferer>
     </p> -->
-    
+
     <p id=capacityBanner style="display: none;">
     </p>
 
@@ -280,27 +281,25 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <input type="range" id=mcs1 style="display: none;" />
         </p>
       </div>
-      
+
 
       <div style="width: 25%;">
-        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+        <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
           <div style="font-size: 110%; color: #b5ebff; display: inline-block;">Link 2</div>
           <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
           <input style="width: 3.5rem;" id="multiplier2" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-        </div>
-        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        </div> -->
+        <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
           <label for="strategy">IIP3</label> &nbsp;
           <input style="width: 3.5rem;" id="iip3_2" type="text" value="0"
             oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-        </div>
-        <p>
+        </div> -->
+        <!-- <p>
           <input type="range" id=gn2 />
-        </p>
-        <div type = "text"
-        id="slider_1_parent"
-        ></div>
+        </p> -->
+        <div type="text" id="sinr_div"></div>
         <!-- <p>
           <input type="range" id=bw2 style="display: none;" />
         </p>
@@ -314,33 +313,33 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     </div>
 
     <div style="width: 25%;">
-      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+      <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
         <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
         <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
         <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-      </div>
-      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+      </div> -->
+      <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="strategy">IIP3</label> &nbsp;
         <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
           oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-      </div>
+      </div> -->
     </div>
 
     <div style="width: 25%;">
-      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+      <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
         <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
         <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
         <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-      </div>
-      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+      </div> -->
+      <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="strategy">IIP3</label> &nbsp;
         <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
           oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -377,28 +376,28 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <input style="width: 3.5rem; height: 1.2rem;" id="phi" type="text" value="20"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        
-        <input id="apply" type="button" value="Apply" onclick="updatePathLoss()">  &nbsp; &nbsp;
+
+        <input id="apply" type="button" value="Apply" onclick="updatePathLoss()"> &nbsp; &nbsp;
       </p>
     </div>
     <div>
       <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
         <label for="path_loss">Path Loss (dB) : </label> &nbsp;
-          <label id="path_loss" for="path_loss"></label>
-         &nbsp; &nbsp; &nbsp;
-       <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
-          <label id="power_rx_db" for="power_rx_db"></label>
+        <label id="path_loss" for="path_loss"></label>
+        &nbsp; &nbsp; &nbsp;
+        <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
+        <label id="power_rx_db" for="power_rx_db"></label>
         &nbsp; &nbsp; &nbsp;
         <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
-          <label id="rec_trans_dist" for="rec_trans_dist"></label>
+        <label id="rec_trans_dist" for="rec_trans_dist"></label>
         &nbsp; &nbsp; &nbsp;
-  
+
         <label for="rec_trans_dist_label">Rotation Angle (degrees) : </label> &nbsp;
-          <label id="angleX" for="angleX"></label> &nbsp;
-          <label id="angleY" for="angleY"></label> &nbsp;
-          <label id="angleZ" for="angleZ"></label> &nbsp;
-          <label id="thetaAngle" for="theta"></label> &nbsp;
-          <label id="phiAngle" for="phi"></label> &nbsp;
+        <label id="angleX" for="angleX"></label> &nbsp;
+        <label id="angleY" for="angleY"></label> &nbsp;
+        <label id="angleZ" for="angleZ"></label> &nbsp;
+        <label id="thetaAngle" for="theta"></label> &nbsp;
+        <label id="phiAngle" for="phi"></label> &nbsp;
       </div>
     </div>
   </div>
@@ -643,19 +642,25 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
 
-  Slider(noise,'gn', '#gn2');
+  //Slider(noise, 'gn', '#gn2');
 
-Label(
+  Label(
     sig1,
     "sinr",
     {
       prefix: "Signal-to-Noise Ratio: SNR = ",
     },
-    "slider_1_parent"
+    "sinr_div"
   );
+
 
   var receiverPos = new Position(0, 0, 0);
   var translatorPos = new Position(0, 0, 0);
+  //setting default values of receiver power
+  //overriding SNR and distance(tx and rx)
+  getCoordinatesFromX3D("receiver");
+  calcDistance(receiverPos, new Position(0, 0, 0));
+  updatePathLoss();
 
   // HoppingInterferer(interferer, '#hoppingInterferer');
   CapacityBanner(sig1, '#capacityBanner');
@@ -688,8 +693,8 @@ Label(
       document.getElementById("bw1").style.display = "none";
       document.getElementById("gn1").style.display = "none";
       document.getElementById("mcs1").style.display = "none";
-      document.getElementById("gn2").style.display = "initial";
-      document.getElementById("slider_1_parent").style.display = "inline";
+      //document.getElementById("gn2").style.display = "initial";
+      document.getElementById("sinr_div").style.display = "inline";
 
       Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
         element.style.display = "none";
@@ -710,7 +715,7 @@ Label(
       document.getElementById("bw1").style.display = "initial";
       document.getElementById("gn1").style.display = "initial";
       document.getElementById("mcs1").style.display = "initial";
-      document.getElementById("gn2").style.display = "initial";
+      //document.getElementById("gn2").style.display = "initial";
 
     }
 
@@ -743,16 +748,16 @@ Label(
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
         sig1.nonlinearModel = true;
-      
+
       });
     } else {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "none";
       });
       sig1.nonlinearModel = false;
-      
 
-      sig1.iip3Point = null;     
+
+      sig1.iip3Point = null;
     }
 
   }
@@ -764,17 +769,17 @@ Label(
 
     if (selection == '') {
       sig1.bandwidthMultiplier = 1;
-    
+
       sig1.nonlinearModel = false;
-    
+
       sig1.iip3Point = null;
-     
+
     }
 
     // ideal receiver filter with wider bandwidth than the received signal
     if (selection == 'a0') {
       sig1.bandwidthMultiplier = 1;
-   
+
     }
 
     // ideal receiver filter with equal bandwidth multiplier for all signals
@@ -784,7 +789,7 @@ Label(
         let bw_m = Number(bwMultiplier);
 
         sig1.bandwidthMultiplier = bw_m;
-       
+
       } else {
         return;
       }
@@ -793,16 +798,22 @@ Label(
     // ideal receiver filter with unequal bandwidth multipliers 
     if (selection == 'a2' || selection == 'a4') {
       let bwMultiplier1 = document.getElementById("multiplier1").value;
-      let bwMultiplier2 = document.getElementById("multiplier2").value;
-      let bwMultiplier3 = document.getElementById("multiplier3").value;
-      let bwMultiplier4 = document.getElementById("multiplier4").value;
+      // let bwMultiplier2 = document.getElementById("multiplier2").value;
+      // let bwMultiplier3 = document.getElementById("multiplier3").value;
+      // let bwMultiplier4 = document.getElementById("multiplier4").value;
 
-      if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
-        bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
-        bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+      // if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
+      //   bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
+      //   bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+
+      //   sig1.bandwidthMultiplier = Number(bwMultiplier1);
+
+      // }
+      if (bwMultiplier1 &&
+        bwMultiplier1.length > 0) {
 
         sig1.bandwidthMultiplier = Number(bwMultiplier1);
-     
+
       } else {
         return;
       }
@@ -811,15 +822,20 @@ Label(
     // nonlinear frontend receiver filter 
     if (selection == 'a4' || selection == 'a5') {
       let iip3_1 = document.getElementById("iip3_1").value;
-      let iip3_2 = document.getElementById("iip3_2").value;
-    
+      //let iip3_2 = document.getElementById("iip3_2").value;
 
-      if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
-        iip3_1.length > 0 && iip3_2.length > 0 &&
-        iip3_3.length > 0 && iip3_4.length > 0) {
+
+      // if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
+      //   iip3_1.length > 0 && iip3_2.length > 0 &&
+      //   iip3_3.length > 0 && iip3_4.length > 0) {
+
+      //   sig1.iip3Point = Number(iip3_1);
+
+      // }
+      if (iip3_1 && iip3_1.length > 0) {
 
         sig1.iip3Point = Number(iip3_1);
-       
+
       } else {
         return;
       }
@@ -829,12 +845,28 @@ Label(
     // occupying the enter frequency range
     if (selection == 'a5') {
       sig1.bandwidthMultiplier = -Infinity;
-    
+
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)
     sig1.triggerCallbacks();
-   
+    //sinr value is changed where the formula is re-evaluated based on receiver 
+    //distance instead of sig gain
+    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    if (sig1.nonlinearModel == false) {
+      let t_ccip = sig1.calculateSINR(null, false)[0];
+      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
+    else {
+      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
+
 
   }
 
@@ -980,6 +1012,15 @@ Label(
     let theta = document.getElementById("theta").value;
     let phi = document.getElementById("phi").value;
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
+
+    //sinr value is changed where the formula is re-evaluated based on receiver 
+    //distance instead of sig gain
+    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    let t_ccip = sig1.calculateSINR(null, false)[0];
+    sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
+    sig1._callbacks.sinr.forEach(function (callback) {
+      callback(sig1, sig1._sinr);
+    });
   }
 
 
