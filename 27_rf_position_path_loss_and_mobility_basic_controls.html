@@ -312,35 +312,35 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       </div>
     </div>
 
-    <div style="width: 25%;">
-      <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+    <!-- <div style="width: 25%;"> -->
+    <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
         <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
         <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
         <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
       </div> -->
-      <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+    <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="strategy">IIP3</label> &nbsp;
         <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
           oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div> -->
-    </div>
+    <!-- </div> -->
 
-    <div style="width: 25%;">
-      <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+    <!-- <div style="width: 25%;"> -->
+    <!-- <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
         <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
         <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
         <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
           .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
       </div> -->
-      <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+    <!-- <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
         <label for="strategy">IIP3</label> &nbsp;
         <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
           oninput="this.value = this.value
           .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
       </div> -->
-    </div>
+    <!-- </div> -->
   </div>
 
   <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
@@ -852,22 +852,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     sig1.triggerCallbacks();
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
-    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
-    if (sig1.nonlinearModel == false) {
-      let t_ccip = sig1.calculateSINR(null, false)[0];
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
-      });
-    }
-    else {
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
-      });
-    }
-
-
+    CalculateSINR_BasedOn_ReceivedPower();
   }
 
   window.addEventListener('load', (event) => {
@@ -1015,12 +1000,24 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
+    CalculateSINR_BasedOn_ReceivedPower();
+  }
+
+  function CalculateSINR_BasedOn_ReceivedPower() {
     let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
-    let t_ccip = sig1.calculateSINR(null, false)[0];
-    sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
-    sig1._callbacks.sinr.forEach(function (callback) {
-      callback(sig1, sig1._sinr);
-    });
+    if (sig1.nonlinearModel == false) {
+      let t_ccip = sig1.calculateSINR(null, false)[0];
+      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
+    else {
+      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
   }
 
 
