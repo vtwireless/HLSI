@@ -699,6 +699,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
 
+  //function calculate SINR as freq slider moved
+  let slider_params = ['freq', 'bw', 'gn', 'mcs'];
+  slider_params.forEach(param => {
+    sig1._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
+    CalculateSINR_BasedOn_ReceivedPower(sig1, sig1['_' + param]);
+  })
   //Slider(noise, 'gn', '#gn2');
 
   Label(
