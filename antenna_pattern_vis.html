@@ -21,8 +21,8 @@
     <canvas id="canvas-h" width="500" height="500"></canvas>
 
     <script>
-        let thetaresolution = 10;
-        let phiresolution = 10;
+        let thetaresolution = 1;
+        let phiresolution = 1;
         let fvert = [];
         let fhoriz = [];
 
@@ -47,7 +47,7 @@
                     if (k === 0 || k === thetadim - 1) {
                         fv[k][m] = 0;
                     } else {
-                        fv[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
+                        fv[k][m] = 1.64 * Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
                     }
                 }
             }
@@ -56,8 +56,73 @@
             fhoriz = fh;
 
         }
+        // directional, vertically polarized antenna with specified horizontal and vertical beamwidth and sidelobe level
+        // Generates the pattern for a vertically polarized directional antenna with a flat main beam and uniform side lobe level.
+        function dirantv(thetares, phires, azbw, elbw, SLL) {
+            let patterns = [];
+            if (SLL > 0) {
+                console.log("Error! SLL must be <= 0.");
+                return;
+            }
+            if (90 / thetares !== Math.round(90 / thetares)) {
+                console.log("Error! theta resolution must divide evenly into 90 degrees.");
+                return;
+            }
+            const thetadim = 180 / thetares + 1;
+            const phidim = 360 / phires + 1;
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // vertical polarization
+            let fh = fv.slice(); // horizontal polarization
+            for (let k = 1; k <= thetadim; k++) {
+                const theta = Math.PI * thetares * (k - 1) / 180;
+                for (let m = 1; m <= phidim; m++) {
+                    const phi = Math.PI * phires * (m - 1) / 180;
+                    if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 1800 > Math.PI * (elbw / 2) / 180) {
+                        if (SLL !== -999) {
+                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
+                        }
+                    } else if (phi - Math.PI * phires / 1800 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
+                        if (SLL !== -999) {
+                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
+                        }
+                    } else {
+                        fv[k - 1][m - 1] = 1;
+                    }
+                }
+            }
+            fvert = fv;
+            fhoriz = fh;
+        }
+        // vertically oriented small dipole antenna
+        function sloop(thetares, phires) {
 
-        halfwave(thetaresolution, phiresolution);
+            if (90 / thetares !== Math.round(90 / thetares)) {
+                console.log('Error!  theta resolution must divide evenly into 90 degrees.');
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // vertical polarization
+            let fh = fv.slice(); // horizontal polarization
+
+
+            for (let k = 1; k <= thetadim; k++) {
+                let theta = Math.PI * thetares * (k - 1) / 180;
+                for (let m = 1; m <= phidim; m++) {
+                    let phi = Math.PI * phires * (m - 1) / 180;
+                    fv[k - 1][m - 1] = 1.5 * Math.sin(theta);
+                }
+            }
+            fvert = fv;
+            fhoriz = fh;
+        }
+        //halfwave(thetaresolution, phiresolution);
+        //dirantv(thetaresolution, phiresolution, 20, 20, -1.5)
+        sloop(thetaresolution, phiresolution);
 
         function threepat() {
             console.log(fvert);
@@ -68,8 +133,8 @@
                 return;
             }
 
-            let thetadim = s[0];
-            let phidim = s[1];
+            let thetadim = s;
+            let phidim = s;
             let thetares = 180 / (thetadim - 1);
             let phires = 360 / (phidim - 1);
 
