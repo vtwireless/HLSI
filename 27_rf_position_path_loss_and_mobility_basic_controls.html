@@ -413,24 +413,76 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <!-- Transmitter and Antenna -->
         <transform id="transmitterTranslation">
 
-          <transform DEF='ant_1' translation='0 -2 0' scale='1 0.5 1'>
+          <transform DEF='ant_1' translation='0 -2.5 0'>
             <shape>
               <Appearance>
                 <Material diffuseColor="0 0.6902 0.9412" />
               </Appearance>
-              <cylinder bottomradius='5' height='8'></cylinder>
+              <cylinder radius='0.25' height='5'></cylinder>
             </shape>
             <viewpoint></viewpoint>
           </transform>
 
           <matrixTransform id="transmitterRotation">
-            <transform translation='0 3 0' scale='0.4 0.4 0.4'>
+
+            <transform translation='0 1.25 0' rotation="1 0 0 3.1415">
+
+          <switch id="receiver-geometry" whichchoice="0">
+                
+            <transform> 
               <shape>
                 <Appearance>
                   <Material diffuseColor="0 0.6902 0.9412" />
                 </Appearance>
-                <Cone bottomradius='5' height='8' />
+                <Cylinder radius='1.5' height='3' />
               </shape>
+              <inline url='vert_iso_pat.x3d'/>
+            </transform>
+
+            <transform> 
+              <shape>
+                <Appearance>
+                  <Material diffuseColor="0 1 0" />
+                </Appearance>
+                <Cone bottomradius='1.5' height='3' />
+              </shape>
+              <inline url='horiz_iso_pat.x3d'/>
+            </transform>
+
+            <transform> 
+              <shape>
+                <Appearance>
+                  <Material diffuseColor="0 0 1" />
+                </Appearance>
+                <Cone bottomradius='1.5' height='3' />
+              </shape>
+              <inline url='halfwave_pat.x3d'/>
+            </transform>
+
+            <transform> 
+              <shape>
+                <Appearance>
+                  <Material diffuseColor="0 0 1" />
+                </Appearance>
+                <Cone bottomradius='1.5' height='3' />
+              </shape>
+              <inline url='small_dip_pat.x3d'/>
+            </transform>
+
+
+            <transform> 
+              <shape>
+                <Appearance>
+                  <Material diffuseColor="0 0 1" />
+                </Appearance>
+                <Cone bottomradius='1.5' height='3' />
+              </shape>
+              <inline url='directional_pat.x3d'/>
+            </transform>
+
+
+            </switch>
+
               <shape>
                 <appearance>
                   <material diffuseColor='1 0 0'></material>
@@ -438,6 +490,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                 </appearance>
                 <cylinder height='50' radius='0.1'></cylinder>
               </shape>
+
+
+
+
+
             </transform>
           </matrixTransform>
         </transform>
@@ -452,8 +509,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           </shape>
         </transform>
 
-
-        <transform id="receiver" translation='12 5 0' rotation='1 0 0 -1.57'>
+        <!--This is the transmitter, not the receiver-->
+        <transform id="receiver" translation='0 2 -12'> 
           <shape>
             <appearance>
               <material diffuseColor='1 0 0'></material>
