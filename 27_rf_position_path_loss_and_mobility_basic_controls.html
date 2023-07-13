@@ -1027,11 +1027,14 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
     document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
-    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
+    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
+
+    document.getElementById("theta").value = thetaPhi[0].toFixed(2);
+    document.getElementById("phi").value = thetaPhi[1].toFixed(2);
 
     // update path loss
-    // updatePathLoss();
+    updatePathLoss();
 
     //set matrix value in column major format, as required by the MatrixTransform node
     transmitterRotationNode.setFieldValue("matrix", transformMatrix.transpose());
@@ -1063,8 +1066,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   // Updates the Path Loss
   function updatePathLoss() {
     let pattern = document.getElementById("antenna_pattern").value;
-    let theta = document.getElementById("theta").value;
-    let phi = document.getElementById("phi").value;
+    let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
+    let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
