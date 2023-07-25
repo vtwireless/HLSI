@@ -1160,6 +1160,64 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
   PowerSpectrumPlot_2D();
+
+  const verticalCheckbox = document.getElementById("vertical");
+const horizontalCheckbox = document.getElementById("horizontal");
+
+verticalCheckbox.addEventListener("change", updateInlineUrls);
+horizontalCheckbox.addEventListener("change", updateInlineUrls);
+
+function updateInlineUrls() {
+  const isCheckedVertical = verticalCheckbox.checked;
+  const isCheckedHorizontal = horizontalCheckbox.checked;
+
+  const transformElements = document.querySelectorAll("transform.pattern-models");;
+
+  transformElements.forEach((transform) => {
+    const transformId = transform.getAttribute("id");
+    let inlineElement = transform.querySelector("inline");
+
+    if (isCheckedVertical && isCheckedHorizontal) {
+      if (inlineElement) {
+        transform.removeChild(inlineElement);
+      }
+      let inlineUrl = 'vertical_' + transformId + '.x3d';
+      createInlineElement(transform, inlineUrl);
+      inlineUrl = 'horizontal_' + transformId + '.x3d';
+      createInlineElement(transform, inlineUrl);
+      console.log(transform);
+      
+    } else if (isCheckedVertical) {
+      if (inlineElement) {
+        transform.removeChild(inlineElement);
+      }
+      const inlineUrl = 'vertical_' + transformId + '.x3d';
+      createInlineElement(transform, inlineUrl);
+      console.log(transform);
+    } else if (isCheckedHorizontal) {
+      if (inlineElement) {
+        transform.removeChild(inlineElement);
+        inlineElement = transform.querySelector("inline");
+      }
+      const inlineUrl = 'horizontal_' + transformId + '.x3d';
+      createInlineElement(transform, inlineUrl);
+      console.log(transform);
+    } else {
+      if (inlineElement) {
+        transform.removeChild(inlineElement);
+      }
+    }
+    console.log(transform);
+    console.log(inlineElement);
+  });
+}
+
+function createInlineElement(transform, url) {
+  const inlineElement = document.createElement("inline");
+  inlineElement.setAttribute("id", "inline-model");
+  inlineElement.setAttribute("url", url);
+  transform.appendChild(inlineElement);
+}
 </script>
 
 </html>
