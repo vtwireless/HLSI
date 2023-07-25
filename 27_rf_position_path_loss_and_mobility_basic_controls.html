@@ -368,6 +368,14 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </select>
       </p> &nbsp; &nbsp; &nbsp;
       <p>
+        <label for="polarization">
+          <input type="checkbox" id="vertical" name="gender" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal" name="gender" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+      <p>
         <label for="theta">Theta (0-180)</label> &nbsp; &nbsp;
         <input style="width: 3.5rem; height: 1.2rem;" id="theta" type="text" value="20"
           oninput="this.value = this.value
@@ -425,57 +433,57 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
             <transform translation='0 1.25 0' rotation="1 0 0 3.1415">
 
-              <switch id="receiver-geometry" whichchoice="3">
+              <switch id="receiver-geometry" whichchoice="0">
 
-                <transform>
+                <transform id="vert_iso_pat" class="pattern-models" rotation="0 0 1 1.5707">
                   <shape>
                     <Appearance>
                       <Material diffuseColor="0 0.6902 0.9412" />
                     </Appearance>
-                    <Cylinder radius='1.5' height='3' />
+                    <Cylinder radius='0.8' height='0.05' />
                   </shape>
-                  <inline url='vert_iso_pat.x3d' />
+                  <!-- <inline id="inline-model" url='vert_iso_pat.x3d'/> -->
                 </transform>
 
-                <transform>
+                <transform id="horiz_iso_pat" class="pattern-models">
                   <shape>
                     <Appearance>
-                      <Material diffuseColor="0 1 0" />
+                      <Material diffuseColor="0 0.6902 0.9412" />
                     </Appearance>
-                    <Cone bottomradius='1.5' height='3' />
+                    <Cylinder radius='0.8' height='0.05' />
                   </shape>
-                  <inline url='horiz_iso_pat.x3d' />
+                  <inline id="inline-model" url='horiz_iso_pat.x3d'/>
                 </transform>
 
-                <transform>
+                <transform id="halfwave_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='halfwave_pat.x3d'/>
+                </transform>
+
+                <transform id="small_dip_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='small_dip_pat.x3d'/>
+                </transform>
+
+
+                <transform id="directional_pat" class="pattern-models">
                   <shape>
                     <Appearance>
                       <Material diffuseColor="0 0 1" />
                     </Appearance>
                     <Cone bottomradius='1.5' height='3' />
                   </shape>
-                  <inline url='halfwave_pat.x3d' />
-                </transform>
-
-                <transform>
-                  <shape>
-                    <Appearance>
-                      <Material diffuseColor="0 0 1" />
-                    </Appearance>
-                    <Cone bottomradius='1.5' height='3' />
-                  </shape>
-                  <inline url='small_dip_pat.x3d' />
-                </transform>
-
-
-                <transform>
-                  <shape>
-                    <Appearance>
-                      <Material diffuseColor="0 0 1" />
-                    </Appearance>
-                    <Cone bottomradius='1.5' height='3' />
-                  </shape>
-                  <inline url='directional_pat.x3d' />
+                  <inline id="inline-model" url='directional_pat.x3d'/>
                 </transform>
 
 
@@ -1065,6 +1073,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   // Updates the Path Loss
   function updatePathLoss() {
+    const selectElement = document.getElementById("antenna_pattern");
+    const switchElement = document.getElementById("receiver-geometry");
+
+    selectElement.addEventListener("change", () => {
+      const selectedValue = selectElement.selectedIndex;
+      switchElement.setAttribute("whichchoice", selectedValue);
+    }); 
     let pattern = document.getElementById("antenna_pattern").value;
     let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
     let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
