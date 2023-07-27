@@ -21,8 +21,8 @@
     <canvas id="canvas-h" width="500" height="500"></canvas>
 
     <script>
-        let thetaresolution = 5;
-        let phiresolution = 5;
+        let thetaresolution = 2;
+        let phiresolution = 2;
         let fvert = [];
         let fhoriz = [];
 
@@ -41,6 +41,8 @@
             let fh = Array(thetadim)
                 .fill()
                 .map(() => Array(phidim).fill(0)); // horizontal polarization
+            
+            let maxGain = 0;
 
             for (let k = 0; k < thetadim; k++) {
                 let theta = (Math.PI * thetares * k) / 180;
@@ -51,8 +53,10 @@
                     } else {
                         fv[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
                     }
+                    maxGain += (fv[k][m]**2) * Math.sin(theta) * (thetares * Math.PI/180) * (phires * Math.PI/180);
                 }
             }
+            console.log(4 * Math.PI / maxGain);
 
             fvert = fv.map(subArray => subArray.map(number => number * 1.64));
             fhoriz = fh.map(subArray => subArray.map(number => number * 1.64));
@@ -78,7 +82,7 @@
                 .fill()
                 .map(() => Array(phidim).fill(0)); // horizontal polarization
             patterns.push(fh);
-            // console.log(fv);
+            console.log(fv);
             // console.log(fh);
             fvert = fv;
             fhoriz = fh;
@@ -151,6 +155,9 @@
             }
             fvert = fv;
             fhoriz = fh;
+
+            fvert = fv.map(subArray => subArray.map(number => number));
+            fhoriz = fh.map(subArray => subArray.map(number => number));
         }
 
         function short_dipole(thetares, phires) {
@@ -216,12 +223,17 @@
             fhoriz = fh;
         }
 
-        // halfwave(thetaresolution, phiresolution);
+        function maxGain(fvert, fhoriz) {
+            fvert = fvert/Math.max(fvert);
+            
+        }
+
+        halfwave(thetaresolution, phiresolution);
         // isovert(thetaresolution, phiresolution);
         // isohoriz(thetaresolution, phiresolution);
         // sloop(thetaresolution, phiresolution);
-        short_dipole(thetaresolution, phiresolution);
-        //dirantv(thetaresolution, phiresolution, 40, 70, -5.5);
+        // short_dipole(thetaresolution, phiresolution);
+        // dirantv(thetaresolution, phiresolution, 40, 70, -5.5);
 
         function threepat() {
             console.log(fvert);

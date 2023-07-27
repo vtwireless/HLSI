@@ -442,7 +442,63 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                     </Appearance>
                     <Cylinder radius='0.8' height='0.05' />
                   </shape>
-                  <!-- <inline id="inline-model" url='vert_iso_pat.x3d'/> -->
+                </transform>
+
+                <transform id="vert_iso_pat" class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
+
+                <transform id="vert_iso_pat" class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='vert_iso_pat.x3d'/>
+                </transform>
+
+                <transform id="vert_iso_pat" class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='vert_iso_pat.x3d'/>
+                </transform>
+
+                <transform id="horiz_iso_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
+
+                <transform id="horiz_iso_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='horiz_iso_pat.x3d'/>
+                </transform>
+
+                <transform id="horiz_iso_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
                 </transform>
 
                 <transform id="horiz_iso_pat" class="pattern-models">
@@ -462,7 +518,53 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                     </Appearance>
                     <cylinder radius='0.25' height='5'></cylinder>
                   </shape>
+                </transform>
+
+                <transform id="halfwave_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
                   <inline id="inline-model" url='halfwave_pat.x3d'/>
+                </transform>
+
+                <transform id="halfwave_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform id="halfwave_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='halfwave_pat.x3d'/>
+                </transform>
+
+                <transform id="small_dip_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform id="small_dip_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
                 </transform>
 
                 <transform id="small_dip_pat" class="pattern-models">
@@ -475,6 +577,44 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                   <inline id="inline-model" url='small_dip_pat.x3d'/>
                 </transform>
 
+                <transform id="small_dip_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='small_dip_pat.x3d'/>
+                </transform>
+
+
+                <transform id="directional_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </shape>
+                </transform>
+
+                <transform id="directional_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </shape>
+                </transform>
+
+                <transform id="directional_pat" class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </shape>
+                  <inline id="inline-model" url='directional_pat.x3d'/>
+                </transform>
 
                 <transform id="directional_pat" class="pattern-models">
                   <shape>
@@ -1073,13 +1213,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   // Updates the Path Loss
   function updatePathLoss() {
-    const selectElement = document.getElementById("antenna_pattern");
-    const switchElement = document.getElementById("receiver-geometry");
-
-    selectElement.addEventListener("change", () => {
-      const selectedValue = selectElement.selectedIndex;
-      switchElement.setAttribute("whichchoice", selectedValue);
-    }); 
     let pattern = document.getElementById("antenna_pattern").value;
     let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
     let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
@@ -1162,61 +1295,20 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   PowerSpectrumPlot_2D();
 
   const verticalCheckbox = document.getElementById("vertical");
-const horizontalCheckbox = document.getElementById("horizontal");
+  const horizontalCheckbox = document.getElementById("horizontal");
 
-verticalCheckbox.addEventListener("change", updateInlineUrls);
-horizontalCheckbox.addEventListener("change", updateInlineUrls);
+  document.getElementById("antenna_pattern").addEventListener("change", selectModel);
+  verticalCheckbox.addEventListener("change", selectModel);
+  horizontalCheckbox.addEventListener("change", selectModel);
 
-function updateInlineUrls() {
-  const isCheckedVertical = verticalCheckbox.checked;
-  const isCheckedHorizontal = horizontalCheckbox.checked;
+function selectModel() {
+  const selectedValue = document.getElementById("antenna_pattern").selectedIndex;
+  const isCheckedVertical = verticalCheckbox.checked ? 1 : 0;
+  const isCheckedHorizontal = horizontalCheckbox.checked ? 1 : 0;
+  const modelNumber = (selectedValue)*4 + 2*isCheckedVertical + isCheckedHorizontal;
+  console.log(modelNumber);
+  document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber);
 
-  const transformElements = document.querySelectorAll("transform.pattern-models");;
-
-  transformElements.forEach((transform) => {
-    const transformId = transform.getAttribute("id");
-    let inlineElement = transform.querySelector("inline");
-
-    if (isCheckedVertical && isCheckedHorizontal) {
-      if (inlineElement) {
-        transform.removeChild(inlineElement);
-      }
-      let inlineUrl = 'vertical_' + transformId + '.x3d';
-      createInlineElement(transform, inlineUrl);
-      inlineUrl = 'horizontal_' + transformId + '.x3d';
-      createInlineElement(transform, inlineUrl);
-      console.log(transform);
-      
-    } else if (isCheckedVertical) {
-      if (inlineElement) {
-        transform.removeChild(inlineElement);
-      }
-      const inlineUrl = 'vertical_' + transformId + '.x3d';
-      createInlineElement(transform, inlineUrl);
-      console.log(transform);
-    } else if (isCheckedHorizontal) {
-      if (inlineElement) {
-        transform.removeChild(inlineElement);
-        inlineElement = transform.querySelector("inline");
-      }
-      const inlineUrl = 'horizontal_' + transformId + '.x3d';
-      createInlineElement(transform, inlineUrl);
-      console.log(transform);
-    } else {
-      if (inlineElement) {
-        transform.removeChild(inlineElement);
-      }
-    }
-    console.log(transform);
-    console.log(inlineElement);
-  });
-}
-
-function createInlineElement(transform, url) {
-  const inlineElement = document.createElement("inline");
-  inlineElement.setAttribute("id", "inline-model");
-  inlineElement.setAttribute("url", url);
-  transform.appendChild(inlineElement);
 }
 </script>
 
