@@ -18,11 +18,11 @@
 
     <!-- Create canvas elements for the two patterns -->
     <canvas id="canvas-v" width="500" height="500"></canvas>
-    <canvas id="canvas-h" width="500" height="500"></canvas>
+    <canvas id="canvas-fhoriz_coordinate_set" width="500" height="500"></canvas>
 
     <script>
-        let thetaresolution = 2;
-        let phiresolution = 2;
+        let thetaresolution = 5;
+        let phiresolution = 5;
         let fvert = [];
         let fhoriz = [];
 
@@ -41,7 +41,7 @@
             let fh = Array(thetadim)
                 .fill()
                 .map(() => Array(phidim).fill(0)); // horizontal polarization
-            
+
             let maxGain = 0;
 
             for (let k = 0; k < thetadim; k++) {
@@ -53,7 +53,7 @@
                     } else {
                         fv[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
                     }
-                    maxGain += (fv[k][m]**2) * Math.sin(theta) * (thetares * Math.PI/180) * (phires * Math.PI/180);
+                    maxGain += (fv[k][m] ** 2) * Math.sin(theta) * (thetares * Math.PI / 180) * (phires * Math.PI / 180);
                 }
             }
             console.log(4 * Math.PI / maxGain);
@@ -188,7 +188,6 @@
 
             // console.log(fvert);
             // console.log(fhoriz);
-
             // Multiply normalized pattern by max gain
             fvert = fv.map(subArray => subArray.map(number => number * 3));
             fhoriz = fh.map(subArray => subArray.map(number => number * 3));
@@ -224,16 +223,16 @@
         }
 
         function maxGain(fvert, fhoriz) {
-            fvert = fvert/Math.max(fvert);
-            
+            fvert = fvert / Math.max(fvert);
+
         }
 
         halfwave(thetaresolution, phiresolution);
-        // isovert(thetaresolution, phiresolution);
+        //   isovert(thetaresolution, phiresolution);
         // isohoriz(thetaresolution, phiresolution);
         // sloop(thetaresolution, phiresolution);
         // short_dipole(thetaresolution, phiresolution);
-        // dirantv(thetaresolution, phiresolution, 40, 70, -5.5);
+        //dirantv(thetaresolution, phiresolution, 70, 70, -4);
 
         function threepat() {
             console.log(fvert);
@@ -256,9 +255,13 @@
             let yh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
             let zh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
 
-            let Vert_Coord = [];
-            let H = [];
+            let fvert_coordinate_set = [];
+            let fhoriz_coordinate_set = [];
 
+            let point_index = -1; //tracks the index of the pointset
+            let indexed_lineset = []; // IndexedLineSet indices are stored here
+
+            let prev_iter_fvert_val;
             for (let k = 0; k < thetadim; k++) {
                 let theta = k * thetares * Math.PI / 180;
                 for (let m = 0; m < phidim; m++) {
@@ -267,20 +270,34 @@
                     xv[k][m] = rv * Math.sin(theta) * Math.cos(phi);
                     yv[k][m] = rv * Math.sin(theta) * Math.sin(phi);
                     zv[k][m] = rv * Math.cos(theta);
-                    Vert_Coord.push(xv[k][m]);
-                    Vert_Coord.push(yv[k][m]);
-                    Vert_Coord.push(zv[k][m]);
+
+                    point_index = point_index + 1;
+                    //Finding the IndexedLineSet in the below code
+                    if ((rv == 1 && prev_iter_fvert_val != 1) 
+                    || (rv != 1 && prev_iter_fvert_val == 1)) 
+                    {
+                        indexed_lineset.push(point_index);
+                        indexed_lineset.push(point_index - 1);
+                        indexed_lineset.push(-1);
+                    }
+                    fvert_coordinate_set.push(xv[k][m]);
+                    fvert_coordinate_set.push(yv[k][m]);
+                    fvert_coordinate_set.push(zv[k][m]);
                     let rh = Math.abs(fhoriz[k][m]);
                     xh[k][m] = rh * Math.sin(theta) * Math.cos(phi);
                     yh[k][m] = rh * Math.sin(theta) * Math.sin(phi);
                     zh[k][m] = rh * Math.cos(theta);
-                    H.push(xh[k][m]);
-                    H.push(yh[k][m]);
-                    H.push(zh[k][m]);
+                    fhoriz_coordinate_set.push(xh[k][m]);
+                    fhoriz_coordinate_set.push(yh[k][m]);
+                    fhoriz_coordinate_set.push(zh[k][m]);
+                    prev_iter_fvert_val = rv;
                 }
             }
-            console.log(Vert_Coord);
-            //console.log(H);
+            console.log("Vertical Coordinate set")          
+            fvert_coordinate_set = fvert_coordinate_set.map((element) => element * 3);
+            console.log(fvert_coordinate_set);
+            console.log("indexed_lineset Set")
+            console.log(indexed_lineset)
 
             // determine the maximum coordinate value
             var maxcoordv = Math.max(
@@ -352,19 +369,18 @@
                     }
                 }
             }
-            let finalColorRGBValues = []
+            let rgb_values_final = []
             // Convert the single surface color value to RGB
             for (let i = 0; i < colorsTrace.length; i++) {
                 let temp = mapValueToRGB(colorsTrace[i], colorScale);
-                finalColorRGBValues.push(temp[0]);
-                finalColorRGBValues.push(temp[1]);
-                finalColorRGBValues.push(temp[2]);
+                rgb_values_final.push(temp[0]);
+                rgb_values_final.push(temp[1]);
+                rgb_values_final.push(temp[2]);
             }
-            finalColorRGBValues = finalColorRGBValues.map(element => element / 255);
+            rgb_values_final = rgb_values_final.map(element => element / 255);
 
-            console.log("Maximum")
-            console.log(max);
-            console.log(finalColorRGBValues);
+            console.log("final color RGB Values")
+            console.log(rgb_values_final);
             let layout = {
                 title: title,
                 scene: {
@@ -454,7 +470,7 @@
         renderToCanvas(document.getElementById('canvas-v'), surfaceV);
 
         // var surfaceH = getSurfaceData('Horizontal Polarization Pattern');
-        // renderToCanvas(document.getElementById('canvas-h'), surfaceH);
+        // renderToCanvas(document.getElementById('canvas-fhoriz_coordinate_set'), surfaceH);
     </script>
 </body>
 
