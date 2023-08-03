@@ -417,7 +417,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <viewpoint position="22.63097 11.99303 33.99213" orientation="-0.68741 0.71533 -0.12561 0.62705"></viewpoint>
 
         <!-- Transmitter and Antenna -->
-        <transform id="transmitterTranslation">
+        <transform id="transmitterTranslation" translation="0 0 0">
 
           <transform DEF='ant_1' translation='0 -2.5 0'>
             <shape>
@@ -1112,6 +1112,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       // console.log(translatorPos);
 
       calcDistance(receiverPos, translatorPos);
+      console.log(receiverPos);
+      console.log(translatorPos);
 
       // update path loss
       updatePathLoss();
@@ -1197,9 +1199,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) *
       Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) +
     Math.cos(x) * Math.cos(y) * Math.sin(z));
-    theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
-    theta = theta * 180 / Math.PI; // Convert radians to degrees
-    theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
+    // theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
+    theta = theta * 180 / Math.PI; // Convert radians to degrees    
+    // theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
+    // theta -= 90;  
 
     let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) *
       Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) *
@@ -1211,8 +1214,14 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     return [theta, phi];
   }
 
+  function getTxRxRelativeAngle(x, y, z) {
+
+  }
+
   // Updates the Path Loss
   function updatePathLoss() {
+    console.log(getCoordinatesFromX3D("receiver"));
+    console.log(getCoordinatesFromX3D("transmitterTranslation"));
     let pattern = document.getElementById("antenna_pattern").value;
     let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
     let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;

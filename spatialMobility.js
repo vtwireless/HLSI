@@ -133,6 +133,8 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
     // let fhoriz_tx_dB = 20 * Math.log10(Math.abs(fhoriz_antenna_pattern));
 
     let antenna_pattern = getAntennaPatternValue(theta, phi, pattern);
+    // console.log(theta);
+    // console.log(phi);
     
     let fvert_rx_dB = 20 * Math.log10(Math.abs(antenna_pattern[0]));
     let fhoriz_rx_dB = 20 * Math.log10(Math.abs(antenna_pattern[1]));
@@ -150,10 +152,16 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
 
     let pathLoss_dB = 20 * Math.log10((4 * Math.PI * distance)/lambda);
 
+    // console.log(fvert_rx_dB);
+    // console.log(fhoriz_rx_dB);
+
     let p_receiver_vert_dB = eirp_vert_dB - pathLoss_dB + fvert_rx_dB;
     let p_receiver_horiz_dB = eirp_horiz_dB - pathLoss_dB + fhoriz_rx_dB;
 
     let p_receiver_dB = 10 * Math.log10(10 ** (p_receiver_vert_dB/10) + 10 ** (p_receiver_horiz_dB/10));
+    // console.log(p_receiver_horiz_dB);
+    // console.log(p_receiver_vert_dB);
+    // console.log(p_receiver_dB);
 
     document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
     document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
