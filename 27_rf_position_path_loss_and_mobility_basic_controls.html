@@ -826,7 +826,14 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 </body>
 <script>
   'use strict';
+    //These values initiated while loading
+  let x_prev = 0;
+  let y_prev = 1;
+  let z_prev = 0;
 
+  let x_degPrev = 0;
+  let y_degPrev = 0;
+  let z_degPrev = 0;
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -1163,6 +1170,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     //incorporate the current rotation offset, interpreted globally, into the stored rotation value
     var transformMatrix = currentGizmoRotationOffset.mult(currentGizmoRotation);
+    console.log(transformMatrix);
 
     // get the rotation angles in radians
     var angles = transformMatrix.getEulerAngles();
@@ -1191,28 +1199,84 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
 
+  let theta_prev = 0;
+  let phi_prev = 0;
+
   function anglesToThetaPhi(xDeg, yDeg, zDeg) {
-    const x = xDeg * Math.PI / 180;
-    const y = yDeg * Math.PI / 180;
-    const z = zDeg * Math.PI / 180;
 
-    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) *
-      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) +
-    Math.cos(x) * Math.cos(y) * Math.sin(z));
-    // theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
-    theta = theta * 180 / Math.PI; // Convert radians to degrees    
-    // theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
-    // theta -= 90;  
 
-    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) *
-      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) *
-        Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
-    phi = (phi >= 0) ? phi : (phi + (2 * Math.PI)); // Convert negative values to positive
-    phi = phi * 180 / Math.PI; // Convert radians to degrees
-    phi = (phi >= 0) ? phi : (phi + 360); // Restrict the range to 0-360 degrees
+    
+    let x = xDeg * Math.PI / 180;
+    let y = yDeg * Math.PI / 180;
+    let z = zDeg * Math.PI / 180;
+
+    let phi = 0;
+    let theta = 0;
+    if(Math.abs(x_degPrev-x) > 0.01)
+    {
+      // Apply X-axis rotation
+      let x_new = x_prev;
+      let y_new = y_prev * Math.cos(x - x_degPrev) - z_prev * Math.sin(x - x_degPrev);
+      let z_new = y_prev * Math.sin(x - x_degPrev) + z_prev * Math.cos(x - x_degPrev);
+
+      x_prev = x_new;
+      y_prev = y_new;
+      z_prev = z_new;
+      x_degPrev = x;
+      z_degPrev = z;
+      y_degPrev = y;
+    }
+
+    if(Math.abs(y_degPrev-y) > 0.01)
+    {
+      // Apply Y-axis rotation
+      let x_new = x_prev * Math.cos(y - y_degPrev) + z_prev * Math.sin(y - y_degPrev);
+      let y_new = y_prev;
+      let z_new = -x_prev * Math.sin(y - y_degPrev) + z_prev * Math.cos(y - y_degPrev);
+
+      if(z_new < 0)
+      {
+        console.log("z is")
+      }
+
+      x_prev = x_new;
+      y_prev = y_new;
+      z_prev = z_new;
+      y_degPrev = y;
+      x_degPrev = x;
+      z_degPrev = z;
+      
+    }
+
+    if(Math.abs(z_degPrev-z) > 0.01)
+    {
+      // Apply Z-axis rotation
+      let x_new = x_prev * Math.cos(z - z_degPrev) - y_prev * Math.sin(z - z_degPrev);
+      let y_new = x_prev * Math.sin(z - z_degPrev) + y_prev * Math.cos(z - z_degPrev);
+      let z_new = z_prev;
+
+      x_prev = x_new;
+      y_prev = y_new;
+      z_prev = z_new;
+      x_degPrev = x;
+      z_degPrev = z;
+      y_degPrev = y;
+    }
+
+    theta = Math.acos((y_prev)/ Math.sqrt(x_prev * x_prev + z_prev * z_prev + y_prev * y_prev));
+    phi = Math.acos(x_prev / Math.sqrt(x_prev * x_prev + z_prev * z_prev));
+    phi = phi *(180/Math.PI)
+
+    theta = theta * (180/Math.PI);
+
+    if(z_prev <= 0)
+      {
+        phi =  360-phi;
+      }
 
     return [theta, phi];
   }
+
 
   function getTxRxRelativeAngle(x, y, z) {
 
