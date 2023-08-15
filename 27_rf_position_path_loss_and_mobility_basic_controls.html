@@ -827,6 +827,16 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 <script>
   'use strict';
     //These values initiated while loading
+  let x_prev = 0;
+  let y_prev = 1;
+  let z_prev = 0;
+
+  let x_degPrev = 0;
+  let y_degPrev = 0;
+  let z_degPrev = 0;
+
+  let theta_prev = 0;
+  let phi_prev = 0;
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -1253,13 +1263,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     return calculatePolarAngles(resultCoordMatrix[0], resultCoordMatrix[1],
     resultCoordMatrix[2]);
-  }
-
-
-  function getTxRxRelativeAngle(x, y, z) 
-  {
-
-
   }
 
   // Updates the Path Loss
