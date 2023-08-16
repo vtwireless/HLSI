@@ -629,7 +629,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
               </switch>
 
-              <shape>
+              <shape DEF = 'point'> 
                 <appearance>
                   <material diffuseColor='1 0 0'></material>
                   <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
@@ -827,13 +827,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 <script>
   'use strict';
     //These values initiated while loading
-  let x_prev = 0;
-  let y_prev = 1;
-  let z_prev = 0;
-
-  let x_degPrev = 0;
-  let y_degPrev = 0;
-  let z_degPrev = 0;
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -853,7 +846,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   // sig4['name'] = "comm_link_4";
 
   var signalList = [sig1];
-  var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
+  var noise = Signal(conf.noise, "Noise", { gn_init: -60 })
 
   Slider(sig1, 'freq', '#freq1');
   Slider(sig1, 'bw', '#bw1');
@@ -1171,6 +1164,26 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     //incorporate the current rotation offset, interpreted globally, into the stored rotation value
     var transformMatrix = currentGizmoRotationOffset.mult(currentGizmoRotation);
     console.log(transformMatrix);
+    let matrix = [];
+
+    for (let i = 0; i < 3; i++) 
+    {
+      let row = [];
+      for (let j = 0; j < 3; j++) 
+      {
+        row.push(0);
+      }
+        matrix.push(row);
+    }
+    matrix[0][0] = transformMatrix._00;
+    matrix[0][1] = transformMatrix._01;
+    matrix[0][2] = transformMatrix._02;
+    matrix[1][0] = transformMatrix._10;
+    matrix[1][1] = transformMatrix._11;
+    matrix[1][2] = transformMatrix._12;
+    matrix[2][0] = transformMatrix._20;
+    matrix[2][1] = transformMatrix._21;
+    matrix[2][2] = transformMatrix._22;
 
     // get the rotation angles in radians
     var angles = transformMatrix.getEulerAngles();
@@ -1179,7 +1192,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var angleX = ((angles[0] * (180 / Math.PI)) + 360) % 360;
     var angleY = ((angles[1] * (180 / Math.PI)) + 360) % 360;
     var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
-    var thetaPhi = anglesToThetaPhi(angleX, angleY, angleZ);
+    var thetaPhi = anglesToThetaPhi(matrix);
 
     // Print rotation angles in degrees
     document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
@@ -1199,86 +1212,53 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
 
-  let theta_prev = 0;
-  let phi_prev = 0;
-
-  function anglesToThetaPhi(xDeg, yDeg, zDeg) {
-
-
-    
-    let x = xDeg * Math.PI / 180;
-    let y = yDeg * Math.PI / 180;
-    let z = zDeg * Math.PI / 180;
-
-    let phi = 0;
-    let theta = 0;
-    if(Math.abs(x_degPrev-x) > 0.01)
+  function matrixMultiply(matrixA, matrixB) 
+  {
+    if (matrixA[0].length !== matrixB.length) 
     {
-      // Apply X-axis rotation
-      let x_new = x_prev;
-      let y_new = y_prev * Math.cos(x - x_degPrev) - z_prev * Math.sin(x - x_degPrev);
-      let z_new = y_prev * Math.sin(x - x_degPrev) + z_prev * Math.cos(x - x_degPrev);
-
-      x_prev = x_new;
-      y_prev = y_new;
-      z_prev = z_new;
-      x_degPrev = x;
-      z_degPrev = z;
-      y_degPrev = y;
+      throw new Error("Incompatible matrix dimensions for multiplication");
     }
-
-    if(Math.abs(y_degPrev-y) > 0.01)
+    let result = [];
+    for (let i = 0; i < matrixA.length; i++) 
     {
-      // Apply Y-axis rotation
-      let x_new = x_prev * Math.cos(y - y_degPrev) + z_prev * Math.sin(y - y_degPrev);
-      let y_new = y_prev;
-      let z_new = -x_prev * Math.sin(y - y_degPrev) + z_prev * Math.cos(y - y_degPrev);
-
-      if(z_new < 0)
+      let sum = 0;
+      for (let j = 0; j < matrixB.length; j++) 
       {
-        console.log("z is")
+        sum += matrixA[i][j] * matrixB[j][0];
       }
-
-      x_prev = x_new;
-      y_prev = y_new;
-      z_prev = z_new;
-      y_degPrev = y;
-      x_degPrev = x;
-      z_degPrev = z;
-      
+      result.push([sum]);
     }
+    return result;
+  }
 
-    if(Math.abs(z_degPrev-z) > 0.01)
-    {
-      // Apply Z-axis rotation
-      let x_new = x_prev * Math.cos(z - z_degPrev) - y_prev * Math.sin(z - z_degPrev);
-      let y_new = x_prev * Math.sin(z - z_degPrev) + y_prev * Math.cos(z - z_degPrev);
-      let z_new = z_prev;
-
-      x_prev = x_new;
-      y_prev = y_new;
-      z_prev = z_new;
-      x_degPrev = x;
-      z_degPrev = z;
-      y_degPrev = y;
-    }
-
-    theta = Math.acos((y_prev)/ Math.sqrt(x_prev * x_prev + z_prev * z_prev + y_prev * y_prev));
-    phi = Math.acos(x_prev / Math.sqrt(x_prev * x_prev + z_prev * z_prev));
-    phi = phi *(180/Math.PI)
-
-    theta = theta * (180/Math.PI);
-
-    if(z_prev <= 0)
-      {
-        phi =  360-phi;
-      }
-
+  function calculatePolarAngles(x, y, z) 
+  {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let theta = Math.acos(y / radius); // Theta angle in radians
+    let phi = Math.atan2(x, -z); // Phi angle in radians
+    theta = theta *(180/Math.PI);
+    phi = phi * (180/Math.PI);
+    if(phi < 0)
+      phi = phi + 360;
     return [theta, phi];
   }
 
+  function anglesToThetaPhi(matrix) 
+  {
+    let matrixB = [[0],
+                  [1],
+                  [0]];
+    
+    let resultCoordMatrix = matrixMultiply(matrix, matrixB);
 
-  function getTxRxRelativeAngle(x, y, z) {
+    return calculatePolarAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+    resultCoordMatrix[2]);
+  }
+
+
+  function getTxRxRelativeAngle(x, y, z) 
+  {
+
 
   }
 
