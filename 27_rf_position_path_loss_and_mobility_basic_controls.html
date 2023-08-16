@@ -588,41 +588,49 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                 </transform>
 
 
-                <transform id="directional_pat" class="pattern-models" rotation="1 0 0 -1.5707">
+                <transform id="directional_pat" class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3'/>
+                  </shape>
+                  </Transform>
+                </transform>
+
+                <transform id="directional_pat" class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
                   <shape>
                     <Appearance>
                       <Material diffuseColor="0 0 1" />
                     </Appearance>
                     <Cone bottomradius='1.5' height='3' />
                   </shape>
+                </Transform>
                 </transform>
 
-                <transform id="directional_pat" class="pattern-models" rotation="1 0 0 -1.5707">
+                <transform id="directional_pat" class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
                   <shape>
                     <Appearance>
                       <Material diffuseColor="0 0 1" />
                     </Appearance>
                     <Cone bottomradius='1.5' height='3' />
-                  </shape>
-                </transform>
-
-                <transform id="directional_pat" class="pattern-models" rotation="1 0 0 -1.5707">
-                  <shape>
-                    <Appearance>
-                      <Material diffuseColor="0 0 1" />
-                    </Appearance>
-                    <Cone bottomradius='1.5' height='3' />
+                  </Transform>
                   </shape>
                   <inline id="inline-model" url='directional_pat.x3d'/>
                 </transform>
 
-                <transform id="directional_pat" class="pattern-models" rotation="1 0 0 -1.5707">
+                <transform id="directional_pat" class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
                   <shape>
                     <Appearance>
                       <Material diffuseColor="0 0 1" />
                     </Appearance>
                     <Cone bottomradius='1.5' height='3' />
                   </shape>
+                </Transform>
                   <inline id="inline-model" url='directional_pat.x3d'/>
                 </transform>
 
