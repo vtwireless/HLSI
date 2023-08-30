@@ -406,6 +406,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <label id="angleZ" for="angleZ"></label> &nbsp;
         <label id="thetaAngle" for="theta"></label> &nbsp;
         <label id="phiAngle" for="phi"></label> &nbsp;
+        <label id="effectivePhi" for="effectivePhi"></label> &nbsp;
       </div>
     </div>
   </div>
@@ -1250,6 +1251,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let theta = Math.acos(y / radius); // Theta angle in radians
     let phi = Math.atan2(x, -z); // Phi angle in radians
     theta = theta *(180/Math.PI);
+    theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
@@ -1277,6 +1279,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
     phi = (Number(phi) +  phi_offset + 360)%360;
     console.log("Effective phi: " + phi);
+    document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi;
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
