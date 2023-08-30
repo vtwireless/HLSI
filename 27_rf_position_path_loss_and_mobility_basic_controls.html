@@ -665,7 +665,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </transform>
         <!--26 16 2-->
         <!--This is the transmitter, not the receiver-->
-        <transform id="receiver" translation='0 2 -12'>
+        <transform id="receiver" translation='0 0 -12'>
           <shape>
             <appearance>
               <material diffuseColor='1 0 0'></material>
@@ -673,12 +673,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             <sphere radius='0.75'></sphere>
           </shape>
         </transform>
-        <transform translation='0 -1.25 -12'>
+        <transform translation='0 -3.25 -12'>
           <shape>
             <appearance>
               <material diffuseColor='0.71 0.396 0.114'></material>
             </appearance>
-            <cylinder radius='0.25' height='6.8'></cylinder>
+            <cylinder radius='0.25' height='3'></cylinder>
           </shape>
         </transform>
 
@@ -1251,7 +1251,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let theta = Math.acos(y / radius); // Theta angle in radians
     let phi = Math.atan2(x, -z); // Phi angle in radians
     theta = theta *(180/Math.PI);
-    theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
+    // theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
@@ -1280,6 +1280,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     phi = (Number(phi) +  phi_offset + 360)%360;
     console.log("Effective phi: " + phi);
     document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi;
+    // Transform theta
+    console.log("thetaPrev: " + theta);
+    theta = (90 + Number(theta)) % 180;
+    console.log("theta: " + theta);
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
