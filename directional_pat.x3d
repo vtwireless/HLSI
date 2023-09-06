@@ -12,7 +12,7 @@
 <Shape>
 <Appearance sorttype="auto" alphaclipthreshold="0.1">
     <!--<Material _diffuseColor="0.4 0.4 0" _emissiveColor="0.5 0.4 0"></Material>-->
-    <PointProperties pointsizemaxvalue="4" pointsizeminvalue=".01" pointsizescalefactor="4000" attenuation="5 0 0" containerfield="pointProperties">
+    <PointProperties pointsizemaxvalue="4" pointsizeminvalue=".01" pointsizescalefactor="4000" attenuation="5 3 0" containerfield="pointProperties">
     </PointProperties>
 </Appearance>
 
