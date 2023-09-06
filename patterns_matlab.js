@@ -5,8 +5,8 @@
 // 'fvert' and 'fhoriz' represent the complex gain of the antenna at each phi and theta angle, 
 // and are normalized to a maximum absolute value of 1.
 
-let thetaresolution = 10;
-let phiresolution = 10;
+let thetaresolution = 5;
+let phiresolution = 5;
 
 // vertically polarized isotropic antenna
 function isovert(thetares, phires) {
@@ -158,11 +158,11 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
     const theta = Math.PI * thetares * (k - 1) / 180;
     for (let m = 1; m <= phidim; m++) {
       const phi = Math.PI * phires * (m - 1) / 180;
-      if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 1800 > Math.PI * (elbw / 2) / 180) {
+      if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 180 > Math.PI * (elbw / 2) / 180) {
         if (SLL !== -999) {
           fvert[k - 1][m - 1] = 10 ** (SLL / 10);
         }
-      } else if (phi - Math.PI * phires / 1800 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
+      } else if (phi - Math.PI * phires / 180 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
         if (SLL !== -999) {
           fvert[k - 1][m - 1] = 10 ** (SLL / 10);
         }
@@ -198,7 +198,7 @@ function getAntennaPatternValue(theta, phi, pattern) {
       patterns = sloop(thetaresolution, phiresolution);
       break;
     case 'dirAnt_sideLobe':
-      patterns = dirantv(thetaresolution, phiresolution, 20, 20, -1.5);
+      patterns = dirantv(thetaresolution, phiresolution, 30, 30, -10);
       break;
     default:
       patterns = isovert(thetaresolution, phiresolution);
