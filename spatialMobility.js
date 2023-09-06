@@ -163,8 +163,13 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
     // console.log(p_receiver_vert_dB);
     // console.log(p_receiver_dB);
 
+    if (isNaN(p_receiver_dB)) {
+        console.log("it is NaN");
+    }
     document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
-    document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
+    if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) != Infinity) {
+        document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
+    }
 
 
 }
