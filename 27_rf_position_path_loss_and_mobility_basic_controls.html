@@ -1277,9 +1277,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let pattern = document.getElementById("antenna_pattern").value;
     let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
     let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
-    phi = (Number(phi) +  phi_offset + 360)%360;
+    // phi = (Number(phi) +  phi_offset + 360)%360;
+    phi = (Number(phi) + phi_offset + 90) % 360;
     console.log("Effective phi: " + phi);
-    document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi;
+    document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi.toFixed(2);
     // Transform theta
     console.log("thetaPrev: " + theta);
     theta = (90 + Number(theta)) % 180;
