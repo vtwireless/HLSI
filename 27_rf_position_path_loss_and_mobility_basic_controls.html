@@ -368,6 +368,14 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </select>
       </p> &nbsp; &nbsp; &nbsp;
       <p>
+        <label for="polarization">
+          <input type="checkbox" id="vertical" name="gender" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal" name="gender" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+      <p>
         <label for="theta">Theta (0-180)</label> &nbsp; &nbsp;
         <input style="width: 3.5rem; height: 1.2rem;" id="theta" type="text" value="20"
           oninput="this.value = this.value
@@ -398,20 +406,19 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <label id="angleZ" for="angleZ"></label> &nbsp;
         <label id="thetaAngle" for="theta"></label> &nbsp;
         <label id="phiAngle" for="phi"></label> &nbsp;
+        <label id="effectivePhi" for="effectivePhi"></label> &nbsp;
       </div>
     </div>
   </div>
 
   <div id="x3dModelWindow">
 
-    <x3d id='x3dElement' showStat='false' showLog='false' width='1520px' height='720px'>
+    <x3d id='x3dElement' showStat='false' showLog='false' width='1520px' height='500px'>
       <scene DEF='scene'>
-        <viewpoint position="13.71854 10.00018 18.01263" orientation="-0.96475 0.63173 0.00059 0.751072"></viewpoint>
-
-
+        <viewpoint position="22.63097 11.99303 33.99213" orientation="-0.68741 0.71533 -0.12561 0.62705"></viewpoint>
 
         <!-- Transmitter and Antenna -->
-        <transform id="transmitterTranslation">
+        <transform id="transmitterTranslation" translation="0 0 0">
 
           <transform DEF='ant_1' translation='0 -2.5 0'>
             <shape>
@@ -425,65 +432,213 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
           <matrixTransform id="transmitterRotation">
 
-            <transform translation='0 1.25 0' rotation="1 0 0 3.1415">
+            <transform rotation="1 0 0 3.1415">
 
-          <switch id="receiver-geometry" whichchoice="0">
-                
-            <transform> 
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 0.6902 0.9412" />
-                </Appearance>
-                <Cylinder radius='1.5' height='3' />
-              </shape>
-              <inline url='vert_iso_pat.x3d'/>
-            </transform>
+              <switch id="receiver-geometry" whichchoice="0">
 
-            <transform> 
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 1 0" />
-                </Appearance>
-                <Cone bottomradius='1.5' height='3' />
-              </shape>
-              <inline url='horiz_iso_pat.x3d'/>
-            </transform>
+                <transform class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
 
-            <transform> 
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 0 1" />
-                </Appearance>
-                <Cone bottomradius='1.5' height='3' />
-              </shape>
-              <inline url='halfwave_pat.x3d'/>
-            </transform>
+                <transform class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
 
-            <transform> 
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 0 1" />
-                </Appearance>
-                <Cone bottomradius='1.5' height='3' />
-              </shape>
-              <inline url='small_dip_pat.x3d'/>
-            </transform>
+                <transform class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='vert_iso_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models" rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='vert_iso_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='horiz_iso_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0.6902 0.9412" />
+                    </Appearance>
+                    <Cylinder radius='0.8' height='0.05' />
+                  </shape>
+                  <inline id="inline-model" url='horiz_iso_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='halfwave_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='5'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='halfwave_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='small_dip_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <cylinder radius='0.25' height='1'></cylinder>
+                  </shape>
+                  <inline id="inline-model" url='small_dip_pat.x3d'/>
+                </transform>
 
 
-            <transform> 
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 0 1" />
-                </Appearance>
-                <Cone bottomradius='1.5' height='3' />
-              </shape>
-              <inline url='directional_pat.x3d'/>
-            </transform>
+                <transform class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3'/>
+                  </shape>
+                  </Transform>
+                </transform>
+
+                <transform class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </shape>
+                </Transform>
+                </transform>
+
+                <transform class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </Transform>
+                  </shape>
+                  <inline id="inline-model" url='directional_pat.x3d'/>
+                </transform>
+
+                <transform class="pattern-models">
+                  <Transform rotation="0 0 1 1.5707">
+                  <shape>
+                    <Appearance>
+                      <Material diffuseColor="0 0 1" />
+                    </Appearance>
+                    <Cone bottomradius='1.5' height='3' />
+                  </shape>
+                </Transform>
+                  <inline id="inline-model" url='directional_pat.x3d'/>
+                </transform>
 
 
-            </switch>
+              </switch>
 
-              <shape>
+              <shape DEF = 'point'> 
                 <appearance>
                   <material diffuseColor='1 0 0'></material>
                   <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
@@ -505,17 +660,25 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             <appearance>
               <material diffuseColor='0.7 0.7 0.7'></material>
             </appearance>
-            <box solid='true' size='26 16 2'></box>
+            <box solid='true' size='26 28 2'></box>
           </shape>
         </transform>
-
+        <!--26 16 2-->
         <!--This is the transmitter, not the receiver-->
-        <transform id="receiver" translation='0 2 -12'> 
+        <transform id="receiver" translation='0 0 -12'>
           <shape>
             <appearance>
               <material diffuseColor='1 0 0'></material>
             </appearance>
-            <box size='1 1 1'></box>
+            <sphere radius='0.75'></sphere>
+          </shape>
+        </transform>
+        <transform translation='0 -3.25 -12'>
+          <shape>
+            <appearance>
+              <material diffuseColor='0.71 0.396 0.114'></material>
+            </appearance>
+            <cylinder radius='0.25' height='5'></cylinder>
           </shape>
         </transform>
 
@@ -526,7 +689,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           </planeSensor>
 
           <transform id='translationHandleTransform'>
-            <transform translation='0 -5.5 8' rotation='0 1 0 1.57'>
+            <transform translation='0 -5.5 14' rotation='0 1 0 1.57'>
               <transform translation='0 0 1.5' rotation='1 0 0 1.57'>
                 <shape DEF='CONE_CAP'>
                   <appearance DEF='CYAN_MAT'>
@@ -672,7 +835,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 </body>
 <script>
   'use strict';
-
+    //These values initiated while loading
+  let phi_offset = 0;
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     bw_max: 38.0e6, // Hz
@@ -692,7 +856,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   // sig4['name'] = "comm_link_4";
 
   var signalList = [sig1];
-  var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
+  var noise = Signal(conf.noise, "Noise", { gn_init: -60 })
 
   Slider(sig1, 'freq', '#freq1');
   Slider(sig1, 'bw', '#bw1');
@@ -958,6 +1122,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       // console.log(translatorPos);
 
       calcDistance(receiverPos, translatorPos);
+      
+      console.log(receiverPos);
+      console.log(translatorPos);
+
+      phi_offset = 90 - Math.atan2(12, translatorPos.x) * 180/Math.PI;
+      console.log("Phi offset: " + phi_offset);
 
       // update path loss
       updatePathLoss();
@@ -1007,58 +1177,114 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     //incorporate the current rotation offset, interpreted globally, into the stored rotation value
     var transformMatrix = currentGizmoRotationOffset.mult(currentGizmoRotation);
+    console.log(transformMatrix);
+    let matrix = [];
+
+    for (let i = 0; i < 3; i++) 
+    {
+      let row = [];
+      for (let j = 0; j < 3; j++) 
+      {
+        row.push(0);
+      }
+        matrix.push(row);
+    }
+    matrix[0][0] = transformMatrix._00;
+    matrix[0][1] = transformMatrix._01;
+    matrix[0][2] = transformMatrix._02;
+    matrix[1][0] = transformMatrix._10;
+    matrix[1][1] = transformMatrix._11;
+    matrix[1][2] = transformMatrix._12;
+    matrix[2][0] = transformMatrix._20;
+    matrix[2][1] = transformMatrix._21;
+    matrix[2][2] = transformMatrix._22;
 
     // get the rotation angles in radians
     var angles = transformMatrix.getEulerAngles();
-
+    
     // convert angles from radians to degrees
     var angleX = ((angles[0] * (180 / Math.PI)) + 360) % 360;
     var angleY = ((angles[1] * (180 / Math.PI)) + 360) % 360;
     var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
-    var thetaPhi = anglesToThetaPhi(angleX, angleY, angleZ);
+    var thetaPhi = anglesToThetaPhi(matrix);
 
     // Print rotation angles in degrees
     document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
     document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
-    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
+    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
+
+    document.getElementById("theta").value = thetaPhi[0].toFixed(2);
+    document.getElementById("phi").value = thetaPhi[1].toFixed(2);
 
     // update path loss
-    // updatePathLoss();
+    updatePathLoss();
 
     //set matrix value in column major format, as required by the MatrixTransform node
     transmitterRotationNode.setFieldValue("matrix", transformMatrix.transpose());
 
   }
 
-  function anglesToThetaPhi(xDeg, yDeg, zDeg) {
-    const x = xDeg * Math.PI / 180;
-    const y = yDeg * Math.PI / 180;
-    const z = zDeg * Math.PI / 180;
+  function matrixMultiply(matrixA, matrixB) 
+  {
+    if (matrixA[0].length !== matrixB.length) 
+    {
+      throw new Error("Incompatible matrix dimensions for multiplication");
+    }
+    let result = [];
+    for (let i = 0; i < matrixA.length; i++) 
+    {
+      let sum = 0;
+      for (let j = 0; j < matrixB.length; j++) 
+      {
+        sum += matrixA[i][j] * matrixB[j][0];
+      }
+      result.push([sum]);
+    }
+    return result;
+  }
 
-    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) *
-      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) +
-    Math.cos(x) * Math.cos(y) * Math.sin(z));
-    theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
-    theta = theta * 180 / Math.PI; // Convert radians to degrees
-    theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
-
-    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) *
-      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) *
-        Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
-    phi = (phi >= 0) ? phi : (phi + (2 * Math.PI)); // Convert negative values to positive
-    phi = phi * 180 / Math.PI; // Convert radians to degrees
-    phi = (phi >= 0) ? phi : (phi + 360); // Restrict the range to 0-360 degrees
-
+  function calculatePolarAngles(x, y, z) 
+  {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let theta = Math.acos(y / radius); // Theta angle in radians
+    let phi = Math.atan2(x, -z); // Phi angle in radians
+    theta = theta *(180/Math.PI);
+    // theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
+    phi = phi * (180/Math.PI);
+    if(phi < 0)
+      phi = phi + 360;
     return [theta, phi];
+  }
+
+  function anglesToThetaPhi(matrix) 
+  {
+    let matrixB = [[0],
+                  [1],
+                  [0]];
+    
+    let resultCoordMatrix = matrixMultiply(matrix, matrixB);
+
+    return calculatePolarAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+    resultCoordMatrix[2]);
   }
 
   // Updates the Path Loss
   function updatePathLoss() {
+    console.log(getCoordinatesFromX3D("receiver"));
+    console.log(getCoordinatesFromX3D("transmitterTranslation"));
     let pattern = document.getElementById("antenna_pattern").value;
-    let theta = document.getElementById("theta").value;
-    let phi = document.getElementById("phi").value;
+    let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
+    let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
+    // phi = (Number(phi) +  phi_offset + 360)%360;
+    phi = (Number(phi) + phi_offset + 90) % 360;
+    console.log("Effective phi: " + phi);
+    document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi.toFixed(2);
+    // Transform theta
+    console.log("thetaPrev: " + theta);
+    theta = (90 + Number(theta)) % 180;
+    console.log("theta: " + theta);
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
@@ -1136,6 +1362,23 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   }
   PowerSpectrumPlot_2D();
+
+  const verticalCheckbox = document.getElementById("vertical");
+  const horizontalCheckbox = document.getElementById("horizontal");
+
+  document.getElementById("antenna_pattern").addEventListener("change", selectModel);
+  verticalCheckbox.addEventListener("change", selectModel);
+  horizontalCheckbox.addEventListener("change", selectModel);
+
+function selectModel() {
+  const selectedValue = document.getElementById("antenna_pattern").selectedIndex;
+  const isCheckedVertical = verticalCheckbox.checked ? 1 : 0;
+  const isCheckedHorizontal = horizontalCheckbox.checked ? 1 : 0;
+  const modelNumber = (selectedValue)*4 + 2*isCheckedVertical + isCheckedHorizontal;
+  console.log(modelNumber);
+  document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber);
+
+}
 </script>
 
 </html>
