@@ -10,9 +10,12 @@
 <NavigationInfo type='"EXAMINE" "WALK" "FLY" "ANY"'/>
 <transform rotation='1 0 0 -1.57'>
 <Shape>
-<Appearance>
-<Material emissiveColor="0 0 1" />
-    </Appearance>
+<Appearance sorttype="auto" alphaclipthreshold="0.1">
+	<Material emissiveColor="0 0 1"/>
+    <!--<Material _diffuseColor="0.4 0.4 0" _emissiveColor="0.5 0.4 0"></Material>-->
+    <PointProperties pointsizemaxvalue="5" pointsizeminvalue=".01" pointsizescalefactor="4000" attenuation="5 3 0" containerfield="pointProperties">
+    </PointProperties>
+</Appearance>
 <PointSet color = '0 0 1'>
 <!--<Color color='1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0'/>-->
 
