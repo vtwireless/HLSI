@@ -1249,7 +1249,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   {
     let radius = Math.sqrt(x * x + y * y + z * z);
     let theta = Math.acos(y / radius); // Theta angle in radians
-    let phi = Math.atan2(z, x); // Phi angle in radians
+    let phi = Math.atan2(x, -z); // Phi angle in radians
     theta = theta *(180/Math.PI);
     // theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
     phi = phi * (180/Math.PI);
