@@ -1137,6 +1137,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
       //transform the affected element
       document.getElementById('transmitterTranslation').setFieldValue('translation', translationValue);
+      applyRotationGizmoTransformations();
     }
   }
 
@@ -1211,6 +1212,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     // Print rotation angles in degrees
     document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+    
     document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
     document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
     document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
@@ -1245,6 +1247,68 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     return result;
   }
 
+  function cross_product_unit_vector(a_vector, b_vector)
+  {
+    var crossProduct = {
+      x: a_vector.y * b_vector.z - a_vector.z * b_vector.y,
+      y: a_vector.z * b_vector.x - a_vector.x * b_vector.z,
+      z: a_vector.x * b_vector.y - a_vector.y * b_vector.x
+    };
+    // Calculate the magnitude (length) of the cross product
+    var magnitude = Math.sqrt(
+      crossProduct.x * crossProduct.x + crossProduct.y * crossProduct.y + crossProduct.z * crossProduct.z);
+    // Calculate the unit vector
+    var result_unit_vector = {
+      x: crossProduct.x / magnitude,
+      y: crossProduct.y / magnitude,
+      z: crossProduct.z / magnitude
+    };
+
+    return  result_unit_vector;
+  }
+
+  function dotProduct(a_vector, b_vector) {
+    return a_vector.x * b_vector.x + a_vector.y * b_vector.y + a_vector.z * b_vector.z;
+  }
+
+  //1) In this case the receiver is always aligned with x3d scene +y axis (0, 1, 0)
+  //2) initial line joining the Rx Pos and Tx Pos is -z axis (0, 0, -1)
+  //3) The cross product ((-Z) x Y) gives +ve X axis
+  //4) line in (2) is always the new -z axis and (3) is always the new +ve X axis
+  //5) from the considerations we can get the x axis  
+  function calculateUpdatedAngles(x_initial, y_initial, z_initial)
+  {
+    var magnitud1 = Math.sqrt(
+      x_initial * x_initial + y_initial * y_initial + z_initial * z_initial);
+    var rx_coordinates = getCoordinatesFromX3D("receiver");
+    var tx_cordinates = translatorPos;
+    var updated_z_vector = {x:-(rx_coordinates.x - tx_cordinates.x), y:-(rx_coordinates.y - tx_cordinates.y),
+                          z:-(rx_coordinates.z - tx_cordinates.z)};
+    var updated_z_magnitude = Math.sqrt( updated_z_vector.x * updated_z_vector.x 
+            + updated_z_vector.y * updated_z_vector.y + updated_z_vector.z * updated_z_vector.z);
+    
+    updated_z_vector.x = updated_z_vector.x / updated_z_magnitude;
+    updated_z_vector.y = updated_z_vector.y / updated_z_magnitude;
+    updated_z_vector.z = updated_z_vector.z / updated_z_magnitude;
+    var initial_y_vector = {x: 0, y: 1, z: 0};
+    var updated_x_vector = cross_product_unit_vector(initial_y_vector, updated_z_vector);
+    var updated_y_vector = cross_product_unit_vector(updated_z_vector, updated_x_vector);
+    var x_new = dotProduct({x : x_initial, y : y_initial,
+                            z : z_initial}, updated_x_vector);
+    var y_new = dotProduct({x : x_initial, y : y_initial,
+                            z : z_initial}, updated_y_vector);
+    var z_new = dotProduct({x : x_initial, y : y_initial,
+                            z : z_initial}, updated_z_vector);
+    var magnitude = Math.sqrt(
+      x_new * x_new + y_new * y_new + z_new * z_new);
+    
+    var angles_upated = calculatePolarAngles(x_new, y_new, z_new);
+    console.log("theta - functional");
+    console.log(angles_upated[0]);
+    console.log("phi - functional");
+    console.log(angles_upated[1] + 90);
+  }
+
   function calculatePolarAngles(x, y, z) 
   {
     let radius = Math.sqrt(x * x + y * y + z * z);
@@ -1265,13 +1329,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                   [0]];
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
-
+    calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+    resultCoordMatrix[2]);
     return calculatePolarAngles(resultCoordMatrix[0], resultCoordMatrix[1],
     resultCoordMatrix[2]);
   }
 
   // Updates the Path Loss
   function updatePathLoss() {
+    console.log("Tx and RX Coordinates");
     console.log(getCoordinatesFromX3D("receiver"));
     console.log(getCoordinatesFromX3D("transmitterTranslation"));
     let pattern = document.getElementById("antenna_pattern").value;
@@ -1289,7 +1355,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
-    CalculateSINR_BasedOn_ReceivedPower();
+      CalculateSINR_BasedOn_ReceivedPower();
   }
 
   function CalculateSINR_BasedOn_ReceivedPower() {
