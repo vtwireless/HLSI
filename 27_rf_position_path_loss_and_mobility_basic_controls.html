@@ -1306,7 +1306,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     console.log("theta - functional");
     console.log(angles_upated[0]);
     console.log("phi - functional");
-    console.log(angles_upated[1] + 90);
+    angles_upated[1] = angles_upated[1] + 90
+    if(angles_upated[1] > 360)
+    angles_upated[1] = angles_upated[1] % 360;
+    console.log(angles_upated[1]);
   }
 
   function calculatePolarAngles(x, y, z) 
@@ -1319,6 +1322,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
+
     return [theta, phi];
   }
 
