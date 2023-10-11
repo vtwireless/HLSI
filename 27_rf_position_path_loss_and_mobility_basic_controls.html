@@ -126,7 +126,17 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         display: flex;
         flex-direction: column;
       }
+
     }
+    .table {
+          width: 100%;
+        }
+
+        td, th {
+          border: 1px solid white;
+          text-align: center;
+          padding: 8px;
+        }
   </style>
 </head>
 
@@ -358,7 +368,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   <div>
     <div style="display: inline-flex; margin-left: 2em; font-size: large;">
-      <p><label for="antenna_pattern">Type of Antenna Pattern:</label> &nbsp;
+      <p><label for="antenna_pattern">Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
         <select id="antenna_pattern">
           <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
           <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
@@ -369,24 +379,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       </p> &nbsp; &nbsp; &nbsp;
       <p>
         <label for="polarization">
-          <input type="checkbox" id="vertical" name="gender" value="vertical">
+          <input type="checkbox" id="vertical" value="vertical">
           Vertical
-          <input type="checkbox" id="horizontal" name="gender" value="horizontal">
+          <input type="checkbox" id="horizontal" value="horizontal">
           Horizontal
         </label><br>
       </p>&nbsp; &nbsp;
-      <p>
-        <label for="theta">Theta (0-180)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="theta" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        <label for="phi">Phi (0-360)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="phi" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-
-        <input id="apply" type="button" value="Apply" onclick="updatePathLoss()"> &nbsp; &nbsp;
-      </p>
     </div>
     <div>
       <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
@@ -399,21 +397,12 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
         <label id="rec_trans_dist" for="rec_trans_dist"></label>
         &nbsp; &nbsp; &nbsp;
-
-        <label for="rec_trans_dist_label">Rotation Angle (degrees) : </label> &nbsp;
-        <label id="angleX" for="angleX"></label> &nbsp;
-        <label id="angleY" for="angleY"></label> &nbsp;
-        <label id="angleZ" for="angleZ"></label> &nbsp;
-        <label id="thetaAngle" for="theta"></label> &nbsp;
-        <label id="phiAngle" for="phi"></label> &nbsp;
-        <label id="effectivePhi" for="effectivePhi"></label> &nbsp;
       </div>
     </div>
   </div>
 
-  <div id="x3dModelWindow">
-
-    <x3d id='x3dElement' showStat='false' showLog='false' width='1520px' height='500px'>
+  <div id="x3dModelWindow" style="display: flex;">
+    <x3d id='x3dElement' showStat='false' showLog='false' width='1020px' height='500px'>
       <scene DEF='scene'>
         <viewpoint position="22.63097 11.99303 33.99213" orientation="-0.68741 0.71533 -0.12561 0.62705"></viewpoint>
 
@@ -672,6 +661,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             </appearance>
             <sphere radius='0.75'></sphere>
           </shape>
+          <inline id="inline-model" url='vert_iso_pat.x3d'/>
         </transform>
         <transform translation='0 -3.25 -12'>
           <shape>
@@ -790,7 +780,34 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       </scene>
     </x3d>
-
+    <div>
+      <table id="angles-table" width="100px">
+        <tr>
+          <th>Angle</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>X</td>
+          <td id="angle-x-table">0</td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td id="angle-y-table">0</td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td id="angle-z-table">0</td>
+        </tr>
+        <tr>
+          <td>Theta</td>
+          <td id="angle-theta-table">0</td>
+        </tr>
+        <tr>
+          <td>Phi</td>
+          <td id="angle-phi-table">0</td>
+        </tr>
+        </table>
+      </div>
   </div>
 
   <div class="grid-container-main">
@@ -886,6 +903,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //setting default values of receiver power
   //overriding SNR and distance(tx and rx)
   getCoordinatesFromX3D("receiver");
+  console.log(receiverPos);
   calcDistance(receiverPos, new Position(0, 0, 0));
   updatePathLoss();
 
@@ -1119,8 +1137,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       translatorPos.x = translationValue.x;
       translatorPos.y = translationValue.y;
       translatorPos.z = translationValue.z;
-      // console.log(translatorPos);
+      console.log(translatorPos);
 
+      getCoordinatesFromX3D("receiver");
+      console.log(receiverPos);
+      console.log(translatorPos);
       calcDistance(receiverPos, translatorPos);
       
       console.log(receiverPos);
@@ -1169,7 +1190,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       applyRotationGizmoTransformations();
     }
   }
-  
+
   /*
    * Applies the current transformations, computed from the rotation gizmo output, to the scene
    */
@@ -1210,15 +1231,20 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var thetaPhi = anglesToThetaPhi(matrix);
 
     // Print rotation angles in degrees
-    document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-    document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-    
-    document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
-    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
+    // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+    document.getElementById('angle-x-table').textContent = angleX.toFixed(2);
 
-    document.getElementById("theta").value = thetaPhi[0].toFixed(2);
-    document.getElementById("phi").value = thetaPhi[1].toFixed(2);
+    // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+    document.getElementById('angle-y-table').textContent = angleY.toFixed(2);
+    
+    // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+    document.getElementById('angle-z-table').textContent = angleZ.toFixed(2);
+
+    // document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
+    // document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
+
+    // document.getElementById("theta").value = thetaPhi[0].toFixed(2);
+    // document.getElementById("phi").value = thetaPhi[1].toFixed(2);
 
     // update path loss
     updatePathLoss();
@@ -1305,20 +1331,20 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var angles_upated = calculatePolarAngles(x_new, y_new, z_new);
     console.log("theta - functional");
     console.log(angles_upated[0]);
+    document.getElementById('angle-theta-table').textContent = angles_upated[0].toFixed(2);
     console.log("phi - functional");
-    angles_upated[1] = angles_upated[1] + 90
     if(angles_upated[1] > 360)
     angles_upated[1] = angles_upated[1] % 360;
     console.log(angles_upated[1]);
+    document.getElementById('angle-phi-table').textContent = angles_upated[1].toFixed(2);
   }
 
   function calculatePolarAngles(x, y, z) 
   {
     let radius = Math.sqrt(x * x + y * y + z * z);
-    let theta = Math.acos(- y / radius); // Theta angle in radians
+    let theta = Math.acos(y / radius); // Theta angle in radians
     let phi = Math.atan2(z, x); // Phi angle in radians
     theta = theta *(180/Math.PI);
-    // theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
@@ -1328,9 +1354,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   function anglesToThetaPhi(matrix) 
   {
-    let matrixB = [[1],
+    let matrixB = [[0],
                   [0],
-                  [0]];
+                  [1]];
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
     calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
@@ -1345,16 +1371,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     console.log(getCoordinatesFromX3D("receiver"));
     console.log(getCoordinatesFromX3D("transmitterTranslation"));
     let pattern = document.getElementById("antenna_pattern").value;
-    let theta = document.getElementById("thetaAngle").value || document.getElementById("theta").value;
-    let phi = document.getElementById("phiAngle").value || document.getElementById("phi").value;
-    // phi = (Number(phi) +  phi_offset + 360)%360;
-    phi = (Number(phi) + phi_offset + 90) % 360;
-    console.log("Effective phi: " + phi);
-    document.getElementById('effectivePhi').textContent = 'Effective Phi: ' + phi.toFixed(2);
-    // Transform theta
-    console.log("thetaPrev: " + theta);
-    theta = (90 + Number(theta)) % 180;
-    console.log("theta: " + theta);
+
+    let theta = Number(document.getElementById("angle-theta-table").innerText) || 0;
+    let phi = Number(document.getElementById("angle-phi-table").innerText) || 0;
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
@@ -1392,7 +1411,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(transmitterObj.getAttribute("axisRotation"));
     // let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
 
-    calcDistance(receiverPos, new Position(0, 0, 0));
+    calcDistance(translatorPos, receiverPos);
+    console.log("INITIAL RECEIVER")
+    console.log(receiverPos);
+    console.log("INITIAL TRANS")
+    console.log(translatorPos);
 
   };
 
@@ -1427,7 +1450,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     var distance = Math.sqrt(a * a + b * b + c * c);
     distance_tx_rx = distance;
-    // console.log(distance);
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   }
