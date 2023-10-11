@@ -386,25 +386,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </label><br>
       </p>&nbsp; &nbsp;
     </div>
-    <div style="display: inline-flex; margin-left: 2em; margin-top: -2em; font-size: large;">
-      <p><label for="antenna_pattern">Type of Transmitter Pattern:</label> &nbsp;
-        <select id="tx_pattern">
-          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
-          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
-          <option id="halfwave" value="halfwave">Half-wave dipole</option>
-          <option id="sdipole" value="sdipole">Small dipole</option>
-          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
-        </select>
-      </p> &nbsp; &nbsp; &nbsp;
-      <p>
-        <label for="polarization">
-          <input type="checkbox" id="vertical" value="vertical">
-          Vertical
-          <input type="checkbox" id="horizontal" value="horizontal">
-          Horizontal
-        </label><br>
-      </p>&nbsp; &nbsp;
-    </div>
     <div>
       <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
         <label for="path_loss">Path Loss (dB) : </label> &nbsp;
@@ -922,6 +903,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //setting default values of receiver power
   //overriding SNR and distance(tx and rx)
   getCoordinatesFromX3D("receiver");
+  console.log(receiverPos);
   calcDistance(receiverPos, new Position(0, 0, 0));
   updatePathLoss();
 
@@ -1157,6 +1139,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       translatorPos.z = translationValue.z;
       console.log(translatorPos);
 
+      getCoordinatesFromX3D("receiver");
+      console.log(receiverPos);
+      console.log(translatorPos);
       calcDistance(receiverPos, translatorPos);
       
       console.log(receiverPos);
@@ -1348,7 +1333,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     console.log(angles_upated[0]);
     document.getElementById('angle-theta-table').textContent = angles_upated[0].toFixed(2);
     console.log("phi - functional");
-    angles_upated[1] = angles_upated[1] + 90
     if(angles_upated[1] > 360)
     angles_upated[1] = angles_upated[1] % 360;
     console.log(angles_upated[1]);
@@ -1361,7 +1345,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let theta = Math.acos(y / radius); // Theta angle in radians
     let phi = Math.atan2(z, x); // Phi angle in radians
     theta = theta *(180/Math.PI);
-    // theta = (90 + theta) % 180; // To convert theta from receiver frame to receiver-transmitter relative frame
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
@@ -1372,8 +1355,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   function anglesToThetaPhi(matrix) 
   {
     let matrixB = [[0],
-                  [1],
-                  [0]];
+                  [0],
+                  [1]];
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
     calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
@@ -1391,7 +1374,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     let theta = Number(document.getElementById("angle-theta-table").innerText) || 0;
     let phi = Number(document.getElementById("angle-phi-table").innerText) || 0;
-    theta = (90 + Number(theta)) % 180;
     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
@@ -1429,7 +1411,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(transmitterObj.getAttribute("axisRotation"));
     // let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
 
-    calcDistance(translatorPos, new Position(0, 0, 0));
+    calcDistance(translatorPos, receiverPos);
     console.log("INITIAL RECEIVER")
     console.log(receiverPos);
     console.log("INITIAL TRANS")
@@ -1468,7 +1450,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     var distance = Math.sqrt(a * a + b * b + c * c);
     distance_tx_rx = distance;
-    // console.log(distance);
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   }
