@@ -105,6 +105,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       height: 2rem;
     }
 
+    #tx_pattern_options {
+    display: none;
+    margin-left: 2em; 
+    margin-top: -2em; 
+    font-size: large;
+    }
+
     @media screen and (max-width: 1500px) {
       .grid-container {
         display: flex;
@@ -379,9 +386,28 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       </p> &nbsp; &nbsp; &nbsp;
       <p>
         <label for="polarization">
-          <input type="checkbox" id="vertical" value="vertical">
+          <input type="checkbox" id="vertical_rx" value="vertical">
           Vertical
-          <input type="checkbox" id="horizontal" value="horizontal">
+          <input type="checkbox" id="horizontal_rx" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+    </div>
+    <div id="tx_pattern_options">
+      <p><label for="tx_pattern">Type of Transmitter Pattern:</label> &nbsp;
+        <select id="tx_pattern">
+          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+          <option id="halfwave" value="halfwave">Half-wave dipole</option>
+          <option id="sdipole" value="sdipole">Small dipole</option>
+          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+        </select>
+      </p> &nbsp; &nbsp; &nbsp;
+      <p>
+        <label for="polarization">
+          <input type="checkbox" id="vertical_tx" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal_tx" value="horizontal">
           Horizontal
         </label><br>
       </p>&nbsp; &nbsp;
@@ -654,15 +680,198 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </transform>
         <!--26 16 2-->
         <!--This is the transmitter, not the receiver-->
-        <transform id="receiver" translation='0 0 -12'>
-          <shape>
-            <appearance>
-              <material diffuseColor='1 0 0'></material>
-            </appearance>
-            <sphere radius='0.75'></sphere>
-          </shape>
-          <inline id="inline-model" url='vert_iso_pat.x3d'/>
-        </transform>
+        <switch id="tx-geometry" whichchoice="1">
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='vert_iso_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='vert_iso_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='horiz_iso_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='horiz_iso_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='halfwave_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='halfwave_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='small_dip_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='small_dip_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='directional_pat.x3d'/>
+          </transform>
+
+          <transform id="receiver" translation='0 0 -12'>
+            <shape>
+              <appearance>
+                <material diffuseColor='1 0 0'></material>
+              </appearance>
+              <sphere radius='0.75'></sphere>
+            </shape>
+            <inline id="inline-model" url='directional_pat.x3d'/>
+          </transform>
+        </switch>
         <transform translation='0 -3.25 -12'>
           <shape>
             <appearance>
@@ -710,7 +919,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
               onoutputchange='processRotationGizmoEvent(event);'>
             </cylinderSensor>
 
-            <transform>
+            <transform DEF="RED_ROTATION_HANDLE">
               <transform scale='2.5 5 5'>
                 <shape>
                   <appearance DEF='RED_APP'>
@@ -733,7 +942,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             <cylinderSensor autoOffset='false' onoutputchange='processRotationGizmoEvent(event);'>
             </cylinderSensor>
 
-            <transform>
+            <transform DEF="GREEN_ROTATION_HANDLE">
               <transform scale='2.5 5.05 5.05' rotation='0 0 1 -1.57'>
                 <shape>
                   <appearance DEF='GREEN_APP'>
@@ -757,7 +966,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
               onoutputchange='processRotationGizmoEvent(event);'>
             </cylinderSensor>
 
-            <transform>
+            <transform DEF="BLUE_ROTATION_HANDLE">
               <transform scale='2.5 5.1 5.1' rotation='0 1 0 -1.57'>
                 <shape>
                   <appearance DEF='BLUE_APP'>
@@ -951,6 +1160,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       calculateSINR();
 
+      document.getElementById('tx_pattern_options').style.display = 'none';
+
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
@@ -961,6 +1172,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("gn1").style.display = "initial";
       document.getElementById("mcs1").style.display = "initial";
       //document.getElementById("gn2").style.display = "initial";
+      document.getElementById('tx_pattern_options').style.display = 'inline-flex';
 
     }
 
@@ -1455,20 +1667,33 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   }
   PowerSpectrumPlot_2D();
 
-  const verticalCheckbox = document.getElementById("vertical");
-  const horizontalCheckbox = document.getElementById("horizontal");
+  const rx_verticalCheckbox = document.getElementById("vertical_rx");
+  const rx_horizontalCheckbox = document.getElementById("horizontal_rx");
+
+  const tx_verticalCheckbox = document.getElementById("vertical_tx");
+  const tx_horizontalCheckbox = document.getElementById("horizontal_tx");
 
   document.getElementById("antenna_pattern").addEventListener("change", selectModel);
-  verticalCheckbox.addEventListener("change", selectModel);
-  horizontalCheckbox.addEventListener("change", selectModel);
+  document.getElementById("tx_pattern").addEventListener("change", selectModel);
+  rx_verticalCheckbox.addEventListener("change", selectModel);
+  rx_horizontalCheckbox.addEventListener("change", selectModel);
+
+  tx_verticalCheckbox.addEventListener("change", selectModel);
+  tx_horizontalCheckbox.addEventListener("change", selectModel);
 
 function selectModel() {
-  const selectedValue = document.getElementById("antenna_pattern").selectedIndex;
-  const isCheckedVertical = verticalCheckbox.checked ? 1 : 0;
-  const isCheckedHorizontal = horizontalCheckbox.checked ? 1 : 0;
-  const modelNumber = (selectedValue)*4 + 2*isCheckedVertical + isCheckedHorizontal;
-  console.log(modelNumber);
-  document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber);
+  const selectedValue_rx = document.getElementById("antenna_pattern").selectedIndex;
+  const selectedValue_tx = document.getElementById("tx_pattern").selectedIndex;
+  const rx_isCheckedVertical = rx_verticalCheckbox.checked ? 1 : 0;
+  const rx_isCheckedHorizontal = rx_horizontalCheckbox.checked ? 1 : 0;
+  const tx_isCheckedVertical = tx_verticalCheckbox.checked ? 1 : 0;
+  const tx_isCheckedHorizontal = tx_horizontalCheckbox.checked ? 1 : 0;
+  const modelNumber_rx = (selectedValue_rx)*4 + 2*rx_isCheckedVertical + rx_isCheckedHorizontal;
+  console.log(modelNumber_rx);
+  const modelNumber_tx = (selectedValue_tx)*4 + 2*tx_isCheckedVertical + tx_isCheckedHorizontal;
+  console.log(modelNumber_tx);
+  document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber_rx);
+  document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
 
 }
 </script>
