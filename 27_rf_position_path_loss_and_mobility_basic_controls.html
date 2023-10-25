@@ -108,7 +108,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     #tx_pattern_options {
     display: none;
     margin-left: 2em; 
-    margin-top: -2em; 
+    margin-bottom: -2em; 
     font-size: large;
     }
 
@@ -374,27 +374,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   </div>
 
   <div>
-    <div style="display: inline-flex; margin-left: 2em; font-size: large;">
-      <p><label for="antenna_pattern">Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
-        <select id="antenna_pattern">
-          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
-          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
-          <option id="halfwave" value="halfwave">Half-wave dipole</option>
-          <option id="sdipole" value="sdipole">Small dipole</option>
-          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
-        </select>
-      </p> &nbsp; &nbsp; &nbsp;
-      <p>
-        <label for="polarization">
-          <input type="checkbox" id="vertical_rx" value="vertical">
-          Vertical
-          <input type="checkbox" id="horizontal_rx" value="horizontal">
-          Horizontal
-        </label><br>
-      </p>&nbsp; &nbsp;
-    </div>
     <div id="tx_pattern_options">
-      <p><label for="tx_pattern">Type of Transmitter Pattern:</label> &nbsp;
+      <div style="width: 28px; height: 15px; background:rgba(163,36,36,255); margin:auto"></div>
+      <p><label for="tx_pattern">&nbsp;&nbsp;Type of Transmitter Pattern:</label> &nbsp;
         <select id="tx_pattern">
           <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
           <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
@@ -408,6 +390,26 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <input type="checkbox" id="vertical_tx" value="vertical">
           Vertical
           <input type="checkbox" id="horizontal_tx" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+    </div>
+    <div style="display: inline-flex; margin-left: 2em; font-size: large;">
+      <div style="width: 28px; height: 15px; background:rgba(0,176,240,255); margin:auto"></div>
+      <p><label for="antenna_pattern">&nbsp;&nbsp;Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
+        <select id="antenna_pattern">
+          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+          <option id="halfwave" value="halfwave">Half-wave dipole</option>
+          <option id="sdipole" value="sdipole">Small dipole</option>
+          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+        </select>
+      </p> &nbsp; &nbsp; &nbsp;
+      <p>
+        <label for="polarization">
+          <input type="checkbox" id="vertical_rx" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal_rx" value="horizontal">
           Horizontal
         </label><br>
       </p>&nbsp; &nbsp;
@@ -986,6 +988,28 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
         </transform>
         <!-- END OF ROTATION GIZMO -->
+
+        <transform>
+          <group>
+            </cylinderSensor>
+            <transform  translation="0 0 -12">
+              <transform USE="RED_ROTATION_HANDLE" />
+            </transform>
+          </group>
+
+          <group>
+            <transform  translation="0 0 -12">
+              <transform USE="GREEN_ROTATION_HANDLE" />
+            </transform>
+          </group>
+
+          <group>
+            </cylinderSensor>
+            <transform  translation="0 0 -12">
+              <transform USE="BLUE_ROTATION_HANDLE" />
+            </transform>
+          </group>
+        </transform>
 
       </scene>
     </x3d>
