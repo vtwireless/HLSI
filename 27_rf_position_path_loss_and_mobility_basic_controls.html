@@ -133,7 +133,17 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         display: flex;
         flex-direction: column;
       }
+
     }
+    .table {
+          width: 100%;
+        }
+
+        td, th {
+          border: 1px solid white;
+          text-align: center;
+          padding: 8px;
+        }
   </style>
 </head>
 
@@ -1197,7 +1207,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //setting default values of receiver power
   //overriding SNR and distance(tx and rx)
   getCoordinatesFromX3D("receiver");
-  console.log(receiverPos);
   calcDistance(receiverPos, new Position(0, 0, 0));
   updatePathLoss();
 
@@ -1546,20 +1555,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
     // document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
     // document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
-    // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-    document.getElementById('angle-x-table').textContent = angleX.toFixed(2);
 
-    // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-    document.getElementById('angle-y-table').textContent = angleY.toFixed(2);
-    
-    // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('angle-z-table').textContent = angleZ.toFixed(2);
-
-    // document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
-    // document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
-
-    // document.getElementById("theta").value = thetaPhi[0].toFixed(2);
-    // document.getElementById("phi").value = thetaPhi[1].toFixed(2);
     // document.getElementById("theta").value = thetaPhi[0].toFixed(2);
     // document.getElementById("phi").value = thetaPhi[1].toFixed(2);
 
@@ -1649,12 +1645,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     console.log("theta - functional");
     console.log(angles_upated[0]);
     document.getElementById('angle-theta-table').textContent = angles_upated[0].toFixed(2);
-    document.getElementById('angle-theta-table').textContent = angles_upated[0].toFixed(2);
     console.log("phi - functional");
     if(angles_upated[1] > 360)
     angles_upated[1] = angles_upated[1] % 360;
     console.log(angles_upated[1]);
-    document.getElementById('angle-phi-table').textContent = angles_upated[1].toFixed(2);
     document.getElementById('angle-phi-table').textContent = angles_upated[1].toFixed(2);
   }
 
