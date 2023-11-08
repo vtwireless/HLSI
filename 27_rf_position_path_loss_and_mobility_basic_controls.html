@@ -112,6 +112,20 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     font-size: large;
     }
 
+    .angles-table {
+      margin: 25px;
+    }
+
+    .tx-axes {
+      display: none;
+    }
+
+    #tx_red_cyl {
+      display: none;
+    }
+
+    
+
     @media screen and (max-width: 1500px) {
       .grid-container {
         display: flex;
@@ -447,7 +461,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
             <viewpoint></viewpoint>
           </transform>
 
-          <matrixTransform id="transmitterRotation">
+          <matrixTransform id="rxRotation">
 
             <transform rotation="1 0 0 3.1415">
 
@@ -866,17 +880,21 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
                   </appearance>
                   <Cone bottomradius='1.5' height='3'/>
                 </shape>
-                <inline id="inline-model" url='directional_pat.x3d'/>
+                <transform rotation="0 0 1 -1.5707">
+                  <inline id="inline-model" url='directional_pat.x3d'/>
+                </transform>
               </transform>
 
-              <transform rotation="0 0 1 1.5707">
+              <transform rotation="0 0 1 -1.5707">
                 <shape>
                   <appearance>
                     <material diffuseColor='1 0 0'></material>
                   </appearance>
                   <Cone bottomradius='1.5' height='3'/>
                 </shape>
-                <inline url='directional_pat.x3d'/>
+                <transform rotation="0 0 1 1.5707">
+                  <inline id="inline-model" url='directional_pat.x3d'/>
+                </transform>
               </transform>
             </switch>
           </transform>
@@ -1003,7 +1021,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <transform id='RotationHandleTransform2'>
 
           <group>
-            <cylinderSensor id="tx_red_cyl" autoOffset='false' axisRotation='0 0 1 -1.57' 
+            <cylinderSensor id="tx_red_cyl" class="tx-axes" autoOffset='false' axisRotation='0 0 1 -1.57' 
             onoutputchange='processRotationGizmoEvent(event, "tx");'>
           </cylinderSensor>
             <transform  translation="0 0 -12">
@@ -1027,7 +1045,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           </group>
 
           <group>
-            <cylinderSensor id="tx_green_cyl" autoOffset='false' onoutputchange='processRotationGizmoEvent(event, "tx");'>
+            <cylinderSensor id="tx_green_cyl" class="tx-axes" autoOffset='false' onoutputchange='processRotationGizmoEvent(event, "tx");'>
             </cylinderSensor>
 
             <transform  translation="0 0 -12">
@@ -1052,7 +1070,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
           <group>
 
-            <cylinderSensor id="tx_blue_cyl" autoOffset='false' axisRotation='1 0 0 -1.57'
+            <cylinderSensor id="tx_blue_cyl" class="tx-axes" autoOffset='false' axisRotation='1 0 0 -1.57'
             onoutputchange='processRotationGizmoEvent(event, "tx");'>
             </cylinderSensor>
 
@@ -1082,10 +1100,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       </scene>
     </x3d>
-    <div>
+    <div style="display: flex; flex-direction: row;">
 
 
-      <table id="angles-table" width="100px">
+      <table class="angles-table" width="100px">
+        <caption>RX-TX-Relative</caption>
         <tr>
           <th>Angle</th>
           <th>Value</th>
@@ -1104,14 +1123,71 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         </tr>
         <tr>
           <td>Theta</td>
-          <td id="angle-theta-table">0</td>
+          <td id="angle-theta-table">90</td>
         </tr>
         <tr>
           <td>Phi</td>
-          <td id="angle-phi-table">0</td>
+          <td id="angle-phi-table">90</td>
         </tr>
-        </table>
-      </div>
+      </table>
+
+      <table class="angles-table" width="100px">
+        <caption>RX-Absolute</caption>
+        <tr>
+          <th>Angle</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>X</td>
+          <td id="angle-x-table-rx">0</td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td id="angle-y-table-rx">0</td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td id="angle-z-table-rx">0</td>
+        </tr>
+        <tr>
+          <td>Theta</td>
+          <td id="angle-theta-table-rx">0</td>
+        </tr>
+        <tr>
+          <td>Phi</td>
+          <td id="angle-phi-table-rx">0</td>
+        </tr>
+      </table>
+
+      <table class="angles-table" width="100px">
+        <caption>TX-Absolute</caption>
+        <tr>
+          <th>Angle</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>X</td>
+          <td id="angle-x-table-tx">0</td>
+        </tr>
+        <tr>
+          <td>Y</td>
+          <td id="angle-y-table-tx">0</td>
+        </tr>
+        <tr>
+          <td>Z</td>
+          <td id="angle-z-table-tx">0</td>
+        </tr>
+        <tr>
+          <td>Theta</td>
+          <td id="angle-theta-table-tx">0</td>
+        </tr>
+        <tr>
+          <td>Phi</td>
+          <td id="angle-phi-table-tx">0</td>
+        </tr>
+      </table>
+
+    </div>
   </div>
 
   <div class="grid-container-main">
@@ -1478,7 +1554,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       currentGizmoRotationOffset = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
 
       applyRotationGizmoTransformations(module);
-      console.log("First cond");
+      console.log(module + " : First cond");
     }
 
     if (event.fieldName === 'isActive' && event.value === false) {
@@ -1489,13 +1565,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
 
       applyRotationGizmoTransformations(module);
-      console.log("Second cond");
+      console.log(module + " : Second cond");
     }
   }
 
   function getRotationNode(module) {
     if (module == "rx") {
-      return document.getElementById('transmitterRotation'); 
+      return document.getElementById('rxRotation'); 
     }
     return document.getElementById('txRotation'); 
   }
@@ -1504,10 +1580,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
    * Applies the current transformations, computed from the rotation gizmo output, to the scene
    */
   function applyRotationGizmoTransformations(module) {
-    // if(module == "tx") {
-    //   return;
-    // }
-    // var transmitterRotationNode = document.getElementById('transmitterRotation'); 
     var transmitterRotationNode = getRotationNode(module);
 
     //incorporate the current rotation offset, interpreted globally, into the stored rotation value
@@ -1543,21 +1615,21 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
     var thetaPhi = anglesToThetaPhi(matrix);
 
+    document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+    document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+
     // Print rotation angles in degrees
     // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angle-x-table').textContent = angleX.toFixed(2);
+    document.getElementById('angle-x-table-rx').textContent = angleX.toFixed(2);
 
     // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
     document.getElementById('angle-y-table').textContent = angleY.toFixed(2);
+    document.getElementById('angle-y-table-rx').textContent = angleY.toFixed(2);
     
     // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
     document.getElementById('angle-z-table').textContent = angleZ.toFixed(2);
-
-    // document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + thetaPhi[0].toFixed(2);
-    // document.getElementById('phiAngle').textContent = 'Angle Phi: ' + thetaPhi[1].toFixed(2);
-
-    // document.getElementById("theta").value = thetaPhi[0].toFixed(2);
-    // document.getElementById("phi").value = thetaPhi[1].toFixed(2);
+    document.getElementById('angle-z-table-rx').textContent = angleZ.toFixed(2);
 
     // update path loss
     updatePathLoss();
@@ -1661,20 +1733,30 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     phi = phi * (180/Math.PI);
     if(phi < 0)
       phi = phi + 360;
+    return [theta, phi];
+  }
 
+  function calculateGlobalAngles(x, y, z) {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let theta = Math.acos(y / radius); // Theta angle in radians
+    let phi = Math.atan2(-z, x); // Phi angle in radians
+    theta = theta *(180/Math.PI);
+    phi = phi * (180/Math.PI);
+    phi = (phi - 270 + 360) % 360;
+    theta = (270 - theta) % 180;
+    console.log("Theta(Original): " + theta);
+    console.log("Phi(Original): " + phi);
     return [theta, phi];
   }
 
   function anglesToThetaPhi(matrix) 
   {
-    let matrixB = [[0],
-                  [0],
-                  [1]];
+    let matrixB = [[0],[0],[1]];
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
     calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
     resultCoordMatrix[2]);
-    return calculatePolarAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+    return calculateGlobalAngles(resultCoordMatrix[0], resultCoordMatrix[1],
     resultCoordMatrix[2]);
   }
 
