@@ -700,6 +700,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <!--This is the transmitter, not the receiver-->
         <!-- <transform translation='0 0 -12'> -->
         <transform id="receiver" translation='0 0 -12'>
+          <transform translation='0 -2.5 0'>
+            <shape>
+              <appearance>
+                <material diffuseColor='0.71 0.396 0.114'></material>
+              </appearance>
+              <cylinder radius='0.25' height='5'></cylinder>
+            </shape>
+          </transform>
+  
         <matrixTransform id="txRotation">
           <transform id="receiver-temp" rotation="1 0 0 3.1415">
             <switch id="tx-geometry" whichchoice="1">
@@ -900,14 +909,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           </transform>
         </matrixTransform>
         </transform>
-        <transform translation='0 -3.25 -12'>
-          <shape>
-            <appearance>
-              <material diffuseColor='0.71 0.396 0.114'></material>
-            </appearance>
-            <cylinder radius='0.25' height='5'></cylinder>
-          </shape>
-        </transform>
+
+        
 
         <!-- TRANSLATION GIZMO (CONTAINING PLANE SENSOR AND SENSOR GEOMETRY) -->
         <group>
@@ -1330,7 +1333,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       document.getElementById('tx_pattern_options').style.display = 'none';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", -1);
-      
+      document.getElementById("tx-geometry").setAttribute("whichChoice", 0);  
 
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
@@ -1866,10 +1869,18 @@ function selectModel() {
   const tx_isCheckedHorizontal = tx_horizontalCheckbox.checked ? 1 : 0;
   const modelNumber_rx = (selectedValue_rx)*4 + 2*rx_isCheckedVertical + rx_isCheckedHorizontal;
   console.log(modelNumber_rx);
-  const modelNumber_tx = (selectedValue_tx)*4 + 2*tx_isCheckedVertical + tx_isCheckedHorizontal;
+  let modelNumber_tx = 0;
+  if(document.getElementById("mode").value != 'beginner')
+    modelNumber_tx =  (selectedValue_tx)*4 + 2*tx_isCheckedVertical + tx_isCheckedHorizontal;
+  console.log("test");
   console.log(modelNumber_tx);
   document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber_rx);
-  document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
+  if(document.getElementById("mode").value == 'beginner')
+  {
+    document.getElementById("tx-geometry").setAttribute("whichchoice", 0);
+  }
+  else
+    document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
 
 }
 </script>
