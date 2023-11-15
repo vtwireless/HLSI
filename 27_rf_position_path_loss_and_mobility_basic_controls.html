@@ -1775,6 +1775,25 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     //distance instead of sig gain
       CalculateSINR_BasedOn_ReceivedPower();
   }
+  
+  // function updatePathLoss() {
+  //   let pattern = document.getElementById("antenna_pattern").value;
+
+  //   let theta_rx = Number(document.getElementById("angle-theta-table-rx").innerText) || 0;
+  //   let phi_rx = Number(document.getElementById("angle-phi-table-rx").innerText) || 0;
+
+  //   let theta_tx = Number(document.getElementById("angle-theta-table-tx").innerText) || 0;
+  //   let phi_tx = Number(document.getElementById("angle-phi-table-tx").innerText) || 0;
+
+  //   if(document.getElementById("mode").value == 'beginner')
+  //     calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
+  //   else
+  //     calculatePathLoss(sig, theta_rx, phi_rx, theta_tx, phi_tx, distance, pattern);
+
+  //   //sinr value is changed where the formula is re-evaluated based on receiver 
+  //   //distance instead of sig gain
+  //     CalculateSINR_BasedOn_ReceivedPower();
+  // }
 
   function CalculateSINR_BasedOn_ReceivedPower() {
     let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
