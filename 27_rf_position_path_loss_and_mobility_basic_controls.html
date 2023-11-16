@@ -1747,6 +1747,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     phi = phi * (180/Math.PI);
     phi = (phi - 270 + 360) % 360;
     theta = (270 - theta) % 180;
+    if(phi < 0)
+      phi = (phi + 360) % 360;
     console.log("Theta(Original): " + theta);
     console.log("Phi(Original): " + phi);
     return [theta, phi];
