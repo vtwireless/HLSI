@@ -171,15 +171,7 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
 
 }
 
-
-// Calculates the path loss at a given point in space with given spherical coordinates theta and phi for Tx and Rx
-// Uses equation: 
-// path_loss = 20log10(lambda/(4pi*distance)) + abs(fvert(theta,phi))^2 + abs(fhoriz(theta,phi))^2
-// lambda: wavelength of the signal
-// distance: the distance from the receiver antenna to the transmitter
-// fvert(theta,phi) and fhoriz(theta,phi): the complex antenna pattern values at the given spherical coordinates
-// pattern: selected antenna pattern string
-function calculatePathLoss(sig, theta_rx, phi_rx, theta_tx, phi_tx, distance, pattern) {
+function calculatePathLossAdvanced(sig, theta_rx, phi_rx, theta_tx, phi_tx, distance, pattern) {
     // compute wavelength in meters
     let lambda = 299.792458e6 / (sig["_freq"]);
 
@@ -190,7 +182,7 @@ function calculatePathLoss(sig, theta_rx, phi_rx, theta_tx, phi_tx, distance, pa
 
     let antenna_pattern = getAntennaPatternValue(theta_rx, phi_rx, pattern);
     let tx_pattern = getAntennaPatternValue(theta_tx, phi_tx, pattern);
-    
+
     let fvert_rx_dB = 20 * Math.log10(Math.abs(antenna_pattern[0]));
     let fhoriz_rx_dB = 20 * Math.log10(Math.abs(antenna_pattern[1]));
     //the below values of fvert and fhoriz are default values in 
@@ -207,8 +199,8 @@ function calculatePathLoss(sig, theta_rx, phi_rx, theta_tx, phi_tx, distance, pa
     console.log("Transmitter gain: " + sig._gn);
     console.log("eirp vert dB: " + eirp_vert_dB);
     console.log("eirp horiz dB: " + eirp_horiz_dB);
-    
-        
+
+
     let pathLoss_dB = 20 * Math.log10((4 * Math.PI * distance)/lambda);
 
     // console.log(fvert_rx_dB);
