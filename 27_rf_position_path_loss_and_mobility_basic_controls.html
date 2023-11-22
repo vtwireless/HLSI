@@ -1537,7 +1537,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
       //transform the affected element
       document.getElementById('transmitterTranslation').setFieldValue('translation', translationValue);
-      applyRotationGizmoTransformations();
+      applyRotationGizmoTransformations("translation-module");
     }
   }
 
@@ -1616,23 +1616,23 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var angleX = ((angles[0] * (180 / Math.PI)) + 360) % 360;
     var angleY = ((angles[1] * (180 / Math.PI)) + 360) % 360;
     var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
-    var thetaPhi = anglesToThetaPhi(matrix);
+    var thetaPhi = anglesToThetaPhi(matrix, module);
 
-    document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
-    document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+    // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+    // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
 
     // Print rotation angles in degrees
     // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
     document.getElementById('angle-x-table').textContent = angleX.toFixed(2);
-    document.getElementById('angle-x-table-rx').textContent = angleX.toFixed(2);
+    document.getElementById('angle-x-table-' + module).textContent = angleX.toFixed(2);
 
     // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
     document.getElementById('angle-y-table').textContent = angleY.toFixed(2);
-    document.getElementById('angle-y-table-rx').textContent = angleY.toFixed(2);
+    document.getElementById('angle-y-table-' + module).textContent = angleY.toFixed(2);
     
     // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
     document.getElementById('angle-z-table').textContent = angleZ.toFixed(2);
-    document.getElementById('angle-z-table-rx').textContent = angleZ.toFixed(2);
+    document.getElementById('angle-z-table-' + module).textContent = angleZ.toFixed(2);
 
     // update path loss
     updatePathLoss();
@@ -1690,10 +1690,11 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
   //3) The cross product ((-Z) x Y) gives +ve X axis
   //4) line in (2) is always the new -z axis and (3) is always the new +ve X axis
   //5) from the considerations we can get the x axis  
-  function calculateUpdatedAngles(x_initial, y_initial, z_initial)
+  function calculateUpdatedAngles(x_initial, y_initial, z_initial, module)
   {
     var magnitud1 = Math.sqrt(
       x_initial * x_initial + y_initial * y_initial + z_initial * z_initial);
+      //Here receiver means transmitter
     var rx_coordinates = getCoordinatesFromX3D("receiver");
     var tx_cordinates = translatorPos;
     var updated_z_vector = {x:-(rx_coordinates.x - tx_cordinates.x), y:-(rx_coordinates.y - tx_cordinates.y),
@@ -1716,15 +1717,30 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     var magnitude = Math.sqrt(
       x_new * x_new + y_new * y_new + z_new * z_new);
     
-    var angles_upated = calculatePolarAngles(x_new, y_new, z_new);
-    console.log("theta - functional");
-    console.log(angles_upated[0]);
-    document.getElementById('angle-theta-table').textContent = angles_upated[0].toFixed(2);
-    console.log("phi - functional");
-    if(angles_upated[1] > 360)
-    angles_upated[1] = angles_upated[1] % 360;
-    console.log(angles_upated[1]);
-    document.getElementById('angle-phi-table').textContent = angles_upated[1].toFixed(2);
+    var angles_updated = calculatePolarAngles(x_new, y_new, z_new);
+    // console.log("theta - updated");
+    // console.log(angles_updated[0]);
+    // console.log("phi - updated");
+    if(angles_updated[1] > 360)
+    angles_updated[1] = angles_updated[1] % 360;
+    // console.log(angles_updated[1]);
+    if(module === "translation-module" || module === "rx")
+    {
+      /*update angles of rx w.r.t tx*/
+      document.getElementById('angle-theta-table').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table').textContent = angles_updated[1].toFixed(2);
+      console.log("rx angles", angles_updated[0], angles_updated[1])
+    }
+
+    if(module === "translation-module" || module === "tx")
+    {
+      /*update angles of tx w.r.t rx*/
+      angles_updated[1] = (540 - angles_updated[1]) % 360;
+      document.getElementById('angle-theta-table-tx').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table-tx').textContent = angles_updated[1].toFixed(2);
+      console.log("tx angles",angles_updated[0], angles_updated[1])
+    }
+
   }
 
   function calculatePolarAngles(x, y, z) 
@@ -1754,13 +1770,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     return [theta, phi];
   }
 
-  function anglesToThetaPhi(matrix) 
+  function anglesToThetaPhi(matrix, module) 
   {
     let matrixB = [[0],[0],[1]];
+    console.log("module", module);
+    console.log(typeof(module));
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
     calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
-    resultCoordMatrix[2]);
+    resultCoordMatrix[2], module);
     return calculateGlobalAngles(resultCoordMatrix[0], resultCoordMatrix[1],
     resultCoordMatrix[2]);
   }
