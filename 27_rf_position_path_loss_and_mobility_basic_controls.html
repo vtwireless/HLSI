@@ -124,6 +124,13 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       display: none;
     }
 
+    #manual-angle-options-tx {
+      display: none;
+    }
+
+    #manual-angle-options-rx {
+      display: none;
+    }
     
 
     @media screen and (max-width: 1500px) {
@@ -407,6 +414,18 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           Horizontal
         </label><br>
       </p>&nbsp; &nbsp;
+      <p id="manual-angle-options-tx">
+        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="theta_tx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="phi_tx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        
+        <input id="apply" type="button" value="Apply" onclick="manualInput()">  &nbsp; &nbsp;
+      </p>
     </div>
     <div style="display: inline-flex; margin-left: 2em; font-size: large;">
       <div style="width: 28px; height: 15px; background:rgba(0,176,240,255); margin:auto"></div>
@@ -427,6 +446,18 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           Horizontal
         </label><br>
       </p>&nbsp; &nbsp;
+      <p id="manual-angle-options-rx">
+        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="theta_rx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="phi_rx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        
+        <input id="apply" type="button" value="Apply" onclick="manualInput()">  &nbsp; &nbsp;
+      </p>
     </div>
     <div>
       <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
@@ -1334,6 +1365,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById('tx_pattern_options').style.display = 'none';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", -1);
       document.getElementById("tx-geometry").setAttribute("whichChoice", 0);  
+      document.getElementById('manual-angle-options-tx').style.display = 'none';
+      document.getElementById('manual-angle-options-rx').style.display = 'none';
 
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
@@ -1347,6 +1380,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       //document.getElementById("gn2").style.display = "initial";
       document.getElementById('tx_pattern_options').style.display = 'inline-flex';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", 0);
+      document.getElementById('manual-angle-options-tx').style.display = 'block';
+      document.getElementById('manual-angle-options-rx').style.display = 'block';
+
     }
 
   }
@@ -1903,6 +1939,29 @@ function selectModel() {
   else
     document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
 
+}
+
+function manualInput() {
+  let theta_tx = Number(document.getElementById("theta_tx_manual").value);
+  let phi_tx = Number(document.getElementById("phi_tx_manual").value);
+  let theta_rx = Number(document.getElementById("theta_rx_manual").value);
+  let phi_rx = Number(document.getElementById("phi_rx_manual").value);
+  let pattern = document.getElementById("antenna_pattern").value;
+
+  console.log("Manual pattern is: " + pattern);
+
+  document.getElementById('angle-theta-table-tx').textContent = theta_tx ;
+  document.getElementById('angle-phi-table-tx').textContent = phi_tx;
+  
+  document.getElementById('angle-theta-table-rx').textContent = theta_rx ;
+  document.getElementById('angle-phi-table-rx').textContent = phi_rx;
+
+  if (theta_tx < 0 || theta_tx > 180 || phi_tx < 0 || phi_tx > 360 || 
+      theta_rx < 0 || theta_rx > 180 || phi_rx < 0 || phi_rx > 360) {
+    console.log("Invalid input for theta/phi");
+    return;
+  }
+  calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
 }
 </script>
 
