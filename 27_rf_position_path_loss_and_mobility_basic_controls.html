@@ -112,9 +112,6 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     font-size: large;
     }
 
-    .angles-table {
-      margin: 25px;
-    }
 
     .tx-axes {
       display: none;
@@ -1104,7 +1101,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     <div style="display: flex; flex-direction: row;">
 
 
-      <table class="angles-table" width="100px">
+      <!-- <table class="angles-table" width="100px">
         <caption>RX-TX-Relative</caption>
         <tr>
           <th>Angle</th>
@@ -1130,61 +1127,77 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
           <td>Phi</td>
           <td id="angle-phi-table">90</td>
         </tr>
-      </table>
+      </table> -->
 
-      <table class="angles-table" width="100px">
-        <caption>RX-Absolute</caption>
+      <table id="angles-table-rx" width="100px" style="margin: 20px;">
+        <caption>RX-Details</caption>
         <tr>
           <th>Angle</th>
           <th>Value</th>
         </tr>
         <tr>
-          <td>X</td>
+          <td>X<sub>absolute</sub></td>
           <td id="angle-x-table-rx">0</td>
         </tr>
         <tr>
-          <td>Y</td>
+          <td>Y<sub>absolute</sub></td>
           <td id="angle-y-table-rx">0</td>
         </tr>
         <tr>
-          <td>Z</td>
+          <td>Z<sub>absolute</sub></td>
           <td id="angle-z-table-rx">0</td>
         </tr>
         <tr>
-          <td>Theta</td>
+          <td>&theta;<sub>absolute</sub></td>
           <td id="angle-theta-table-rx">0</td>
         </tr>
         <tr>
-          <td>Phi</td>
+          <td>&Phi;<sub>absolute</sub></td>
           <td id="angle-phi-table-rx">0</td>
+        </tr>
+        <tr>
+          <td>&theta;<sub>rx-tx</sub></td>
+          <td id="angle-theta-table-rx-rel">90</td>
+        </tr>
+        <tr>
+          <td>&Phi;<sub>rx-tx</sub></td>
+          <td id="angle-phi-table-rx-rel">90</td>
         </tr>
       </table>
 
-      <table class="angles-table" width="100px">
-        <caption>TX-Absolute</caption>
+      <table id="angles-table-tx" width="100px" style="margin: 20px;">
+        <caption>TX-Details</caption>
         <tr>
           <th>Angle</th>
           <th>Value</th>
         </tr>
         <tr>
-          <td>X</td>
+          <td>X<sub>absolute</sub></td>
           <td id="angle-x-table-tx">0</td>
         </tr>
         <tr>
-          <td>Y</td>
+          <td>Y<sub>absolute</sub></td>
           <td id="angle-y-table-tx">0</td>
         </tr>
         <tr>
-          <td>Z</td>
+          <td>Z<sub>absolute</sub></td>
           <td id="angle-z-table-tx">0</td>
         </tr>
         <tr>
-          <td>Theta</td>
+          <td>&theta;<sub>absolute</sub></td>
           <td id="angle-theta-table-tx">0</td>
         </tr>
         <tr>
-          <td>Phi</td>
+          <td>&Phi;<sub>absolute</sub></td>
           <td id="angle-phi-table-tx">0</td>
+        </tr>
+        <tr>
+          <td>&theta;<sub>tx-rx</sub></td>
+          <td id="angle-theta-table-tx-rel">90</td>
+        </tr>
+        <tr>
+          <td>&Phi;<sub>tx-rx</sub></td>
+          <td id="angle-phi-table-tx-rel">90</td>
         </tr>
       </table>
 
@@ -1318,6 +1331,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("bw1").style.display = "none";
       document.getElementById("gn1").style.display = "none";
       document.getElementById("mcs1").style.display = "none";
+      document.getElementById("angles-table-tx").style.display = 'none';
       //document.getElementById("gn2").style.display = "initial";
       document.getElementById("sinr_div").style.display = "inline";
 
@@ -1334,6 +1348,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById('tx_pattern_options').style.display = 'none';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", -1);
       document.getElementById("tx-geometry").setAttribute("whichChoice", 0);  
+      
 
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
@@ -1344,6 +1359,7 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
       document.getElementById("bw1").style.display = "initial";
       document.getElementById("gn1").style.display = "initial";
       document.getElementById("mcs1").style.display = "initial";
+      document.getElementById("angles-table-tx").style.display = "";
       //document.getElementById("gn2").style.display = "initial";
       document.getElementById('tx_pattern_options').style.display = 'inline-flex';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", 0);
@@ -1624,15 +1640,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       // Print rotation angles in degrees
       // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-      document.getElementById('angle-x-table').textContent = angleX_rx.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_rx.toFixed(2);
       document.getElementById('angle-x-table-rx').textContent = angleX_rx.toFixed(2);
 
       // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-      document.getElementById('angle-y-table').textContent = angleY_rx.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_rx.toFixed(2);
       document.getElementById('angle-y-table-rx').textContent = angleY_rx.toFixed(2);
       
       // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-      document.getElementById('angle-z-table').textContent = angleZ_rx.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_rx.toFixed(2);
       document.getElementById('angle-z-table-rx').textContent = angleZ_rx.toFixed(2);
 
       //set matrix value in column major format, as required by the MatrixTransform node
@@ -1659,15 +1675,15 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       // Print rotation angles in degrees
       // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-      document.getElementById('angle-x-table').textContent = angleX_tx.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_tx.toFixed(2);
       document.getElementById('angle-x-table-tx').textContent = angleX_tx.toFixed(2);
 
       // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-      document.getElementById('angle-y-table').textContent = angleY_tx.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_tx.toFixed(2);
       document.getElementById('angle-y-table-tx').textContent = angleY_tx.toFixed(2);
       
       // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-      document.getElementById('angle-z-table').textContent = angleZ_tx.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_tx.toFixed(2);
       document.getElementById('angle-z-table-tx').textContent = angleZ_tx.toFixed(2);
 
       //set matrix value in column major format, as required by the MatrixTransform node
@@ -1761,8 +1777,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     if(module === "translation-module" || module === "rx")
     {
       /*update angles of rx w.r.t tx*/
-      document.getElementById('angle-theta-table').textContent = angles_updated[0].toFixed(2);
-      document.getElementById('angle-phi-table').textContent = angles_updated[1].toFixed(2);
+      document.getElementById('angle-theta-table-rx-rel').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table-rx-rel').textContent = angles_updated[1].toFixed(2);
       console.log("rx angles", angles_updated[0], angles_updated[1])
     }
 
@@ -1770,8 +1786,8 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     {
       /*update angles of tx w.r.t rx*/
       angles_updated[1] = (540 - angles_updated[1]) % 360;
-      document.getElementById('angle-theta-table-tx').textContent = angles_updated[0].toFixed(2);
-      document.getElementById('angle-phi-table-tx').textContent = angles_updated[1].toFixed(2);
+      document.getElementById('angle-theta-table-tx-rel').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table-tx-rel').textContent = angles_updated[1].toFixed(2);
       console.log("tx angles",angles_updated[0], angles_updated[1])
     }
 
@@ -1819,15 +1835,34 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   // Updates the Path Loss
   function updatePathLoss() {
-    let pattern = document.getElementById("antenna_pattern").value;
+    let pattern_rx = document.getElementById("antenna_pattern").value;
+    let pattern_tx = document.getElementById("tx_pattern").value;
 
-    let theta = Number(document.getElementById("angle-theta-table").innerText) || 0;
-    let phi = Number(document.getElementById("angle-phi-table").innerText) || 0;
-    calculatePathLoss(sig1, theta, phi, distance_tx_rx, pattern);
+    let theta_rx = Number(document.getElementById("angle-theta-table-rx-rel").innerText) || 0;
+    let phi_rx = Number(document.getElementById("angle-phi-table-rx-rel").innerText) || 0;
+
+    let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
+    let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
+    //calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    let mode = document.getElementById("mode").value;
+
+    console.log(pattern_rx, theta_rx, phi_rx);
+    console.log(pattern_tx, theta_tx, phi_tx);
+// beginner mode
+    if (mode === 'beginner')
+    {
+      calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx)
+    }
+    else
+    {
+      calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
+    }
+    
+    
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
-      CalculateSINR_BasedOn_ReceivedPower();
+    CalculateSINR_BasedOn_ReceivedPower();
   }
   
   // function updatePathLoss() {
