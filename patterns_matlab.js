@@ -153,6 +153,8 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
 
   const fvert = Array.from({ length: thetadim }, () => Array.from({ length: phidim }).fill(0));
   const fhoriz = Array.from({ length: thetadim }, () => Array.from({ length: phidim }).fill(0));
+  let minTheta = 1.3089969389957472;
+  const c = (10 ** (SLL / 10));
 
   for (let k = 1; k <= thetadim; k++) {
     const theta = Math.PI * thetares * (k - 1) / 180;
@@ -160,11 +162,24 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
       const phi = Math.PI * phires * (m - 1) / 180;
       if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 180 > Math.PI * (elbw / 2) / 180) {
         if (SLL !== -999) {
-          fvert[k - 1][m - 1] = 10 ** (SLL / 10);
+          let factor = 0;
+          if (theta > Math.PI/2) factor = Math.PI - theta;
+          else factor = theta;
+          if (theta < Math.PI/2) fvert[k - 1][m - 1] = 0;
+          else fvert[k - 1][m - 1] = c;
+          if (phi < 0.4363323129985824 || phi > 5.934119456780721) fvert[k - 1][m - 1] = (factor/minTheta)**1 + (1 - (factor/minTheta)**1)*c;
+          else fvert[k - 1][m - 1] =  (10 ** (SLL / 10));
         }
       } else if (phi - Math.PI * phires / 180 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
         if (SLL !== -999) {
-          fvert[k - 1][m - 1] = 10 ** (SLL / 10);
+          // minPhi = Math.min(minPhi, phi);
+          // maxPhi = Math.max(maxPhi, phi);
+          let factor = 0;
+          if (phi < Math.PI/2) factor = Math.PI/2 - phi;
+          else if (phi > 1.5 * Math.PI) factor = phi - 1.5 * Math.PI;
+          console.log("factor: " + factor);
+          if (phi < Math.PI/2  || phi > 1.5 * Math.PI) fvert[k - 1][m - 1] = (factor/minTheta)**1 + (1 - (factor/minTheta)**1)*c;
+          else fvert[k - 1][m - 1] =  (10 ** (SLL / 10));
         }
       } else {
         fvert[k - 1][m - 1] = 1;

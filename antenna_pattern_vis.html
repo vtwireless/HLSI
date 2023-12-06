@@ -136,29 +136,49 @@
                 .fill()
                 .map(() => Array(phidim).fill(0)); // vertical polarization
             let fh = fv.slice(); // horizontal polarization
+            // const maxTheta = 1.23;
+            // const maxPhi = 5.6;
+            let minTheta = 1.3089969389957472;
+            let maxTheta = 1.8325957145940461;
+            const c = (10 ** (SLL / 10));
+
             for (let k = 1; k <= thetadim; k++) {
                 const theta = Math.PI * thetares * (k - 1) / 180;
                 for (let m = 1; m <= phidim; m++) {
                     const phi = Math.PI * phires * (m - 1) / 180;
                     if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 180 > Math.PI * (elbw / 2) / 180) {
-                        if (SLL !== -999) {
-                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
-                        }
+                        let factor = 0;
+                        if (theta > Math.PI/2) factor = Math.PI - theta;
+                        else factor = theta;
+                        if (theta < Math.PI/2) fv[k - 1][m - 1] = 0;
+                        else fv[k - 1][m - 1] = c;
+                        if (phi < 0.4363323129985824 || phi > 5.934119456780721) fv[k - 1][m - 1] = (factor/minTheta)**1 + (1 - (factor/minTheta)**1)*c;
+                        else fv[k - 1][m - 1] =  (10 ** (SLL / 10));
                     } else if (phi - Math.PI * phires / 180 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
-                        if (SLL !== -999) {
-                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
-                        }
+                        // minPhi = Math.min(minPhi, phi);
+                        // maxPhi = Math.max(maxPhi, phi);
+                        let factor = 0;
+                        if (phi < Math.PI/2) factor = Math.PI/2 - phi;
+                        else if (phi > 1.5 * Math.PI) factor = phi - 1.5 * Math.PI;
+                        if (phi < Math.PI/2  || phi > 1.5 * Math.PI) fv[k - 1][m - 1] = (factor/minTheta)**1 + (1 - (factor/minTheta)**1)*c;
+                        else fv[k - 1][m - 1] =  (10 ** (SLL / 10));
                     } else {
                         fv[k - 1][m - 1] = 1;
                     }
                 }
             }
+            // console.log("minTheta: " + minTheta);
+            // console.log("maxTheta: " + maxTheta);
+            // console.log("minPhi: " + minPhi);
+            // console.log("maxPhi: " + maxPhi);
+
             fvert = fv;
             fhoriz = fh;
 
-            fvert = fv.map(subArray => subArray.map(number => number * 3));
+            fvert = fv.map(subArray => subArray.map(number => number * 2));
             fhoriz = fh.map(subArray => subArray.map(number => number));
-        }
+}
+
 
         function short_dipole(thetares, phires) {
 
