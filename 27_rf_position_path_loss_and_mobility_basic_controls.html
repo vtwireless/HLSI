@@ -467,6 +467,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
         <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
         <label id="rec_trans_dist" for="rec_trans_dist"></label>
         &nbsp; &nbsp; &nbsp;
+        <label for="polarization_label">Polarization Angle(Rx-Tx) : </label> &nbsp;
+        <label id="polarization_angle" for="polarization_angle"></label>
+        &nbsp; &nbsp; &nbsp;
       </div>
     </div>
   </div>
@@ -1292,6 +1295,9 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
   let distance_tx_rx = 0;
 
+  let polarizationVectorTx = {x: 0, y: 1, z: 0} ;
+  let polarizationVectorRx = {x: 0, y: 1, z: 0} ;
+
   // sig1['name'] = "comm_link_1";
   // sig2['name'] = "comm_link_2";
   // sig3['name'] = "comm_link_3";
@@ -1689,6 +1695,10 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       //set matrix value in column major format, as required by the MatrixTransform node
       document.getElementById('rxRotation').setFieldValue("matrix", transformMatrix_rx.transpose());
+
+      //update the global variable polarizationVectorRx with the new rotation
+      polarizationVector(matrix_rx, "rx");
+      
     }
     if(module === "tx"|| module === "translation-module")
     {
@@ -1724,11 +1734,37 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
 
       //set matrix value in column major format, as required by the MatrixTransform node
       document.getElementById('txRotation').setFieldValue("matrix", transformMatrix_tx.transpose());
+
+      //update the global variable polarizationVectorRx with the new rotation
+      polarizationVector(matrix_tx, "tx");
     }
-    
+
+    document.getElementById("polarization_angle").innerHTML = angleBetweenVectorsCosInverse(polarizationVectorTx, polarizationVectorRx).toFixed(2);
+    console.log("Polarization angle: ", angleBetweenVectorsCosInverse(polarizationVectorTx, polarizationVectorRx).toFixed(2));
+    console.log("Polarization vector Tx: ", polarizationVectorTx);
+    console.log("Polarization vector Rx: ", polarizationVectorRx);
+
     // update path loss
     updatePathLoss();
   }
+
+  function angleBetweenVectorsCosInverse(vector1, vector2) {
+    // Calculate the dot product
+    const dotProduct = vector1.x * vector2.x + vector1.y * vector2.y + vector1.z * vector2.z;
+
+    // Calculate the magnitude of each vector
+    const magnitude1 = Math.sqrt(vector1.x**2 + vector1.y**2 + vector1.z**2);
+    const magnitude2 = Math.sqrt(vector2.x**2 + vector2.y**2 + vector2.z**2);
+
+    // Calculate the cosine of the angle
+    const cosTheta = dotProduct / (magnitude1 * magnitude2);
+
+    // Calculate the angle in radians
+    const angleRadians = Math.acos(cosTheta);
+
+    // Return the angle in degrees
+    return angleRadians * (180 / Math.PI);
+}
 
   function matrixMultiply(matrixA, matrixB) 
   {
@@ -1856,11 +1892,95 @@ Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-bas
     return [theta, phi];
   }
 
+//   //clockwiseAngle(x, y) returns y->x clockwise angle in degrees
+//   function clockwiseAngle(x, y) {
+//     // Dot product of vectors
+//     const dotProduct = x[0] * y[0] + x[1] * y[1];
+
+//     // Magnitude of vectors
+//     const magnitudeX = Math.sqrt(x[0] ** 2 + x[1] ** 2);
+//     const magnitudeY = Math.sqrt(y[0] ** 2 + y[1] ** 2);
+
+//     // Cosine of the angle
+//     const cosineTheta = dotProduct / (magnitudeX * magnitudeY);
+
+//     // Angle in radians
+//     let angleRadians = Math.acos(cosineTheta);
+
+//     // Determine the sign of the angle based on the orientation of the vectors
+//     const orientation = x[0] * y[1] - x[1] * y[0];
+//     if (orientation < 0) {
+//         angleRadians = 2 * Math.PI - angleRadians;
+//     }
+
+//     // Convert radians to degrees
+//     const angleDegrees = (angleRadians * 180) / Math.PI;
+
+//     return angleDegrees;
+// }
+
+  function polarizationVector(matrix, module)
+  {
+    // this is the vertical (y-axis for both Rx and Tx) vector
+    let matrixBase = [[0], [1], [0]];
+    let resultCoordMatrix = matrixMultiply(matrix, matrixBase);
+    //Here receiver means transmitter
+    var rx_coordinates = getCoordinatesFromX3D("receiver");
+    var tx_cordinates = translatorPos;
+    var updated_normal_vector = {x:-(rx_coordinates.x - tx_cordinates.x), y:-(rx_coordinates.y - tx_cordinates.y),
+                          z:-(rx_coordinates.z - tx_cordinates.z)};
+    var updated_normal_magnitude = Math.sqrt( updated_normal_vector.x * updated_normal_vector.x 
+            + updated_normal_vector.y * updated_normal_vector.y + updated_normal_vector.z * updated_normal_vector.z);
+    
+    updated_normal_vector.x = updated_normal_vector.x / updated_normal_magnitude;
+    updated_normal_vector.y = updated_normal_vector.y / updated_normal_magnitude;
+    updated_normal_vector.z = updated_normal_vector.z / updated_normal_magnitude;
+
+
+    console.log("updated_normal_magnitude-final", updated_normal_vector);
+    console.log("updated_normal_magnitude", updated_normal_magnitude);
+    console.log("resultCoordMatrix", resultCoordMatrix);
+    // The polarization angle will be the angle between
+    // (i) the projection of the vector on the plane for which normal is calculated above
+    // (ii) matrix Base vector
+    // The projection of the vector on the plane is calculated by subtracting the projection of the vector on the normal vector
+    let resultCoordMatrixObject = {x: resultCoordMatrix[0][0], y: resultCoordMatrix[1][0], z: resultCoordMatrix[2][0]};
+    console.log("resultCoordMatrixObject", resultCoordMatrixObject);
+    let scalar_normal = dotProduct(resultCoordMatrixObject, updated_normal_vector);
+    console.log("scalar_normal", scalar_normal);
+    let projection_normal = { x: (scalar_normal * updated_normal_vector.x) , y: (scalar_normal * updated_normal_vector.y), 
+      z: (scalar_normal * updated_normal_vector.z)};
+    console.log("projection_normal", projection_normal);
+    let projection_on_plane = { x: (resultCoordMatrixObject.x - projection_normal.x), y: (resultCoordMatrixObject.y - projection_normal.y), 
+      z: (resultCoordMatrixObject.z - projection_normal.z)};
+    console.log("projection_on_plane", projection_on_plane);
+    //The below function gets the angle of polarization for Tx/Rx
+
+    if(module === "translation-module" || module === "rx")
+    {
+      //declared this variable globally
+      polarizationVectorRx.x = projection_on_plane.x;
+      polarizationVectorRx.y = projection_on_plane.y;
+      polarizationVectorRx.z = projection_on_plane.z;
+      console.log(polarizationVectorRx)
+    }
+
+    if(module === "translation-module" || module === "tx")
+    {
+      //declared this variable globally
+      polarizationVectorTx.x = projection_on_plane.x;
+      polarizationVectorTx.y = projection_on_plane.y;
+      polarizationVectorTx.z = projection_on_plane.z; 
+      console.log(polarizationVectorTx);    
+    }
+
+    }
+
   function anglesToThetaPhi(matrix, module) 
   {
     let matrixB = [[0],[0],[1]];
-    console.log("module", module);
-    console.log(typeof(module));
+    // console.log("module", module);
+    // console.log(typeof(module));
     
     let resultCoordMatrix = matrixMultiply(matrix, matrixB);
     calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
