@@ -116,8 +116,10 @@ const SinrPlot_BarChart = {
                     //   }
                     },
                     y: {
-                      min: -20.0,
-                      max: 50.0,
+                      min: -40.0,
+                      // max: 80.0, //this was changed based on the new req
+                      max:100.0,
+
                       ticks: {
                         display: true,
                         color: "#fff"

@@ -29,7 +29,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
     if(typeof(opts.yMax) === 'undefined')
         opts.yMax = 20;
     if(typeof(opts.yMin) === 'undefined')
-        opts.yMin = -60;
+        opts.yMin = -160;
 
     var sigs = [];
     var noises = []; // We can only have one noise.
@@ -345,7 +345,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         dataf = d3.range(0, nfft - 1).map(function (i) {
             // console.log(generator.psd[i])
             // return { y: generator.psd[i] };
-            return { y: Math.max(generator.psd[i], -40) };
+            return { y: Math.max(generator.psd[i], -160) };
         });
 
         pathf.datum(dataf).attr("d", linef);
