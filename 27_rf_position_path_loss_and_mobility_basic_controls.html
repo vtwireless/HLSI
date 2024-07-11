@@ -1670,6 +1670,13 @@
       calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
     }
 
+    var x3d_pr =document.getElementById("power_rx_db").innerHTML;
+    var x3d_bw=sig1.bw/1000000;
+    // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
+    var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
+    sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
+
 
 
     //sinr value is changed where the formula is re-evaluated based on receiver 
@@ -1885,6 +1892,13 @@
 
   // Function to toggle the value
   function toggleSliders() {
+    // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
+    // var x3d_bw=sig1.bw/1000000;
+    // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
+    // var anuj=x3d_pr - 10 * Math.log10(x3d_bw);
+    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",anuj);
+    // gn1.value=;
     var div = document.getElementById('sliderGroup2');
     // var div2 = document.getElementById('sliderGroup2Left');
     var div3 = document.getElementById('sliderLeft');
@@ -1992,6 +2006,7 @@
     });
   }
 
+  
 
   // Set up sliders for rotation
   setupSlider('sliderForRotateX', 'rx', 'X');
@@ -2015,6 +2030,8 @@
     var rotateYSlider = document.getElementById('sliderForRotateY');
     // var rotateZSlider = document.getElementById('sliderForRotateZ');
     var slider2ForRotateX = document.getElementById('slider2ForRotateX')
+
+    
 
 
 
