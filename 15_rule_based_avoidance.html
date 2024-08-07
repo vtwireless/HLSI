@@ -117,6 +117,263 @@ timed simulation that freezes at end of timed simulation
 
 
 <body style="margin:0;">
+  <div id="gamepad-status">No gamepad connected.</div>
+  <div id="gamepad-inputs"></div> 
+
+  <script>
+    const buttonNames = [
+      "A", "B", "X", "Y", "LB", "RB", "LT", "RT", "Back", "Start", 
+      "Left Stick", "Right Stick", "D-Pad Up", "D-Pad Down", 
+      "D-Pad Left", "D-Pad Right", "Guide"
+    ];
+
+    const axisNames = [
+      "Left Stick X", "Left Stick Y", "Right Stick X", "Right Stick Y"
+    ];
+
+    let canAdjustFrequency = false; 
+    let canAdjustBandwidth = false; 
+ 
+    function toggle3DMode() {
+        const checkbox = document.getElementById('psd_3d_checkbox');
+        checkbox.checked = !checkbox.checked;
+        power_spectral_density_3d_checkbox_change();
+    }
+
+    function adjustFrequencyWithJoystick(axisValue) {
+        if (canAdjustFrequency) { 
+            const freqSlider = document.getElementById('freq');
+            const currentFreqValue = parseFloat(freqSlider.value);
+
+            let incrementedFreqValue;
+            if (axisValue > 0.9) {
+                incrementedFreqValue = currentFreqValue + 1000000;
+            } else if (axisValue < -0.9) {
+                incrementedFreqValue = currentFreqValue - 1000000; 
+            } else {
+                return; 
+            }
+
+            incrementedFreqValue = Math.min(Math.max(incrementedFreqValue, parseFloat(freqSlider.min)), parseFloat(freqSlider.max));
+            freqSlider.value = incrementedFreqValue;
+
+            const displayedValueInMHz = incrementedFreqValue / 1e6;
+            const freqOutput = document.querySelector('output[for="freq"]');
+            if (freqOutput) {
+                freqOutput.textContent = displayedValueInMHz.toFixed(2) + ' MHz';
+            }
+
+            console.log(displayedValueInMHz.toFixed(2) + ' MHz');
+        }
+    }
+
+    function adjustBandwidthWithJoystick(axisValue) {
+        if (canAdjustBandwidth) { 
+            const bwSlider = document.getElementById('bw');
+            const currentBwValue = parseFloat(bwSlider.value);
+
+            let incrementedBwValue;
+            if (axisValue > 0.9) {
+                incrementedBwValue = currentBwValue + 1000000;
+            } else if (axisValue < -0.9) {
+                incrementedBwValue = currentBwValue - 1000000; 
+            } else {
+                return; 
+            }
+
+            incrementedBwValue = Math.min(Math.max(incrementedBwValue, parseFloat(bwSlider.min)), parseFloat(bwSlider.max));
+            bwSlider.value = incrementedBwValue;
+
+            const displayedValueInMHz = incrementedBwValue / 1e6;
+            const bwOutput = document.querySelector('output[for="bw"]');
+            if (bwOutput) {
+                bwOutput.textContent = displayedValueInMHz.toFixed(2) + ' MHz';
+            }
+
+            console.log(displayedValueInMHz.toFixed(2) + ' MHz');
+        }
+    }
+
+    function adjustGainWithJoystick(axisValue) {
+        if (canAdjustGain) { 
+            const gainSlider = document.getElementById('gn');
+            const currentGainValue = parseFloat(gainSlider.value);
+
+            let incrementedGainValue;
+            if (axisValue > 0.9) {
+                incrementedGainValue = currentGainValue + 1;  
+            } else if (axisValue < -0.9) {
+                incrementedGainValue = currentGainValue - 1; 
+            } else {
+                return; 
+            }
+
+            incrementedGainValue = Math.min(Math.max(incrementedGainValue, parseFloat(gainSlider.min)), parseFloat(gainSlider.max));
+            gainSlider.value = incrementedGainValue;
+
+            const gainOutput = document.querySelector('output[for="gn"]');
+            if (gainOutput) {
+                gainOutput.textContent = incrementedGainValue.toFixed(2) + ' dB';
+            }
+
+            console.log(incrementedGainValue.toFixed(2) + ' dB');
+        }
+    }
+
+    function adjustModCodeWithJoystick(axisValue) {
+        if (canAdjustModCode) { 
+            const mcsSlider = document.getElementById('mcs'); 
+            const currentMcsValue = parseFloat(mcsSlider.value);
+
+            let incrementedMcsValue;
+            if (axisValue > 0.9) {
+                incrementedMcsValue = currentMcsValue + 1; 
+            } else if (axisValue < -0.9) {
+                incrementedMcsValue = currentMcsValue - 1; 
+            } else {
+                return; 
+            }
+
+            incrementedMcsValue = Math.min(Math.max(incrementedMcsValue, parseFloat(mcsSlider.min)), parseFloat(mcsSlider.max));
+            mcsSlider.value = incrementedMcsValue;
+
+            const mcsOutput = document.querySelector('output[for="mcs"]');
+            if (mcsOutput) {
+                const mcsMapping = {
+                    0: "r1/2 BPSK (0.50 b/s/Hz)",
+                    1: "r2/3 BPSK (0.67 b/s/Hz)",
+                    2: "r1/2 QPSK (1.00 b/s/Hz)",
+                    3: "r2/3 QPSK (1.33 b/s/Hz)",
+                    4: "r8/9 QPSK (1.78 b/s/Hz)",
+                    5: "r2/3 16-QAM (2.67 b/s/Hz)",
+                    6: "r8/9 16-QAM (3.56 b/s/Hz)",
+                    7: "r8/9 32-QAM (4.44 b/s/Hz)",
+                    8: "r8/9 64-QAM (5.33 b/s/Hz)",
+                    9: "r8/9 128-QAM (6.22 b/s/Hz)",
+                    10: "r8/9 256-QAM (7.11 b/s/Hz)",
+                    11: "uncoded 256-QAM (8.00 b/s/Hz)"
+                };
+                const displayedMcs = mcsMapping[incrementedMcsValue];
+                mcsOutput.textContent = displayedMcs ? displayedMcs : "Unknown MCS";
+            }
+
+            console.log(`MCS: ${incrementedMcsValue}`);
+        }
+    }
+
+    function changeFreqValue(newValue) {
+      let currentValue = parseInt(document.getElementById("freq").value, 10);
+      let newVa = parseInt(newValue, 10);
+      let updatedValue = currentValue + newVa;
+      document.getElementById("freq").value = updatedValue;
+      document.getElementById("freq").dispatchEvent(new Event('input'));
+    }
+    
+    function changeBwValue(newValue) {
+        let currentValue = parseInt(document.getElementById("bw").value, 10);
+        let newVa = parseInt(newValue, 10);
+        let updatedValue = currentValue + newVa;
+        document.getElementById("bw").value = updatedValue;
+        document.getElementById("bw").dispatchEvent(new Event('input'));
+    }
+
+    function changeGainValue(newValue) {
+        let currentValue = parseFloat(document.getElementById("gn").value);
+        let newVa = parseFloat(newValue);
+        let updatedValue = currentValue + newVa;
+        document.getElementById("gn").value = updatedValue;
+        document.getElementById("gn").dispatchEvent(new Event('input'));
+    }
+
+    function changeModCodeValue(newValue) {
+        let currentValue = parseFloat(document.getElementById("mcs").value);
+        let newVa = parseFloat(newValue);
+        let updatedValue = currentValue + newVa;
+        document.getElementById("mcs").value = updatedValue;
+        document.getElementById("mcs").dispatchEvent(new Event('input'));
+    }
+
+     window.addEventListener("gamepadconnected", (event) => {
+        const gamepad = event.gamepad;
+        document.getElementById("gamepad-status").textContent = 
+            `Gamepad connected at index ${gamepad.index}: ${gamepad.id}. ${gamepad.buttons.length} buttons, ${gamepad.axes.length} axes.`;
+        console.log(`Gamepad connected at index ${gamepad.index}: ${gamepad.id}. ${gamepad.buttons.length} buttons, ${gamepad.axes.length} axes.`);
+        requestAnimationFrame(pollGamepads);
+    });
+
+    window.addEventListener("gamepaddisconnected", (event) => {
+        const gamepad = event.gamepad;
+        document.getElementById("gamepad-status").textContent = "No gamepad connected.";
+        document.getElementById("gamepad-inputs").textContent = ""; 
+        console.log(`Gamepad disconnected from index ${gamepad.index}: ${gamepad.id}`);
+    });
+    
+    function pollGamepads() {
+        const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+        let inputsDisplay = "";
+
+        for (let i = 0; i < gamepads.length; i++) {
+            const gp = gamepads[i];
+            if (gp) {
+                inputsDisplay += `<p>Gamepad ${i}: ${gp.id}</p>`;
+                inputsDisplay += "<ul>";
+
+                for (let j = 0; j < gp.buttons.length; j++) {
+                    if (gp.buttons[j].pressed) {
+                        inputsDisplay += `<li>Button ${j} (${buttonNames[j]}) pressed</li>`;
+                        if (j === 0) {
+                            canAdjustFrequency = true;
+                            canAdjustBandwidth = false;
+                            canAdjustGain = false;
+                            canAdjustModCode = false;  
+                    } else if (j === 1) {  
+                            canAdjustBandwidth = true;
+                            canAdjustFrequency = false; 
+                            canAdjustGain = false; 
+                            canAdjustModCode = false;
+                    } else if (j === 2) {  
+                            canAdjustGain = true; 
+                            canAdjustBandwidth = false;
+                            canAdjustFrequency = false; 
+                            canAdjustModCode = false;
+                    } else if (j === 3) {  
+                            canAdjustModCode = true;
+                            canAdjustGain = false; 
+                            canAdjustBandwidth = false;
+                            canAdjustFrequency = false; 
+                    } else {
+                            canAdjustFrequency = false;
+                            canAdjustBandwidth = false;  
+                            canAdjustGain = false;
+                            canAdjustModCode = false;
+                    }
+                }
+           }
+
+                for (let k = 0; k < gp.axes.length; k++) {
+                    if (Math.abs(gp.axes[k]) > 0.1) {
+                        inputsDisplay += `<li>Axis ${k} (${axisNames[k]}) moved: ${gp.axes[k].toFixed(2)}</li>`;
+                    }
+                }
+
+                inputsDisplay += "</ul>";
+
+                if (gp.buttons[16].pressed) {
+                  toggle3DMode();
+                }
+
+                adjustFrequencyWithJoystick(gp.axes[0]);
+                adjustBandwidthWithJoystick(gp.axes[0]);
+                adjustGainWithJoystick(gp.axes[0]);
+                adjustModCodeWithJoystick(gp.axes[0]);
+            }
+        }
+
+        document.getElementById("gamepad-inputs").innerHTML = inputsDisplay;
+        requestAnimationFrame(pollGamepads);
+    }
+
+  </script>
   <!-- <h2>Exercise 15 Rule Based Interferer Avoidance</h2>
   <p><a href="index.html">[exercises]</a></p> -->
 
@@ -272,6 +529,7 @@ timed simulation that freezes at end of timed simulation
 
 </body>
 <script>
+
 'use strict';
 
 
