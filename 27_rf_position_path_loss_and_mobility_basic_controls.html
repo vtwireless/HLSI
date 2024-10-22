@@ -1,10 +1,5 @@
 <!DOCTYPE html>
-<!--
-To Do: Add Guard Bands w/ flashing "too-close" indicator, Guard Band menu with options 
-for fixed, receiver-dependent, e.g., lower minimum for Links 1, 2, and 4, higher for Link 3; 
-Separately, a switch to select ideal SINR w/o ACI vs. receiver-dependent ACI-based SINR
-test
--->
+
 <html lang="en-US" style="display: flex;">
 
 <head>
@@ -35,6 +30,8 @@ test
   <script src=slidersMultiSignals.js></script>
   <!-- <script src=powerSpectrumPlot.js></script> -->
   <script type='text/javascript' src='./x3dom/x3dom.js'></script>
+  <script src=powerSpectrumPlot_2D.js></script>
+  <script src=powerSpectrumPlot_3D.js></script>
   <script src=powerSpectrumPlot_2D_MultiSignals.js></script>
   <script src=powerSpectrumPlot_3D_MultiSignals.js></script>
   <script src=spectralEfficiencyPlot_BarChart.js></script>
@@ -49,7 +46,6 @@ test
   <script src=scriptController.js></script>
   <script src=codemirror.min.js></script>
   <script src=codeMirror_javascript.js></script>
-  <!-- <script src=throughputPlot.js></script> -->
   <script src=throughputPlotMultiSignals.js></script>
   <script src=spatialMobility.js></script>
   <script src=hoppingInterferer.js></script>
@@ -104,6 +100,31 @@ test
       height: 2rem;
     }
 
+    #tx_pattern_options {
+      display: none;
+      margin-left: 2em;
+      margin-bottom: -2em;
+      font-size: large;
+    }
+
+
+    .tx-axes {
+      display: none;
+    }
+
+    #tx_red_cyl {
+      display: none;
+    }
+
+    #manual-angle-options-tx {
+      display: none;
+    }
+
+    #manual-angle-options-rx {
+      display: none;
+    }
+
+
     @media screen and (max-width: 1500px) {
       .grid-container {
         display: flex;
@@ -125,6 +146,18 @@ test
         display: flex;
         flex-direction: column;
       }
+
+    }
+
+    .table {
+      width: 100%;
+    }
+
+    td,
+    th {
+      border: 1px solid white;
+      text-align: center;
+      padding: 8px;
     }
   </style>
 </head>
@@ -132,66 +165,10 @@ test
 
 <body style="margin:0;">
   <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85)">
-    <label for="menu-control" class="hamburger">
-      <i class="hamburger__icon"></i>
-      <i class="hamburger__icon"></i>
-      <i class="hamburger__icon"></i>
-    </label>
-
-    <input type="checkbox" id="menu-control" class="menu-control">
-
-    <aside class="sidebar" style="z-index: 10;">
-
-      <nav class="sidebar__menu">
-        <a href="01_bw.html"><b>1</b> Bandwidth</a>
-        <a href="02_freq.html"><b>2</b> Frequency</a>
-        <a href="03_gn.html"><b>3</b> Gain</a>
-        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
-        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
-        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
-        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
-        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
-        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
-        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
-        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
-        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
-        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
-        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
-        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
-        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
-        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
-        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer
-          Avoidance</a>
-        <a href="19_rf_front_end_spectrum_sharing.html" class="selected"><b>19</b> RF Front End Spectrum Sharing</a>
-        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
-        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with
-          Interferer</a>
-        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with
-          Interferer</a>
-        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual
-          and Programmable</a>
-        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options
-          menu</a>
-        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR
-          Calculations Programmable
-        </a>
-        <a href="27_rf_position_path_loss_and_mobility_basic_controls.html"><b>27</b> RFFE Spectrum Sharing -- Position,
-          Path Loss, and
-          Mobility -- Basic Controls
-        </a>
-        <a href="28_rf_position_path_loss_and_mobility.html"><b>28</b> RFFE Spectrum Sharing -- Position, Path Loss, and
-          Mobility
-        </a>
-      </nav>
-
-      <label for="menu-control" class="sidebar__close"></label>
-
-
-    </aside>
-
     <div
       style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;">
-      <span style="color: #ddd;">Exercise 27</span> In Progress - RFFE Spectrum Sharing -- Position, Path Loss, and Mobility -- Basic
+      <span style="color: #ddd;">Exercise 27</span> In Progress - RFFE Spectrum Sharing -- Position, Path Loss, and
+      Mobility -- Basic
       Controls
     </div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
@@ -204,9 +181,7 @@ test
   </section>
 
   <div class="content-section" style="margin: 0% 2%; margin-top: 5%;">
-    <!-- <p id=hoppingInterferer>
-    </p> -->
-    
+
     <p id=capacityBanner style="display: none;">
     </p>
 
@@ -251,94 +226,7 @@ test
       </div>
     </div>
 
-    <div class="linkinputs">
-      <div style="width: 25%;">
-        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
-          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-          <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
-          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-        </div>
-        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-          <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
-            oninput="this.value = this.value
-          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-        </div>
 
-        <p>
-          <input type="range" id=freq1 />
-        </p>
-        <p>
-          <input type="range" id=bw1 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn1 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs1 style="display: none;" />
-        </p>
-      </div>
-      
-
-      <div style="width: 25%;">
-        <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-          <div style="font-size: 110%; color: #b5ebff; display: inline-block;">Link 2</div>
-          <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-          <input style="width: 3.5rem;" id="multiplier2" type="text" value="1" oninput="this.value = this.value
-          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-        </div>
-        <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-          <label for="strategy">IIP3</label> &nbsp;
-          <input style="width: 3.5rem;" id="iip3_2" type="text" value="0"
-            oninput="this.value = this.value
-          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-        </div>
-
-        <p>
-          <input type="range" id=freq2 />
-        </p>
-        <p>
-          <input type="range" id=bw2 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=gn2 style="display: none;" />
-        </p>
-        <p>
-          <input type="range" id=mcs2 style="display: none;" />
-        </p>
-      </div>
-    </div>
-
-    <div style="width: 25%;">
-      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-        <div style="font-size: 110%; color: #afffd3; display: inline-block;">Link 3</div>
-        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-        <input style="width: 3.5rem;" id="multiplier3" type="text" value="1" oninput="this.value = this.value
-          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-      </div>
-      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-        <label for="strategy">IIP3</label> &nbsp;
-        <input style="width: 3.5rem;" id="iip3_3" type="text" value="0"
-          oninput="this.value = this.value
-          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-      </div>
-    </div>
-
-    <div style="width: 25%;">
-      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-        <div style="font-size: 110%; color: #ffe699; display: inline-block;">Link 4</div>
-        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-        <input style="width: 3.5rem;" id="multiplier4" type="text" value="1" oninput="this.value = this.value
-          .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-      </div>
-      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-        <label for="strategy">IIP3</label> &nbsp;
-        <input style="width: 3.5rem;" id="iip3_4" type="text" value="0"
-          oninput="this.value = this.value
-          .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
-      </div>
-    </div>
   </div>
 
   <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
@@ -355,8 +243,41 @@ test
   </div>
 
   <div>
+    <div id="tx_pattern_options">
+      <div style="width: 28px; height: 15px; background:rgba(163,36,36,255); margin:auto"></div>
+      <p><label for="tx_pattern">&nbsp;&nbsp;Type of Transmitter Pattern:</label> &nbsp;
+        <select id="tx_pattern">
+          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+          <option id="halfwave" value="halfwave">Half-wave dipole</option>
+          <option id="sdipole" value="sdipole">Small dipole</option>
+          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+        </select>
+      </p> &nbsp; &nbsp; &nbsp;
+      <p>
+        <label for="polarization">
+          <input type="checkbox" id="vertical_tx" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal_tx" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+      <p id="manual-angle-options-tx">
+        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="theta_tx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="phi_tx_manual" type="text" value="20"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+
+        <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
+      </p>
+    </div>
     <div style="display: inline-flex; margin-left: 2em; font-size: large;">
-      <p><label for="antenna_pattern">Type of Antenna Pattern:</label> &nbsp;
+      <div style="width: 28px; height: 15px; background:rgba(0,176,240,255); margin:auto"></div>
+      <p><label for="antenna_pattern">&nbsp;&nbsp;Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
         <select id="antenna_pattern">
           <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
           <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
@@ -366,261 +287,788 @@ test
         </select>
       </p> &nbsp; &nbsp; &nbsp;
       <p>
-        <label for="theta">Theta (0-180)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="theta" type="text" value="20"
+        <label for="polarization">
+          <input type="checkbox" id="vertical_rx" value="vertical">
+          Vertical
+          <input type="checkbox" id="horizontal_rx" value="horizontal">
+          Horizontal
+        </label><br>
+      </p>&nbsp; &nbsp;
+      <p id="manual-angle-options-rx">
+        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="theta_rx_manual" type="text" value="20"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        <label for="phi">Phi (0-360)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="phi" type="text" value="20"
+        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+        <input style="width: 3.5rem; height: 1.2rem;" id="phi_rx_manual" type="text" value="20"
           oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        
-        <input id="apply" type="button" value="Apply" onclick="updatePathLoss()">  &nbsp; &nbsp;
+
+        <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
       </p>
     </div>
     <div>
       <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
         <label for="path_loss">Path Loss (dB) : </label> &nbsp;
-          <label id="path_loss" for="path_loss"></label>
-         &nbsp; &nbsp; &nbsp;
-       <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
-          <label id="power_rx_db" for="power_rx_db"></label>
+        <label id="path_loss" for="path_loss"></label>
+        &nbsp; &nbsp; &nbsp;
+        <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
+        <label id="power_rx_db" for="power_rx_db"></label>
         &nbsp; &nbsp; &nbsp;
         <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
-          <label id="rec_trans_dist" for="rec_trans_dist"></label>
+        <label id="rec_trans_dist" for="rec_trans_dist"></label>
         &nbsp; &nbsp; &nbsp;
-  
-        <label for="rec_trans_dist_label">Rotation Angle (degrees) : </label> &nbsp;
-          <label id="angleX" for="angleX"></label> &nbsp;
-          <label id="angleY" for="angleY"></label> &nbsp;
-          <label id="angleZ" for="angleZ"></label> &nbsp;
-          <label id="thetaAngle" for="theta"></label> &nbsp;
-          <label id="phiAngle" for="phi"></label> &nbsp;
       </div>
+      <!-- <button class="toggle-button" onclick="toggleSliders()">
+        Toggle Sliders
+      </button> -->
     </div>
   </div>
 
-  <div id="x3dModelWindow">
-
-    <x3d id='x3dElement' showStat='false' showLog='false' width='1520px' height='720px'>
-      <scene DEF='scene'>
-        <viewpoint position="13.71854 10.00018 18.01263" orientation="-0.96475 0.63173 0.00059 0.751072"></viewpoint>
-
-
-
-        <!-- Transmitter and Antenna -->
-        <transform id="transmitterTranslation">
-
-          <transform DEF='ant_1' translation='0 -2 0' scale='1 0.5 1'>
-            <shape>
-              <Appearance>
-                <Material diffuseColor="0 0.6902 0.9412" />
-              </Appearance>
-              <cylinder bottomradius='5' height='8'></cylinder>
-            </shape>
-            <viewpoint></viewpoint>
-          </transform>
-
-          <matrixTransform id="transmitterRotation">
-            <transform translation='0 3 0' scale='0.4 0.4 0.4'>
-              <shape>
-                <Appearance>
-                  <Material diffuseColor="0 0.6902 0.9412" />
-                </Appearance>
-                <Cone bottomradius='5' height='8' />
-              </shape>
-              <shape>
-                <appearance>
-                  <material diffuseColor='1 0 0'></material>
-                  <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
-                </appearance>
-                <cylinder height='50' radius='0.1'></cylinder>
-              </shape>
-            </transform>
-          </matrixTransform>
-        </transform>
-
-        <!-- EXAMPLE GROUND PLANE, FOR BETTER ORIENTATION -->
-        <transform translation='0 -5.5 0' rotation='1 0 0 -1.57'>
-          <shape>
-            <appearance>
-              <material diffuseColor='0.7 0.7 0.7'></material>
-            </appearance>
-            <box solid='true' size='26 16 2'></box>
-          </shape>
-        </transform>
-
-
-        <transform id="receiver" translation='12 5 0' rotation='1 0 0 -1.57'>
-          <shape>
-            <appearance>
-              <material diffuseColor='1 0 0'></material>
-            </appearance>
-            <box size='1 1 1'></box>
-          </shape>
-        </transform>
-
-        <!-- TRANSLATION GIZMO (CONTAINING PLANE SENSOR AND SENSOR GEOMETRY) -->
-        <group>
-          <planeSensor id="transmitterPlane" autoOffset='true' axisRotation='1 0 0 -1.57' minPosition='-12 0'
-            maxPosition='12 0' onoutputchange='processTranslationGizmoEvent(event)'>
-          </planeSensor>
-
-          <transform id='translationHandleTransform'>
-            <transform translation='0 -5.5 8' rotation='0 1 0 1.57'>
-              <transform translation='0 0 1.5' rotation='1 0 0 1.57'>
-                <shape DEF='CONE_CAP'>
-                  <appearance DEF='CYAN_MAT'>
-                    <material diffuseColor='1 1 0'></material>
-                  </appearance>
-                  <cone height='1'></cone>
-                </shape>
-              </transform>
-              <transform rotation='1 0 0 -1.57'>
-                <shape>
-                  <appearance USE='CYAN_MAT'></appearance>
-                  <cylinder></cylinder>
-                </shape>
-              </transform>
-              <transform translation='0 0 -1.5' rotation='1 0 0 -1.57'>
-                <shape USE='CONE_CAP'></shape>
-              </transform>
-            </transform>
-          </transform>
-        </group>
-
-        <!-- BEGIN OF ROTATION GIZMO (CONTAINING CYLINDER SENSORS AND SENSOR GEOMETRY) -->
-        <transform id='rotationHandleTransform'>
-
-          <!-- Rotation Handle X -->
-          <group>
-            <cylinderSensor autoOffset='false' axisRotation='0 0 1 -1.57'
-              onoutputchange='processRotationGizmoEvent(event);'>
-            </cylinderSensor>
-
-            <transform>
-              <transform scale='2.5 5 5'>
-                <shape>
-                  <appearance DEF='RED_APP'>
-                    <material diffuseColor='1 0.3 0.3'></material>
-                  </appearance>
-                  <indexedtriangleset solid="true" normalpervertex="true"
-                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
-                    <coordinate
-                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
-                    <normal
-                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
-                  </indexedtriangleset>
-                </shape>
-              </transform>
-            </transform>
-          </group>
-
-          <!-- Rotation Handle Y -->
-          <group>
-            <cylinderSensor autoOffset='false' onoutputchange='processRotationGizmoEvent(event);'>
-            </cylinderSensor>
-
-            <transform>
-              <transform scale='2.5 5.05 5.05' rotation='0 0 1 -1.57'>
-                <shape>
-                  <appearance DEF='GREEN_APP'>
-                    <material diffuseColor='0.3 1 0.3'></material>
-                  </appearance>
-                  <indexedtriangleset solid="true" normalpervertex="true"
-                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
-                    <coordinate
-                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
-                    <normal
-                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
-                  </indexedtriangleset>
-                </shape>
-              </transform>
-            </transform>
-          </group>
-
-          <!-- Rotation Handle Z -->
-          <group>
-            <cylinderSensor autoOffset='false' axisRotation='1 0 0 -1.57'
-              onoutputchange='processRotationGizmoEvent(event);'>
-            </cylinderSensor>
-
-            <transform>
-              <transform scale='2.5 5.1 5.1' rotation='0 1 0 -1.57'>
-                <shape>
-                  <appearance DEF='BLUE_APP'>
-                    <material diffuseColor='0.3 0.3 1'></material>
-                  </appearance>
-                  <indexedtriangleset solid="true" normalpervertex="true"
-                    index="0 1 2 0 2 3 4 5 6 4 6 7 8 9 10 8 10 11 12 0 3 12 3 13 14 4 7 14 7 15 16 8 11 16 11 17 18 14 15 18 15 19 20 16 17 20 17 21 22 18 19 22 19 23 24 20 21 24 21 25 26 22 23 26 23 27 28 24 25 28 25 29 1 26 27 1 27 2 5 28 29 5 29 6 27 23 30 27 30 31 29 25 32 29 32 33 2 27 31 2 31 34 6 29 33 6 33 35 3 2 34 3 34 36 7 6 35 7 35 37 11 10 38 11 38 39 13 3 36 13 36 40 15 7 37 15 37 41 17 11 39 17 39 42 19 15 41 19 41 43 21 17 42 21 42 44 23 19 43 23 43 30 25 21 44 25 44 32 45 46 47 45 47 48 49 50 51 49 51 52 53 45 48 53 48 54 55 49 52 55 52 56 57 53 54 57 54 58 59 55 56 59 56 60 61 57 58 61 58 62 63 59 60 63 60 64 65 61 62 65 62 66 67 63 64 67 64 68 69 70 71 69 71 72 73 65 66 73 66 74 46 67 68 46 68 47 50 69 72 50 72 51 66 62 75 66 75 76 68 64 77 68 77 78 72 71 79 72 79 80 74 66 76 74 76 81 47 68 78 47 78 82 51 72 80 51 80 83 48 47 82 48 82 84 52 51 83 52 83 85 54 48 84 54 84 86 56 52 85 56 85 87 58 54 86 58 86 88 60 56 87 60 87 89 62 58 88 62 88 75 64 60 89 64 89 77 13 90 91 13 91 12 70 92 93 70 93 71 9 94 93 9 93 10 90 13 40 90 40 95 74 90 95 74 95 73 94 79 71 94 71 93 90 74 81 90 81 91 92 38 10 92 10 93 ">
-                    <coordinate
-                      point="-0.126178 0.375330 -0.923880 -0.126178 0.544895 -0.831470 0.000000 0.555570 -0.831470 0.000000 0.382684 -0.923880 -0.126178 0.980785 0.000000 -0.126178 0.961940 0.195090 0.000000 0.980785 0.195090 0.000000 1.000000 0.000000 -0.126178 0.375331 0.923880 -0.126178 0.191342 0.980785 0.000000 0.195091 0.980785 0.000000 0.382684 0.923880 -0.126178 0.191342 -0.980785 0.000000 0.195090 -0.980785 -0.126178 0.961940 -0.195090 0.000000 0.980785 -0.195090 -0.126178 0.544895 0.831470 0.000000 0.555570 0.831470 -0.126178 0.906128 -0.382683 0.000000 0.923880 -0.382683 -0.126178 0.693520 0.707107 0.000000 0.707107 0.707107 -0.126178 0.815493 -0.555570 0.000000 0.831470 -0.555570 -0.126178 0.815493 0.555570 0.000000 0.831470 0.555570 -0.126178 0.693520 -0.707107 0.000000 0.707107 -0.707107 -0.126178 0.906128 0.382683 0.000000 0.923880 0.382683 0.126178 0.815493 -0.555570 0.126178 0.693520 -0.707107 0.126178 0.815493 0.555570 0.126178 0.906128 0.382683 0.126178 0.544895 -0.831470 0.126178 0.961940 0.195090 0.126178 0.375330 -0.923880 0.126178 0.980785 0.000000 0.126178 0.191342 0.980785 0.126178 0.375330 0.923880 0.126178 0.191342 -0.980785 0.126178 0.961940 -0.195090 0.126178 0.544895 0.831470 0.126178 0.906128 -0.382683 0.126178 0.693520 0.707107 0.126178 -0.906128 -0.382683 0.126178 -0.961940 -0.195090 0.000000 -0.980785 -0.195090 0.000000 -0.923880 -0.382683 0.126178 -0.693520 0.707107 0.126178 -0.544895 0.831470 0.000000 -0.555570 0.831470 0.000000 -0.707107 0.707107 0.126178 -0.815493 -0.555570 0.000000 -0.831469 -0.555570 0.126178 -0.815493 0.555570 0.000000 -0.831469 0.555570 0.126178 -0.693520 -0.707107 0.000000 -0.707107 -0.707107 0.126178 -0.906127 0.382683 0.000000 -0.923879 0.382683 0.126178 -0.544895 -0.831470 0.000000 -0.555570 -0.831470 0.126178 -0.961940 0.195090 0.000000 -0.980785 0.195090 0.126178 -0.375330 -0.923880 0.000000 -0.382683 -0.923880 0.126178 -0.980785 0.000000 0.000000 -1.000000 0.000000 0.126178 -0.375330 0.923880 0.126178 -0.191342 0.980785 0.000000 -0.195090 0.980785 0.000000 -0.382684 0.923880 0.126178 -0.191342 -0.980785 0.000000 -0.195090 -0.980785 -0.126178 -0.544895 -0.831470 -0.126178 -0.375330 -0.923880 -0.126178 -0.961939 0.195090 -0.126178 -0.980785 0.000000 -0.126178 -0.191342 0.980785 -0.126178 -0.375330 0.923880 -0.126178 -0.191342 -0.980785 -0.126178 -0.961939 -0.195090 -0.126178 -0.544895 0.831470 -0.126178 -0.906127 -0.382683 -0.126178 -0.693520 0.707107 -0.126178 -0.815493 -0.555570 -0.126178 -0.815493 0.555570 -0.126178 -0.693520 -0.707107 -0.126178 -0.906127 0.382683 0.000000 0.000000 -1.012271 -0.126178 0.000000 -1.012271 0.126178 0.000000 1.012271 0.000000 0.000000 1.012271 -0.126178 0.000000 1.012271 0.126178 0.000000 -1.012271 " />
-                    <normal
-                      vector="-0.023133 0.382550 -0.923643 -0.047182 0.554918 -0.830561 0.000000 0.562792 -0.826563 0.000000 0.388867 -0.921262 -0.149113 0.988800 0.000000 -0.143559 0.970611 0.193060 0.000000 0.981445 0.191626 0.000000 1.000000 0.000000 -0.023133 0.382550 0.923643 -0.007538 0.226142 0.974059 0.000000 0.228553 0.973510 0.000000 0.388867 0.921262 -0.007538 0.226142 -0.974059 0.000000 0.228553 -0.973510 -0.143559 0.970611 -0.193060 0.000000 0.981445 -0.191626 -0.047182 0.554918 0.830561 0.000000 0.562792 0.826563 -0.127689 0.916288 -0.379559 0.000000 0.926359 -0.376629 -0.075533 0.705039 0.705100 0.000000 0.713675 0.700430 -0.103824 0.826930 -0.552568 0.000000 0.836207 -0.548387 -0.103824 0.826930 0.552568 0.000000 0.836207 0.548387 -0.075533 0.705039 -0.705100 0.000000 0.713675 -0.700430 -0.127689 0.916288 0.379559 0.000000 0.926359 0.376629 0.103824 0.826930 -0.552568 0.075533 0.705039 -0.705100 0.103824 0.826930 0.552568 0.127689 0.916288 0.379559 0.047182 0.554918 -0.830561 0.143559 0.970611 0.193060 0.023133 0.382550 -0.923643 0.149113 0.988800 0.000000 0.007538 0.226142 0.974059 0.023133 0.382550 0.923643 0.007538 0.226142 -0.974059 0.143559 0.970611 -0.193060 0.047182 0.554918 0.830561 0.127689 0.916288 -0.379559 0.075533 0.705039 0.705100 0.127689 -0.916288 -0.379559 0.143559 -0.970611 -0.193060 0.000000 -0.981445 -0.191626 0.000000 -0.926359 -0.376629 0.075533 -0.705039 0.705100 0.047182 -0.554918 0.830561 0.000000 -0.562792 0.826563 0.000000 -0.713706 0.700430 0.103824 -0.826930 -0.552568 0.000000 -0.836207 -0.548387 0.103824 -0.826960 0.552568 0.000000 -0.836207 0.548387 0.075533 -0.705039 -0.705100 0.000000 -0.713706 -0.700430 0.127689 -0.916288 0.379559 0.000000 -0.926359 0.376629 0.047182 -0.554918 -0.830561 0.000000 -0.562792 -0.826563 0.143559 -0.970611 0.193060 0.000000 -0.981445 0.191626 0.023133 -0.382550 -0.923643 0.000000 -0.388867 -0.921262 0.149113 -0.988800 0.000000 0.000000 -1.000000 0.000000 0.023133 -0.382550 0.923643 0.007538 -0.226142 0.974059 0.000000 -0.228553 0.973510 0.000000 -0.388867 0.921262 0.007538 -0.226142 -0.974059 0.000000 -0.228553 -0.973510 -0.047182 -0.554918 -0.830561 -0.023133 -0.382550 -0.923643 -0.143559 -0.970611 0.193060 -0.149113 -0.988800 0.000000 -0.007538 -0.226142 0.974059 -0.023133 -0.382550 0.923643 -0.007538 -0.226142 -0.974059 -0.143559 -0.970611 -0.193060 -0.047182 -0.554918 0.830561 -0.127689 -0.916288 -0.379559 -0.075533 -0.705039 0.705100 -0.103824 -0.826930 -0.552568 -0.103824 -0.826960 0.552568 -0.075533 -0.705039 -0.705100 -0.127689 -0.916288 0.379559 0.000000 0.000000 -1.000000 -0.002411 0.000000 -0.999969 0.002411 0.000000 0.999969 0.000000 0.000000 1.000000 -0.002411 0.000000 0.999969 0.002411 0.000000 -0.999969 " />
-                  </indexedtriangleset>
-                </shape>
-              </transform>
-            </transform>
-          </group>
-
-        </transform>
-        <!-- END OF ROTATION GIZMO -->
-
-      </scene>
-    </x3d>
-
+  <div id="togglebutton" style="padding-top: 3%;">
+    <div id="toggleValueDisplay" style="padding-left: 30%;">You are Controlling: RX "Press to toggle"</div>
+    <div style="padding-left: 35%;">
+    <button class="toggle-button" id="toggle-button" onclick="toggleSliders()">
+      Toggle RX/TX
+    </button>
+  </div>
   </div>
 
-  <div class="grid-container-main">
-    <div class="grid-container-item">
-      <div class="grid-item">
-        <div id="throughput-multisignal" style="width: 720px;">
-          <div class="throughput-heading">Data Throughput History</div>
+
+  <div style="display: flex;">
+    <div id="x3dModelWindow" style="display: flex;flex-direction: column;">
+      <div id="x3dMain" style="display: flex;">
+        <div id="sliderLeft" style="display: flex;flex-direction: row;">
+          <label for="sliderForVertical" style="writing-mode: tb-rl;transform: rotate(-180deg);">Move
+            North-South</label>
+          <input type="range" id="sliderForVertical" min="-12" max="12" step="any" value="0" class="vertical-slider" style="transform: rotate(180deg);">
+        </div>
+
+        <x3d id='x3dElement' showStat='false' showLog='false' width='1020px' height='500px'>
+          <scene DEF='scene'>
+              <physicalenvironmentlight diffuse="simpleDiffuse.dds" specular="simpleSpecular.dds"></physicalenvironmentlight>
+              <Background backUrl='nz.png' bottomUrl='ny.png' frontUrl='pz.png' leftUrl='nx.png' rightUrl='px.png' topUrl='py.png'></Background>
+              <!-- Adjusted Viewpoint with modified position and orientation -->
+              <Viewpoint DEF="OverheadView" position="0 100 0" orientation="1 0 0 -1.57"
+                         zNear="0.1" zFar="1000" centerOfRotation="0 0 0" fieldOfView="0.78540"
+                         description="Overhead View"></Viewpoint>
+              <!-- <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo> -->
+
+            <!-- Transmitter and Antenna -->
+            <transform id="transmitterTranslation" translation="0 0 0">
+
+              <transform DEF='ant_1' translation='0 -2.5 0'>
+                <shape>
+                  <Appearance>
+                    <Material diffuseColor="0 0.6902 0.9412" />
+                  </Appearance>
+                  <cylinder radius='0.25' height='5'></cylinder>
+                </shape>
+                <!-- <viewpoint></viewpoint> -->
+              </transform>
+
+              <matrixTransform id="rxRotation">
+
+                <transform rotation="1 0 0 3.1415">
+
+                  <switch id="receiver-geometry" whichchoice="0">
+
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='vert_iso_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='vert_iso_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='horiz_iso_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0.6902 0.9412" />
+                        </Appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='horiz_iso_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='halfwave_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='halfwave_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='small_dip_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <shape>
+                        <Appearance>
+                          <Material diffuseColor="0 0 1" />
+                        </Appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='small_dip_pat.x3d' />
+                    </transform>
+
+
+                    <transform class="pattern-models">
+                      <Transform rotation="0 0 1 1.5707">
+                        <shape>
+                          <Appearance>
+                            <Material diffuseColor="0 0 1" />
+                          </Appearance>
+                          <Cone bottomradius='1.5' height='3' />
+                        </shape>
+                      </Transform>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <Transform rotation="0 0 1 1.5707">
+                        <shape>
+                          <Appearance>
+                            <Material diffuseColor="0 0 1" />
+                          </Appearance>
+                          <Cone bottomradius='1.5' height='3' />
+                        </shape>
+                      </Transform>
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <Transform rotation="0 0 1 1.5707">
+                        <shape>
+                          <Appearance>
+                            <Material diffuseColor="0 0 1" />
+                          </Appearance>
+                          <Cone bottomradius='1.5' height='3' />
+                      </Transform>
+                      </shape>
+                      <inline id="inline-model" url='directional_pat.x3d' />
+                    </transform>
+
+                    <transform class="pattern-models">
+                      <Transform rotation="0 0 1 1.5707">
+                        <shape>
+                          <Appearance>
+                            <Material diffuseColor="0 0 1" />
+                          </Appearance>
+                          <Cone bottomradius='1.5' height='3' />
+                        </shape>
+                      </Transform>
+                      <inline id="inline-model" url='directional_pat.x3d' />
+                    </transform>
+
+
+                  </switch>
+
+                  <shape DEF='point'>
+                    <appearance>
+                      <material diffuseColor='1 0 0'></material>
+                      <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
+                    </appearance>
+                    <cylinder height='50' radius='0.1'></cylinder>
+                  </shape>
+
+
+
+
+
+                </transform>
+              </matrixTransform>
+            </transform>
+
+            <!-- GROUND PLANE, FOR BETTER ORIENTATION -->
+            <transform translation='0 -5.5 0' rotation='1 0 0 -1.57'>
+              <shape>
+                <appearance>
+                  <Material ambientIntensity='0.25' diffuseColor='0.510609 0.17264 0.059872' shininess='0.933333' specularColor='0.533333 0.533333 0.533333'/>
+                </appearance>
+                <box solid='true' size='60 60 2'></box>
+              </shape>
+            </transform>
+            <!--26 16 2-->
+
+
+            <!--This is the transmitter, not the receiver-->
+            <!-- <transform translation='0 0 -12'> -->
+            <transform id="receiver" translation='0 0 -12'>
+              <transform translation='0 -2.5 0'>
+                <shape>
+                  <appearance>
+                    <material diffuseColor='0.71 0.396 0.114'></material>
+                  </appearance>
+                  <cylinder radius='0.25' height='5'></cylinder>
+                </shape>
+              </transform>
+
+              <matrixTransform id="txRotation">
+                <transform id="receiver-temp" rotation="1 0 0 3.1415">
+                  <switch id="tx-geometry" whichchoice="1">
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='vert_iso_pat.x3d' />
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='vert_iso_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='horiz_iso_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cylinder radius='0.8' height='0.05' />
+                      </shape>
+                      <inline id="inline-model" url='horiz_iso_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='halfwave_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='5'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='halfwave_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='small_dip_pat.x3d' />
+                    </transform>
+
+                    <transform>
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <cylinder radius='0.25' height='1'></cylinder>
+                      </shape>
+                      <inline id="inline-model" url='small_dip_pat.x3d' />
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cone bottomradius='1.5' height='3' />
+                      </shape>
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cone bottomradius='1.5' height='3' />
+                      </shape>
+                    </transform>
+
+                    <transform rotation="0 0 1 1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cone bottomradius='1.5' height='3' />
+                      </shape>
+                      <transform rotation="0 0 1 -1.5707">
+                        <inline id="inline-model" url='directional_pat.x3d' />
+                      </transform>
+                    </transform>
+
+                    <transform rotation="0 0 1 -1.5707">
+                      <shape>
+                        <appearance>
+                          <material diffuseColor='1 0 0'></material>
+                        </appearance>
+                        <Cone bottomradius='1.5' height='3' />
+                      </shape>
+                      <transform rotation="0 0 1 1.5707">
+                        <inline id="inline-model" url='directional_pat.x3d' />
+                      </transform>
+                    </transform>
+                  </switch>
+                </transform>
+              </matrixTransform>
+            </transform>
+            <!-- TRANSLATION GIZMO (CONTAINING PLANE SENSOR AND SENSOR GEOMETRY) -->
+            <group>
+              <planeSensor id="transmitterPlane" autoOffset='true' axisRotation='1 0 0 -1.57' minPosition='-12 0'
+                maxPosition='12 0' onoutputchange='processTranslationGizmoEvent(event)'>
+              </planeSensor>
+            </group>
+            <Switch whichChoice="0" id="rotation_gizmo">
+              <transform id='RotationHandleTransform2'>
+              </transform>
+            </Switch>
+          </scene>
+        </x3d>
+
+        <div id="sliderRight" style="display: flex; flex-direction: row;">
+
+          <input type="range" id="sliderForRotateX" min="0" max="360" step="any" value="0" class="vertical-slider">
+          <label for="sliderForRotateX" style="writing-mode: tb-rl;transform: rotate(-180deg);">Point Antenna Up-Down
+            (Elevation)
+          </label>
+        </div>
+        <div id="sliderRight2" style="display: none;">
+          <label for="sliderForRotateY" style="writing-mode: tb-rl;transform: rotate(-180deg);">Point Receiver Up-Down
+            (Elevation)
+          </label>
+          <input type="range" id="slider2ForRotateX" min="0" max="360" step="any" value="0" class="vertical-slider"
+            style="accent-color: red">
+
+        </div>
+      </div>
+      <div id="sliderBottom">
+        <div id="sliderBottomLeft" style="
+      display: flex;
+      flex-direction: column;
+  ">
+          <input type="range" id="sliderForHorizontal" min="-10" max="10" step="any" value="0">
+          <label for="sliderForHorizontal">Move East-West
+          </label>
+        </div>
+        <div id="sliderBottomRight" style="
+      display: flex;
+      flex-direction: column;
+  ">
+          <input type="range" id="sliderForRotateY" min="0" max="360" step="any" value="0" style="transform: rotate(180deg);">
+          <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
+          </label>
         </div>
       </div>
 
-      <div class="grid-item">
-        <div class="grid-container">
+      <!-- Group 2 of Sliders (Initially hidden) -->
+      <div id="sliderGroup2" style="display: none;">
+
+        <div id="sliderBottom2">
+          <div id="sliderBottomRight2">
+            <input type="range" id="slider2ForRotateY" min="0" max="360" step="any" value="0" style="accent-color: red;transform: rotate(180deg);">
+            <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: row;">
+        <table id="angles-table-rx" width="100px" style="margin: 20px;">
+          <caption>RX-Details</caption>
+          <tr>
+            <th>Angle</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>X<sub>absolute</sub></td>
+            <td id="angle-x-table-rx">0</td>
+          </tr>
+          <tr>
+            <td>Y<sub>absolute</sub></td>
+            <td id="angle-y-table-rx">0</td>
+          </tr>
+          <tr>
+            <td>Z<sub>absolute</sub></td>
+            <td id="angle-z-table-rx">0</td>
+          </tr>
+          <tr>
+            <td>&theta;<sub>absolute</sub></td>
+            <td id="angle-theta-table-rx">0</td>
+          </tr>
+          <tr>
+            <td>&Phi;<sub>absolute</sub></td>
+            <td id="angle-phi-table-rx">0</td>
+          </tr>
+          <tr>
+            <td>&theta;<sub>rx-tx</sub></td>
+            <td id="angle-theta-table-rx-rel">90</td>
+          </tr>
+          <tr>
+            <td>&Phi;<sub>rx-tx</sub></td>
+            <td id="angle-phi-table-rx-rel">90</td>
+          </tr>
+        </table>
+
+        <table id="angles-table-tx" width="100px" style="margin: 20px;">
+          <caption>TX-Details</caption>
+          <tr>
+            <th>Angle</th>
+            <th>Value</th>
+          </tr>
+          <tr>
+            <td>X<sub>absolute</sub></td>
+            <td id="angle-x-table-tx">0</td>
+          </tr>
+          <tr>
+            <td>Y<sub>absolute</sub></td>
+            <td id="angle-y-table-tx">0</td>
+          </tr>
+          <tr>
+            <td>Z<sub>absolute</sub></td>
+            <td id="angle-z-table-tx">0</td>
+          </tr>
+          <tr>
+            <td>&theta;<sub>absolute</sub></td>
+            <td id="angle-theta-table-tx">0</td>
+          </tr>
+          <tr>
+            <td>&Phi;<sub>absolute</sub></td>
+            <td id="angle-phi-table-tx">0</td>
+          </tr>
+          <tr>
+            <td>&theta;<sub>tx-rx</sub></td>
+            <td id="angle-theta-table-tx-rel">90</td>
+          </tr>
+          <tr>
+            <td>&Phi;<sub>tx-rx</sub></td>
+            <td id="angle-phi-table-tx-rel">90</td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+
+    <div class="grid-container-main">
+      <div class="grid-container-item">
+
+
+        <div class="grid-item">
+          <div class="grid-container">
+            <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+              <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-container-item">
+        <div class="grid-item">
           <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-            <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+            <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
           </div>
         </div>
       </div>
     </div>
-    <div class="grid-container-item">
-      <div class="grid-item">
-        <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-          <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
-        </div>
-      </div>
-    </div>
-
   </div>
 
+  <nav id="buttons-nav">
+    <button id="btnThroughput" onclick="toggleSection('throughput-multisignal')">Throughput Graph</button>
+    <button id="btnPsd" onclick="toggleSection('psd_svg_figure_parent')">PSD Graph</button>
+  </nav>
+  <div style="display: flex;">
+    <div style="display:inline-flex;">
+    </div>
+    <div class="grid-item">
+      <div id="throughput-multisignal" class="hidden" style="width: 720px;">
+      </div>
+    </div>
+    <!-- <div class="linkinputs" style="display: none;"> -->
+    <div style="width: 25%;">
+      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+        <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
+        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+        <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
+        .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
+      </div>
+      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+        <label for="strategy">IIP3</label> &nbsp;
+        <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
+          oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+      </div>
+
+      <p>
+        <input type="range" id=freq1 />
+      </p>
+      <p>
+        <input type="range" id=bw1 style="display: none;" />
+      </p>
+      <p>
+        <input type="range" id=gn1 style="display: none;"  />
+      </p>
+      <p>
+        <input type="range" id=mcs1 style="display: none;" />
+      </p>
+    </div>
+
+
+    <div style="width: 25%;">
+
+      <div type="text" id="sinr_div"></div>
+
+    </div>
+    <!-- </div> -->
+    <div class="grid-item">
+      <div id="psd_svg_figure_parent" class="hidden"></div>
+    </div>
+  </div>
 </body>
 <script>
-  'use strict';
 
+  // nav_bar toggle
+  const sections = {
+    'throughput-multisignal': false,
+    'psd_svg_figure_parent': false
+  };
+
+  function toggleSection(sectionId) {
+    // Toggle the section state
+    sections[sectionId] = !sections[sectionId];
+
+    // Show or hide the section based on its state
+    document.getElementById(sectionId).classList.toggle('hidden', !sections[sectionId]);
+
+    // If all sections are selected, show all sections
+    if (Object.values(sections).every(state => state)) {
+      Object.keys(sections).forEach(id => {
+        document.getElementById(id).classList.remove('hidden');
+      });
+    }
+  }
+
+
+
+
+  'use strict';
+  //These values initiated while loading
+
+
+
+  let phi_offset = 0;
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    bw_max: 38.0e6, // Hz
-    bw_min: 4.0e6,  // Hz
+    // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
+    bw_max:4.0e7,
+    // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
+    bw_min: 0,
     bw_init: 4.0e6, // Hz
     gn_init: -10, // dB
-    gn_min: -40, // dB
+    gn_min: -10, // dB
+    gn_max:90,
     mcs_init: 6, // array index int
     freq_init: 1785.0e6
-  });
-
-  // Transmitter (Red signal)
-  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    bw_max: 38.0e6, // Hz
-    bw_min: 4.0e6,  // Hz
-    bw_init: 4.0e6, // Hz
-    gn_init: -10, // dB
-    gn_min: -40, // dB
-    mcs_init: 6, // array index int
-    freq_init: 1795.0e6
   });
 
   let distance_tx_rx = 0;
@@ -630,21 +1078,48 @@ test
   // sig3['name'] = "comm_link_3";
   // sig4['name'] = "comm_link_4";
 
-  var signalList = [sig1, sig2];
-  var noise = Signal(conf.noise, "Noise", { gn_init: -40 })
+  var signalList = [sig1];
+  var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
 
   Slider(sig1, 'freq', '#freq1');
   Slider(sig1, 'bw', '#bw1');
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
 
-  Slider(sig2, 'freq', '#freq2');
-  Slider(sig2, 'bw', '#bw2');
-  Slider(sig2, 'gn', '#gn2');
-  Slider(sig2, 'mcs', '#mcs2');
+  
+ // updates sinr and pr values when ever there is a change in TX Slider
+  document.querySelector('#gn1').addEventListener('input', function() {
+    updatePathLoss();
+  });
+
+  // gn1.addEventListener("change", updatePathLoss());
+  // Slider(sig1,'noise',"noise")
+
+  //function calculate SINR as freq slider moved
+  let slider_params = ['freq', 'bw', 'gn', 'mcs'];
+  slider_params.forEach(param => {
+    sig1._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
+    CalculateSINR_BasedOn_ReceivedPower(sig1, sig1['_' + param]);
+  })
+  // Slider(noise, 'gn', '#gn2');
+
+  Label(
+    sig1,
+    "sinr",
+    {
+      prefix: "Signal-to-Noise Ratio: SNR = ",
+    },
+    "sinr_div"
+  );
+
 
   var receiverPos = new Position(0, 0, 0);
   var translatorPos = new Position(0, 0, 0);
+  //setting default values of receiver power
+  //overriding SNR and distance(tx and rx)
+  getCoordinatesFromX3D("receiver");
+  calcDistance(receiverPos, new Position(0, 0, 0));
+  updatePathLoss();
 
   // HoppingInterferer(interferer, '#hoppingInterferer');
   CapacityBanner(sig1, '#capacityBanner');
@@ -673,14 +1148,14 @@ test
       document.getElementById("nonlinear").disabled = true;
       document.getElementById("multiplierDiv").style.display = "none";
       document.getElementById("default").selected = "selected";
+      document.getElementById('togglebutton').style.display = 'none';
 
       document.getElementById("bw1").style.display = "none";
       document.getElementById("gn1").style.display = "none";
       document.getElementById("mcs1").style.display = "none";
-
-      document.getElementById("bw2").style.display = "none";
-      document.getElementById("gn2").style.display = "none";
-      document.getElementById("mcs2").style.display = "none";
+      document.getElementById("angles-table-tx").style.display = 'none';
+      //document.getElementById("gn2").style.display = "initial";
+      document.getElementById("sinr_div").style.display = "inline";
 
       Array.from(document.getElementsByClassName("bwMultiplierDiv")).forEach(element => {
         element.style.display = "none";
@@ -692,6 +1167,13 @@ test
 
       calculateSINR();
 
+      document.getElementById('tx_pattern_options').style.display = 'none';
+      document.getElementById("rotation_gizmo").setAttribute("whichChoice", -1);
+      document.getElementById("tx-geometry").setAttribute("whichChoice", 0);
+      document.getElementById('manual-angle-options-tx').style.display = 'none';
+      document.getElementById('manual-angle-options-rx').style.display = 'none';
+
+
     } else if (mode === 'advanced') {
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
@@ -701,10 +1183,14 @@ test
       document.getElementById("bw1").style.display = "initial";
       document.getElementById("gn1").style.display = "initial";
       document.getElementById("mcs1").style.display = "initial";
+      document.getElementById("angles-table-tx").style.display = "";
+      //document.getElementById("gn2").style.display = "initial";
+      document.getElementById('tx_pattern_options').style.display = 'inline-flex';
+      document.getElementById("rotation_gizmo").setAttribute("whichChoice", 0);
+      document.getElementById('manual-angle-options-tx').style.display = 'block';
+      document.getElementById('manual-angle-options-rx').style.display = 'block';
+      document.getElementById('togglebutton').style.display = 'block';
 
-      document.getElementById("bw2").style.display = "initial";
-      document.getElementById("gn2").style.display = "initial";
-      document.getElementById("mcs2").style.display = "initial";
 
     }
 
@@ -737,20 +1223,16 @@ test
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
         sig1.nonlinearModel = true;
-        sig2.nonlinearModel = true;
-      
+
       });
     } else {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "none";
       });
       sig1.nonlinearModel = false;
-      sig2.nonlinearModel = false;
-      
+
 
       sig1.iip3Point = null;
-      sig2.iip3Point = null;
-     
     }
 
   }
@@ -762,21 +1244,17 @@ test
 
     if (selection == '') {
       sig1.bandwidthMultiplier = 1;
-      sig2.bandwidthMultiplier = 1;
-    
+
       sig1.nonlinearModel = false;
-      sig2.nonlinearModel = false;
-    
+
       sig1.iip3Point = null;
-      sig2.iip3Point = null;
-     
+
     }
 
     // ideal receiver filter with wider bandwidth than the received signal
     if (selection == 'a0') {
       sig1.bandwidthMultiplier = 1;
-      sig2.bandwidthMultiplier = 1;
-   
+
     }
 
     // ideal receiver filter with equal bandwidth multiplier for all signals
@@ -786,8 +1264,7 @@ test
         let bw_m = Number(bwMultiplier);
 
         sig1.bandwidthMultiplier = bw_m;
-        sig2.bandwidthMultiplier = bw_m;
-       
+
       } else {
         return;
       }
@@ -796,17 +1273,22 @@ test
     // ideal receiver filter with unequal bandwidth multipliers 
     if (selection == 'a2' || selection == 'a4') {
       let bwMultiplier1 = document.getElementById("multiplier1").value;
-      let bwMultiplier2 = document.getElementById("multiplier2").value;
-      let bwMultiplier3 = document.getElementById("multiplier3").value;
-      let bwMultiplier4 = document.getElementById("multiplier4").value;
+      // let bwMultiplier2 = document.getElementById("multiplier2").value;
+      // let bwMultiplier3 = document.getElementById("multiplier3").value;
+      // let bwMultiplier4 = document.getElementById("multiplier4").value;
 
-      if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
-        bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
-        bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+      // if (bwMultiplier1 && bwMultiplier2 && bwMultiplier3 && bwMultiplier4 &&
+      //   bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
+      //   bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
+
+      //   sig1.bandwidthMultiplier = Number(bwMultiplier1);
+
+      // }
+      if (bwMultiplier1 &&
+        bwMultiplier1.length > 0) {
 
         sig1.bandwidthMultiplier = Number(bwMultiplier1);
-        sig2.bandwidthMultiplier = Number(bwMultiplier2);
-     
+
       } else {
         return;
       }
@@ -815,16 +1297,20 @@ test
     // nonlinear frontend receiver filter 
     if (selection == 'a4' || selection == 'a5') {
       let iip3_1 = document.getElementById("iip3_1").value;
-      let iip3_2 = document.getElementById("iip3_2").value;
-    
+      //let iip3_2 = document.getElementById("iip3_2").value;
 
-      if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
-        iip3_1.length > 0 && iip3_2.length > 0 &&
-        iip3_3.length > 0 && iip3_4.length > 0) {
+
+      // if (iip3_1 && iip3_2 && iip3_3 && iip3_4 &&
+      //   iip3_1.length > 0 && iip3_2.length > 0 &&
+      //   iip3_3.length > 0 && iip3_4.length > 0) {
+
+      //   sig1.iip3Point = Number(iip3_1);
+
+      // }
+      if (iip3_1 && iip3_1.length > 0) {
 
         sig1.iip3Point = Number(iip3_1);
-        sig2.iip3Point = Number(iip3_2);
-       
+
       } else {
         return;
       }
@@ -834,15 +1320,14 @@ test
     // occupying the enter frequency range
     if (selection == 'a5') {
       sig1.bandwidthMultiplier = -Infinity;
-      sig2.bandwidthMultiplier = -Infinity;
-    
+
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)
     sig1.triggerCallbacks();
-    sig2.triggerCallbacks();
-   
-
+    //sinr value is changed where the formula is re-evaluated based on receiver 
+    //distance instead of sig gain
+    CalculateSINR_BasedOn_ReceivedPower();
   }
 
   window.addEventListener('load', (event) => {
@@ -859,49 +1344,56 @@ test
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1", "Link 2"]);
-  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1", "Link 2", "Average Total"]);
+  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1"]);
+  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1"]);
 
-  var currentGizmoRotation = new x3dom.fields.SFMatrix4f();
-  var currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
+  var currentGizmoRotation_rx = new x3dom.fields.SFMatrix4f();
+  var currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
+
+  var currentGizmoRotation_tx = new x3dom.fields.SFMatrix4f();
+  var currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
 
   /*
      * Callback function, invoked on translation gizmo output.
      */
   function processTranslationGizmoEvent(event) {
-    var sensorToWorldMatrix, translationValue;
 
     if (event.fieldName === 'translation_changed') {
       //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
-      sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
+      let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
 
       // console.log(event.value);
 
-      translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
+      let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
 
       translatorPos.x = translationValue.x;
+      console.log("ANuj", translationValue.x);
       translatorPos.y = translationValue.y;
       translatorPos.z = translationValue.z;
-      // console.log(translatorPos);
 
+
+      getCoordinatesFromX3D("receiver");
       calcDistance(receiverPos, translatorPos);
 
+
+      phi_offset = 90 - Math.atan2(12, translatorPos.x) * 180 / Math.PI;
+
       // update path loss
-      // updatePathLoss();
+      updatePathLoss();
 
       //transform the affected sensor geometry
-      document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
-      document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
-
+      // document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
+      //document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
       //transform the affected element
       document.getElementById('transmitterTranslation').setFieldValue('translation', translationValue);
+      applyRotationGizmoTransformations("translation-module");
     }
   }
 
   /*
    * Callback function, invoked on rotation gizmo output.
    */
-  function processRotationGizmoEvent(event) {
+  function processRotationGizmoEvent(event, module) {
     var sensorToWorldMatrix, rotationMatrixWorld;
 
     if (event.fieldName === 'rotation_changed') {
@@ -911,84 +1403,319 @@ test
 
       //create an offset that applies the current rotation in world coordinates,
       //but doesn't change the orientation of the coordinate system
-      currentGizmoRotationOffset = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
+      if (module === "rx")
+        currentGizmoRotationOffset_rx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
+      else if (module === "tx")
+        currentGizmoRotationOffset_tx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
 
-      applyRotationGizmoTransformations();
+      applyRotationGizmoTransformations(module);
+      console.log(module + " : First cond");
     }
 
     if (event.fieldName === 'isActive' && event.value === false) {
       //incorporate the current rotation offset, interpreted globally, into the stored rotation value
-      currentGizmoRotation = currentGizmoRotationOffset.mult(currentGizmoRotation);
+      if (module === "rx") {
+        currentGizmoRotation_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
+        //reset current rotation offset to zero rotation
+        currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
+      }
+      else if (module === "tx") {
+        currentGizmoRotation_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
+        //reset current rotation offset to zero rotation
+        currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
+      }
 
-      //reset current rotation offset to zero rotation
-      currentGizmoRotationOffset = new x3dom.fields.SFMatrix4f();
 
-      applyRotationGizmoTransformations();
+      applyRotationGizmoTransformations(module);
+      console.log(module + " : Second cond");
     }
+  }
+
+  function getRotationNode(module) {
+    if (module == "rx") {
+      return document.getElementById('rxRotation');
+    }
+    return document.getElementById('txRotation');
   }
 
   /*
    * Applies the current transformations, computed from the rotation gizmo output, to the scene
    */
-  function applyRotationGizmoTransformations() {
-    var transmitterRotationNode = document.getElementById('transmitterRotation');
+  function applyRotationGizmoTransformations(module) {
+    //var transmitterRotationNode = getRotationNode(module);
 
     //incorporate the current rotation offset, interpreted globally, into the stored rotation value
-    var transformMatrix = currentGizmoRotationOffset.mult(currentGizmoRotation);
 
-    // get the rotation angles in radians
-    var angles = transformMatrix.getEulerAngles();
+    let transformMatrix_rx, transformMatrix_tx;
+    if (module === "rx" || module === "translation-module") {
+      transformMatrix_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
+      let matrix_rx = [];
+      for (let i = 0; i < 3; i++) {
+        matrix_rx.push([transformMatrix_rx[`_${i}0`], transformMatrix_rx[`_${i}1`], transformMatrix_rx[`_${i}2`]]);
+      }
+      let angles_rx = transformMatrix_rx.getEulerAngles();
 
-    // convert angles from radians to degrees
-    var angleX = ((angles[0] * (180 / Math.PI)) + 360) % 360;
-    var angleY = ((angles[1] * (180 / Math.PI)) + 360) % 360;
-    var angleZ = ((angles[2] * (180 / Math.PI)) + 360) % 360;
-    var thetaPhi = anglesToThetaPhi(angleX, angleY, angleZ);
+      // convert angles from radians to degrees
+      let angleX_rx = ((angles_rx[0] * (180 / Math.PI)) + 360) % 360;
+      let angleY_rx = ((angles_rx[1] * (180 / Math.PI)) + 360) % 360;
+      let angleZ_rx = ((angles_rx[2] * (180 / Math.PI)) + 360) % 360;
+      let thetaPhi_rx = anglesToThetaPhi(matrix_rx, "rx");
 
-    // Print rotation angles in degrees
-    document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-    document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-    document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-    document.getElementById('thetaAngle').textContent = 'Angle Theta: ' + angleZ.toFixed(2);
-    document.getElementById('phiAngle').textContent = 'Angle Phi: ' + angleZ.toFixed(2);
+      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+
+      // Print rotation angles in degrees
+      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_rx.toFixed(2);
+      document.getElementById('angle-x-table-rx').textContent = angleX_rx.toFixed(2);
+
+      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_rx.toFixed(2);
+      document.getElementById('angle-y-table-rx').textContent = angleY_rx.toFixed(2);
+
+      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_rx.toFixed(2);
+      document.getElementById('angle-z-table-rx').textContent = angleZ_rx.toFixed(2);
+
+      //set matrix value in column major format, as required by the MatrixTransform node
+      document.getElementById('rxRotation').setFieldValue("matrix", transformMatrix_rx.transpose());
+    }
+    if (module === "tx" || module === "translation-module") {
+      transformMatrix_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
+      let matrix_tx = [];
+      for (let i = 0; i < 3; i++) {
+        matrix_tx.push([transformMatrix_tx[`_${i}0`], transformMatrix_tx[`_${i}1`], transformMatrix_tx[`_${i}2`]]);
+      }
+
+      // get the rotation angles in radians
+      let angles_tx = transformMatrix_tx.getEulerAngles();
+      let angleX_tx = ((angles_tx[0] * (180 / Math.PI)) + 360) % 360;
+      let angleY_tx = ((angles_tx[1] * (180 / Math.PI)) + 360) % 360;
+      let angleZ_tx = ((angles_tx[2] * (180 / Math.PI)) + 360) % 360;
+      let thetaPhi_tx = anglesToThetaPhi(matrix_tx, "tx");
+
+      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+
+      // Print rotation angles in degrees
+      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_tx.toFixed(2);
+      document.getElementById('angle-x-table-tx').textContent = angleX_tx.toFixed(2);
+
+      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_tx.toFixed(2);
+      document.getElementById('angle-y-table-tx').textContent = angleY_tx.toFixed(2);
+
+      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_tx.toFixed(2);
+      document.getElementById('angle-z-table-tx').textContent = angleZ_tx.toFixed(2);
+
+      //set matrix value in column major format, as required by the MatrixTransform node
+      document.getElementById('txRotation').setFieldValue("matrix", transformMatrix_tx.transpose());
+    }
 
     // update path loss
-    // updatePathLoss();
+    updatePathLoss();
+  }
 
-    //set matrix value in column major format, as required by the MatrixTransform node
-    transmitterRotationNode.setFieldValue("matrix", transformMatrix.transpose());
+  function matrixMultiply(matrixA, matrixB) {
+    if (matrixA[0].length !== matrixB.length) {
+      throw new Error("Incompatible matrix dimensions for multiplication");
+    }
+    let result = [];
+    for (let i = 0; i < matrixA.length; i++) {
+      let sum = 0;
+      for (let j = 0; j < matrixB.length; j++) {
+        sum += matrixA[i][j] * matrixB[j][0];
+      }
+      result.push([sum]);
+    }
+    return result;
+  }
+
+  function cross_product_unit_vector(a_vector, b_vector) {
+    var crossProduct = {
+      x: a_vector.y * b_vector.z - a_vector.z * b_vector.y,
+      y: a_vector.z * b_vector.x - a_vector.x * b_vector.z,
+      z: a_vector.x * b_vector.y - a_vector.y * b_vector.x
+    };
+    // Calculate the magnitude (length) of the cross product
+    var magnitude = Math.sqrt(
+      crossProduct.x * crossProduct.x + crossProduct.y * crossProduct.y + crossProduct.z * crossProduct.z);
+    // Calculate the unit vector
+    var result_unit_vector = {
+      x: crossProduct.x / magnitude,
+      y: crossProduct.y / magnitude,
+      z: crossProduct.z / magnitude
+    };
+
+    return result_unit_vector;
+  }
+
+  function dotProduct(a_vector, b_vector) {
+    return a_vector.x * b_vector.x + a_vector.y * b_vector.y + a_vector.z * b_vector.z;
+  }
+
+  //1) In this case the receiver is always aligned with x3d scene +y axis (0, 1, 0)
+  //2) initial line joining the Rx Pos and Tx Pos is -z axis (0, 0, -1)
+  //3) The cross product ((-Z) x Y) gives +ve X axis
+  //4) line in (2) is always the new -z axis and (3) is always the new +ve X axis
+  //5) from the considerations we can get the x axis  
+  function calculateUpdatedAngles(x_initial, y_initial, z_initial, module) {
+    var magnitud1 = Math.sqrt(
+      x_initial * x_initial + y_initial * y_initial + z_initial * z_initial);
+    //Here receiver means transmitter
+    var rx_coordinates = getCoordinatesFromX3D("receiver");
+    var tx_cordinates = translatorPos;
+    var updated_z_vector = {
+      x: -(rx_coordinates.x - tx_cordinates.x), y: -(rx_coordinates.y - tx_cordinates.y),
+      z: -(rx_coordinates.z - tx_cordinates.z)
+    };
+    var updated_z_magnitude = Math.sqrt(updated_z_vector.x * updated_z_vector.x
+      + updated_z_vector.y * updated_z_vector.y + updated_z_vector.z * updated_z_vector.z);
+
+    updated_z_vector.x = updated_z_vector.x / updated_z_magnitude;
+    updated_z_vector.y = updated_z_vector.y / updated_z_magnitude;
+    updated_z_vector.z = updated_z_vector.z / updated_z_magnitude;
+    var initial_y_vector = { x: 0, y: 1, z: 0 };
+    var updated_x_vector = cross_product_unit_vector(initial_y_vector, updated_z_vector);
+    var updated_y_vector = cross_product_unit_vector(updated_z_vector, updated_x_vector);
+    var x_new = dotProduct({
+      x: x_initial, y: y_initial,
+      z: z_initial
+    }, updated_x_vector);
+    var y_new = dotProduct({
+      x: x_initial, y: y_initial,
+      z: z_initial
+    }, updated_y_vector);
+    var z_new = dotProduct({
+      x: x_initial, y: y_initial,
+      z: z_initial
+    }, updated_z_vector);
+    var magnitude = Math.sqrt(
+      x_new * x_new + y_new * y_new + z_new * z_new);
+
+    var angles_updated = calculatePolarAngles(x_new, y_new, z_new);
+
+    if (angles_updated[1] > 360)
+      angles_updated[1] = angles_updated[1] % 360;
+
+    if (module === "translation-module" || module === "rx") {
+      /*update angles of rx w.r.t tx*/
+      document.getElementById('angle-theta-table-rx-rel').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table-rx-rel').textContent = angles_updated[1].toFixed(2);
+      console.log("rx angles", angles_updated[0], angles_updated[1])
+    }
+
+    if (module === "translation-module" || module === "tx") {
+      /*update angles of tx w.r.t rx*/
+      angles_updated[1] = (540 - angles_updated[1]) % 360;
+      document.getElementById('angle-theta-table-tx-rel').textContent = angles_updated[0].toFixed(2);
+      document.getElementById('angle-phi-table-tx-rel').textContent = angles_updated[1].toFixed(2);
+      console.log("tx angles", angles_updated[0], angles_updated[1])
+    }
 
   }
 
-  function anglesToThetaPhi(xDeg, yDeg, zDeg) {
-    const x = xDeg * Math.PI / 180;
-    const y = yDeg * Math.PI / 180;
-    const z = zDeg * Math.PI / 180;
-
-    let theta = Math.atan2(Math.sqrt(Math.pow(Math.cos(y) * Math.cos(z), 2) + Math.pow(Math.sin(z) *
-      Math.cos(x) + Math.cos(z) * Math.sin(x) * Math.sin(y), 2)), Math.sin(x) * Math.sin(y) +
-    Math.cos(x) * Math.cos(y) * Math.sin(z));
-    theta = (theta >= 0) ? theta : (theta + (2 * Math.PI)); // Convert negative values to positive
-    theta = theta * 180 / Math.PI; // Convert radians to degrees
-    theta = (theta > 180) ? (theta - 180) : theta; // Restrict the range to 0-180 degrees
-
-    let phi = Math.atan2(Math.sin(x) * Math.cos(y) * Math.cos(z) + Math.sin(y) *
-      Math.sin(z), Math.sqrt(Math.pow(Math.cos(z) * Math.sin(x) - Math.sin(y) * Math.cos(x) *
-        Math.sin(z), 2) + Math.pow(Math.cos(x) * Math.cos(y), 2)));
-    phi = (phi >= 0) ? phi : (phi + (2 * Math.PI)); // Convert negative values to positive
-    phi = phi * 180 / Math.PI; // Convert radians to degrees
-    phi = (phi >= 0) ? phi : (phi + 360); // Restrict the range to 0-360 degrees
-
+  function calculatePolarAngles(x, y, z) {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let theta = Math.acos(y / radius); // Theta angle in radians
+    let phi = Math.atan2(z, x); // Phi angle in radians
+    theta = theta * (180 / Math.PI);
+    phi = phi * (180 / Math.PI);
+    if (phi < 0)
+      phi = phi + 360;
     return [theta, phi];
+  }
+
+  function calculateGlobalAngles(x, y, z) {
+    let radius = Math.sqrt(x * x + y * y + z * z);
+    let theta = Math.acos(y / radius); // Theta angle in radians
+    let phi = Math.atan2(-z, x); // Phi angle in radians
+    theta = theta * (180 / Math.PI);
+    phi = phi * (180 / Math.PI);
+    phi = (phi - 270 + 360) % 360;
+    theta = (270 - theta) % 180;
+    if (phi < 0)
+      phi = (phi + 360) % 360;
+    console.log("Theta(Original): " + theta);
+    console.log("Phi(Original): " + phi);
+    return [theta, phi];
+  }
+
+  function anglesToThetaPhi(matrix, module) {
+    let matrixB = [[0], [0], [1]];
+    console.log("module", module);
+    console.log(typeof (module));
+
+    let resultCoordMatrix = matrixMultiply(matrix, matrixB);
+    calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+      resultCoordMatrix[2], module);
+    return calculateGlobalAngles(resultCoordMatrix[0], resultCoordMatrix[1],
+      resultCoordMatrix[2]);
   }
 
   // Updates the Path Loss
   function updatePathLoss() {
-    let pattern = document.getElementById("antenna_pattern").value;
-    let theta = document.getElementById("theta").value;
-    let phi = document.getElementById("phi").value;
-    calculatePathLoss(sig1, sig2, theta, phi, distance_tx_rx, pattern);
-      
+    let pattern_rx = document.getElementById("antenna_pattern").value;
+    let pattern_tx = document.getElementById("tx_pattern").value;
+
+    let theta_rx = Number(document.getElementById("angle-theta-table-rx-rel").innerText) || 0;
+    let phi_rx = Number(document.getElementById("angle-phi-table-rx-rel").innerText) || 0;
+
+    let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
+    let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
+    //calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    let mode = document.getElementById("mode").value;
+
+    console.log(pattern_rx, theta_rx, phi_rx);
+    console.log(pattern_tx, theta_tx, phi_tx);
+    // beginner mode
+    if (mode === 'beginner') {
+      calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx)
+    }
+    else {
+      calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
+    }
+
+    // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
+    // var x3d_bw=sig1.bw/1000000;
+    // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
+    // var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
+
+    //connection b/w x3d and slider
+    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    PowerSpectrumPlot_2D()
+    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
+
+
+
+    //sinr value is changed where the formula is re-evaluated based on receiver 
+    //distance instead of sig gain
+    CalculateSINR_BasedOn_ReceivedPower();
+  }
+
+  function CalculateSINR_BasedOn_ReceivedPower() {
+    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    if (sig1.nonlinearModel == false) {
+      let t_ccip = sig1.calculateSINR(null, false)[0];
+      console.log(t_ccip,"@@###@#@#@")
+      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
+      band=sig1.bw;
+      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
+      console.log("Sinr",sig1._sinr,10*Math.log10(band))
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
+    else {
+      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
+      band=sig1.bw;
+      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
+      sig1._callbacks.sinr.forEach(function (callback) {
+        callback(sig1, sig1._sinr);
+      });
+    }
   }
 
 
@@ -998,14 +1725,12 @@ test
     getCoordinatesFromX3D("receiver");
     const transmitterNode = document.getElementById("transmitterPlane");
     const axisRotationAttr = transmitterNode.getAttribute("axisRotation");
-    // console.log(axisRotationAttr);
 
     let transmitterObj = document.getElementById("transmitterPlane");
     let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(transmitterObj.getAttribute("axisRotation"));
     // let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
 
-    calcDistance(receiverPos, new Position(0, 0, 0));
-
+    calcDistance(translatorPos, receiverPos);
   };
 
   function getCoordinatesFromX3D(objectName) {
@@ -1039,10 +1764,320 @@ test
 
     var distance = Math.sqrt(a * a + b * b + c * c);
     distance_tx_rx = distance;
-    // console.log(distance);
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   }
+  PowerSpectrumPlot_2D();
+
+  const rx_verticalCheckbox = document.getElementById("vertical_rx");
+  const rx_horizontalCheckbox = document.getElementById("horizontal_rx");
+
+  const tx_verticalCheckbox = document.getElementById("vertical_tx");
+  const tx_horizontalCheckbox = document.getElementById("horizontal_tx");
+
+  document.getElementById("antenna_pattern").addEventListener("change", selectModel);
+  document.getElementById("tx_pattern").addEventListener("change", selectModel);
+  rx_verticalCheckbox.addEventListener("change", selectModel);
+  rx_horizontalCheckbox.addEventListener("change", selectModel);
+
+  tx_verticalCheckbox.addEventListener("change", selectModel);
+  tx_horizontalCheckbox.addEventListener("change", selectModel);
+  onModeChange();
+
+  function selectModel() {
+    const selectedValue_rx = document.getElementById("antenna_pattern").selectedIndex;
+    const selectedValue_tx = document.getElementById("tx_pattern").selectedIndex;
+    const rx_isCheckedVertical = rx_verticalCheckbox.checked ? 1 : 0;
+    const rx_isCheckedHorizontal = rx_horizontalCheckbox.checked ? 1 : 0;
+    const tx_isCheckedVertical = tx_verticalCheckbox.checked ? 1 : 0;
+    const tx_isCheckedHorizontal = tx_horizontalCheckbox.checked ? 1 : 0;
+    const modelNumber_rx = (selectedValue_rx) * 4 + 2 * rx_isCheckedVertical + rx_isCheckedHorizontal;
+    console.log(modelNumber_rx);
+    let modelNumber_tx = 0;
+    if (document.getElementById("mode").value != 'beginner')
+      modelNumber_tx = (selectedValue_tx) * 4 + 2 * tx_isCheckedVertical + tx_isCheckedHorizontal;
+    console.log("test");
+    console.log(modelNumber_tx);
+    document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber_rx);
+    if (document.getElementById("mode").value == 'beginner') {
+      document.getElementById("tx-geometry").setAttribute("whichchoice", 0);
+    }
+    else
+      document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
+
+  }
+
+  function manualInput() {
+    let theta_tx = Number(document.getElementById("theta_tx_manual").value);
+    let phi_tx = Number(document.getElementById("phi_tx_manual").value);
+    let theta_rx = Number(document.getElementById("theta_rx_manual").value);
+    let phi_rx = Number(document.getElementById("phi_rx_manual").value);
+    let pattern = document.getElementById("antenna_pattern").value;
+
+    console.log("Manual pattern is: " + pattern);
+
+    document.getElementById('angle-theta-table-tx').textContent = theta_tx;
+    document.getElementById('angle-phi-table-tx').textContent = phi_tx;
+
+    document.getElementById('angle-theta-table-rx').textContent = theta_rx;
+    document.getElementById('angle-phi-table-rx').textContent = phi_rx;
+
+    if (theta_tx < 0 || theta_tx > 180 || phi_tx < 0 || phi_tx > 360 ||
+      theta_rx < 0 || theta_rx > 180 || phi_rx < 0 || phi_rx > 360) {
+      console.log("Invalid input for theta/phi");
+      return;
+    }
+    calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var verticalSlider = document.getElementById('sliderForVertical');
+    var horizontalSlider = document.getElementById('sliderForHorizontal');
+    var rotateXSlider = document.getElementById('sliderForRotateX');
+    var rotateYSlider = document.getElementById('sliderForRotateY');
+    var transmitterTransform = document.getElementById('rxRotation');
+
+    // var verticalSlider2 = document.getElementById('slider2ForVertical');
+    // var horizontalSlider2 = document.getElementById('slider2ForHorizontal');
+    var rotateXSlider2 = document.getElementById('slider2ForRotateX');
+    var rotateYSlider2 = document.getElementById('slider2ForRotateY');
+
+    if (!transmitterTransform) {
+      console.error('Transmitter Transform not found');
+      return;
+    }
+
+    verticalSlider.addEventListener('input', function () {
+      updateTranslation(verticalSlider.value, null);
+    });
+
+    horizontalSlider.addEventListener('input', function () {
+      updateTranslation(null, horizontalSlider.value);
+    });
+
+    rotateXSlider.addEventListener('input', function () {
+      updateRotation(rotateXSlider.value, null);
+    });
+
+    rotateYSlider.addEventListener('input', function () {
+      updateRotation(null, rotateYSlider.value);
+    });
+
+    // toggle
+
+    rotateXSlider2.addEventListener('input', function () {
+      updateRotation(rotateXSlider2.value, null);
+    });
+
+    rotateYSlider2.addEventListener('input', function () {
+      updateRotation(null, rotateYSlider2.value);
+    });
+
+    function updateTranslation(newX, newZ) {
+      var currentTranslation = transmitterTransform.getAttribute('translation');
+      var translationComponents = currentTranslation.split(' ');
+      if (newX !== null) translationComponents[0] = newX;
+      if (newZ !== null) translationComponents[2] = newZ;
+      transmitterTransform.setAttribute('translation', translationComponents.join(' '));
+      console.log('Updated translation:', translationComponents.join(' '));
+    }
+
+    function updateRotation(newX, newY) {
+      var currentRotation = transmitterTransform.getAttribute('rotation');
+      var rotationComponents = currentRotation ? currentRotation.split(' ') : [0, 0, 0, 0];
+
+      if (newX !== null) {
+        rotationComponents[3] = newX * Math.PI / 180; // Convert degrees to radians
+        rotationComponents[0] = 1; // Rotate around x-axis
+        rotationComponents[1] = 0;
+        rotationComponents[2] = 0;
+      }
+
+      if (newY !== null) {
+        rotationComponents[3] = newY * Math.PI / 180; // Convert degrees to radians
+        rotationComponents[0] = 0;
+        rotationComponents[1] = 1; // Rotate around y-axis
+        rotationComponents[2] = 0;
+      }
+
+      transmitterTransform.setAttribute('rotation', rotationComponents.join(' '));
+      console.log('Updated rotation:', rotationComponents.join(' '));
+    }
+  });
+
+  let toggleValue = "RX";
+
+  // Function to toggle the value
+  function toggleSliders() {
+    // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
+    // var x3d_bw=sig1.bw/1000000;
+    // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
+    // var anuj=x3d_pr - 10 * Math.log10(x3d_bw);
+    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",anuj);
+    // gn1.value=;
+    var div = document.getElementById('sliderGroup2');
+    // var div2 = document.getElementById('sliderGroup2Left');
+    var div3 = document.getElementById('sliderLeft');
+    var div4 = document.getElementById('sliderRight');
+    var div5 = document.getElementById('sliderBottom');
+    var div6 = document.getElementById('sliderRight2');
+
+    if (div.style.display === 'none') {
+      div.style.display = 'block';
+      // div2.style.display = 'block';
+      div3.style.display = 'none';
+      div4.style.display = 'none';
+      div5.style.display = 'none';
+      div6.style.display = 'block';
+
+    } else {
+      div.style.display = 'none';
+      // div2.style.display = 'none';
+      div3.style.display = 'flex';
+      div4.style.display = 'inherit';
+      div5.style.display = 'inherit';
+      div6.style.display = 'none'
+    }
+    toggleValue = (toggleValue === "RX") ? "TX" : "RX";
+    document.getElementById('toggle-button').style.backgroundColor = (toggleValue === "RX") ? "#00ffff" : "red";
+    console.log("Toggled Value:", toggleValue);
+    toggleValueDisplay.textContent = `You are Controlling: ${toggleValue} "Press to toggle"`;
+
+  }
+
+
+
+  let globalTransformMatrix = x3dom.fields.SFMatrix4f.identity();
+  let lastSliderValue = { X: 0, Y: 0, Z: 0 }; // to store the last slider values
+  const translationState = { X: 0, Y: 0, Z: 0 }; // to store translation states
+
+  // Helper function to apply rotation around Y axis to the current transformation matrix
+  function applyRotationY(angleInDegrees) {
+    const angleInRadians = angleInDegrees * (Math.PI / 180);
+    const rotationMatrixY = x3dom.fields.SFMatrix4f.rotationY(angleInRadians);
+    globalTransformMatrix = rotationMatrixY.mult(globalTransformMatrix);
+    return globalTransformMatrix;
+  }
+
+  // Helper function to apply rotation around X axis to the current transformation matrix
+  function applyRotationX(angleInDegrees) {
+    const angleInRadians = angleInDegrees * (Math.PI / 180);
+    const rotationMatrixX = x3dom.fields.SFMatrix4f.rotationX(angleInRadians);
+    globalTransformMatrix = rotationMatrixX.mult(globalTransformMatrix);
+    return globalTransformMatrix;
+  }
+
+  function setupSlider(sliderId, module, axis, isTranslation = false) {
+    document.getElementById(sliderId).addEventListener('input', function (event) {
+      const currentSliderValue = parseFloat(event.target.value);
+      const deltaValue = currentSliderValue - lastSliderValue[axis]; // Calculate the change in value
+
+      if (isTranslation) {
+        // Incrementally update the translation state
+        translationState[axis] = currentSliderValue;
+
+        // Create the translation event with the updated state
+        var translationEvent = {
+          fieldName: 'translation_changed',
+          target: { getAttribute: function (attr) { return '0 0 0 0'; } }, // Dummy function for example
+          value: new x3dom.fields.SFVec3f(
+            translationState.X,
+            translationState.Y,
+            translationState.Z
+          )
+        };
+
+        processTranslationGizmoEvent(translationEvent);
+      } else {
+        // Rotation handling
+        let combinedRotationMatrix;
+        if (axis === 'Y') {
+          combinedRotationMatrix = applyRotationY(deltaValue); // Apply the change in value
+          globalTransformMatrix = combinedRotationMatrix;
+        } else {
+          const angleInRadiansX = deltaValue * (Math.PI / 180);
+          const rotationMatrixX = x3dom.fields.SFMatrix4f.rotationX(angleInRadiansX);
+          globalTransformMatrix = rotationMatrixX.mult(globalTransformMatrix);
+        }
+
+        var rotationEvent = {
+          fieldName: 'rotation_changed',
+          value: {
+            toMatrix: function () {
+              return globalTransformMatrix;
+            }
+          },
+          target: {
+            getAttribute: function () {
+              return '0 0 0 0'; // Dummy target attribute
+            }
+          }
+        };
+
+        processRotationGizmoEvent(rotationEvent, module);
+      }
+
+      lastSliderValue[axis] = currentSliderValue; // Update the last slider value
+
+      updatePathLoss();
+    });
+  }
+
+  
+
+  // Set up sliders for rotation
+  setupSlider('sliderForRotateX', 'rx', 'X');
+  setupSlider('sliderForRotateY', 'rx', 'Y');
+  // Set up sliders for translation
+  setupSlider('sliderForHorizontal', 'rx', 'X', true); // Horizontal translation
+  setupSlider('sliderForVertical', 'rx', 'Z', true); // Vertical translation
+
+  //Toggle
+  setupSlider('slider2ForRotateX', 'tx', 'X');
+  setupSlider('slider2ForRotateY', 'tx', 'Y');
+
+
+  // Set up sliders for translation
+  // setupSlider('slider2ForHorizontal', 'tx', 'X', true); // Horizontal translation
+  // setupSlider('slider2ForVertical', 'tx', 'Z', true); // Vertical translation
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var rotateXSlider = document.getElementById('sliderForRotateX');
+    var rotateYSlider = document.getElementById('sliderForRotateY');
+    // var rotateZSlider = document.getElementById('sliderForRotateZ');
+    var slider2ForRotateX = document.getElementById('slider2ForRotateX')
+
+    
+
+
+
+    var objectTransform = document.getElementById('rotationHandleTransform');
+
+    if (!objectTransform) {
+      console.error('Rotation Handle Transform not found');
+      return;
+    }
+
+    rotateXSlider.addEventListener('input', function () {
+      var angleRadians = this.value * Math.PI / 180;
+      console.log('Rotate X:', angleRadians);
+    });
+
+    rotateYSlider.addEventListener('input', function () {
+      var angleRadians = this.value * Math.PI / 180;
+      console.log('Rotate Y:', angleRadians);
+    });
+
+    rotateZSlider.addEventListener('input', function () {
+      var angleRadians = this.value * Math.PI / 180;
+      console.log('Rotate Z:', angleRadians);
+      objectTransform.setAttribute('rotation', `0 0 1 ${angleRadians}`);
+
+    });
+  });
+
 </script>
 
 </html>
