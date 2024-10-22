@@ -328,7 +328,7 @@
   <div id="togglebutton" style="padding-top: 3%;">
     <div id="toggleValueDisplay" style="padding-left: 30%;">You are Controlling: RX "Press to toggle"</div>
     <div style="padding-left: 35%;">
-    <button class="toggle-button" onclick="toggleSliders()">
+    <button class="toggle-button" id="toggle-button" onclick="toggleSliders()">
       Toggle RX/TX
     </button>
   </div>
@@ -341,19 +341,18 @@
         <div id="sliderLeft" style="display: flex;flex-direction: row;">
           <label for="sliderForVertical" style="writing-mode: tb-rl;transform: rotate(-180deg);">Move
             North-South</label>
-          <input type="range" id="sliderForVertical" min="-12" max="12" step="any" value="0" class="vertical-slider">
+          <input type="range" id="sliderForVertical" min="-12" max="12" step="any" value="0" class="vertical-slider" style="transform: rotate(180deg);">
         </div>
 
         <x3d id='x3dElement' showStat='false' showLog='false' width='1020px' height='500px'>
           <scene DEF='scene'>
-            <physicalenvironmentlight diffuse="simpleDiffuse.dds" specular="simpleSpecular.dds">
-            </physicalenvironmentlight>
-            <Background backUrl='nz.png' bottomUrl='ny.png' frontUrl='pz.png' leftUrl='nx.png' rightUrl='px.png'
-              topUrl='py.png'></Background>
-            <Viewpoint position="2.94508 4.85773 12.57227" orientation="-0.84005 0.53375 0.09708 0.42644"
-              zNear="0.00692" zFar="500" centerOfRotation="0.00000 0.00000 0.00000" fieldOfView="0.78540"
-              description=""></Viewpoint>
-            <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo>
+              <physicalenvironmentlight diffuse="simpleDiffuse.dds" specular="simpleSpecular.dds"></physicalenvironmentlight>
+              <Background backUrl='nz.png' bottomUrl='ny.png' frontUrl='pz.png' leftUrl='nx.png' rightUrl='px.png' topUrl='py.png'></Background>
+              <!-- Adjusted Viewpoint with modified position and orientation -->
+              <Viewpoint DEF="OverheadView" position="0 100 0" orientation="1 0 0 -1.57"
+                         zNear="0.1" zFar="1000" centerOfRotation="0 0 0" fieldOfView="0.78540"
+                         description="Overhead View"></Viewpoint>
+              <!-- <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo> -->
 
             <!-- Transmitter and Antenna -->
             <transform id="transmitterTranslation" translation="0 0 0">
@@ -596,7 +595,7 @@
             <transform translation='0 -5.5 0' rotation='1 0 0 -1.57'>
               <shape>
                 <appearance>
-                  <material diffuseColor='0.7 0.7 0.7'></material>
+                  <Material ambientIntensity='0.25' diffuseColor='0.510609 0.17264 0.059872' shininess='0.933333' specularColor='0.533333 0.533333 0.533333'/>
                 </appearance>
                 <box solid='true' size='60 60 2'></box>
               </shape>
@@ -858,7 +857,7 @@
       display: flex;
       flex-direction: column;
   ">
-          <input type="range" id="sliderForRotateY" min="0" max="360" step="any" value="0">
+          <input type="range" id="sliderForRotateY" min="0" max="360" step="any" value="0" style="transform: rotate(180deg);">
           <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
           </label>
         </div>
@@ -869,7 +868,7 @@
 
         <div id="sliderBottom2">
           <div id="sliderBottomRight2">
-            <input type="range" id="slider2ForRotateY" min="0" max="360" step="any" value="0" style="accent-color: red">
+            <input type="range" id="slider2ForRotateY" min="0" max="360" step="any" value="0" style="accent-color: red;transform: rotate(180deg);">
             <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
             </label>
           </div>
@@ -1007,7 +1006,7 @@
         <input type="range" id=bw1 style="display: none;" />
       </p>
       <p>
-        <input type="range" id=gn1 style="display: none;" />
+        <input type="range" id=gn1 style="display: none;"  />
       </p>
       <p>
         <input type="range" id=mcs1 style="display: none;" />
@@ -1061,12 +1060,13 @@
   // Receiver (Blue signal)
   var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
-    bw_max:1.0e8,
+    bw_max:4.0e7,
     // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
-    bw_min:-1.0e7,
+    bw_min: 0,
     bw_init: 4.0e6, // Hz
     gn_init: -10, // dB
-    gn_min: -40, // dB
+    gn_min: -10, // dB
+    gn_max:90,
     mcs_init: 6, // array index int
     freq_init: 1785.0e6
   });
@@ -1079,12 +1079,20 @@
   // sig4['name'] = "comm_link_4";
 
   var signalList = [sig1];
-  var noise = Signal(conf.noise, "Noise", { gn_init: -160 })
+  var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
 
   Slider(sig1, 'freq', '#freq1');
   Slider(sig1, 'bw', '#bw1');
   Slider(sig1, 'gn', '#gn1');
   Slider(sig1, 'mcs', '#mcs1');
+
+  
+ // updates sinr and pr values when ever there is a change in TX Slider
+  document.querySelector('#gn1').addEventListener('input', function() {
+    updatePathLoss();
+  });
+
+  // gn1.addEventListener("change", updatePathLoss());
   // Slider(sig1,'noise',"noise")
 
   //function calculate SINR as freq slider moved
@@ -1093,7 +1101,7 @@
     sig1._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
     CalculateSINR_BasedOn_ReceivedPower(sig1, sig1['_' + param]);
   })
-  Slider(noise, 'gn', '#gn2');
+  // Slider(noise, 'gn', '#gn2');
 
   Label(
     sig1,
@@ -1670,12 +1678,15 @@
       calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
     }
 
-    var x3d_pr =document.getElementById("power_rx_db").innerHTML;
-    var x3d_bw=sig1.bw/1000000;
-    // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
-    var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
-    sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
-    console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
+    // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
+    // var x3d_bw=sig1.bw/1000000;
+    // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
+    // var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
+
+    //connection b/w x3d and slider
+    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    PowerSpectrumPlot_2D()
+    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
 
 
 
@@ -1688,13 +1699,19 @@
     let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
     if (sig1.nonlinearModel == false) {
       let t_ccip = sig1.calculateSINR(null, false)[0];
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip);
+      console.log(t_ccip,"@@###@#@#@")
+      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
+      band=sig1.bw;
+      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
+      console.log("Sinr",sig1._sinr,10*Math.log10(band))
       sig1._callbacks.sinr.forEach(function (callback) {
         callback(sig1, sig1._sinr);
       });
     }
     else {
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
+      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
+      band=sig1.bw;
+      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
       sig1._callbacks.sinr.forEach(function (callback) {
         callback(sig1, sig1._sinr);
       });
@@ -1923,6 +1940,7 @@
       div6.style.display = 'none'
     }
     toggleValue = (toggleValue === "RX") ? "TX" : "RX";
+    document.getElementById('toggle-button').style.backgroundColor = (toggleValue === "RX") ? "#00ffff" : "red";
     console.log("Toggled Value:", toggleValue);
     toggleValueDisplay.textContent = `You are Controlling: ${toggleValue} "Press to toggle"`;
 

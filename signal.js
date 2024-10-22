@@ -272,7 +272,7 @@ var conf = {
         bw_init: 4000.0e6, // unused
 
         // Gain represents noise level
-        gn_min: -160.0,
+        gn_min: -120.0,
         gn_max: 0.0,
         gn_step: 0.01,
         gn_scale: 1.0,

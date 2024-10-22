@@ -307,3 +307,7 @@ input:checked + .slider:before {
   width: 100%;
   padding: 10px;
 }
+
+.toggle-button{
+  background-color: aqua;
+}

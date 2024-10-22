@@ -166,6 +166,7 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
     document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
     if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) != Infinity) {
         document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
+        console.log("Done2.....Anuj",eirp_vert_dB);
     }
 
 
@@ -196,6 +197,7 @@ function calculatePathLossAdvanced(sig, theta_rx, phi_rx, theta_tx, phi_tx, dist
     // Assuming it as linear polarization
     let eirp_vert_dB = sig._gn + fvert_tx_dB;
     let eirp_horiz_dB = sig._gn + fhoriz_tx_dB;
+    console.log("TX>>>>>>>>>>>>>>>>>>"+sig._gn)
     console.log("Transmitter gain: " + sig._gn);
     console.log("eirp vert dB: " + eirp_vert_dB);
     console.log("eirp horiz dB: " + eirp_horiz_dB);
@@ -217,6 +219,7 @@ function calculatePathLossAdvanced(sig, theta_rx, phi_rx, theta_tx, phi_tx, dist
     document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
     if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) != Infinity) {
         document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
+        console.log("Done.....Anuj",sig._gn);
     }
 }
 
