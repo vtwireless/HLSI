@@ -1704,9 +1704,20 @@
       band=sig1.bw;
       sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
       console.log("Sinr",sig1._sinr,10*Math.log10(band))
+      // (Jakcson) red neck fix will find real issue later
+      if(sig1._sinr >= conf.schemes[sig1._mcs].SNR){
+        sig1._rate = sig1._bw * conf.schemes[sig1._mcs].rate;
+      }else{
+        sig1._rate = 0.1;
+      }
+      
+
+
       sig1._callbacks.sinr.forEach(function (callback) {
         callback(sig1, sig1._sinr);
       });
+      console.log("Rate",sig1._rate)
+
     }
     else {
       // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
