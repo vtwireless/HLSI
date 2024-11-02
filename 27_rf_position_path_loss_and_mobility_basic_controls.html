@@ -1092,6 +1092,10 @@
     updatePathLoss();
   });
 
+  document.querySelector('#freq1').addEventListener('input', function() {
+    updatePathLoss();
+  });
+
   // gn1.addEventListener("change", updatePathLoss());
   // Slider(sig1,'noise',"noise")
 
@@ -1703,16 +1707,16 @@
       // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
       band=sig1.bw;
       sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
-      console.log("Sinr",sig1._sinr,10*Math.log10(band))
-      // (Jakcson) red neck fix will find real issue later
+      console.log("Sinr",sig1._sinr,10*Math.log10(band));
+      // keeping this fix since ccip doesn't consider path loss and this will
       if(sig1._sinr >= conf.schemes[sig1._mcs].SNR){
         sig1._rate = sig1._bw * conf.schemes[sig1._mcs].rate;
       }else{
         sig1._rate = 0.1;
       }
       
-
-
+      
+      
       sig1._callbacks.sinr.forEach(function (callback) {
         callback(sig1, sig1._sinr);
       });
@@ -1743,7 +1747,6 @@
 
     calcDistance(translatorPos, receiverPos);
   };
- // comment
   function getCoordinatesFromX3D(objectName) {
 
     const transformNode = document.getElementById(objectName);
