@@ -159,7 +159,7 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
       makeSlider(sig, n, "Bandwidth", parameter, 1.0, "Hz");
       break;
     case "gn": // signal gain - input range slider
-      makeSlider(sig, n, "Gain", parameter, 1.0, "dB");
+      makeSlider(sig, n, "TX Power(Sig._gn)", parameter, 1.0, "dBm");
       break;
     case "mcs": // modulation scheme - input range slider
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {

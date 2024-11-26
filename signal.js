@@ -272,7 +272,7 @@ var conf = {
         bw_init: 4000.0e6, // unused
 
         // Gain represents noise level
-        gn_min: -60.0,
+        gn_min: -120.0,
         gn_max: 0.0,
         gn_step: 0.01,
         gn_scale: 1.0,
@@ -523,6 +523,7 @@ function Signal(sig, name = "", opts = null) {
     // checkSetRate() to initialize it, far below here.
     obj._rate = -1.0;
     obj._sinr = -1.0;
+    obj._non_linear_ccip = null;
 
 
     // list of user callbacks that are called when one of the "values"
@@ -586,6 +587,8 @@ function Signal(sig, name = "", opts = null) {
         
         if(obj._sinr >= conf.schemes[obj._mcs].SNR)
             new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+        else    
+            new_rate = 0.1;
 
         // if the new rate and old rate are the same we do not
         // trigger rate events. 
@@ -708,8 +711,13 @@ function Signal(sig, name = "", opts = null) {
             if(have_change) {
                 // trigger "sinr" change callbacks:
                 obj._callbacks.sinr.forEach(function(callback) {
-                    //console.log("CALLING: " + callback);
+                    console.log("CALLING: " + callback);
                     callback(obj, obj._sinr);
+                });
+                // trigger "rate" change callbacks:
+                obj._callbacks.rate.forEach(function(callback) {
+                    console.log("CALLING: " + callback);
+                    callback(obj, obj._rate);
                 });
             }
         }
@@ -858,6 +866,7 @@ function Signal(sig, name = "", opts = null) {
         let p_adj = sum_ip / 10 ** (obj.iip3Point / 10);
         let sig_ccip = obj.calculateSINR(null, false)[0];
         new_sinr = obj._gn - 10 * Math.log10(p_adj + sig_ccip);
+        obj._non_linear_ccip = p_adj + sig_ccip;
 
         console.log(obj.name + " Sum IP: " + sum_ip + ", p_adj: " + p_adj + ", p_int: " + sig_ccip + ", New SINR : " + new_sinr);
         if (sum_ip < 0) 

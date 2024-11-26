@@ -235,6 +235,7 @@ function PowerSpectrumPlot_3D(opts = {}, has_signal=true, has_interferer=true) {
             let fc = -0.5 + (sig.freq - sig.freq_plot_min) / df;
             let bw = sig.bw / df;
             let gn = sig.gn;
+            
 
             if(sig["name"]=="interferer"){
                 cur_interferer_freq = fc;

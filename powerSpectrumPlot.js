@@ -146,7 +146,7 @@ function PowerSpectrumPlot(opts = {}) {
             let bw = sig.bw / df;
             let gn = sig.gn;
 
-            //console.log("fc=" + fc + " bw=" + bw + " gn=" + gn);
+            console.log("fc=" + fc + " bw=" + bw + " gn=" + gn);
             // ! bw (slider %) is limited to 90% range, as log(0) == inf
             generator.add_signal(fc, bw, gn + 10 * Math.log10(bw));
             //generator.add_signal(fc, bw, gn);

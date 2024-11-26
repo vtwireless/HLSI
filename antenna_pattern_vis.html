@@ -18,11 +18,11 @@
 
     <!-- Create canvas elements for the two patterns -->
     <canvas id="canvas-v" width="500" height="500"></canvas>
-    <canvas id="canvas-h" width="500" height="500"></canvas>
+    <canvas id="canvas-fhoriz_coordinate_set" width="500" height="500"></canvas>
 
     <script>
-        let thetaresolution = 10;
-        let phiresolution = 10;
+        let thetaresolution = 5;
+        let phiresolution = 5;
         let fvert = [];
         let fhoriz = [];
 
@@ -38,7 +38,11 @@
             let fv = Array(thetadim)
                 .fill()
                 .map(() => Array(phidim).fill(0)); // vertical polarization
-            let fh = fv.slice(); // horizontal polarization
+            let fh = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // horizontal polarization
+
+            let maxGain = 0;
 
             for (let k = 0; k < thetadim; k++) {
                 let theta = (Math.PI * thetares * k) / 180;
@@ -49,15 +53,186 @@
                     } else {
                         fv[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
                     }
+                    maxGain += (fv[k][m] ** 2) * Math.sin(theta) * (thetares * Math.PI / 180) * (phires * Math.PI / 180);
                 }
             }
+            console.log(4 * Math.PI / maxGain);
 
-            fvert = fv;
-            fhoriz = fh;
+            fvert = fv.map(subArray => subArray.map(number => number));
+            fhoriz = fh.map(subArray => subArray.map(number => number));
 
         }
 
-        halfwave(thetaresolution, phiresolution);
+        function isovert(thetares, phires) {
+            let patterns = [];
+            if (90 % thetares !== 0) {
+                console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(1)); // vertical polarization
+            patterns.push(fv);
+
+            let fh = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // horizontal polarization
+            patterns.push(fh);
+            console.log(fv);
+            // console.log(fh);
+            fvert = fv;
+            fhoriz = fh;
+            return patterns;
+        }
+
+        function isohoriz(thetares, phires) {
+            let patterns = [];
+            if (90 % thetares !== 0) {
+                console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // vertical polarization
+
+            let fh = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(1)); // horizontal polarization
+
+            patterns.push(fv);
+            patterns.push(fh);
+            fvert = fv;
+            fhoriz = fh;
+            // console.log(fvert);
+            // console.log(fhoriz);
+
+            return patterns;
+
+        }
+
+        // directional, vertically polarized antenna with specified horizontal and vertical beamwidth and sidelobe level
+        // Generates the pattern for a vertically polarized directional antenna with a flat main beam and uniform side lobe level.
+        function dirantv(thetares, phires, azbw, elbw, SLL) {
+            let patterns = [];
+            if (SLL > 0) {
+                console.log("Error! SLL must be <= 0.");
+                return;
+            }
+            if (90 / thetares !== Math.round(90 / thetares)) {
+                console.log("Error! theta resolution must divide evenly into 90 degrees.");
+                return;
+            }
+            const thetadim = 180 / thetares + 1;
+            const phidim = 360 / phires + 1;
+            let fv = Array(thetadim)
+                .fill()
+                .map(() => Array(phidim).fill(0)); // vertical polarization
+            let fh = fv.slice(); // horizontal polarization
+            for (let k = 1; k <= thetadim; k++) {
+                const theta = Math.PI * thetares * (k - 1) / 180;
+                for (let m = 1; m <= phidim; m++) {
+                    const phi = Math.PI * phires * (m - 1) / 180;
+                    if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 180 > Math.PI * (elbw / 2) / 180) {
+                        if (SLL !== -999) {
+                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
+                        }
+                    } else if (phi - Math.PI * phires / 180 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
+                        if (SLL !== -999) {
+                            fv[k - 1][m - 1] = 10 ** (SLL / 10);
+                        }
+                    } else {
+                        fv[k - 1][m - 1] = 1;
+                    }
+                }
+            }
+            fvert = fv;
+            fhoriz = fh;
+
+            fvert = fv.map(subArray => subArray.map(number => number * 3));
+            fhoriz = fh.map(subArray => subArray.map(number => number));
+        }
+
+        function short_dipole(thetares, phires) {
+
+            if (90 / thetares !== Math.round(90 / thetares)) {
+                console.log('Error!  theta resolution must divide evenly into 90 degrees.');
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+
+            let fv = [];
+            let fh = [];
+            for (let i = 0; i < thetadim; i++) {
+                fv.push(new Array(phidim).fill(0));
+                fh.push(new Array(phidim).fill(0));
+            }
+
+            // Calculate normalized antenna pattern
+            for (let k = 1; k <= thetadim; k++) {
+                let theta = Math.PI * thetares * (k - 1) / 180;
+                for (let m = 1; m <= phidim; m++) {
+                    let phi = Math.PI * phires * (m - 1) / 180;
+                    fv[k - 1][m - 1] = Math.sin(theta);
+                }
+            }
+
+            // console.log(fvert);
+            // console.log(fhoriz);
+            // Multiply normalized pattern by max gain
+            fvert = fv.map(subArray => subArray.map(number => number * 3));
+            fhoriz = fh.map(subArray => subArray.map(number => number * 3));
+
+        }
+
+        function sloop(thetares, phires) {
+
+            if (90 / thetares !== Math.round(90 / thetares)) {
+                console.log('Error!  theta resolution must divide evenly into 90 degrees.');
+                return;
+            }
+
+            let thetadim = 180 / thetares + 1;
+            let phidim = 360 / phires + 1;
+
+            let fv = [];
+            let fh = [];
+            for (let i = 0; i < thetadim; i++) {
+                fv.push(new Array(phidim).fill(0));
+                fh.push(new Array(phidim).fill(0));
+            }
+
+            for (let k = 1; k <= thetadim; k++) {
+                let theta = Math.PI * thetares * (k - 1) / 180;
+                for (let m = 1; m <= phidim; m++) {
+                    let phi = Math.PI * phires * (m - 1) / 180;
+                    fh[k - 1][m - 1] = Math.sin(theta);
+                }
+            }
+            fvert = fv;
+            fhoriz = fh;
+        }
+
+        function maxGain(fvert, fhoriz) {
+            fvert = fvert / Math.max(fvert);
+
+        }
+
+        // halfwave(thetaresolution, phiresolution);
+        // isovert(thetaresolution, phiresolution);
+        // isohoriz(thetaresolution, phiresolution);
+        // sloop(thetaresolution, phiresolution);
+        // short_dipole(thetaresolution, phiresolution);
+        dirantv(thetaresolution, phiresolution, 30, 30, -10);
 
         function threepat() {
             console.log(fvert);
@@ -68,8 +243,8 @@
                 return;
             }
 
-            let thetadim = s[0];
-            let phidim = s[1];
+            let thetadim = s;
+            let phidim = fvert[0].length;
             let thetares = 180 / (thetadim - 1);
             let phires = 360 / (phidim - 1);
 
@@ -80,6 +255,13 @@
             let yh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
             let zh = new Array(thetadim).fill(0).map(() => new Array(phidim).fill(0));
 
+            let fvert_coordinate_set = [];
+            let fhoriz_coordinate_set = [];
+
+            let point_index = -1; //tracks the index of the pointset
+            let indexed_lineset = []; // IndexedLineSet indices are stored here
+
+            let prev_iter_fvert_val;
             for (let k = 0; k < thetadim; k++) {
                 let theta = k * thetares * Math.PI / 180;
                 for (let m = 0; m < phidim; m++) {
@@ -88,12 +270,34 @@
                     xv[k][m] = rv * Math.sin(theta) * Math.cos(phi);
                     yv[k][m] = rv * Math.sin(theta) * Math.sin(phi);
                     zv[k][m] = rv * Math.cos(theta);
+
+                    point_index = point_index + 1;
+                    //Finding the IndexedLineSet in the below code
+                    if ((rv == 1 && prev_iter_fvert_val != 1) 
+                    || (rv != 1 && prev_iter_fvert_val == 1)) 
+                    {
+                        indexed_lineset.push(point_index);
+                        indexed_lineset.push(point_index - 1);
+                        indexed_lineset.push(-1);
+                    }
+                    fvert_coordinate_set.push(xv[k][m]);
+                    fvert_coordinate_set.push(yv[k][m]);
+                    fvert_coordinate_set.push(zv[k][m]);
                     let rh = Math.abs(fhoriz[k][m]);
                     xh[k][m] = rh * Math.sin(theta) * Math.cos(phi);
                     yh[k][m] = rh * Math.sin(theta) * Math.sin(phi);
                     zh[k][m] = rh * Math.cos(theta);
+                    fhoriz_coordinate_set.push(xh[k][m]);
+                    fhoriz_coordinate_set.push(yh[k][m]);
+                    fhoriz_coordinate_set.push(zh[k][m]);
+                    prev_iter_fvert_val = rv;
                 }
             }
+            console.log("Vertical Coordinate set")          
+            fvert_coordinate_set = fvert_coordinate_set.map((element) => element * 3);
+            console.log(fvert_coordinate_set);
+            console.log("indexed_lineset Set")
+            console.log(indexed_lineset)
 
             // determine the maximum coordinate value
             var maxcoordv = Math.max(
@@ -112,11 +316,12 @@
             );
             var mc = Math.ceil(Math.max(maxcoordv, maxcoordh) * 2) / 2;
 
-            plotSurface(xv, yv, zv, fvert, "Vertical Polarization Pattern");
+            let axisLimits = [-mc, mc, -mc, mc, -mc, mc];
+            plotSurface(xv, yv, zv, fvert, "Vertical Polarization Pattern", axisLimits);
 
             // set the axis limits
-            let axisLimits = [-mc, mc, -mc, mc, -mc, mc];
-            plotSurface(xh, yh, zh, fhoriz, "Horizontal Polarization Pattern", axisLimits);
+            // let axisLimits = [-mc, mc, -mc, mc, -mc, mc];
+            // plotSurface(xh, yh, zh, fhoriz, "Horizontal Polarization Pattern", axisLimits);
         }
 
         // plot a surface
@@ -128,7 +333,66 @@
                 surfacecolor: f.map(row => [...row]),
                 type: 'surface'
             };
+            let colorsTrace = [];
+            let len = trace.surfacecolor.length;
+            let wid = trace.surfacecolor[0].length;
+            let max = 0;
+            //filling surface color values as an array and normalising it
+            for (let k = 0; k < len; k++) {
+                for (let m = 0; m < wid; m++) {
+                    colorsTrace.push(trace.surfacecolor[k][m]);
+                    if (trace.surfacecolor[k][m] > max) {
+                        max = trace.surfacecolor[k][m];
+                    }
+                }
+            }
+            colorsTrace = colorsTrace.map(element => element / max);
 
+            // Define your color scale
+            // const colorScale = [
+            //     [0, [255, 0, 0]],   // Color for the minimum value Red
+            //     [0.5, [128, 0, 128]],  // Color for the mid value Purple
+            //     [1, [0, 0, 255]]     // Color for the maximum value Blue
+            // ];
+
+            const colorScale = [
+                [0, [255,245,240]],
+                [0.125, [254,224,210]],
+                [0.25, [252,187,161]],
+                [0.375, [252,146,114]],
+                [0.5, [251,106,74]],
+                [0.625, [239,59,44]],
+                [0.75, [203,24,29]],
+                [0.875, [165,15,21]],
+                [1, [103,0,13]]
+            ]
+
+            // Function to map the value to RGB based on the color scale
+            function mapValueToRGB(value, scale) {
+                for (let i = 0; i < scale.length - 1; i++) {
+                    if (value <= scale[i + 1][0]) {
+                        const [x1, color1] = scale[i];
+                        const [x2, color2] = scale[i + 1];
+                        const fraction = (value - x1) / (x2 - x1);
+                        let r = (Math.round(color1[0] + fraction * (color2[0] - color1[0])));
+                        let g = (Math.round(color1[1] + fraction * (color2[1] - color1[1])));
+                        let b = (Math.round(color1[2] + fraction * (color2[2] - color1[2])));
+                        return [r, g, b];
+                    }
+                }
+            }
+            let rgb_values_final = []
+            // Convert the single surface color value to RGB
+            for (let i = 0; i < colorsTrace.length; i++) {
+                let temp = mapValueToRGB(colorsTrace[i], colorScale);
+                rgb_values_final.push(temp[0]);
+                rgb_values_final.push(temp[1]);
+                rgb_values_final.push(temp[2]);
+            }
+            rgb_values_final = rgb_values_final.map(element => element / 255);
+
+            console.log("final color RGB Values")
+            console.log(rgb_values_final);
             let layout = {
                 title: title,
                 scene: {
@@ -218,7 +482,7 @@
         renderToCanvas(document.getElementById('canvas-v'), surfaceV);
 
         // var surfaceH = getSurfaceData('Horizontal Polarization Pattern');
-        // renderToCanvas(document.getElementById('canvas-h'), surfaceH);
+        // renderToCanvas(document.getElementById('canvas-fhoriz_coordinate_set'), surfaceH);
     </script>
 </body>
 
