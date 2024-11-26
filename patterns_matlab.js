@@ -1,8 +1,23 @@
+/**
+ * This code defines functions to generate antenna patterns for different types of antennas and enables
+ * lookup of specific values within those patterns based on theta and phi angles.
+ *
+ * @param {number} thetares - The angular resolution in degrees for the elevation angle (θ) in the
+ * antenna pattern lookup tables. This parameter determines the granularity of the pattern data in the
+ * vertical direction.
+ * @param {number} phires - The angular resolution in degrees for the azimuth angle (φ) in the antenna
+ * pattern lookup tables. This parameter sets the granularity of the pattern data around the antenna in
+ * the horizontal direction and is used to calculate the number of azimuth divisions in the lookup tables.
+ * @returns {Function} Returns a function that allows you to generate and look up antenna pattern values
+ * based on specific theta and phi angles, depending on the selected antenna pattern type. The
+ * `getAntennaPatternValue` function calculates the antenna pattern for a given pattern type and retrieves
+ * values using `lookupAntennaPatternValue`.
+ */
 
 // **** Antenna pattern lookup tables *****
 // fvert - vertical polarization
 // fhoriz - horizontal polarization
-// 'fvert' and 'fhoriz' represent the complex gain of the antenna at each phi and theta angle, 
+// 'fvert' and 'fhoriz' represent the complex gain of the antenna at each phi and theta angle,
 // and are normalized to a maximum absolute value of 1.
 
 let thetaresolution = 5;
@@ -59,7 +74,6 @@ function isohoriz(thetares, phires) {
   // console.log(fhoriz);
 
   return patterns;
-
 }
 
 // vertically oriented half-wave dipole antenna
@@ -85,7 +99,8 @@ function halfwave(thetares, phires) {
       if (k === 0 || k === thetadim - 1) {
         fvert[k][m] = 0;
       } else {
-        fvert[k][m] = Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
+        fvert[k][m] =
+          Math.cos((Math.PI / 2) * Math.cos(theta)) / Math.sin(theta);
       }
     }
   }
@@ -96,14 +111,13 @@ function halfwave(thetares, phires) {
   // console.log(fhoriz);
 
   return patterns;
-
 }
 
 // vertically oriented small dipole antenna
 function sloop(thetares, phires) {
   let patterns = [];
   if (90 / thetares !== Math.round(90 / thetares)) {
-    console.log('Error!  theta resolution must divide evenly into 90 degrees.');
+    console.log("Error!  theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -118,9 +132,9 @@ function sloop(thetares, phires) {
   }
 
   for (let k = 1; k <= thetadim; k++) {
-    let theta = Math.PI * thetares * (k - 1) / 180;
+    let theta = (Math.PI * thetares * (k - 1)) / 180;
     for (let m = 1; m <= phidim; m++) {
-      let phi = Math.PI * phires * (m - 1) / 180;
+      let phi = (Math.PI * phires * (m - 1)) / 180;
       fvert[k - 1][m - 1] = Math.sin(theta);
     }
   }
@@ -131,7 +145,6 @@ function sloop(thetares, phires) {
   // console.log(fhoriz);
 
   return patterns;
-
 }
 
 // directional, vertically polarized antenna with specified horizontal and vertical beamwidth and sidelobe level
@@ -151,18 +164,29 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
   const thetadim = 180 / thetares + 1;
   const phidim = 360 / phires + 1;
 
-  const fvert = Array.from({ length: thetadim }, () => Array.from({ length: phidim }).fill(0));
-  const fhoriz = Array.from({ length: thetadim }, () => Array.from({ length: phidim }).fill(0));
+  const fvert = Array.from({ length: thetadim }, () =>
+    Array.from({ length: phidim }).fill(0)
+  );
+  const fhoriz = Array.from({ length: thetadim }, () =>
+    Array.from({ length: phidim }).fill(0)
+  );
 
   for (let k = 1; k <= thetadim; k++) {
-    const theta = Math.PI * thetares * (k - 1) / 180;
+    const theta = (Math.PI * thetares * (k - 1)) / 180;
     for (let m = 1; m <= phidim; m++) {
-      const phi = Math.PI * phires * (m - 1) / 180;
-      if (Math.abs(theta - Math.PI / 2) - Math.PI * thetares / 180 > Math.PI * (elbw / 2) / 180) {
+      const phi = (Math.PI * phires * (m - 1)) / 180;
+      if (
+        Math.abs(theta - Math.PI / 2) - (Math.PI * thetares) / 180 >
+        (Math.PI * (elbw / 2)) / 180
+      ) {
         if (SLL !== -999) {
           fvert[k - 1][m - 1] = 10 ** (SLL / 10);
         }
-      } else if (phi - Math.PI * phires / 180 > (azbw / 2) * Math.PI / 180 && (2 * Math.PI - phi) > (azbw / 2) * Math.PI / 180 + Math.PI * phires / 1800) {
+      } else if (
+        phi - (Math.PI * phires) / 180 > ((azbw / 2) * Math.PI) / 180 &&
+        2 * Math.PI - phi >
+          ((azbw / 2) * Math.PI) / 180 + (Math.PI * phires) / 1800
+      ) {
         if (SLL !== -999) {
           fvert[k - 1][m - 1] = 10 ** (SLL / 10);
         }
@@ -178,26 +202,25 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
   // console.log(fhoriz);
 
   return patterns;
-
 }
 
 // invokes the method for the selected antenna pattern and looks up the value for corresp phi and theta
 function getAntennaPatternValue(theta, phi, pattern) {
   let patterns;
   switch (pattern) {
-    case 'vertical_isotropic':
+    case "vertical_isotropic":
       patterns = isovert(thetaresolution, phiresolution);
       break;
-    case 'horizontal_isotropic':
+    case "horizontal_isotropic":
       patterns = isohoriz(thetaresolution, phiresolution);
       break;
-    case 'halfwave':
+    case "halfwave":
       patterns = halfwave(thetaresolution, phiresolution);
       break;
-    case 'sdipole':
+    case "sdipole":
       patterns = sloop(thetaresolution, phiresolution);
       break;
-    case 'dirAnt_sideLobe':
+    case "dirAnt_sideLobe":
       patterns = dirantv(thetaresolution, phiresolution, 30, 30, -10);
       break;
     default:
@@ -209,7 +232,6 @@ function getAntennaPatternValue(theta, phi, pattern) {
 
 // looks up the antenna pattern value from the table
 function lookupAntennaPatternValue(theta, phi, patterns) {
-
   let fvert = patterns[0];
   let fhoriz = patterns[1];
   theta_index = Math.round(Number(theta) / thetaresolution) + 1;
@@ -219,7 +241,6 @@ function lookupAntennaPatternValue(theta, phi, patterns) {
   let f_horiz_val = fhoriz[theta_index][phi_index];
 
   return [f_vert_val, f_horiz_val];
-
 }
 
 // method invocations
@@ -228,4 +249,3 @@ function lookupAntennaPatternValue(theta, phi, patterns) {
 // halfwave(thetaresolution, phiresolution);
 // sloop(thetaresolution, phiresolution);
 // dirantv(thetaresolution, phiresolution, 20, 20, -1.5);
-

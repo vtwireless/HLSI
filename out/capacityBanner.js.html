@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: capacityBanner.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: capacityBanner.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * The `CapacityBanner` function creates a banner that displays various signal parameters and calculations
+ * related to capacity and efficiency, such as Signal-to-Noise Ratio (SNR), information capacity, spectral
+ * efficiency, link margin, and actual data rate.
+ *
+ * @param {Object} sig - A signal object containing properties related to signal characteristics, such as
+ * signal-to-noise ratio (SNR), bandwidth, modulation scheme (MCS), and data rate. These properties are used
+ * within the function to calculate and display various capacity metrics.
+ * @param {HTMLElement|string|null} [parentElement=null] - Specifies the parent element where the banner content
+ * will be appended. If not provided, a new `&lt;p>` element is created and appended to the `&lt;body>` by default.
+ * @returns {HTMLElement} A dynamically created HTML element that displays various signal parameters, such as
+ * SNR, information capacity, spectral efficiency, link margin, and actual rate. These values are calculated
+ * based on the input signal object and are updated using the `Label` function as needed.
+ */
+
+function CapacityBanner(sig, parentElement = null) {
+  var id = (CapacityBanner.count++).toString() + "_cap";
+
+  var innerHTML =
+    "\
+    &lt;label for=signal_to_noise_ratio" +
+    id +
+    ">" +
+    sig.snrLabel +
+    ": &lt;/label>\
+        &lt;output for=signal_to_noise_ratio" +
+    id +
+    " id=snr" +
+    id +
+    ">&lt;/output>,\
+    &lt;label for=information_capacity" +
+    id +
+    ">Capacity: &lt;/label>\
+        &lt;output for=information_capacity" +
+    id +
+    " id=cap" +
+    id +
+    ">&lt;/output>,\
+    &lt;label for=spectral_efficiency" +
+    id +
+    ">Spect. Eff.: &lt;/label>\
+        &lt;output for=spectral_efficiency" +
+    id +
+    " id=eta" +
+    id +
+    ">&lt;/output>,\
+    &lt;label for=link_margin" +
+    id +
+    ">Link Margin: &lt;/label>\
+        &lt;output for=link_margin" +
+    id +
+    " id=margin" +
+    id +
+    ">&lt;/output>,\
+    &lt;label for=actual_rate" +
+    id +
+    ">Actual Rate: &lt;/label>\
+        &lt;output for=actual_rate" +
+    id +
+    " id=rate" +
+    id +
+    ">&lt;/output>\
+";
+
+  function getElement(sel) {
+    return document.querySelector(sel + id);
+  }
+
+  if (parentElement === null) {
+    parentElement = document.createElement("p");
+    document.body.appendChild(parentElement);
+  } else if (typeof parentElement === "string") {
+    parentElement = document.querySelector(parentElement);
+  }
+
+  parentElement.innerHTML = innerHTML;
+
+  Label(sig, "sinr", { element: "#snr" + id });
+
+  Label(sig, "sinr", {
+    func: function (sinr) {
+      // sinr is SNR in dB
+      let C = sig.bw * Math.log2(1 + Math.pow(10.0, sinr / 10));
+      let [scale, units] = scale_units(C, 0.1);
+      return d3.format(".1f")(C * scale) + " " + units + "b/s";
+    },
+    element: "#cap" + id,
+  });
+
+  Label(sig, "sinr", {
+    func: function (sinr) {
+      // sinr is SNR in dB
+      let se = Math.log2(1 + Math.pow(10.0, sinr / 10.0));
+      return d3.format(".3f")(se) + " b/s/Hz";
+    },
+    element: "#eta" + id,
+  });
+
+  // This Label trigger a change from 2 signal parameters.
+  var margin = getElement("#margin");
+  Label(sig, ["sinr", "mcs"], {
+    func: function () {
+      // sig.sinr is SNR in dB
+      let m = sig.sinr - conf.schemes[sig.mcs].SNR;
+      if (m &lt;= 0) margin.className = "red";
+      else margin.className = "";
+      return d3.format(".2f")(m) + " dB";
+    },
+    element: "#margin" + id,
+  });
+
+  // This Label triggers a change from 2 signal parameters.
+  var rate = getElement("#rate");
+  Label(sig, ["sinr", "mcs"], {
+    func: function () {
+      let r = sig.rate;
+
+      if (r &lt;= 0) {
+        rate.className = "red";
+        return "0 b/s";
+      }
+
+      rate.className = "";
+
+      let [scale, units] = scale_units(r, 1.0);
+      let percent =
+        (100.0 * r) / (sig.bw * Math.log2(1 + Math.pow(10.0, sig.sinr / 10.0)));
+
+      if (percent > 100) {
+        rate.className = "red";
+        return "0 b/s";
+      }
+
+      return (
+        d3.format(".2f")(r * scale) +
+        " " +
+        units +
+        "b/s (" +
+        d3.format(".1f")(percent) +
+        "% capacity)"
+      );
+    },
+    element: "#rate" + id,
+  });
+}
+
+// Used to get ids.
+CapacityBanner.count = 0;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#CapacityBanner">CapacityBanner</a></li><li><a href="global.html#Label">Label</a></li><li><a href="global.html#example">example</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.4</a> on Thu Nov 07 2024 14:34:15 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

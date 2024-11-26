@@ -1,3 +1,27 @@
+/**
+ * The `Slider` function creates sliders to change various signal parameters based on valid values,
+ * with validation and setup for different types of sliders.
+ *
+ * @param {Object} sig - A signal object, likely containing information about frequency, bandwidth,
+ *                       gain, modulation scheme, and noise level. This object is used to set up
+ *                       the range of values for each slider.
+ * @param {string} parameter - The type of parameter for which a slider is being created. Valid
+ *                             parameters could include options like "frequency", "bandwidth",
+ *                             "gain", etc.
+ * @param {HTMLElement|string|null} [n=null] - Represents the HTML input range element or a CSS
+ *                                            selector for the node that the slider will attach to.
+ *                                            If `null`, a new `<p>` and `<input>` range element
+ *                                            will be created and appended to the body.
+ * @param {string|null} [append_to_id=null] - The ID of the element to which the created slider
+ *                                           should be appended. If specified, the slider is
+ *                                           appended to the element with this ID; otherwise,
+ *                                           it is appended to the body.
+ *
+ * @returns {Object} A set of sliders, each set up with labels, limits, and callbacks for value
+ *                   changes. The function validates the parameter to ensure that only accepted
+ *                   values are used for creating sliders.
+ */
+
 //
 // Make parameter changing sliders
 //
@@ -19,7 +43,12 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-function Slider(sig, parameter, n = null, append_to_id=null) {
+/* This part of the `Slider` function is performing parameter validation. It checks if the `parameter`
+passed to the function is one of the valid parameter values: "freq", "bw", "gn", "mcs", or "noise".
+If the `parameter` is not one of these values, it logs an error message indicating that the
+parameter type is invalid. This validation ensures that only valid parameters are accepted for
+creating the sliders in the function. */
+function Slider(sig, parameter, n = null, append_to_id = null) {
   {
     let gotPar = false;
 
@@ -42,19 +71,14 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     n = document.createElement("INPUT");
     n.type = "range";
     let p = document.createElement("p");
-    
-    
+
     p.appendChild(n);
-    
-    if(append_to_id !== null){
+
+    if (append_to_id !== null) {
       document.getElementById(append_to_id).appendChild(p);
-    }
-    else{
+    } else {
       document.body.appendChild(p);
     }
-    
-    
-    
   }
 
   if (n.type !== "range") {
@@ -165,8 +189,10 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
         //console.log("val=" + val);
         return (
-            conf.schemes[val].name + " (" +
-            d3.format(".2f")(conf.schemes[val].rate) + " b/s/Hz)"
+          conf.schemes[val].name +
+          " (" +
+          d3.format(".2f")(conf.schemes[val].rate) +
+          " b/s/Hz)"
         );
       });
       break;

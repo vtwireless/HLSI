@@ -1,3 +1,16 @@
+/**
+ * The `PowerSpectrumPlot_2D` function generates a power spectrum plot with one or more signals based
+ * on the provided options and signal parameters.
+ *
+ * @param {Object} [opts] - An options object for configuring the plot.
+ * @param {boolean} [opts.has_signal=true] - A flag indicating whether signals should be included in the plot.
+ * If `true`, signals will be displayed; if `false`, they will be omitted.
+ * @param {boolean} [opts.has_interferer=true] - A flag indicating whether an interferer signal should be included.
+ * If `true`, the plot will display the interferer signal; if `false`, it will exclude it.
+ * @returns {void} This function does not return a value. It generates a Power Spectrum Plot based on the
+ * specified options and updates the visualization according to changes in signal parameters and noise levels.
+ */
+
 "use strict"; // A must for debugging code.
 
 // TODO:
