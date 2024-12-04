@@ -589,6 +589,7 @@ function Signal(sig, name = "", opts = null) {
 
     if (obj._sinr >= conf.schemes[obj._mcs].SNR)
       new_rate = obj._bw * conf.schemes[obj._mcs].rate;
+    else new_rate = 0.1;
 
     // if the new rate and old rate are the same we do not
     // trigger rate events.
@@ -704,8 +705,13 @@ function Signal(sig, name = "", opts = null) {
       if (have_change) {
         // trigger "sinr" change callbacks:
         obj._callbacks.sinr.forEach(function (callback) {
-          //console.log("CALLING: " + callback);
+          console.log("CALLING: " + callback);
           callback(obj, obj._sinr);
+        });
+        // trigger "rate" change callbacks:
+        obj._callbacks.rate.forEach(function (callback) {
+          console.log("CALLING: " + callback);
+          callback(obj, obj._rate);
         });
       }
     }
