@@ -1,3 +1,18 @@
+/**
+ * The `Slider` function creates interactive sliders to change parameters for signal objects based on specified
+ * properties and appends them to the HTML body or a specified element.
+ *
+ * @param {Object} sig - A signal object containing properties like frequency, bandwidth, gain, modulation
+ * scheme, and noise level. This object is used to set the slider's parameters.
+ * @param {string} parameter - The name of the parameter for which a slider is created (e.g., frequency, gain).
+ * @param {HTMLElement|string} [n=null] - An HTML element or CSS selector to attach the slider to. If `null`,
+ * a new `<p>` and `<input type="range">` element will be created and appended to the body.
+ * @param {string} [append_to_id=null] - The ID of an HTML element to which the slider should be appended.
+ * If not provided or set to `null`, the slider will default to appending to the `<body>`.
+ * @returns {HTMLElement} An HTML `<input>` range element configured as a slider for adjusting the specified
+ * parameter on the signal object.
+ */
+
 //
 // Make parameter changing sliders
 //
@@ -19,7 +34,7 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-function Slider(sig, parameter, n = null, append_to_id=null) {
+function Slider(sig, parameter, n = null, append_to_id = null) {
   {
     let gotPar = false;
 
@@ -42,19 +57,14 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     n = document.createElement("INPUT");
     n.type = "range";
     let p = document.createElement("p");
-    
-    
+
     p.appendChild(n);
-    
-    if(append_to_id !== null){
+
+    if (append_to_id !== null) {
       document.getElementById(append_to_id).appendChild(p);
-    }
-    else{
+    } else {
       document.body.appendChild(p);
     }
-    
-    
-    
   }
 
   if (n.type !== "range") {
@@ -165,8 +175,10 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
         //console.log("val=" + val);
         return (
-            conf.schemes[val].name + " (" +
-            d3.format(".2f")(conf.schemes[val].rate) + " b/s/Hz)"
+          conf.schemes[val].name +
+          " (" +
+          d3.format(".2f")(conf.schemes[val].rate) +
+          " b/s/Hz)"
         );
       });
       break;
