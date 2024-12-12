@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * This code defines functions to generate antenna patterns for different types of antennas and enables
  * lookup of specific values within those patterns based on theta and phi angles.
@@ -250,7 +249,6 @@ function lookupAntennaPatternValue(theta, phi, patterns) {
 // halfwave(thetaresolution, phiresolution);
 // sloop(thetaresolution, phiresolution);
 // dirantv(thetaresolution, phiresolution, 20, 20, -1.5);
-=======
 
 // **** Antenna pattern lookup tables *****
 // fvert - vertical polarization
@@ -481,5 +479,3 @@ function lookupAntennaPatternValue(theta, phi, patterns) {
 // halfwave(thetaresolution, phiresolution);
 // sloop(thetaresolution, phiresolution);
 // dirantv(thetaresolution, phiresolution, 20, 20, -1.5);
-
->>>>>>> master
