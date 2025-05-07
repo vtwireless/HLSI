@@ -555,6 +555,7 @@ function PowerSpectrumPlot_2D(
     sig.onChange("freq", update_plot);
     sig.onChange("bw", update_plot);
     sig.onChange("gn", update_plot);
+    // sig.onChange("mcs", update_plot);
   });
   console.log(sigs);
   // update_plot() will be called by the callbacks that are set just

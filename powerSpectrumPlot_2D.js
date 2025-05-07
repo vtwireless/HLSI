@@ -326,6 +326,7 @@ function PowerSpectrumPlot_2D(opts = {}, has_signal=true, has_interferer=true) {
         sig.onChange("freq", update_plot);
         sig.onChange("bw", update_plot);
         sig.onChange("gn", update_plot);
+        // sig.onChange("mcs", update_plot);
     });
 
     // update_plot() will be called by the callbacks that are set just

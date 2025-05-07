@@ -44,11 +44,20 @@ function CapacityBanner(sig, parentElement = null) {
         },
         element: '#cap'+ id
     });
-
-    Label(sig, 'sinr', {
+    // label variable description
+    // label(object, update label on these variables)
+    Label(sig,  [ 'sinr', 'mcs'], {
         func: function(sinr) {
-            // sinr is SNR in dB
-            let se = Math.log2(1 + Math.pow(10.0, sinr/10.0));
+            // sinr is SNR in 
+            let se = 0;
+            if(sig.sinr>conf.schemes[sig._mcs].SNR){
+            // formerly using theoretical spect eff. based on shannon capacity
+            // let se = Math.log2(1 + Math.pow(10.0, sinr/10.0));
+            // now using actual spectral eff. based on mod and FEC encoding
+            se = conf.schemes[sig.mcs].rate
+            } else{
+            se = 0
+            }
             return d3.format(".3f")(se) + " b/s/Hz";
         },
         element: '#eta'+ id
