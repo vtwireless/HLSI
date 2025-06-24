@@ -61,7 +61,7 @@ function constellationDiagram(){
           .attr("cx", function (d) { return x(d.x); } )
           .attr("cy", function (d) { return y(d.y); } )
           .attr("r", 1.5)
-          .style("fill","#00FF00")
+          .style("fill","#1b9e77")
   
   
         // console.log(sig)
@@ -101,8 +101,8 @@ function constellationDiagram(){
           .append("circle")
             .attr("cx", function (d) { return x(d.x); } )
             .attr("cy", function (d) { return y(d.y); } )
-            .attr("r", 1.5)
-            .style("fill","#00FF00")
+            .attr("r", 3)
+            .style("fill","#1b9e77")
           console.log("10 seconds has passed")
         }
       for (let i = 0; i < 99; i++) {
@@ -144,7 +144,7 @@ function constellationDiagram(){
                 }
                 return y(yVal); } )
               .attr("r", 2)
-              .style("fill","#FF0000")
+              .style("fill","#d95f02")
           } else {
             svg.append('g')
             .selectAll("dot")
@@ -168,7 +168,7 @@ function constellationDiagram(){
               }
               return y(yVal); } )
               .attr("r", 2)
-              .style("fill","#0000FF")
+              .style("fill","#7570b3")
           }
         }
 
@@ -180,7 +180,7 @@ function constellationDiagram(){
             .attr("cx", function (d) { return x(d.x); } )
             .attr("cy", function (d) { return y(d.y); } )
             .attr("r", 1.5)
-            .style("fill","#00FF00")
+            .style("fill","#1b9e77")
             }
         // value below is the loop time in miliseconds
     }, 1000);
@@ -231,7 +231,7 @@ function constellationDiagram(){
         .attr("cx", function (d) { return x(d.x); } )
         .attr("cy", function (d) { return y(d.y); } )
         .attr("r", 1.5)
-        .style("fill","#00FF00")
+        .style("fill","#1b9e77")
     }
 
   }

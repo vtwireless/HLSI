@@ -304,6 +304,8 @@ var conf = {
         gn_step: 0.01,
         gn_scale: 1.0,
         gn_init: -14.0,
+
+        phase: 1,
     }
 };
 
@@ -532,7 +534,7 @@ function Signal(sig, name = "", opts = null) {
     // dependency signals independent parameter/variables changing.
     obj._callbacks = { 
         // These are independent variables:
-        freq: [], bw: [], gn: [], mcs: [],
+        freq: [], bw: [], gn: [], mcs: [], 
         // These are dependent variables.
         rate: [ ], sinr: [] };
     if(obj.is_noise)

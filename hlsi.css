@@ -311,3 +311,8 @@ input:checked + .slider:before {
 .toggle-button{
   background-color: aqua;
 }
+
+.tick{
+  color: #fff;
+}
+
