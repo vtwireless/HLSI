@@ -1,11 +1,18 @@
 // Declare global variables
-let sentMessages = 0;
-let messageErrors = 0;
 let bpskFlag = 0;
 let refreshRate = 1000;
 
+class MessageStats {
+  constructor() {
+    this.sentMessages = 0;
+    this.messageErrors = 0;
+  }
 
-
+  reset() {
+    this.sentMessages = 0;
+    this.messageErrors = 0;
+  }
+}
 
 function constellationDiagram(top , left,constellationName, frozenFlag){
   
@@ -257,13 +264,14 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           console.log("10 seconds has passed")
         }
       for (let i = 0; i < messageRate; i++) {
-        sentMessages = sentMessages + 1;
         // creates a variable that can be edited if it goes out of bounds for x and y values
         let translatedTargets = constellationTargets.map(point => ({
           x: point.x  +(2)*variance*randn_bm(),
           y: point.y  +(2)*variance*randn_bm()
         }));
         for (let i = 0; i < constellationTargets.length; i++) {
+          BER_stats.sentMessages = BER_stats.sentMessages + 1;
+
           // console.log(translatedTargets[i])
           // console.log(translatedTargets)
 
@@ -278,7 +286,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           let = printObject = [translatedTargets[i]]
 
           if ( (xErrorDist > distance) || (yErrorDist > distance) ){
-            messageErrors = messageErrors + 1;
+            BER_stats.messageErrors = BER_stats.messageErrors + 1;
           }
 
           // console.log(printObject[0].x)
@@ -369,12 +377,10 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
             .style("fill","#1b9e77")
             }
 
-        // console.log("Sent Messages: " + sentMessages)
-        // console.log("Message Errors: " + messageErrors)
-        // console.log("Error Rate: " + messageErrors/sentMessages)
+
         // value below is the loop time in miliseconds
-        sig.BER = messageErrors/sentMessages;
-        // console.log("Bit Error Rate: " + sig.BER);
+        sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
+        console.log("Bit Error Rate: " + sig.BER);
 
         // Update the BER display
         berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(6)}`;
@@ -465,8 +471,7 @@ function buttonPressedClearPoints(){
   d3.select("#constellationParent2").selectAll("circle").remove();
 
   sig.BER = 0;
-  sentMessages = 0;
-  messageErrors = 0;  
+  BER_stats.reset(); 
 
 }
 

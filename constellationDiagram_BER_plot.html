@@ -40,6 +40,11 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_max: 30,
   });
   noise.gn = 0;
+
+  let BER_stats = new MessageStats();
+  
+
+
 Slider(sig, 'mcs', null, "modCodeSlider");
 Slider(sig, 'gn', null, "gainSlider");
 let frozenFlag1 = false;
