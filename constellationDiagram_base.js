@@ -138,9 +138,9 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
         div = document.getElementById("rateSlider")
       // Check if the rate slider already exists
-      console.log(div.hasChildNodes() == false)
+      // console.log(div.hasChildNodes() == false)
       
-      console.log(document.getElementById("rateSlider").hasChildNodes() == false)
+      // console.log(document.getElementById("rateSlider").hasChildNodes() == false)
       if (!(document.getElementById("rateSlider").hasChildNodes())) {
         messageRateSlider = document.createElement("INPUT");
         messageRateSlider.type = "range";
@@ -380,7 +380,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
         // value below is the loop time in miliseconds
         sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
-        console.log("Bit Error Rate: " + sig.BER);
+        // console.log("Bit Error Rate: " + sig.BER);
 
         // Update the BER display
         berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(6)}`;

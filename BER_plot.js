@@ -71,9 +71,9 @@ function BER_plot(){
 
       function clearErrorRate() {
         BER_stats.reset()
-        console.log("Resetting BER stats");
-        console.log("Sent Messages: " + BER_stats.sentMessages);
-        console.log("Message Errors: " + BER_stats.messageErrors);
+        // console.log("Resetting BER stats");
+        // console.log("Sent Messages: " + BER_stats.sentMessages);
+        // console.log("Message Errors: " + BER_stats.messageErrors);
 
 
       }

@@ -45,7 +45,7 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   
 
 
-Slider(sig, 'mcs', null, "modCodeSlider");
+Slider(sig, 'mcs_simple', null, "modCodeSlider");
 Slider(sig, 'gn', null, "gainSlider");
 let frozenFlag1 = false;
 constellationDiagram(300, 25,"constellationParent", frozenFlag1);
