@@ -19,7 +19,7 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-function Slider(sig, parameter, n = null, append_to_id=null) {
+function Slider(sig, parameter, n = null, append_to_id = null) {
   {
     let gotPar = false;
 
@@ -42,19 +42,14 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     n = document.createElement("INPUT");
     n.type = "range";
     let p = document.createElement("p");
-    
-    
+
     p.appendChild(n);
-    
-    if(append_to_id !== null){
+
+    if (append_to_id !== null) {
       document.getElementById(append_to_id).appendChild(p);
-    }
-    else{
+    } else {
       document.body.appendChild(p);
     }
-    
-    
-    
   }
 
   if (n.type !== "range") {
@@ -88,23 +83,19 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     if (sig.name.length > 0) labelText = sig.name + " " + labelText;
 
     if (par !== "mcs_simple") {
-    // set range INPUT limit attributes
-    n.min = sig[par + "_min"]; // example: sig.freq_min
-    n.max = sig[par + "_max"];
-    n.step = sig[par + "_step"];
-    n.value = sig[par];
-    }
-    else { 
+      // set range INPUT limit attributes
+      n.min = sig[par + "_min"]; // example: sig.freq_min
+      n.max = sig[par + "_max"];
+      n.step = sig[par + "_step"];
+      n.value = sig[par];
+    } else {
       // set range INPUT limit attributes
       n.min = 0;
       n.max = 6;
       n.step = 1;
       n.value = sig["mcs"];
       let msc_mask = 0;
-      
     }
-
-
 
     // Prefix this input with a label.
     let label = document.createElement("label");
@@ -134,9 +125,8 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
       // Set the varying parameter.  For example: sig.freq
       // This calls the parameter setter.
       if (par !== "mcs_simple") {
-      sig[par] = parseValue(n.value);
-      }
-      else {
+        sig[par] = parseValue(n.value);
+      } else {
         msc_mask = parseValue(n.value);
         switch (msc_mask) {
           case 0:
@@ -165,7 +155,6 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     };
 
     if (typeof unit === "string") {
-      
       var [scale, units] = scale_units(sig[par + "_init"], unitScale);
       units = " " + units + unit;
 
@@ -208,13 +197,13 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
     }
     // In this case unit is a function.
     else var outputUnitsCallback = unit;
-    if(par !== "mcs_simple") {
+    if (par !== "mcs_simple") {
       sig.onChange(par, function (sig, val) {
         n.value = val;
         output.value = outputUnitsCallback(sig, val);
       });
     } else {
-        sig.onChange("mcs", function (sig, val) {
+      sig.onChange("mcs", function (sig, val) {
         // n.value = val;
         output.value = outputUnitsCallback(sig, val);
       });
@@ -241,38 +230,40 @@ function Slider(sig, parameter, n = null, append_to_id=null) {
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
         //console.log("val=" + val);
         return (
-            conf.schemes[val].name + " (" +
-            d3.format(".2f")(conf.schemes[val].rate) + " b/s/Hz)"
+          conf.schemes[val].name +
+          " (" +
+          d3.format(".2f")(conf.schemes[val].rate) +
+          " b/s/Hz)"
         );
       });
       break;
     case "mcs_simple": // modulation scheme - input range slider
       makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
-      let msc_simple_name;
-      switch (sig["mcs"]) {
-            case 0:
-              msc_simple_name = "BPSK"; // BPSK
-              break;
-            case 2:
-              msc_simple_name = "QPSK"; // QPSK
-              break;
-            case 5:
-              msc_simple_name = "16QAM"; // 16QAM
-              break;
-            case 7:
-              msc_simple_name = "32QAM"; // 32QAM
-              break;
-            case 8:
-              msc_simple_name = "64QAM"; // 64QAM
-              break;
-            case 9:
-              msc_simple_name = "128QAM"; // 128QAM
-              break;
-            case 10:
-              msc_simple_name = "256QAM"; // 256QAM
-              break;
-          }
-        return (msc_simple_name );
+        let msc_simple_name;
+        switch (sig["mcs"]) {
+          case 0:
+            msc_simple_name = "BPSK"; // BPSK
+            break;
+          case 2:
+            msc_simple_name = "QPSK"; // QPSK
+            break;
+          case 5:
+            msc_simple_name = "16QAM"; // 16QAM
+            break;
+          case 7:
+            msc_simple_name = "32QAM"; // 32QAM
+            break;
+          case 8:
+            msc_simple_name = "64QAM"; // 64QAM
+            break;
+          case 9:
+            msc_simple_name = "128QAM"; // 128QAM
+            break;
+          case 10:
+            msc_simple_name = "256QAM"; // 256QAM
+            break;
+        }
+        return msc_simple_name;
       });
       break;
     case "noise": // noise floor 'volume' - emulated by gain value

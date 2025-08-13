@@ -53,16 +53,94 @@ function BER_plot(){
       ebnoPoints = [
                   { x: sig.gn, y: sig.BER },
                  ];
-      
-        svg.append('g')
-          .selectAll("dot")
-          .data(ebnoPoints)
-          .enter()
-          .append("circle")
-            .attr("cx", function (d) { return x(d.x); } )
-            .attr("cy", function (d) { return y(d.y); } )
-            .attr("r", 1.5)
-            .style("fill","#1b9e77")
+        switch (sig["mcs"]) {
+          case 0:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#c51b7d")
+            break;
+          case 2:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#e9a3c9")
+            break;
+          case 5:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#fde0ef")
+            break;
+          case 7:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#f7f7f7")
+            break;
+          case 8:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#e6f5d0")
+            break;
+          case 9:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#a1d76a")
+            break;
+          case 10:
+          svg.append('g')
+            .selectAll("dot")
+            .data(ebnoPoints)
+            .enter()
+            .append("circle")
+              .attr("cx", function (d) { return x(d.x); } )
+              .attr("cy", function (d) { return y(d.y); } )
+              .attr("r", 2.5)
+              .style("fill","#4d9221")
+            break;
+        }
+        // svg.append('g')
+        //   .selectAll("dot")
+        //   .data(ebnoPoints)
+        //   .enter()
+        //   .append("circle")
+        //     .attr("cx", function (d) { return x(d.x); } )
+        //     .attr("cy", function (d) { return y(d.y); } )
+        //     .attr("r", 1.5)
+        //     .style("fill","#1b9e77")
       }, refreshRate);
 
       sig.onChange("mcs", clearErrorRate);
