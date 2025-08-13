@@ -16,6 +16,7 @@
 <button onclick="buttonPressedClearPoints()">clear message</button> 
 
 <div id="constellationParent" style="width: 100%; height: 100%;"></div>
+<div id="rateSlider" style="margin-left: 1%; margin-top:2; width: 100%;"></div>
 
 
 </body>
@@ -36,8 +37,12 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_max: 30,
   });
   noise.gn = 0;
+
+    let BER_stats = new MessageStats();
+
+    let frozenFlag1 = false;
 Slider(sig, 'mcs', null, "modCodeSlider");
-constellationDiagram()
+constellationDiagram(300, 25,"constellationParent", frozenFlag1);
 
 
 
