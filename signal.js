@@ -686,7 +686,7 @@ function Signal(sig, name = "", opts = null) {
       }
     });
 
-    console.log("ccip linear" + ccip);
+    //console.log("ccip linear" + ccip);
 
     // ccip is now the current interferer power summed for all
     // interferers including any noise interferers.
@@ -705,12 +705,12 @@ function Signal(sig, name = "", opts = null) {
       if (have_change) {
         // trigger "sinr" change callbacks:
         obj._callbacks.sinr.forEach(function (callback) {
-          console.log("CALLING: " + callback);
+          //console.log("CALLING: " + callback);
           callback(obj, obj._sinr);
         });
         // trigger "rate" change callbacks:
         obj._callbacks.rate.forEach(function (callback) {
-          console.log("CALLING: " + callback);
+          //console.log("CALLING: " + callback);
           callback(obj, obj._rate);
         });
       }
@@ -863,6 +863,7 @@ function Signal(sig, name = "", opts = null) {
     new_sinr = obj._gn - 10 * Math.log10(p_adj + sig_ccip);
     obj._non_linear_ccip = p_adj + sig_ccip;
 
+    /*
     console.log(
       obj.name +
         " Sum IP: " +
@@ -874,7 +875,9 @@ function Signal(sig, name = "", opts = null) {
         ", New SINR : " +
         new_sinr
     );
-    if (sum_ip < 0) console.log("Final arr: " + interference_arr);
+    */
+
+    //if (sum_ip < 0) console.log("Final arr: " + interference_arr);
 
     if (setSINR) {
       let have_change = obj._sinr !== new_sinr;

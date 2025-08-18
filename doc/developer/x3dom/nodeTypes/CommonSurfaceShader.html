@@ -1,0 +1,2493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: CommonSurfaceShader</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: CommonSurfaceShader</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Shaders
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            CommonSurfaceShader
+            
+
+            </h2>
+
+        
+        <div class="class-description">Implements the Blinn-Phong BRDF with normal mapping and a perfect specular component.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;CommonSurfaceShader
+
+                
+                alphaFactor='1'
+                
+                alphaTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                alphaTextureChannelMask=''a''
+                
+                alphaTextureCoordinatesId='0'
+                
+                alphaTextureId='-1'
+                
+                ambientFactor='0.2,0.2,0.2'
+                
+                ambientTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                ambientTextureChannelMask=''rgb''
+                
+                ambientTextureCoordinatesId='0'
+                
+                ambientTextureId='-1'
+                
+                binormalTextureCoordinatesId='-1'
+                
+                diffuseDisplacementTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                diffuseFactor='0.8,0.8,0.8'
+                
+                diffuseTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                diffuseTextureChannelMask=''rgb''
+                
+                diffuseTextureCoordinatesId='0'
+                
+                diffuseTextureId='-1'
+                
+                displacementAxis=''y''
+                
+                displacementFactor='255.0'
+                
+                displacementTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                displacementTextureCoordinatesId='0'
+                
+                displacementTextureId='-1'
+                
+                emissiveFactor='0,0,0'
+                
+                emissiveTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                emissiveTextureChannelMask=''rgb''
+                
+                emissiveTextureCoordinatesId='0'
+                
+                emissiveTextureId='-1'
+                
+                environmentFactor='1,1,1'
+                
+                environmentTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                environmentTextureChannelMask=''rgb''
+                
+                environmentTextureCoordinatesId='0'
+                
+                environmentTextureId='-1'
+                
+                fresnelBlend='0'
+                
+                invertAlphaTexture='false'
+                
+                language='""'
+                
+                metadata='X3DMetadataObject'
+                
+                normalBias='-1,-1,1'
+                
+                normalFormat=''UNORM''
+                
+                normalScale='2,2,2'
+                
+                normalSpace=''TANGENT''
+                
+                normalTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                normalTextureChannelMask=''rgb''
+                
+                normalTextureCoordinatesId='0'
+                
+                normalTextureId='-1'
+                
+                reflectionFactor='0,0,0'
+                
+                reflectionTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                reflectionTextureChannelMask=''rgb''
+                
+                reflectionTextureCoordinatesId='0'
+                
+                reflectionTextureId='-1'
+                
+                relativeIndexOfRefraction='1'
+                
+                shininessFactor='0.2'
+                
+                shininessTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                shininessTextureChannelMask=''a''
+                
+                shininessTextureCoordinatesId='0'
+                
+                shininessTextureId='-1'
+                
+                specularFactor='0,0,0'
+                
+                specularTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                specularTextureChannelMask=''rgb''
+                
+                specularTextureCoordinatesId='0'
+                
+                specularTextureId='-1'
+                
+                tangentTextureCoordinatesId='-1'
+                
+                transmissionFactor='0,0,0'
+                
+                transmissionTexture='x3dom.nodeTypes.X3DTextureNode'
+                
+                transmissionTextureChannelMask=''rgb''
+                
+                transmissionTextureCoordinatesId='0'
+                
+                transmissionTextureId='-1'
+                
+
+                &gt;&lt;/CommonSurfaceShader&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DAppearanceChildNode.html">X3DAppearanceChildNode</a>(9)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DShaderNode.html">X3DShaderNode</a>(2)
+                </li>
+            
+
+            <li class="inheritance-lvl-3">
+                <b>CommonSurfaceShader</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="CommonSurfaceShader"><span class="type-signature"></span>CommonSurfaceShader<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for CommonSurfaceShader
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>alphaFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of alphaTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>alphaTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing alpha component.</td>
+        </tr>
+        
+        <tr>
+            <td>alphaTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'a'</a>
+                
+            </td>
+			
+            <td>[a,rgb,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for alphaTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>alphaTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for alphaTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>alphaTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>ambientFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0.2,0.2,0.2</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of ambientTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>ambientTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing ambient component.</td>
+        </tr>
+        
+        <tr>
+            <td>ambientTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for ambientTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>ambientTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for ambientTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>ambientTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>binormalTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel that contains the tangents in v.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseDisplacementTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing diffuse displacement component.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0.8,0.8,0.8</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of diffuseTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing diffuse component.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for diffuseTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for diffuseTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>displacementAxis</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'y'</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Axis along which the vertices are displacement</td>
+        </tr>
+        
+        <tr>
+            <td>displacementFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                255.0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Factor for the displacement.</td>
+        </tr>
+        
+        <tr>
+            <td>displacementTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing displacement component.</td>
+        </tr>
+        
+        <tr>
+            <td>displacementTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for displacementTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>displacementTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of emissiveTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing emissive component.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for emissiveTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for emissiveTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>environmentFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of environmentTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>environmentTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Cube texture containing the environment for perfect specular reflection and transmission.</td>
+        </tr>
+        
+        <tr>
+            <td>environmentTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for environmentTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>environmentTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>[Currently not used, coordinates are computed in shader.]</td>
+        </tr>
+        
+        <tr>
+            <td>environmentTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>fresnelBlend</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>To what degree the Fresnel equation for dielectrics should be used to blend the perfect specular reflection and transmission.</td>
+        </tr>
+        
+        <tr>
+            <td>invertAlphaTexture</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>If true, (1-sampledValue) is used as alpha. If false the sampled value is used.</td>
+        </tr>
+        
+        <tr>
+            <td>language</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td>["Cg"|"GLSL"|"HLSL"|...]</td>
+
+            <td>
+                
+                <a href="X3DShaderNode.html">X3DShaderNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The language field is used to indicate to the browser which shading language is used for the source file(s). This field may be used as a hint for the browser if the shading language is not immediately determinable from the source (e.g., a generic MIME type of text/plain is returned). A browser may use this field for determining which node instance will be selected and to ignore languages that it is not capable of supporting. Three basic language types are defined for this specification and others may be optionally supported by a browser.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>normalBias</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                -1,-1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Bias to apply to normal sampled from normalTexture</td>
+        </tr>
+        
+        <tr>
+            <td>normalFormat</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'UNORM'</a>
+                
+            </td>
+			
+            <td>[UNORM]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>How normals are stored in normalTexture. Currently only "UNORM" (each component packed into a [0,1] color channel) is supported.</td>
+        </tr>
+        
+        <tr>
+            <td>normalScale</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                2,2,2</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>scale to apply to normal sampled from normalTexture</td>
+        </tr>
+        
+        <tr>
+            <td>normalSpace</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'TANGENT'</a>
+                
+            </td>
+			
+            <td>[TANGENT, OBJECT]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Space in which normals in normalTexture are defined.</td>
+        </tr>
+        
+        <tr>
+            <td>normalTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing normal component for normal mapping.</td>
+        </tr>
+        
+        <tr>
+            <td>normalTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for normalTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>normalTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for normalTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>normalTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>reflectionFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of reflectionTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>reflectionTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing reflection component.</td>
+        </tr>
+        
+        <tr>
+            <td>reflectionTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for reflectionTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>reflectionTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for reflectionTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>reflectionTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>relativeIndexOfRefraction</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Relative IOR for perfect specular component.</td>
+        </tr>
+        
+        <tr>
+            <td>shininessFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.2</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of shininessTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>shininessTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing shininess component.</td>
+        </tr>
+        
+        <tr>
+            <td>shininessTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'a'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for shininessTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>shininessTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for shininessTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>shininessTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>specularFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of specularTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>specularTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing specular component.</td>
+        </tr>
+        
+        <tr>
+            <td>specularTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for specularTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>specularTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for specularTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>specularTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        <tr>
+            <td>tangentTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel that contains the tangents in u.</td>
+        </tr>
+        
+        <tr>
+            <td>transmissionFactor</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The value of transmissionTexture is multiplied by this value. If no texture is set, the value is used directly.</td>
+        </tr>
+        
+        <tr>
+            <td>transmissionTexture</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture containing transmission component.</td>
+        </tr>
+        
+        <tr>
+            <td>transmissionTextureChannelMask</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'rgb'</a>
+                
+            </td>
+			
+            <td>[rgb,a,..]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>ChannelMask for transmissionTexture in the form of a glsl swizzle (e.g. "rgb", "a").</td>
+        </tr>
+        
+        <tr>
+            <td>transmissionTextureCoordinatesId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Texture coordinate channel to use for transmissionTexture.</td>
+        </tr>
+        
+        <tr>
+            <td>transmissionTextureId</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The texture unit.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:17 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

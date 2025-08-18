@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: OrthoViewpoint</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: OrthoViewpoint</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                         3.3
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Navigation
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-experimental">experimental</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            OrthoViewpoint
+            
+
+            </h2>
+
+        
+        <div class="class-description">The OrthoViewpoint node defines a viewpoint that provides an orthographic view of the scene.An orthographic view is one in which all projectors are parallel to the projector from centerOfRotation to position.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;OrthoViewpoint
+
+                
+                bind='false'
+                
+                centerOfRotation='0,0,0'
+                
+                description='""'
+                
+                farClippingPlane='-1'
+                
+                fieldOfView='[-1,-1,1,1]'
+                
+                isActive='false'
+                
+                metadata='X3DMetadataObject'
+                
+                navigationInfo='null'
+                
+                nearClippingPlane='-1'
+                
+                orientation='0,0,0,1'
+                
+                position='0,0,10'
+                
+                viewAll='false'
+                
+                zFar='10000'
+                
+                zNear='0.1'
+                
+
+                &gt;&lt;/OrthoViewpoint&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DChildNode.html">X3DChildNode</a>(12)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DBindableNode.html">X3DBindableNode</a>(5)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="X3DViewpointNode.html">X3DViewpointNode</a>(4)
+                </li>
+            
+
+            <li class="inheritance-lvl-4">
+                <b>OrthoViewpoint</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="OrthoViewpoint"><span class="type-signature"></span>OrthoViewpoint<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for OrthoViewpoint
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>bind</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBindableNode.html">X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Pushes/pops the node on/from the top of the bindable stack</td>
+        </tr>
+        
+        <tr>
+            <td>centerOfRotation</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>centerOfRotation point relates to NavigationInfo EXAMINE mode.</td>
+        </tr>
+        
+        <tr>
+            <td>description</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBindableNode.html">X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Description of the bindable node</td>
+        </tr>
+        
+        <tr>
+            <td>farClippingPlane</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the far clipping plane, alias for zFar</td>
+        </tr>
+        
+        <tr>
+            <td>fieldOfView</td>
+
+            <td>
+               
+
+                MFFloat
+            </td>
+
+            <td>
+                
+                [-1,-1,1,1]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The fieldOfView field specifies minimum and maximum extents of the view in units of the local coordinate system</td>
+        </tr>
+        
+        <tr>
+            <td>isActive</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBindableNode.html">X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>navigationInfo</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                null</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Defines a dedicated NavigationInfo node for this X3DViewpointNode. The specified NavigationInfo node receivesa set_bind TRUE event at the time when the parent node is bound and receives a set_bind FALSE at the timewhen the parent node is unbound.</td>
+        </tr>
+        
+        <tr>
+            <td>nearClippingPlane</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Specifies the near clipping plane, alias for zNear</td>
+        </tr>
+        
+        <tr>
+            <td>orientation</td>
+
+            <td>
+               
+
+                SFRotation
+            </td>
+
+            <td>
+                
+                0,0,0,1</a>
+                
+            </td>
+			
+            <td>[-1, 1] or [-inf, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Rotation (axis, angle in radians) of Viewpoint, relative to default -Z axis direction in local coordinate system.Hint: this is orientation _change_ from default direction (0 0 -1).Hint: complex rotations can be accomplished axis-by-axis using parent Transforms.</td>
+        </tr>
+        
+        <tr>
+            <td>position</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,10</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Position (x, y, z in meters) relative to local coordinate system.</td>
+        </tr>
+        
+        <tr>
+            <td>viewAll</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>When the viewAll field is set to TRUE or a viewpoint is bound with viewAll field TRUE,the current view is modified to change the centerOfRotation field to match center of the bounding box for the entire visible scene,and the orientation field is modified to aim at that point. Finally, the zoom position or fieldofview is adjusted to containthe entire scene in the current viewing window. If needed, the near and far clipping planes shall be adjusted to allow viewingthe entire scene. When the value of the viewAll field is changed from TRUE to FALSE, no change in the current view occurs.</td>
+        </tr>
+        
+        <tr>
+            <td>zFar</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                10000</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>z-far position; used for clipping</td>
+        </tr>
+        
+        <tr>
+            <td>zNear</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>z-near position; used for clipping</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

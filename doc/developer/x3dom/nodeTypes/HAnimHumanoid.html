@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: HAnimHumanoid</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: HAnimHumanoid</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                         3.3
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    H-Anim
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-full">fully implemented</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            HAnimHumanoid
+            
+
+            </h2>
+
+        
+        <div class="class-description">The HAnimHumanoid node is used to store human-readable data such as author and copyright information, as well as to store references to the HAnimJoint, HAnimSegment, and HAnimSite nodes in addition to serving as a container for the entire humanoid.Thus, it serves as a central node for moving the humanoid through its environment.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;HAnimHumanoid
+
+                
+                bboxCenter='0,0,0'
+                
+                bboxColor='1, 1, 0'
+                
+                bboxDisplay='false'
+                
+                bboxMargin='0.01'
+                
+                bboxSize='-1,-1,-1'
+                
+                center='0,0,0'
+                
+                children='X3DChildNode'
+                
+                info='[]'
+                
+                jointBindingPositions='[0 0 0]'
+                
+                jointBindingRotations='[0 0 1 0]'
+                
+                jointBindingScales='[1 1 1]'
+                
+                joints='x3dom.nodeTypes.HAnimJoint'
+                
+                metadata='X3DMetadataObject'
+                
+                name='""'
+                
+                render='true'
+                
+                rotation='0,0,1,0'
+                
+                scale='1,1,1'
+                
+                scaleOrientation='0,0,1,0'
+                
+                segments='x3dom.nodeTypes.HAnimSegment'
+                
+                sites='x3dom.nodeTypes.HAnimSite'
+                
+                skeletalConfiguration=''BASIC''
+                
+                skeleton='x3dom.nodeTypes.HAnimJoint'
+                
+                skin='x3dom.nodeTypes.X3DChildNode'
+                
+                skinBindingCoords='[]'
+                
+                skinBindingNormals='[]'
+                
+                skinCoord='x3dom.nodeTypes.X3DCoordinateNode'
+                
+                skinNormal='x3dom.nodeTypes.X3DNormalNode'
+                
+                translation='0,0,0'
+                
+                version='""'
+                
+                viewpoints='x3dom.nodeTypes.HAnimSite'
+                
+                visible='true'
+                
+
+                &gt;&lt;/HAnimHumanoid&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DChildNode.html">X3DChildNode</a>(12)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DBoundedObject.html">X3DBoundedObject</a>(3)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="X3DGroupingNode.html">X3DGroupingNode</a>(17)
+                </li>
+            
+                <li class="inheritance-lvl-4">
+                    <a href="X3DTransformNode.html">X3DTransformNode</a>(3)
+                </li>
+            
+                <li class="inheritance-lvl-5">
+                    <a href="Transform.html">Transform</a>(4)
+                </li>
+            
+
+            <li class="inheritance-lvl-6">
+                <b>HAnimHumanoid</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="HAnimHumanoid"><span class="type-signature"></span>HAnimHumanoid<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for HAnimHumanoid
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>bboxCenter</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td>[-inf, inf]</td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Center of the bounding box</td>
+        </tr>
+        
+        <tr>
+            <td>bboxColor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1, 1, 0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Color of the bounding box</td>
+        </tr>
+        
+        <tr>
+            <td>bboxDisplay</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Flag to enable display of the bounding box</td>
+        </tr>
+        
+        <tr>
+            <td>bboxMargin</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.01</a>
+                
+            </td>
+			
+            <td>[-inf, inf]</td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Size of additional margin around the bounding box scaled up by the diameter.</td>
+        </tr>
+        
+        <tr>
+            <td>bboxSize</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                -1,-1,-1</a>
+                
+            </td>
+			
+            <td>[0, inf] or -1</td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Size of the bounding box</td>
+        </tr>
+        
+        <tr>
+            <td>center</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="Transform.html">Transform</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The center field specifies a translation offset from the origin of the local coordinate system (0,0,0).</td>
+        </tr>
+        
+        <tr>
+            <td>children</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                X3DChildNode</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DGroupingNode.html">X3DGroupingNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Grouping nodes have a field that contains a list of children nodes. Each grouping node defines acoordinate space for its children. This coordinate space is relative to the coordinate space of the nodeof which the group node is a child. Such a node is called a parent node. This means that transformationsaccumulate down the scene graph hierarchy.</td>
+        </tr>
+        
+        <tr>
+            <td>info</td>
+
+            <td>
+               
+
+                MFString
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The info field consists of a sequence of strings, each of which is of the form term=value.The following terms are defined in this International Standard:  authorName  authorEmail  copyright  creationDate  usageRestrictions  humanoidVersion  age  gender  height  weightThe gender term typically has a value of female, male or neuter. The humanoidVersion term refers to the versionof the humanoid being used, in order to track revisions to the data. It is not the same as the version field ofthe Humanoid object, which refers to the version of the H-Anim specification that was used when building the humanoid.Additional term=value pairs may be included as needed for specific applications.</td>
+        </tr>
+        
+        <tr>
+            <td>jointBindingPositions</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                [0 0 0]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The jointBindingPositions field specifies position values, respectively, associated with the array of Joint objectscontained in the joints field. If only one value is provided (such as the default value) then it is applied to alllisted Joint objects equivalently. Applying each set of these translation, rotation, and scale values, in order,to the corresponding Joint objects maps a skeleton to the binding pose.</td>
+        </tr>
+        
+        <tr>
+            <td>jointBindingRotations</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                [0 0 1 0]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The jointBindingRotations field specifies position values, respectively, associated with the array of Joint objectscontained in the joints field. If only one value is provided (such as the default value) then it is applied to alllisted Joint objects equivalently. Applying each set of these translation, rotation, and scale values, in order,to the corresponding Joint objects maps a skeleton to the binding pose.</td>
+        </tr>
+        
+        <tr>
+            <td>jointBindingScales</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                [1 1 1]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The jointBindingScales field specifies scale values, respectively, associated with the array of Joint objectscontained in the joints field. If only one value is provided (such as the default value) then it is applied to alllisted Joint objects equivalently. Applying each set of these translation, rotation, and scale values, in order,to the corresponding Joint objects maps a skeleton to the binding pose.</td>
+        </tr>
+        
+        <tr>
+            <td>joints</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="HAnimJoint.html">HAnimJoint</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The joints field contains a list of references, one for each Joint object defined within the skeleton field hierarchyof the Humanoid object. The order in which the joints are listed is irrelevant since the names of the joints arestored in the Joint objects themselves. The references to contained Joint objects may be used to support inversekinematics (IK) and other motion tools animating nodes found within the skeleton field.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>name</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The name field, which shall be present, and which shall not have the empty string value,stores the name of the humanoid defined by the Humanoid object.</td>
+        </tr>
+        
+        <tr>
+            <td>render</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Flag to enable/disable rendering</td>
+        </tr>
+        
+        <tr>
+            <td>rotation</td>
+
+            <td>
+               
+
+                SFRotation
+            </td>
+
+            <td>
+                
+                0,0,1,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="Transform.html">Transform</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The rotation field specifies a rotation of the coordinate system.</td>
+        </tr>
+        
+        <tr>
+            <td>scale</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="Transform.html">Transform</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The scale field specifies a non-uniform scale of the coordinate system.Scale values may have any value: positive, negative (indicating a reflection), or zero. A value of zero indicates that any child geometry shall not be displayed.</td>
+        </tr>
+        
+        <tr>
+            <td>scaleOrientation</td>
+
+            <td>
+               
+
+                SFRotation
+            </td>
+
+            <td>
+                
+                0,0,1,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="Transform.html">Transform</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The scaleOrientation specifies a rotation of the coordinate system before the scale (to specify scales in arbitrary orientations).The scaleOrientation applies only to the scale operation.</td>
+        </tr>
+        
+        <tr>
+            <td>segments</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="HAnimSegment.html">HAnimSegment</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The segments field contains a list of references, one for each Segment object defined within the skeletonfield hierarchy of the Humanoid object. The order in which the segments are listed is irrelevant sincethe names of the segments are stored in the Segment objects themselves. The references to contained Segmentobjects may be used to support inverse kinematics (IK) and other motion tools animating nodes found within the skeleton field.</td>
+        </tr>
+        
+        <tr>
+            <td>sites</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="HAnimSite.html">HAnimSite</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The sites field contains a list of references, one for each Site object defined within the skeletonfield hierarchy of the Humanoid object. The order in which the sites are listed is irrelevant sincethe names of the sites are stored in the Site objects themselves. The references to contained Site objectsmay be used to support inverse kinematics (IK) and other motion tools animating nodes found within the skeleton field.</td>
+        </tr>
+        
+        <tr>
+            <td>skeletalConfiguration</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                'BASIC'</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skeletalConfiguration field identifies the skeletal configuration of this model. Any models that share thesame skeletalConfiguration value can also share skeletal animation data. The only specific skeletal configurationdefined in this International Standard is the "BASIC" skeletal configuration specified in 4.8.1 Overview. Since thedefault value of the skeletal configuration is "BASIC", a humanoid model that specifies a skeletalConfiguration valueof "BASIC" shall conform to the restrictive skeletal model specified in 4.8.1 Overview. For any other valuethe model shall also contain one or more of the five binding fields.</td>
+        </tr>
+        
+        <tr>
+            <td>skeleton</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="HAnimJoint.html">HAnimJoint</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skeleton field contains the humanoid_root Joint object. The Humanoid object is considered the parent objectof the humanoid_root Joint object and defines a coordinate space for the humanoid_root Joint object. Thus,the Humanoid object's transformation affects the Joint object hierarchy in the skeleton field. A hierarchy of Jointobjects is defined for each H-Anim humanoid figure within the skeleton field of the Humanoid object and a hierarchicaldefinition of joints is present even when the geometry of the humanoid figure is not defined within the skeleton field.The skeleton field can also contain zero or more Site objects which allow landmarks to be established with respect tothe overall humanoid figure, but which are not affected by the movement of any of the Joint objects.</td>
+        </tr>
+        
+        <tr>
+            <td>skin</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DChildNode.html">X3DChildNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skin field contains one or more indexed mesh definitions. Those indexed mesh definitions utilize the pointand normal data that is defined within the skinCoord and skinNormal fields, respectively, of the Humanoid object.This field is defined as an generic type for which the specific representation is defined by each bindingto a presentation system.</td>
+        </tr>
+        
+        <tr>
+            <td>skinBindingCoords</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skinBindingCoords field specifies an array of vertex locations that define the mesh in the binding pose.For each set of values corresponding to a given pose, the same vertex indexing system that is used for the skinCoordfield also applies to this field.</td>
+        </tr>
+        
+        <tr>
+            <td>skinBindingNormals</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skinBindingNormals field specifies an array of normal vectors that define the mesh normal vectors in thebinding pose. For each set of values corresponding to a given pose, the same normal indexing system used forthe skinNormal field also applies to this field.</td>
+        </tr>
+        
+        <tr>
+            <td>skinCoord</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DCoordinateNode.html">X3DCoordinateNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skinCoord field contains a single sequence of points which are used by the internal mechanisms of the Humanoidobject to create the appropriate surface deformations as well as by the indexed mesh definitions within the skin fieldwhich do the actual rendering of the surface geometry.</td>
+        </tr>
+        
+        <tr>
+            <td>skinNormal</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DNormalNode</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The skinNormal field contains the normal data definition which is used by the internal mechanisms of the Humanoidobject to create the appropriate surface deformations as well as the indexed mesh definitions within the skin fieldwhich contains the actual surface geometry that is rendered.</td>
+        </tr>
+        
+        <tr>
+            <td>translation</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="Transform.html">Transform</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The translation field specifies a translation to the coordinate system.</td>
+        </tr>
+        
+        <tr>
+            <td>version</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The version field stores the version of this International Standard to which the Humanoid object conforms.The version value for International Standard V2.0  is "2.0".</td>
+        </tr>
+        
+        <tr>
+            <td>viewpoints</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="HAnimSite.html">HAnimSite</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The viewpoints field has a different functionality and behaviour than the joints, segments and sites fields.The viewpoints field can contain zero or more Site object definitions. The Site objects defined within this fieldare affected by the transformations applied to the Humanoid object, but are not affected by any of the transformationsperformed on the skeletal hierarchy defined within the skeleton field. The purpose of these Site objects is todefine locations for virtual cameras in the reference frame of the Humanoid object. Site objects that are definedin this manner are intended to be used as attachment points from which a certain viewing perspective can be seen(such as viewing the face or profile of the human figure).</td>
+        </tr>
+        
+        <tr>
+            <td>visible</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBoundedObject.html">X3DBoundedObject</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Flag to enable/disable rendering, alias for render</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:17 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

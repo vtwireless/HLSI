@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: TexCoordDamper2D</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: TexCoordDamper2D</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                         3.3
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Followers
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-experimental">experimental</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            TexCoordDamper2D
+            
+
+            </h2>
+
+        
+        <div class="class-description">The TexCoordDamper2D node animates transitions for an array of 2D vectors (e.g., the texture coordinates of a mesh). Whenever the destination field receives an array of 2D vectors, value begins sending an array of the same length, where each element moves from its current value towards the value at the same position in the array received.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;TexCoordDamper2D
+
+                
+                destination='[]'
+                
+                initialDestination='[]'
+                
+                initialValue='[]'
+                
+                isActive='false'
+                
+                metadata='X3DMetadataObject'
+                
+                order='3'
+                
+                tau='0.3'
+                
+                tolerance='-1'
+                
+                value='[]'
+                
+
+                &gt;&lt;/TexCoordDamper2D&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DChildNode.html">X3DChildNode</a>(12)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DFollowerNode.html">X3DFollowerNode</a>(2)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="X3DDamperNode.html">X3DDamperNode</a>(7)
+                </li>
+            
+
+            <li class="inheritance-lvl-4">
+                <b>TexCoordDamper2D</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="TexCoordDamper2D"><span class="type-signature"></span>TexCoordDamper2D<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for TexCoordDamper2D
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>destination</td>
+
+            <td>
+               
+
+                MFVec2f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The target value.</td>
+        </tr>
+        
+        <tr>
+            <td>initialDestination</td>
+
+            <td>
+               
+
+                MFVec2f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The field initialDestination should be set to the same value than initialValue unless a transition to a certain 2D vector value is to be created right after the scene is loaded or right after the CoordinateDamper node is created dynamically.</td>
+        </tr>
+        
+        <tr>
+            <td>initialValue</td>
+
+            <td>
+               
+
+                MFVec2f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The field initialValue can be used to set the initial value of value_changed.</td>
+        </tr>
+        
+        <tr>
+            <td>isActive</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DFollowerNode.html">X3DFollowerNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>isActive shows if the sensor is active</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>order</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                3</a>
+                
+            </td>
+			
+            <td>[0..5]</td>
+
+            <td>
+                
+                <a href="X3DDamperNode.html">X3DDamperNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The order field specifies the smoothness of the transition.</td>
+        </tr>
+        
+        <tr>
+            <td>tau</td>
+
+            <td>
+               
+
+                SFTime
+            </td>
+
+            <td>
+                
+                0.3</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+                <a href="X3DDamperNode.html">X3DDamperNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The field tau specifies the time-constant of the internal filters and thus the speed that the output of an X3DDamperNode responds to the input. A value of zero for tau means immediate response and the events received on set_destination are forwarded directly. The field tau specifies how long it takes the output of an internal filter to reach the value of its input by 63% (1 - 1/e). The remainder after that period is reduced by 63% during another period of tau seconds provided that the input of the filter does not change. This behavior can be exposed if order is set to one.</td>
+        </tr>
+        
+        <tr>
+            <td>tolerance</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0,inf)</td>
+
+            <td>
+                
+                <a href="X3DDamperNode.html">X3DDamperNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>If tolerance is set to its default value -1, the browser implementation is allowed to find a good way for detecting the end of a transition. Browsers that do not have an elaborate algorithm can just use .001 as the tolerance value instead. If a value larger than zero is specified for tolerance, the browser shall calculate the difference between output and input for each internal filter being used and stop the animation only when all filters fall below that limit or are equal to it. If zero is specified for tolerance, a transition should be stopped only if input and output match exactly for all internal filters.</td>
+        </tr>
+        
+        <tr>
+            <td>value</td>
+
+            <td>
+               
+
+                MFVec2f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The current value.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

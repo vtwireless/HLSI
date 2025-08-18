@@ -1,8 +1,8 @@
 /** 
- * X3DOM 1.8.3-dev
- * Build : 7430
- * Revision: 88dd0f22972cc621553179878802f9615889133c
- * Date: Mon Feb 13 11:33:13 2023 -0500
+ * X3DOM 1.8.3
+ * Build : 7482
+ * Revision: 03da6d38708e4eafc94c2305fdc175312a880321
+ * Date: Tue Aug 1 11:18:17 2023 +0200
  */
 /**
  * X3DOM JavaScript Library
@@ -28,10 +28,10 @@ var x3dom = {
 };
 
 x3dom.about = {
-    version  : "1.8.3-dev",
-    build    : "7430",
-    revision : "88dd0f22972cc621553179878802f9615889133c",
-    date     : "Mon Feb 13 11:33:13 2023 -0500"
+    version  : "1.8.3",
+    build    : "7482",
+    revision : "03da6d38708e4eafc94c2305fdc175312a880321",
+    date     : "Tue Aug 1 11:18:17 2023 +0200"
 };
 
 /**
@@ -668,9 +668,9 @@ x3dom.X3DCanvas = function ( x3dElem, canvasIdx )
 
     this.doc = null;
 
-    this.vrDisplay = null;
-    this.vrDisplayPromise = null;
-    this.vrFrameData = null;
+    this.isSessionSupportedPromise = null;
+    this.xrSession = null;
+    this.xrReferenceSpace = null;
     this.supportsPassiveEvents = false;
 
     this.devicePixelRatio = window.devicePixelRatio || 1;
@@ -1030,34 +1030,6 @@ x3dom.X3DCanvas.prototype.bindEventListeners = function ()
         this.parent.doc.needRender = true;
     };
 
-    this.onVrDisplayPresentChange = function ( evt )
-    {
-        if ( this.vrDisplay && this.vrDisplay.isPresenting )
-        {
-            var leftEye = this.vrDisplay.getEyeParameters( "left" );
-            var rightEye = this.vrDisplay.getEyeParameters( "right" );
-
-            this._oldCanvasWidth  = this.canvas.width;
-            this._oldCanvasHeight = this.canvas.height;
-
-            this.canvas.width = Math.max( leftEye.renderWidth, rightEye.renderWidth ) * 2;
-            this.canvas.height = Math.max( leftEye.renderHeight, rightEye.renderHeight );
-
-            this.gl.VRMode = 2;
-            this.doc.needRender = true;
-        }
-        else if ( this.vrDisplay && !this.vrDisplay.isPresenting )
-        {
-            this.canvas.width  = this._oldCanvasWidth;
-            this.canvas.height = this._oldCanvasHeight;
-
-            this.vrFrameData = null;
-
-            this.gl.VRMode = 1;
-            this.doc.needRender = true;
-        }
-    };
-
     if ( this.canvas !== null && this.gl !== null && this.hasRuntime )
     {
         // event handler for mouse interaction
@@ -1087,9 +1059,6 @@ x3dom.X3DCanvas.prototype.bindEventListeners = function ()
             x3dom.debug.logError( "recover WebGL state and resources on context lost NYI" );
             event.preventDefault();
         }, false );
-
-        // VR Events
-        window.addEventListener( "vrdisplaypresentchange", this.onVrDisplayPresentChange.bind( this ), false );
 
         // Mouse Events
         this.canvas.addEventListener( "mousedown", this.onMouseDown, false );
@@ -1799,9 +1768,9 @@ x3dom.X3DCanvas.prototype._createHTMLCanvas = function ( x3dElem )
 /**
  * Watches for a resize of the canvas and sets the current dimensions
  */
-x3dom.X3DCanvas.prototype._watchForResize = function ()
+x3dom.X3DCanvas.prototype._watchForResize = function ( )
 {
-    if ( this.vrDisplay && this.vrDisplay.isPresenting )
+    if ( this.xrSession )
     {
         return;
     }
@@ -1855,10 +1824,10 @@ x3dom.X3DCanvas.prototype._createVRDiv = function ()
     var vrDiv = document.createElement( "div" );
     vrDiv.setAttribute( "class", "x3dom-vr" );
 
-    vrDiv.onclick = function ()
+    vrDiv.onclick = ( e ) =>
     {
         this.x3dElem.runtime.toggleVR();
-    }.bind( this );
+    };
 
     vrDiv.oncontextmenu = function ( evt )
     {
@@ -1866,6 +1835,8 @@ x3dom.X3DCanvas.prototype._createVRDiv = function ()
         evt.stopPropagation();
         return false;
     };
+
+    vrDiv.title = "Toggle VR";
 
     return vrDiv;
 };
@@ -1889,7 +1860,7 @@ x3dom.X3DCanvas.prototype.mousePosition = function ( evt )
 
 /** Is called in the main loop after every frame
  */
-x3dom.X3DCanvas.prototype.tick = function ( timestamp )
+x3dom.X3DCanvas.prototype.tick = function ( timestamp, xrFrame )
 {
     var that = this;
 
@@ -1920,7 +1891,7 @@ x3dom.X3DCanvas.prototype.tick = function ( timestamp )
         }
     }
 
-    if ( this.doc.needRender )
+    if ( this.doc.needRender || xrFrame )
     {
         // calc average frames per second
         if ( diff >= 1000 )
@@ -1943,23 +1914,12 @@ x3dom.X3DCanvas.prototype.tick = function ( timestamp )
 
         runtime.enterFrame( {"total": this._totalTime, "elapsed": this._elapsedTime} );
 
-        if ( this.vrDisplay && this.vrDisplay.isPresenting )
-        {
-            if ( !this.vrFrameData )
-            {
-                this.vrFrameData = new VRFrameData();
-            }
-
-            this.vrDisplay.getFrameData( this.vrFrameData );
-        }
-        else
+        if ( !xrFrame )
         {
             this.doc.needRender = false;
         }
 
-        // picking might require another pass
-
-        this.doc.render( this.gl, this.vrFrameData, this.vrDisplay );
+        this.doc.render( this.gl, this.getVRFrameData( xrFrame ) );
 
         if ( !this.doc._scene._vf.doPickPass )
         {
@@ -1967,11 +1927,6 @@ x3dom.X3DCanvas.prototype.tick = function ( timestamp )
         }
 
         runtime.exitFrame( {"total": this._totalTime, "elapsed": this._elapsedTime} );
-
-        if ( this.vrDisplay && this.vrDisplay.isPresenting )
-        {
-            this.vrDisplay.submitFrame();
-        }
     }
 
     if ( this.progressDiv )
@@ -2028,7 +1983,28 @@ x3dom.X3DCanvas.prototype.tick = function ( timestamp )
     this.doc.previousDownloadCount = this.doc.downloadCount;
 };
 
-//----------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+x3dom.X3DCanvas.prototype.mainloop = function ( timestamp, xrFrame )
+{
+    if ( this.doc && this.x3dElem.runtime )
+    {
+        this._watchForResize();
+
+        this.tick( timestamp, xrFrame );
+
+        if ( this.xrSession )
+        {
+            this.xrSession.requestAnimationFrame( this.mainloop );
+        }
+        else
+        {
+            window.requestAnimFrame( this.mainloop );
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
 
 /** Loads the given @p uri.
  * @param uri can be a uri or an X3D node
@@ -2038,80 +2014,36 @@ x3dom.X3DCanvas.prototype.tick = function ( timestamp )
 x3dom.X3DCanvas.prototype.load = function ( uri, sceneElemPos, settings )
 {
     this.doc = new x3dom.X3DDocument( this.canvas, this.gl, settings );
-    var x3dCanvas = this;
 
-    this.doc.onload = function ()
+    this.doc.onload = () =>
     {
-        //x3dom.debug.logInfo("loaded '" + uri + "'");
+        this.mainloop = this.mainloop.bind( this );
 
-        if ( x3dCanvas.hasRuntime )
+        this.checkForVRSupport();
+
+        if ( this.hasRuntime )
         {
-            // requestAnimationFrame https://cvs.khronos.org/svn/repos/registry/trunk/public/webgl/sdk/demos/common/webgl-utils.js
-            ( function mainloop ( timestamp )
-            {
-                if ( x3dCanvas.doc && x3dCanvas.x3dElem.runtime )
-                {
-                    x3dCanvas._watchForResize();
-                    x3dCanvas.tick( timestamp );
-
-                    if ( navigator.getVRDisplays && x3dCanvas.vrDisplay === null )
-                    {
-                        if ( !x3dCanvas.vrDisplayPromise )
-                        {
-                            x3dCanvas.vrDisplayPromise = navigator.getVRDisplays();
-                        }
-
-                        x3dCanvas.vrDisplayPromise.then( function ( displays )
-                        {
-                            if ( displays[ 0 ] )
-                            {
-                                x3dCanvas.vrDisplay = displays[ 0 ];
-
-                                x3dCanvas.vrDisplay.requestAnimationFrame( mainloop, x3dCanvas );
-
-                                x3dCanvas.vrDiv.style.display = "block";
-                            }
-                            else
-                            {
-                                x3dCanvas.vrDisplay = undefined;
-                                window.requestAnimFrame( mainloop, x3dCanvas );
-                            }
-                        } ).catch( function ( error )
-                        {
-                            x3dCanvas.vrDisplay = undefined;
-                            window.requestAnimFrame( mainloop, x3dCanvas );
-                        } );
-                    }
-                    else if ( navigator.getVRDisplays && x3dCanvas.vrDisplay )
-                    {
-                        x3dCanvas.vrDisplay.requestAnimationFrame( mainloop, x3dCanvas );
-                    }
-                    else
-                    {
-                        window.requestAnimFrame( mainloop, x3dCanvas );
-                    }
-                }
-            } )();
+            this.mainloop();
         }
         else
         {
-            x3dCanvas.tick();
+            this.tick();
         }
     };
 
-    this.x3dElem.render = function ()
+    this.x3dElem.render = () =>
     {
-        if ( x3dCanvas.hasRuntime )
+        if ( this.hasRuntime )
         {
-            x3dCanvas.doc.needRender = true;
+            this.doc.needRender = true;
         }
         else
         {
-            x3dCanvas.doc.render( x3dCanvas.gl );
+            this.doc.render( x3dCanvas.gl );
         }
     };
 
-    this.x3dElem.context = x3dCanvas.gl.ctx3d;
+    this.x3dElem.context = this.gl.ctx3d;
 
     this.doc.onerror = function ()
     {
@@ -2119,6 +2051,158 @@ x3dom.X3DCanvas.prototype.load = function ( uri, sceneElemPos, settings )
     };
 
     this.doc.load( uri, sceneElemPos );
+};
+
+//------------------------------------------------------------------------------
+
+x3dom.X3DCanvas.prototype.checkForVRSupport = function ()
+{
+    if ( !navigator.xr )
+    {
+        return;
+    }
+
+    navigator.xr.isSessionSupported( "immersive-vr" ).then( ( isSupported ) =>
+    {
+        if ( isSupported )
+        {
+            this.vrDiv.style.display = "block";
+        }
+    } );
+};
+
+x3dom.X3DCanvas.prototype.enterVR = function ()
+{
+    if ( this.xrSession )
+    {
+        return;
+    }
+
+    this.gl.ctx3d.makeXRCompatible().then( () =>
+    {
+        navigator.xr.requestSession( "immersive-vr" ).then( ( session ) =>
+        {
+            session.requestReferenceSpace( "local" ).then( ( space ) =>
+            {
+                const xrLayer = new XRWebGLLayer( session, this.gl.ctx3d );
+                session.updateRenderState( { baseLayer: xrLayer } );
+
+                this._oldCanvasWidth  = this.canvas.width;
+                this._oldCanvasHeight = this.canvas.height;
+
+                this.canvas.width  = xrLayer.framebufferWidth;
+                this.canvas.height = xrLayer.framebufferHeight;
+
+                this.gl.VRMode = 2;
+                this.xrReferenceSpace = space;
+                this.xrSession = session;
+                this.doc.needRender = true;
+
+                var mat_view = this.doc._viewarea.getViewMatrix();
+                var rotation = new x3dom.fields.Quaternion( 0, 0, 1, 0 );
+                rotation.normalize();
+                rotation.setValue( mat_view );
+                var translation = mat_view.e3();
+
+                const offsetTransform = new XRRigidTransform( {x: translation.x, y: translation.y, z: translation.z},
+                    {x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w} );
+                this.xrReferenceSpace = this.xrReferenceSpace.getOffsetReferenceSpace( offsetTransform );
+
+                this.xrSession.addEventListener( "end", () =>
+                {
+                    this.exitVR();
+                } );
+
+                session.requestAnimationFrame( this.mainloop );
+            } );
+        } );
+    } );
+};
+
+//------------------------------------------------------------------------------
+
+x3dom.X3DCanvas.prototype.exitVR = function ()
+{
+    if ( !this.xrSession )
+    {
+        return;
+    }
+
+    this.xrSession.end();
+    this.xrSession = undefined;
+    this.xrReferenceSpace = undefined;
+    this.canvas.width  = this._oldCanvasWidth;
+    this.canvas.height = this._oldCanvasHeight;
+    this.gl.VRMode = 1;
+    this.doc.needRender = true;
+    window.requestAnimationFrame( this.mainloop );
+};
+
+//------------------------------------------------------------------------------
+
+x3dom.X3DCanvas.prototype.getVRFrameData = function ( xrFrame )
+{
+    if ( !xrFrame )
+    {
+        return;
+    }
+
+    const pose = xrFrame.getViewerPose( this.xrReferenceSpace );
+
+    if ( !pose )
+    {
+        return;
+    }
+
+    const vrFrameData = {
+        framebuffer : xrFrame.session.renderState.baseLayer.framebuffer,
+        controllers : {}
+    };
+
+    for ( const view of pose.views )
+    {
+        if ( view.eye === "left" )
+        {
+            vrFrameData.leftViewMatrix = view.transform.inverse.matrix;
+            vrFrameData.leftProjectionMatrix = view.projectionMatrix;
+        }
+        else if ( view.eye === "right" )
+        {
+            vrFrameData.rightViewMatrix = view.transform.inverse.matrix;
+            vrFrameData.rightProjectionMatrix = view.projectionMatrix;
+        }
+    }
+
+    for ( const inputSource of xrFrame.session.inputSources )
+    {
+        // Show the input source if it has a grip space
+        if ( inputSource.gripSpace )
+        {
+            const inputPose = xrFrame.getPose( inputSource.gripSpace, this.xrReferenceSpace );
+            if ( inputPose !== null && inputPose.transform !== null )
+            {
+                vrFrameData.controllers[ inputSource.handedness ] = {
+                    gamepad : inputSource.gamepad,
+                    type    : inputSource.profiles[ 0 ],
+                    pose    : {
+                        position : [
+                            inputPose.transform.position.x,
+                            inputPose.transform.position.y,
+                            inputPose.transform.position.z
+                        ],
+                        orientation : [
+                            inputPose.transform.orientation.x,
+                            inputPose.transform.orientation.y,
+                            inputPose.transform.orientation.z,
+                            inputPose.transform.orientation.w
+                        ]
+                    }
+                };
+            }
+        }
+    }
+
+    return vrFrameData;
 };
 
 /**
@@ -2282,58 +2366,30 @@ x3dom.Viewarea = function ( document, scene )
     this.vrLeftProjMatrix = new x3dom.fields.SFMatrix4f();
     this.vrRightProjMatrix = new x3dom.fields.SFMatrix4f();
 
-    this.vrControllerManager = new x3dom.VRControllerManager();
+    this.vrControllerManager = new x3dom.VRControllerManager( this._doc );
 
     this._inverseDevicePixelRatio = 1.0 / window.devicePixelRatio;
 
     this.arc = null;
 };
 
-x3dom.Viewarea.prototype.setVRFrameData = function ( vrFrameData )
+x3dom.Viewarea.prototype.setVRFrameData = function ( gl, vrFrameData )
 {
     this.vrFrameData = vrFrameData;
 
     if ( this.vrFrameData )
     {
-        this.vrLeftViewMatrix.setFromArray( this.vrFrameData.leftViewMatrix ),
+        this.vrLeftViewMatrix.setFromArray( this.vrFrameData.leftViewMatrix );
         this.vrRightViewMatrix.setFromArray( this.vrFrameData.rightViewMatrix );
+
+        this.vrLeftProjMatrix.setFromArray( this.vrFrameData.leftProjectionMatrix );
+        this.vrRightProjMatrix.setFromArray( this.vrFrameData.rightProjectionMatrix );
     }
 };
 
-x3dom.Viewarea.prototype.updateGamepads = function ( vrDisplay )
+x3dom.Viewarea.prototype.updateGamepads = function ( vrFrameData )
 {
-    this.vrControllerManager.update( this, vrDisplay );
-
-    // var allGamepads = navigator.getGamepads();
-    // var gamepads = [];
-
-    // for(var i = 0; i < allGamepads.length; i++ )
-    // {
-    //     if(allGamepads[i] && allGamepads[i].displayId != undefined && allGamepads[i].displayId == vrDisplay.displayId)
-    //     {
-    //         gamepads.push(allGamepads[i]);
-    //     }
-    // }
-
-    // if(gamepads.length)
-    // {
-    //     var axes = gamepads[0].axes;
-
-    //     var dx = axes[0];
-    //     var dy = axes[1];
-
-    //     var d = (this._scene._lastMax.subtract(this._scene._lastMin)).length();
-    //     d = ((d < x3dom.fields.Eps) ? 1 : d) * 5;
-
-    //     var viewDir = this.vrLeftViewMatrix.e2();
-    //     var rightDir = this.vrLeftViewMatrix.e0();
-
-    //     viewDir = new x3dom.fields.SFVec3f(-viewDir.x, -viewDir.y, viewDir.z).multiply(d*(dy)/this._height);
-    //     rightDir = new x3dom.fields.SFVec3f(-rightDir.x, -rightDir.y, rightDir.z).multiply((d*dx/this._width));
-
-    //     this._movement = this._movement.add(rightDir).add(viewDir);
-    //     this._transMat = x3dom.fields.SFMatrix4f.translation(this._movement);
-    // }
+    this.vrControllerManager.update( this, vrFrameData );
 };
 
 /**
@@ -2555,7 +2611,7 @@ x3dom.Viewarea.prototype.getLightsShadow = function ()
     var lights = this._doc._nodeBag.lights;
     for ( var l = 0; l < lights.length; l++ )
     {
-        if ( lights[ l ]._vf.shadowIntensity > 0.0 )
+        if ( lights[ l ]._vf.shadowIntensity > 0.0 && lights[ l ]._vf.on )
         {
             return true;
         }
@@ -2919,7 +2975,7 @@ x3dom.Viewarea.prototype.getProjectionMatrix = function ()
 {
     if ( this.vrFrameData )
     {
-        return this.vrLeftProjMatrix.setFromArray( this.vrFrameData.leftProjectionMatrix );
+        return this.vrLeftProjMatrix;
     }
     else
     {
@@ -2937,8 +2993,7 @@ x3dom.Viewarea.prototype.getProjectionMatrices = function ()
 {
     if ( this.vrFrameData )
     {
-        return [ this.vrLeftProjMatrix.setFromArray( this.vrFrameData.leftProjectionMatrix ),
-            this.vrRightProjMatrix.setFromArray( this.vrFrameData.rightProjectionMatrix ) ];
+        return [ this.vrLeftProjMatrix, this.vrRightProjMatrix ];
     }
     else
     {
@@ -11517,6 +11572,7 @@ x3dom.NodeNameSpace = function ( name, document )
     this.name = name;
     this.doc = document;
     this.baseURL = "";
+    this.setBaseURL( document.properties.properties.baseURL );
     this.defMap = {};
     this.parent = null;
     this.childSpaces = [];
@@ -11674,7 +11730,7 @@ x3dom.getElementAttribute = function ( attrName )
         attrib = this.__getAttribute( attrName.toLowerCase() );
     }
 
-    if ( attrib || !this._x3domNode )
+    if ( attrib != null || !this._x3domNode )
     {
         return attrib;
     }
@@ -11699,7 +11755,10 @@ x3dom.setElementAttribute = function ( attrName, newVal )
     var x3dNode = this._x3domNode;
     if ( x3dNode )
     {
-        x3dNode.updateField( attrName, newVal );
+        if ( !x3dom.userAgentFeature.supportsMutationObserver )
+        {
+            x3dNode.updateField( attrName, newVal );
+        }
         x3dNode._nameSpace.doc.needRender = true;
     }
 };
@@ -12218,7 +12277,6 @@ x3dom.NodeNameSpace.prototype.routeLateRoutes = function ()
         }
     } );
 };
-
 /**
  * X3DOM JavaScript Library
  * http://www.x3dom.org
@@ -12632,7 +12690,6 @@ x3dom.gfx_webgl = ( function ()
         this.cache = new x3dom.Cache();
         this.stateManager = new x3dom.StateManager( ctx3d );
         this.VRMode = 1;
-        this.vrFrameData = null;
 
         this.BUFFER_IDX =
             {
@@ -15171,7 +15228,7 @@ x3dom.gfx_webgl = ( function ()
             var srcFactor = x3dom.Utils.blendFunc( gl, blendMode._vf.srcFactor );
             var destFactor = x3dom.Utils.blendFunc( gl, blendMode._vf.destFactor );
 
-            if ( srcFactor && destFactor )
+            if ( srcFactor !== false && destFactor !== false )
             {
                 // Enable Blending
                 this.stateManager.enable( gl.BLEND );
@@ -16851,6 +16908,7 @@ x3dom.gfx_webgl = ( function ()
         // rendering
         x3dom.Utils.startMeasure( "render" );
 
+        this.stateManager.bindFramebuffer( gl.FRAMEBUFFER, vrFrameData ? vrFrameData.framebuffer : null );
         this.stateManager.viewport( 0, 0, this.canvas.width, this.canvas.height );
 
         // calls gl.clear etc. (bgnd stuff)
@@ -17594,7 +17652,12 @@ x3dom.gfx_webgl = ( function ()
             for ( k = startIndex; k < endIndex; k++ )
             {currentLights[ currentLights.length ] = shadowedLights[ k ];}
 
-            var sp = this.cache.getShadowRenderingShader( gl, currentLights );
+            // generate shadow shader properties
+            var properties = {};
+
+            properties.FOG = ( scene.getFog()._vf.visibilityRange > 0 ) ? 1 : 0;
+
+            var sp = this.cache.getShadowRenderingShader( gl, currentLights, properties );
 
             this.stateManager.useProgram( sp );
 
@@ -17704,7 +17767,21 @@ x3dom.gfx_webgl = ( function ()
                 }
             }
 
-            gl.drawArrays( gl.TRIANGLES, 0, 6 );
+            if ( properties.FOG ) { sp.fogType = 999.0; } // draw without fog first
+
+            gl.drawArrays( gl.TRIANGLES, 0, 6 ); //shadows
+
+            // Set fog
+            if ( properties.FOG )
+            {
+                var fog = scene.getFog();
+                this.stateManager.blendColor( fog._vf.color.r, fog._vf.color.g, fog._vf.color.b, 1.0 );
+                this.stateManager.blendFunc( gl.CONSTANT_COLOR, gl.ONE_MINUS_SRC_COLOR );
+                sp.fogColor = fog._vf.color.toGL();
+                sp.fogRange = fog._vf.visibilityRange;
+                sp.fogType = ( fog._vf.fogType == "LINEAR" ) ? 0.0 : 1.0;
+                gl.drawArrays( gl.TRIANGLES, 0, 6 ); // fog
+            }
 
             // cleanup
             var nk = shadowIndex + 1;
@@ -17715,7 +17792,6 @@ x3dom.gfx_webgl = ( function ()
             }
             gl.disableVertexAttribArray( sp.position );
         }
-
         this.stateManager.blendFunc( gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA );
     };
 
@@ -19907,30 +19983,21 @@ x3dom.Runtime.prototype.onAnimationFinished = function ()
 
 x3dom.Runtime.prototype.enterVR = function ()
 {
-    if ( this.canvas.vrDisplay && !this.canvas.vrDisplay.isPresenting )
-    {
-        this.canvas.vrDisplay.requestPresent( [ { source: this.canvas.canvas } ] ).then( function ()
-        {
-            this.canvas.doc.needRender = true;
-        }.bind( this ) );
-    }
+    this.canvas.enterVR();
 };
 
 x3dom.Runtime.prototype.exitVR = function ()
 {
-    if ( this.canvas.vrDisplay && this.canvas.vrDisplay.isPresenting )
-    {
-        this.canvas.vrDisplay.exitPresent();
-    }
+    this.canvas.exitVR();
 };
 
 x3dom.Runtime.prototype.toggleVR = function ()
 {
-    if ( this.canvas.vrDisplay && !this.canvas.vrDisplay.isPresenting )
+    if ( !this.canvas.xrSession )
     {
         this.enterVR();
     }
-    else if ( this.canvas.vrDisplay && this.canvas.vrDisplay.isPresenting )
+    else if ( this.canvas.xrSession )
     {
         this.exitVR();
     }
@@ -20008,18 +20075,32 @@ x3dom.Runtime.prototype.toggleProjection = function ( perspViewID, orthoViewID )
  */
 x3dom.Runtime.prototype.replaceWorld = function ( scene )
 {
-    var x3dElement = this.doc.cloneNode( false );
-    var child,
+    var x3dElement,
+        child,
         name;
+
+    if ( scene.localName.toUpperCase() === "X3D" )
+    {
+        x3dElement = scene.cloneNode( false );
+    }
+    else
+    {
+        x3dElement = this.doc.cloneNode( false );
+    }
+    //clean x3d element
     while ( child = scene.firstChild )
     {
         name = child.nodeType === 1 ? child.localName.toUpperCase() : null;
-        if ( name == "HEAD" || name == "SCENE" ) {x3dElement.appendChild( child );}
+        if ( name == "HEAD" || name == "SCENE" )
+        {
+            x3dElement.appendChild( child );
+        }
         else
         {
             child.remove();
         }
     }
+
     this.doc.parentNode.replaceChild( x3dElement, this.doc );
     this.doc = x3dElement;
     x3dom.reload();
@@ -20160,7 +20241,6 @@ x3dom.Runtime.prototype.loadURL = function ( url, optionalURL )
             else {x3dom.debug.logError( "loadURL: could not fetch or parse " + url );}
         } );
 };
-
 /**
  * X3DOM JavaScript Library
  * http://www.x3dom.org
@@ -20176,7 +20256,8 @@ x3dom.Runtime.prototype.loadURL = function ( url, optionalURL )
  * Holds the UserAgent feature
  */
 x3dom.userAgentFeature = {
-    supportsDOMAttrModified : false
+    supportsDOMAttrModified  : false,
+    supportsMutationObserver : true
 };
 
 ( function loadX3DOM ()
@@ -20217,7 +20298,8 @@ x3dom.userAgentFeature = {
             "showTouchpoints",
             "disableTouch",
             "maxActiveDownloads",
-            "useGeoCache"
+            "useGeoCache",
+            "baseURL"
         ] );
 
         var showLoggingConsole = false;
@@ -20231,6 +20313,7 @@ x3dom.userAgentFeature = {
             settings.setProperty( "showProgress", x3ds[ i ].getAttribute( "showProgress" ) || "true" );
             settings.setProperty( "PrimitiveQuality", x3ds[ i ].getAttribute( "PrimitiveQuality" ) || "High" );
             settings.setProperty( "useGeoCache", x3ds[ i ].getAttribute( "useGeoCache" ) || "true" );
+            settings.setProperty( "baseURL", x3ds[ i ].getAttribute( "baseURL" ) || "" );
 
             // for each param element inside the X3D element
             // add settings to properties object
@@ -20428,7 +20511,6 @@ x3dom.userAgentFeature = {
         window.setTimeout( function () { onload(); }, 20 );
     }
 } )();
-
 /**
  * X3DOM JavaScript Library
  * http://www.x3dom.org
@@ -20707,9 +20789,9 @@ x3dom.Cache.prototype.getShaderByProperties = function ( gl, shape, properties, 
  *
  * @returns {*}
  */
-x3dom.Cache.prototype.getShadowRenderingShader = function ( gl, shadowedLights )
+x3dom.Cache.prototype.getShadowRenderingShader = function ( gl, shadowedLights, properties )
 {
-    var ID = "shadow";
+    var ID = "shadow"  + Object.values( properties ).join( "" );
     for ( var i = 0; i < shadowedLights.length; i++ )
     {
         if ( x3dom.isa( shadowedLights[ i ], x3dom.nodeTypes.SpotLight ) )
@@ -20728,7 +20810,7 @@ x3dom.Cache.prototype.getShadowRenderingShader = function ( gl, shadowedLights )
 
     if ( this.shaders[ ID ] === undefined )
     {
-        var program = new x3dom.shader.ShadowRenderingShader( gl, shadowedLights );
+        var program = new x3dom.shader.ShadowRenderingShader( gl, shadowedLights, properties );
         this.shaders[ ID ] = x3dom.Utils.wrapProgram( gl, program, ID );
     }
     return this.shaders[ ID ];
@@ -21809,17 +21891,17 @@ x3dom.X3DDocument.prototype.advanceTime = function ( t )
     }
 };
 
-x3dom.X3DDocument.prototype.render = function ( ctx, vrFrameData, vrDisplay )
+x3dom.X3DDocument.prototype.render = function ( ctx, frameData )
 {
     if ( !ctx || !this._viewarea )
     {
         return;
     }
 
-    this._viewarea.setVRFrameData( vrFrameData );
-    this._viewarea.updateGamepads( vrDisplay );
+    this._viewarea.setVRFrameData( ctx, frameData );
+    this._viewarea.updateGamepads( frameData );
 
-    ctx.renderScene( this._viewarea );
+    ctx.renderScene( this._viewarea, frameData );
 };
 
 x3dom.X3DDocument.prototype.onPick = function ( ctx, x, y )
@@ -22631,29 +22713,39 @@ x3dom.X3DDocument.prototype.onX3DNodeAdded = function ( addedNode, target )
 
 x3dom.X3DDocument.prototype.onMutation = function ( records )
 {
-    for ( var i = 0, n = records.length; i < n; i++ )
+    var i,
+        n,
+        record,
+        newValue;
+    var set_prefix = "set_";
+    for ( i = 0, n = records.length; i < n; i++ )
     {
-        if ( records[ i ].type === "attributes" && records[ i ].oldValue )
+        record = records[ i ];
+        if ( record.type === "attributes" ) // && ( record.oldValue != null ) )
         {
-            this.onAttributeChanged( records[ i ].target,
-                records[ i ].attributeName,
-                records[ i ].target[ records[ i ].attributeName ] );
-        }
-        else if ( records[ i ].type === "childList" )
-        {
-            if ( records[ i ].removedNodes.length )
+            if ( record.oldValue != null || record.attributeName.startsWith( set_prefix ) )
             {
-                for ( var j = 0, k = records[ i ].removedNodes.length; j < k; j++ )
+                newValue = record.target.getAttribute( record.attributeName );
+                this.onAttributeChanged( record.target,
+                    record.attributeName,
+                    newValue );
+            }
+        }
+        else if ( record.type === "childList" )
+        {
+            if ( record.removedNodes.length )
+            {
+                for ( var j = 0, k = record.removedNodes.length; j < k; j++ )
                 {
-                    this.onNodeRemoved( records[ i ].removedNodes[ j ], records[ i ].target );
+                    this.onNodeRemoved( record.removedNodes[ j ], record.target );
                 }
             }
 
-            if ( records[ i ].addedNodes.length )
+            if ( record.addedNodes.length )
             {
-                for ( var j = 0, k = records[ i ].addedNodes.length; j < k; j++ )
+                for ( var j = 0, k = record.addedNodes.length; j < k; j++ )
                 {
-                    this.onNodeAdded( records[ i ].addedNodes[ j ], records[ i ].target );
+                    this.onNodeAdded( record.addedNodes[ j ], record.target );
                 }
             }
         }
@@ -23623,14 +23715,38 @@ x3dom.docs.getComponentInfo = function ()
             result += "<li><a href='" +
                 x3dom.docs.specBaseURL + x3dom.docs.specURLMap[ c ] + "#" + t +
                 "' style='color:black; text-decoration:none; font-weight:bold;'>" +
-                t + "</a></li>";
+                t + "</a> <ul>";
+            if ( ! t.startsWith( "X3D" ) )
+            {
+                try
+                {
+                    var node = new x3dom.nodeTypes[ t ]();
+                    result += "-- basic fields --";
+                    for ( var field in node._vf )
+                    {
+                        result += "<li>" + field + ": " + node._vf[ field ] ;
+                        result += "</li>";
+                    }
+                }
+                catch ( m ) {};
+                try
+                {
+                    result += "-- node fields --";
+                    for ( var cfield in node._cf )
+                    {
+                        result += "<li>" + cfield + ": " + JSON.stringify( node._cf[ cfield ] ) ;
+                        result += "</li>";
+                    }
+                }
+                catch ( m ) {};
+            }
+            result += "</ul> </li>";
         }
         result += "</ul>";
     }
 
     return result;
 };
-
 /*
  * X3DOM JavaScript Library
  * http://www.x3dom.org
@@ -26064,7 +26180,7 @@ x3dom.Utils.isUnsignedType = function ( str )
 *****************************************************************************/
 x3dom.Utils.checkDirtyLighting = function ( viewarea )
 {
-    return ( viewarea.getLights().length + viewarea._scene.getNavigationInfo()._vf.headlight );
+    return ( viewarea.getLights().length + viewarea._scene.getNavigationInfo()._vf.headlight + ( viewarea._scene.getFog()._vf.visibilityRange > 0 ) );
 };
 
 /*****************************************************************************
@@ -28533,11 +28649,13 @@ x3dom.BinaryContainerLoader.setupPopGeo = function ( shape, sp, gl, viewarea, cu
 };
 
 x3dom.BinaryContainerLoader.bufferGeoCache = {};
+x3dom.BinaryContainerLoader.draco = { "DecoderModule": null, "Decoder": null };
 
 /** setup/download buffer geometry */
 x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea, currContext )
 {
-    var URL;
+    var url;
+    var cacheID;
     var isDataURL = false;
     var bufferGeo = shape._cf.geometry.node;
     var idxAccessor = null;
@@ -28546,6 +28664,8 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
 
     // 0 := no BG, 1 := indexed BG, -1 := non-indexed BG
     shape._webgl.bufferGeometry = ( bufferGeo._indexed ) ? 1 : -1;
+
+    var isDraco = bufferGeo._vf.draco;
 
     bufferGeo._mesh._numCoords = bufferGeo._vf.vertexCount[ 0 ];
     bufferGeo._mesh._numFaces = bufferGeo._vf.vertexCount[ 0 ] / 3;
@@ -28623,9 +28743,10 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
 
             var bufferIdx = x3dom.BUFFER_IDX[ accessor._vf.bufferType ];
 
-            var bufferViewID = bufferGeo._cf.views.nodes[ view ]._vf.id;
+            var bufferView = bufferGeo._cf.views.nodes[ view ];
+            var bufferViewID = isDraco ? bufferView._vf.dracoId : bufferView._vf.idx;
 
-            shape._webgl.buffers[ bufferIdx ] = x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].buffers[ bufferViewID ];
+            shape._webgl.buffers[ bufferIdx ] = x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].buffers[ bufferViewID ];
         }
     };
 
@@ -28637,14 +28758,14 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
         {
             var view = views[ i ];
 
-            var bufferID   = view._vf.id;
+            var bufferID   = isDraco ? view._vf.dracoId : view._vf.idx;
             var byteOffset = view._vf.byteOffset;
             var byteLength = view._vf.byteLength;
 
-            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].buffers[ bufferID ] == undefined ||
-               !gl.isBuffer( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].buffers[ bufferID ] ) )
+            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].buffers[ bufferID ] == undefined ||
+               !gl.isBuffer( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].buffers[ bufferID ] ) )
             {
-                var bufferData = new Uint8Array( arraybuffer, byteOffset, byteLength );
+                var bufferData = getBufferData( arraybuffer, byteOffset, byteLength, view, i );
 
                 var buffer = gl.createBuffer();
 
@@ -28652,9 +28773,61 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
                 gl.bufferData( view._vf.target, bufferData, gl.STATIC_DRAW );
                 gl.bindBuffer( view._vf.target, null );
 
-                x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].buffers[ bufferID ] = buffer;
+                x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].buffers[ bufferID ] = buffer;
             }
         }
+    };
+
+    var getBufferData = function ( arraybuffer, byteOffset, byteLength, view, index )
+    {
+        if ( isDraco )
+        {
+            if ( view._vf.target == 34963 ) // INDEX
+            {
+                return decodeIndex();
+            }
+            return decodeAttribute( view, index );
+        }
+        return new Uint8Array( arraybuffer, byteOffset, byteLength );
+    };
+
+    var decodeAttribute = function ( view, index )
+    {
+        var attributeID = view._vf.dracoId;
+        var dracoAttribute = dracoDecoder.GetAttributeByUniqueId( dracoGeometry, attributeID );
+        var attributeAccessor = bufferGeo._cf.accessors.nodes.find( function ( a )
+        {
+            return a._vf.view == index;
+        } );
+        var componentType = attributeAccessor._vf.componentType;
+        var bytes_per_component = x3dom.BinaryContainerLoader.getArrayBufferFromType( componentType ).BYTES_PER_ELEMENT;
+        var numValues = dracoGeometry.num_points() * dracoAttribute.num_components();
+        var byteLength = numValues * bytes_per_component;
+        var ptr = dracoDecoderModule._malloc( byteLength );
+        var status = dracoDecoder.GetAttributeDataArrayForAllPoints( dracoGeometry, dracoAttribute, dracoAttribute.data_type(), byteLength, ptr );
+        var array = x3dom.BinaryContainerLoader.getArrayBufferFromType( componentType, dracoDecoderModule.HEAPF32.buffer, ptr, numValues ).slice();
+        dracoDecoderModule._free( ptr );
+        return array;
+    };
+
+    var decodeIndex = function ()
+    {
+        var numFaces = dracoGeometry.num_faces();
+        var numIndices = numFaces * 3;
+        var byteLength = numIndices * 4;
+
+        var ptr = dracoDecoderModule._malloc( byteLength );
+        var status = dracoDecoder.GetTrianglesUInt32Array( dracoGeometry, byteLength, ptr );
+        var index = new Uint32Array( dracoDecoderModule.HEAPU32.buffer, ptr, numIndices ).slice();
+        dracoDecoderModule._free( ptr );
+
+        var indexAccessor = bufferGeo._cf.accessors.nodes.find( function ( a )
+        {
+            return a._vf.bufferType == "INDEX";
+        } );
+        var componentType = indexAccessor ? indexAccessor._vf.componentType : gl.UNSIGNED_SHORT;
+
+        return x3dom.BinaryContainerLoader.getArrayBufferFromType( componentType, index );
     };
 
     var getPositions = function ( arraybuffer )
@@ -28665,13 +28838,20 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
         {
             var posView = bufferGeo._cf.views.nodes[ posAccessor._vf.view ];
 
-            var byteOffset = posAccessor._vf.byteOffset + posView._vf.byteOffset;
-            var byteLength = posAccessor._vf.count * posAccessor._vf.components;
+            if ( isDraco )
+            {
+                positions = decodeAttribute( posView, posAccessor._vf.view );
+            }
+            else
+            {
+                var byteOffset = posAccessor._vf.byteOffset + posView._vf.byteOffset;
+                var byteLength = posAccessor._vf.count * posAccessor._vf.components;
 
-            positions = x3dom.BinaryContainerLoader.getArrayBufferFromType( posAccessor._vf.componentType,
-                arraybuffer,
-                byteOffset,
-                byteLength );
+                positions = x3dom.BinaryContainerLoader.getArrayBufferFromType( posAccessor._vf.componentType,
+                    arraybuffer,
+                    byteOffset,
+                    byteLength );
+            }
         }
 
         return positions;
@@ -28679,6 +28859,11 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
 
     var getIndices = function ( arraybuffer )
     {
+        if ( isDraco )
+        {
+            return decodeIndex();
+        }
+
         var indices;
 
         if ( idxAccessor )
@@ -28783,6 +28968,10 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
         shape._cleanupGLObjects = function ( force, delGL )
         {
             var _cache = this._webgl._bufferGeoCache;
+            for ( var bufferID in _cache.buffers )
+            {
+                delete _cache.buffers[ bufferID ]; //make undefined to avoid isBuffer check
+            }
             var found = _cache.shapes.indexOf( this );
             if ( found > -1 )
             {
@@ -28796,23 +28985,30 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
         };
     };
 
+    /* setup/download buffer geometry */
+
     if ( bufferGeo._vf.buffer != "" )
     {
-        URL = shape._nameSpace.getURL( bufferGeo._vf.buffer );
+        url = shape._nameSpace.getURL( bufferGeo._vf.buffer );
+        cacheID = url;
+        if ( isDraco )
+        {
+            cacheID += " " + bufferGeo._cf.views.nodes[ 0 ]._vf.byteOffset;
+        }
 
-        if ( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ] == undefined )
+        if ( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ] == undefined )
         {
             shape._nameSpace.doc.incrementDownloads();
 
-            x3dom.BinaryContainerLoader.bufferGeoCache[ URL ] = {};
-            x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].buffers = [];
-            x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].shapes = [];
-            x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].decrementDownload = true;
-            x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].promise = new Promise( function ( resolve, reject )
+            x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ] = {};
+            x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].buffers = [];
+            x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].shapes = [];
+            x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].decrementDownload = true;
+            x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].promise = new Promise( function ( resolve, reject )
             {
                 var xhr = new XMLHttpRequest();
 
-                xhr.open( "GET", URL );
+                xhr.open( "GET", url );
 
                 xhr.responseType = "arraybuffer";
 
@@ -28837,37 +29033,90 @@ x3dom.BinaryContainerLoader.setupBufferGeo = function ( shape, sp, gl, viewarea,
             } );
         }
 
-        x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].promise.then( function ( arraybuffer )
+        var dracoDecoderModule,
+            dracoDecoder,
+            dracoGeometry;
+
+        x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].promise.then( function ( arraybuffer )
+        {
+            if ( isDraco )
+            {
+                if ( x3dom.BinaryContainerLoader.draco.DecoderModule )
+                {
+                    dracoDecoderModule = x3dom.BinaryContainerLoader.draco.DecoderModule;
+                    dracoDecoder = x3dom.BinaryContainerLoader.draco.Decoder;
+
+                    return arraybuffer;
+                }
+                else
+                {
+                    return x3dom.DracoDecoderModule( { wasmBinary: x3dom.DracoDecoderWASM.arrayBuffer } ).then( function ( module )
+                    {
+                        dracoDecoderModule = module;
+                        dracoDecoder = new module.Decoder();
+                        x3dom.BinaryContainerLoader.draco.DecoderModule = module;
+                        x3dom.BinaryContainerLoader.draco.Decoder = dracoDecoder;
+
+                        return arraybuffer;
+                    } );
+                }
+            }
+            return arraybuffer;
+        } ).then( function ( arraybuffer )
         {
             if ( shape._webgl == undefined )
             {
-                x3dom.BinaryContainerLoader.bufferGeoCache[ URL ] = undefined;
+                x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ] = undefined;
                 return;
+            }
+
+            if ( isDraco )
+            {
+                var view = bufferGeo._cf.views.nodes[ 0 ]; // all views the same for draco except dracoId
+                var dracoArray = new Int8Array( arraybuffer ).slice( view._vf.byteOffset,
+                    view._vf.byteOffset + view._vf.byteLength );
+                var geometryType = dracoDecoder.GetEncodedGeometryType( dracoArray );
+                if ( geometryType == dracoDecoderModule.TRIANGULAR_MESH )
+                {
+                    dracoGeometry = new dracoDecoderModule.Mesh();
+                    dracoDecoder.DecodeArrayToMesh( dracoArray, dracoArray.length, dracoGeometry );
+                }
+                if ( geometryType == dracoDecoderModule.POINT_CLOUD )
+                {
+                    dracoGeometry = new dracoDecoderModule.PointCloud();
+                    dracoDecoder.DecodeArrayToPointCloud( dracoArray, dracoArray.length, dracoGeometry );
+                }
             }
 
             initBufferViews( arraybuffer );
             initAccessors();
             computeNormals( arraybuffer );
-            linkCache( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ] );
+            linkCache( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ] );
 
-            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].decrementDownload )
+            if ( isDraco )
             {
-                x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].decrementDownload = false;
+                //dracoDecoderModule.destroy( dracoDecoder );
+                dracoDecoderModule.destroy( dracoGeometry );
+                //dracoDecoderModule = null;
+            }
+
+            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].decrementDownload )
+            {
+                x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].decrementDownload = false;
                 shape._nameSpace.doc.decrementDownloads();
                 shape._nameSpace.doc.needRender = true;
             }
         } ).catch( function ()
         {
-            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].decrementDownload )
+            if ( x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].decrementDownload )
             {
-                x3dom.BinaryContainerLoader.bufferGeoCache[ URL ].decrementDownload = false;
+                x3dom.BinaryContainerLoader.bufferGeoCache[ cacheID ].decrementDownload = false;
                 shape._nameSpace.doc.decrementDownloads();
             }
         } );
     }
 };
 
-/** setup/download buffer geometry */
 x3dom.BinaryContainerLoader.setupBufferInterpolator = function ( interpolator )
 {
     var getKeys = function ( interpolator, accessor, arraybuffer )
@@ -30078,7 +30327,6 @@ x3dom.Moveable.prototype.touchEndHandlerMoz = function ( evt )
         }();return it.prototype.then = l, it.all = F, it.race = Y, it.resolve = h, it.reject = q, it._setScheduler = n, it._setAsap = r, it._asap = G, it.polyfill = L, it.Promise = it, it.polyfill(), it;
 } );
 /**
- *
  * @param {Object} gltf
  * @param {NodeNameSpace} nameSpace
  */
@@ -30091,12 +30339,17 @@ x3dom.glTF2Loader = function ( nameSpace )
         "KHR_materials_unlit",
         "KHR_texture_transform"
     ];
+    if ( x3dom.DracoDecoderModule )
+    {
+        this._supportedExtensions.push( "KHR_draco_mesh_compression" );
+    }
 };
 
 /**
  * Starts the loading/parsing of the glTF-Object
  * @param {Object} gltf
  */
+
 x3dom.glTF2Loader.prototype.load = function ( input, binary )
 {
     this._gltf = this._getGLTF( input, binary );
@@ -30525,7 +30778,18 @@ x3dom.glTF2Loader.prototype._generateX3DShape = function ( primitive )
 
     shape.appendChild( this._generateX3DAppearance( material ) );
 
-    shape.appendChild( this._generateX3DBufferGeometry( primitive ) );
+    var dracoExtension = null;
+    if ( primitive.extensions && primitive.extensions.KHR_draco_mesh_compression )
+    {
+        dracoExtension = primitive.extensions.KHR_draco_mesh_compression;
+    }
+
+    if ( dracoExtension && !x3dom.DracoDecoderModule )
+    {
+        return shape;
+    }
+
+    shape.appendChild( this._generateX3DBufferGeometry( primitive, dracoExtension ) );
 
     return shape;
 };
@@ -30550,6 +30814,7 @@ x3dom.glTF2Loader.prototype._generateX3DAppearance = function ( material )
     {
         appearance.setAttribute( "sortType", "opaque" );
     }
+    appearance.setAttribute( "alphaClipThreshold", 0 );
 
     appearance.appendChild( this._generateX3DPhysicalMaterial( material ) );
 
@@ -30813,17 +31078,32 @@ x3dom.glTF2Loader.prototype._createX3DTextureTransform = function ( imagetexture
  * @param {Object} primitive - A glTF primitive node
  * @return {BufferGeometry}
  */
-x3dom.glTF2Loader.prototype._generateX3DBufferGeometry = function ( primitive )
+x3dom.glTF2Loader.prototype._generateX3DBufferGeometry = function ( primitive, dracoExtension )
 {
     var views = [];
     var bufferGeometry = document.createElement( "buffergeometry" );
     var centerAndSize = this._getCenterAndSize( primitive );
 
-    bufferGeometry.setAttribute( "buffer", this._bufferURI( primitive ) );
+    var bufferURI;
+
+    if ( dracoExtension )
+    {
+        bufferURI = x3dom.Utils.dataURIToObjectURL(
+            this._gltf.buffers[
+                this._gltf.bufferViews [
+                    dracoExtension.bufferView ].buffer ].uri );
+    }
+    else
+    {
+        bufferURI = this._bufferURI( primitive );
+    }
+
+    bufferGeometry.setAttribute( "buffer", bufferURI );
     bufferGeometry.setAttribute( "position", centerAndSize.center.join( " " ) );
     bufferGeometry.setAttribute( "size", centerAndSize.size.join( " " ) );
     bufferGeometry.setAttribute( "vertexCount", this._getVertexCount( primitive ) );
     bufferGeometry.setAttribute( "primType", this._primitiveType( primitive.mode ) );
+    bufferGeometry.setAttribute( "draco", dracoExtension !== null );
 
     //Check Material for double sided rendering
     if ( primitive.material != undefined )
@@ -30836,38 +31116,67 @@ x3dom.glTF2Loader.prototype._generateX3DBufferGeometry = function ( primitive )
         }
     }
 
+    var view,
+        viewID,
+        accessor;
+
     //Check for indices
     if ( primitive.indices != undefined )
     {
-        var accessor = this._gltf.accessors[ primitive.indices ];
+        accessor = this._gltf.accessors[ primitive.indices ];
 
-        var view = this._gltf.bufferViews[ accessor.bufferView ];
-        view.id = accessor.bufferView;
-        view.target = 34963;
-
-        var viewID = views.indexOf( view );
-
-        if ( view.target != undefined && viewID == -1 )
+        if ( dracoExtension )
         {
+            view = Object.assign( {}, this._gltf.bufferViews[ dracoExtension.bufferView ] );
+            view.idx = dracoExtension.bufferView;
+            view.target = 34963;
             viewID = views.push( view ) - 1;
+        }
+
+        else
+        {
+            view = Object.assign( {}, this._gltf.bufferViews[ accessor.bufferView ] );
+            view.idx = accessor.bufferView;
+            view.target = 34963;
+
+            viewID = views.indexOf( view );
+
+            if ( view.target != undefined && viewID == -1 )
+            {
+                viewID = views.push( view ) - 1;
+            }
         }
 
         bufferGeometry.appendChild( this._generateX3DBufferAccessor( "INDEX", accessor, viewID ) );
     }
 
-    for ( var attribute in primitive.attributes )
+    var attributes = dracoExtension ? dracoExtension.attributes : primitive.attributes;
+
+    for ( var attribute in attributes )
     {
-        var accessor = this._gltf.accessors[ primitive.attributes[ attribute ] ];
+        accessor = this._gltf.accessors[ primitive.attributes[ attribute ] ];
 
-        var view = this._gltf.bufferViews[ accessor.bufferView ];
-        view.target = 34962;
-        view.id = accessor.bufferView;
-
-        var viewID = views.indexOf( view );
-
-        if ( view.target != undefined && viewID == -1 )
+        if ( dracoExtension )
         {
+            view = Object.assign( {}, this._gltf.bufferViews[ dracoExtension.bufferView ] );
+            view.target = 34962;
+            view.idx = dracoExtension.bufferView;
+            view.dracoUniqueId = dracoExtension.attributes[ attribute ];
             viewID = views.push( view ) - 1;
+        }
+
+        else
+        {
+            view = Object.assign( {}, this._gltf.bufferViews[ accessor.bufferView ] );
+            view.target = 34962;
+            view.idx = accessor.bufferView;
+
+            viewID = views.indexOf( view );
+
+            if ( view.target != undefined && viewID == -1 )
+            {
+                viewID = views.push( view ) - 1;
+            }
         }
 
         bufferGeometry.appendChild( this._generateX3DBufferAccessor( attribute, accessor, viewID ) );
@@ -30888,25 +31197,28 @@ x3dom.glTF2Loader.prototype._generateX3DBufferView = function ( view )
     bufferView.setAttribute( "target",     view.target );
     bufferView.setAttribute( "byteOffset", view.byteOffset || 0 );
     bufferView.setAttribute( "byteLength", view.byteLength );
-    bufferView.setAttribute( "id", view.id );
+    bufferView.setAttribute( "idx", view.idx );
+    bufferView.setAttribute( "dracoId", view.dracoUniqueId !== undefined ? view.dracoUniqueId : -1 );
 
     return bufferView;
 };
 
-x3dom.glTF2Loader.prototype._generateX3DBufferAccessor = function ( buffer, accessor, viewID )
+x3dom.glTF2Loader.prototype._generateX3DBufferAccessor = function ( bufferType, accessor, viewID )
 {
     var components = this._componentsOf( accessor.type );
 
-    var bufferView = this._gltf.bufferViews[ accessor.bufferView ];
+    var bufferView = "bufferView" in accessor ? this._gltf.bufferViews[ accessor.bufferView ] : {};
 
-    var byteOffset = accessor.byteOffset;
+    var byteStride = "byteStride" in bufferView ? bufferView.byteStride : 0;
+
+    var byteOffset = "byteOffset" in accessor ? accessor.byteOffset : 0;
 
     var bufferAccessor = document.createElement( "bufferaccessor" );
 
-    bufferAccessor.setAttribute( "bufferType", buffer.replace( "_0", "" ) );
+    bufferAccessor.setAttribute( "bufferType", bufferType.replace( "_0", "" ) );
     bufferAccessor.setAttribute( "view", viewID );
-    bufferAccessor.setAttribute( "byteOffset", byteOffset || 0 );
-    bufferAccessor.setAttribute( "byteStride", bufferView.byteStride || 0 );
+    bufferAccessor.setAttribute( "byteOffset", byteOffset );
+    bufferAccessor.setAttribute( "byteStride", byteStride );
     bufferAccessor.setAttribute( "normalized", accessor.normalized || false );
 
     bufferAccessor.setAttribute( "components", components );
@@ -31999,100 +32311,41 @@ x3dom.DDSLoader.A1R5G5B5_To_A1B5G5R5 = function ( src )
     return dst;
 };
 
-x3dom.VRControllerManager = function ()
+x3dom.VRControllerManager = function ( document )
 {
     this.leftInline     = undefined;
     this.leftTransform  = undefined;
     this.rightInline    = undefined;
     this.rightTransform = undefined;
+    this.wasPresenting  = false;
+    this.modelsAdded    = false;
+    this._doc = document;
 
-    this.leftGamepadIdx  = undefined;
-    this.rightGamepadIdx = undefined;
-    this.vrDisplay       = undefined;
-    this.wasPresenting   = false;
-
-    this.controllers = {
-        "HTC Vive MV" : {
+    this._controllers = {
+        "htc-vive" : {
             left        : "https://x3dom.org/download/assets/vr/vive.glb",
             right       : "https://x3dom.org/download/assets/vr/vive.glb",
             scaleFactor : new x3dom.fields.SFVec3f( 40, 40, 40 ),
             offset      : new x3dom.fields.SFVec3f(),
             axesScale   : [ 1, 1 ]
         },
-        "Oculus Oculus Rift CV1" : {
+        "oculus-touch" : {
             left        : "https://x3dom.org/download/assets/vr/oculus-touch-left.glb",
             right       : "https://x3dom.org/download/assets/vr/oculus-touch-right.glb",
             scaleFactor : new x3dom.fields.SFVec3f( 39.5, 39.5, 39.5 ),
             offset      : new x3dom.fields.SFVec3f(),
             axesScale   : [ 1, 1 ]
         },
-        "Oculus Go" : {
+        "oculus-go" : {
             left        : "https://x3dom.org/download/assets/vr/oculus-go.glb",
             right       : "https://x3dom.org/download/assets/vr/oculus-go.glb",
             scaleFactor : new x3dom.fields.SFVec3f( 1, 1, 1 ),
             offset      : new x3dom.fields.SFVec3f( 0.2, -0.3, -0.3 ),
-            axesScale   : [ 1, -1 ]
-        },
-        "Emulated HTC Vive DVT" : {
-            left        : "https://x3dom.org/download/assets/vr/vive.glb",
-            right       : "https://x3dom.org/download/assets/vr/vive.glb",
-            scaleFactor : new x3dom.fields.SFVec3f( 40, 40, 40 ),
-            offset      : new x3dom.fields.SFVec3f(),
-            axesScale   : [ 1, 1 ]
-        },
-        "WindowsMR DELL VISOR VR118" : {
-            left        : "https://x3dom.org/download/assets/vr/microsoft-left.glb",
-            right       : "https://x3dom.org/download/assets/vr/microsoft-right.glb",
-            scaleFactor : new x3dom.fields.SFVec3f( 40, 40, 40 ),
-            offset      : new x3dom.fields.SFVec3f(),
-            axesScale   : [ 1, 1 ]
+            axesScale   : [ -1, 1 ]
         }
     };
 
     this._addInlines();
-    this._addGamePadListeners();
-};
-
-x3dom.VRControllerManager.prototype._addGamePadListeners = function ()
-{
-    window.addEventListener( "gamepadconnected", this._onGamePadConnected.bind( this ) );
-    window.addEventListener( "gamepaddisconnected", this._onGamePadDisconnected.bind( this ) );
-};
-
-x3dom.VRControllerManager.prototype._onGamePadConnected = function ( e )
-{
-    var gamepad = e.gamepad;
-
-    navigator.getVRDisplays().then( function ( displays )
-    {
-        var display = displays[ 0 ];
-
-        if ( display && gamepad.displayId == display.displayId )
-        {
-            var controller = this.controllers[ display.displayName ];
-
-            if ( !controller )
-            {
-                return;
-            }
-
-            if ( gamepad.hand == "left" )
-            {
-                this.leftGamepadIdx = gamepad.index;
-                this.leftInline.setAttribute( "url", controller.left );
-            }
-            else if ( gamepad.hand == "right" )
-            {
-                this.rightGamepadIdx = gamepad.index;
-                this.rightInline.setAttribute( "url", controller.right, controller.scaleFactor );
-            }
-        }
-    }.bind( this ) );
-};
-
-x3dom.VRControllerManager.prototype._onGamePadDisconnected = function ( e )
-{
-    console.log( e );
 };
 
 x3dom.VRControllerManager.prototype._addInlines = function ()
@@ -32117,7 +32370,79 @@ x3dom.VRControllerManager.prototype._addInlines = function ()
         x3dScene.appendChild( this.rightTransform );
     }
 };
-x3dom.VRControllerManager.prototype.fit = function ( viewarea, vrDisplay )
+
+x3dom.VRControllerManager.prototype._addControllerModels = function ( controllers )
+{
+    if ( this.modelsAdded )
+    {
+        return;
+    }
+
+    if ( controllers.left )
+    {
+        const url = this._getControllerModelURL( controllers.left.type, "left" );
+
+        this.leftInline.setAttribute( "url", url );
+    }
+
+    if ( controllers.right )
+    {
+        const url = this._getControllerModelURL( controllers.right.type, "right" );
+
+        this.rightInline.setAttribute( "url", url );
+    }
+
+    this.modelsAdded = true;
+};
+
+x3dom.VRControllerManager.prototype._getControllerAxesScale = function ( type )
+{
+    if ( this._controllers[ type ] === undefined )
+    {
+        return [ 1, 1 ];
+    }
+
+    return this._controllers[ type ].axesScale;
+};
+
+x3dom.VRControllerManager.prototype._getControllerDirection = function ( pose )
+{
+    const controllerRotation = ( pose.orientation ? x3dom.fields.Quaternion.fromArray( pose.orientation ) : new x3dom.fields.Quaternion() );
+    const cRotMatrix = controllerRotation.toMatrix();
+    return cRotMatrix.e2();
+};
+
+x3dom.VRControllerManager.prototype._getControllerModelURL = function ( type, side )
+{
+    if ( this._controllers[ type ] === undefined )
+    {
+        return "";
+    }
+
+    return this._controllers[ type ][ side ];
+};
+
+x3dom.VRControllerManager.prototype._getControllerOffset = function ( type )
+{
+    if ( this._controllers[ type ] === undefined )
+    {
+        return [ 0, 0, 0 ];
+    }
+
+    return this._controllers[ type ].offset;
+};
+
+x3dom.VRControllerManager.prototype._getControllerScaleFactor = function ( type )
+{
+    if ( this._controllers[ type ] === undefined )
+    {
+        return [ 1, 1, 1 ];
+    }
+
+    return this._controllers[ type ].scaleFactor;
+};
+
+x3dom.VRControllerManager.prototype.fit = function ( viewarea )
 {
     var min = viewarea._scene._lastMin;
     var max = viewarea._scene._lastMax;
@@ -32132,12 +32457,13 @@ x3dom.VRControllerManager.prototype.fit = function ( viewarea, vrDisplay )
     var tanfov2 = Math.tan( 0.5 * Math.PI / 2.0 );
     var dist = bsr / tanfov2 / aspect;
 
-    viewarea._movement = viewDir.multiply( -dist );
+    var scaleFactor = 0.001;
+    viewarea._movement = viewDir.multiply( -1 * scaleFactor * dist );
 };
 
-x3dom.VRControllerManager.prototype.update = function ( viewarea, vrDisplay )
+x3dom.VRControllerManager.prototype.update = function ( viewarea, vrFrameData )
 {
-    if ( !vrDisplay || ( vrDisplay && !vrDisplay.isPresenting ) )
+    if ( !vrFrameData )
     {
         if ( this.wasPresenting )
         {
@@ -32149,63 +32475,57 @@ x3dom.VRControllerManager.prototype.update = function ( viewarea, vrDisplay )
 
         return;
     }
-    else
-    {
-        if ( !this.wasPresenting )
-        {
-            this.leftInline.setAttribute( "render", "true" );
-            this.rightInline.setAttribute( "render", "true" );
 
-            this.fit( viewarea, vrDisplay );
-        }
+    if ( !this.wasPresenting )
+    {
+        this.leftInline.setAttribute( "render", "true" );
+        this.rightInline.setAttribute( "render", "true" );
+
+        this.fit( viewarea );
 
         this.wasPresenting = true;
     }
 
-    var gamepads = navigator.getGamepads();
-    var controller = {};
-
-    if ( this.leftGamepadIdx != undefined && gamepads[ this.leftGamepadIdx ] )
-    {
-        var gamepad = gamepads[ this.leftGamepadIdx ];
-        controller.left = gamepad;
-    }
-
-    if ( this.rightGamepadIdx != undefined && gamepads[ this.rightGamepadIdx ] )
-    {
-        var gamepad = gamepads[ this.rightGamepadIdx ];
-        controller.right = gamepad;
-    }
-
-    this.onUpdate( viewarea, vrDisplay, controller );
+    this._addControllerModels( vrFrameData.controllers );
+    this._updateMatrices( viewarea, vrFrameData.controllers );
+    this._updateControllerModels( viewarea, vrFrameData.controllers );
 };
 
-x3dom.VRControllerManager.prototype.onUpdate = function ( viewarea, vrDisplay, controllers )
+x3dom.VRControllerManager.prototype._updateMatrices = function ( viewarea, controllers )
 {
     var transMat = new x3dom.fields.SFMatrix4f();
     var rotMat = new x3dom.fields.SFMatrix4f();
     var axes = [ 0, 0 ];
-    var axesScale = this.controllers[ vrDisplay.displayName ].axesScale;
 
     if ( controllers.left )
     {
-        axes[ 0 ] += controllers.left.axes[ 0 ] * axesScale[ 0 ];
-        axes[ 1 ] += controllers.left.axes[ 1 ] * axesScale[ 1 ];
+        var axesScale = this._getControllerAxesScale( controllers.left.type );
 
-        if ( controllers.left.buttons[ 1 ].pressed )
+        axes[ 0 ] += controllers.left.gamepad.axes[ 0 ] * axesScale[ 0 ];
+        axes[ 1 ] += controllers.left.gamepad.axes[ 1 ] * axesScale[ 1 ];
+
+        if ( controllers.left.gamepad.buttons[ 0 ].pressed )
         {
-            this.fit( viewarea );
+            const pose = controllers.left.pose;
+            const cDirection = this._getControllerDirection( pose );
+            const scaleFactor = this._getViewAreaZoom( viewarea );
+            viewarea._movement = viewarea._movement.add( cDirection.multiply( scaleFactor ) );
         }
     }
 
     if ( controllers.right )
     {
-        axes[ 0 ] += controllers.right.axes[ 0 ] * axesScale[ 0 ];
-        axes[ 1 ] += controllers.right.axes[ 1 ] * axesScale[ 1 ];
+        var axesScale = this._getControllerAxesScale( controllers.right.type );
 
-        if ( controllers.right.buttons[ 1 ].pressed )
+        axes[ 0 ] += controllers.right.gamepad.axes[ 0 ] * axesScale[ 0 ];
+        axes[ 1 ] += controllers.right.gamepad.axes[ 1 ] * axesScale[ 1 ];
+
+        if ( controllers.right.gamepad.buttons[ 0 ].pressed )
         {
-            this.fit( viewarea );
+            const pose = controllers.right.pose;
+            const cDirection = this._getControllerDirection( pose );
+            const scaleFactor = this._getViewAreaZoom( viewarea );
+            viewarea._movement = viewarea._movement.add( cDirection.multiply( scaleFactor ) );
         }
     }
 
@@ -32230,30 +32550,17 @@ x3dom.VRControllerManager.prototype.onUpdate = function ( viewarea, vrDisplay, c
     //Enable default Mouse Navigation
     // viewarea.vrLeftViewMatrix  = viewarea.vrLeftViewMatrix.mult(viewarea._transMat).mult(viewarea._rotMat);
     // viewarea.vrRightViewMatrix = viewarea.vrRightViewMatrix.mult(viewarea._transMat).mult(viewarea._rotMat);
-
-    this._updateControllerModels( viewarea, vrDisplay, controllers );
 };
 
-x3dom.VRControllerManager.prototype._updateControllerModels = function ( viewarea, vrDisplay, controllers )
+x3dom.VRControllerManager.prototype._updateControllerModels = function ( viewarea, controllers )
 {
-    if ( !vrDisplay || ( vrDisplay && !vrDisplay.isPresenting ) )
-    {
-        this.leftInline.setAttribute( "render", "false" );
-        this.rightInline.setAttribute( "render", "false" );
-        return;
-    }
-    else
-    {
-        this.leftInline.setAttribute( "render", "true" );
-        this.rightInline.setAttribute( "render", "true" );
-    }
-
     if ( controllers.left )
     {
-        var pose = controllers.left.pose;
+        var pose     = controllers.left.pose;
+        var offset   = this._getControllerOffset( controllers.left.type );
         var rotation = ( pose.orientation ) ? x3dom.fields.Quaternion.fromArray( pose.orientation ) : new x3dom.fields.Quaternion();
-        var position = ( pose.position ) ? x3dom.fields.SFVec3f.fromArray( pose.position ) : this.controllers[ vrDisplay.displayName ].offset;
-        var scale    = this.controllers[ vrDisplay.displayName ].scaleFactor;
+        var position = ( pose.position ) ? x3dom.fields.SFVec3f.fromArray( pose.position ) : offset;
+        var scale    = this._getControllerScaleFactor( controllers.left.type );
 
         position = position.subtract( viewarea._movement );
 
@@ -32264,10 +32571,11 @@ x3dom.VRControllerManager.prototype._updateControllerModels = function ( vieware
 
     if ( controllers.right )
     {
-        var pose = controllers.right.pose;
+        var pose     = controllers.right.pose;
+        var offset   = this._getControllerOffset( controllers.right.type );
         var rotation = ( pose.orientation ) ? x3dom.fields.Quaternion.fromArray( pose.orientation ) : new x3dom.fields.Quaternion();
-        var position = ( pose.position ) ? x3dom.fields.SFVec3f.fromArray( pose.position ) : this.controllers[ vrDisplay.displayName ].offset;
-        var scale    = this.controllers[ vrDisplay.displayName ].scaleFactor;
+        var position = ( pose.position ) ? x3dom.fields.SFVec3f.fromArray( pose.position ) : offset;
+        var scale    = this._getControllerScaleFactor( controllers.right.type );
 
         position = position.subtract( viewarea._movement );
 
@@ -32275,6 +32583,19 @@ x3dom.VRControllerManager.prototype._updateControllerModels = function ( vieware
 
         this.rightTransform.setAttribute( "matrix", matrix.toString() );
     }
+};
+
+x3dom.VRControllerManager.prototype._getViewAreaZoom = function ( viewarea )
+{
+    var navi = viewarea._scene.getNavigationInfo();
+    var viewpoint = viewarea._scene.getViewpoint();
+    var d = ( viewarea._scene._lastMax.subtract( viewarea._scene._lastMin ) ).length();
+    d = Math.min( d, viewpoint.getFar() );
+    d = ( ( d < x3dom.fields.Eps ) ? 1 : d ) * navi._vf.speed;
+    const fps = this._doc._x3dElem.runtime.getFPS();
+    const zoomAmount = 60 / fps;
+
+    return d * ( zoomAmount ) / viewarea._height;
 };
 /*
  * X3DOM JavaScript Library
@@ -35052,7 +35373,12 @@ x3dom.shader.shadowRendering = function ()
     shaderPart +=
                 "float ESM(float shadowMapDepth, float viewSampleDepth, float offset){\n";
     if ( !x3dom.caps.FP_TEXTURES )
-    {shaderPart +=     "    return exp(-80.0*(1.0-offset)*(viewSampleDepth - shadowMapDepth));\n";}
+    {
+        shaderPart +=
+        "    float d = viewSampleDepth - shadowMapDepth;\n" +
+        "    d = step( 0.002, abs(d) ) * d;\n" +
+        "    return exp(-80.0*(1.0-offset)*d);\n";
+    }
     else     {shaderPart +=     "    return shadowMapDepth * exp(-80.0*(1.0-offset)*viewSampleDepth);\n";}
     shaderPart += "}\n";
 
@@ -36638,10 +36964,10 @@ x3dom.shader.DynamicShader.prototype.generateFragmentShader = function ( gl, pro
     }
     else if ( properties.ALPHAMASK )
     {
-        shader += "if (color.a <= alphaCutoff) discard;\n";
+        shader += "if (color.a < alphaCutoff) discard;\n";
         shader += "color.a = 1.0;\n";
     }
-    else if ( properties.ALPHATHRESHOLD )
+    else if ( +properties.ALPHATHRESHOLD > 0 )
     {
         shader += "if (color.a <= alphaCutoff) discard;\n";
     }
@@ -36660,7 +36986,7 @@ x3dom.shader.DynamicShader.prototype.generateFragmentShader = function ( gl, pro
     shader += "color = " + x3dom.shader.encodeGamma( properties, "color" ) + ";\n";
 
     //Fog
-    if ( properties.FOG )
+    if ( properties.FOG && !properties.SHADOW )
     {
         shader += "float f0 = calcFog(fragEyePosition);\n";
         shader += "color.rgb = fogColor * (1.0-f0) + f0 * (color.rgb);\n";
@@ -38119,11 +38445,11 @@ x3dom.shader.BackgroundCubeTextureDDSShader.prototype.generateFragmentShader = f
 /**
  * Generate the final Shader program
  */
-x3dom.shader.ShadowRenderingShader = function ( gl, shadowedLights )
+x3dom.shader.ShadowRenderingShader = function ( gl, shadowedLights, properties )
 {
     this.program = gl.createProgram();
-    var vertexShader   = this.generateVertexShader( gl );
-    var fragmentShader = this.generateFragmentShader( gl, shadowedLights );
+    var vertexShader = this.generateVertexShader( gl );
+    var fragmentShader = this.generateFragmentShader( gl, shadowedLights, properties );
 
     gl.attachShader( this.program, vertexShader );
     gl.attachShader( this.program, fragmentShader );
@@ -38166,7 +38492,7 @@ x3dom.shader.ShadowRenderingShader.prototype.generateVertexShader = function ( g
 /**
  * Generate the fragment shader
  */
-x3dom.shader.ShadowRenderingShader.prototype.generateFragmentShader = function ( gl, shadowedLights )
+x3dom.shader.ShadowRenderingShader.prototype.generateFragmentShader = function ( gl, shadowedLights, properties )
 {
     var shader = "#ifdef GL_FRAGMENT_PRECISION_HIGH\n";
     shader += "precision highp float;\n";
@@ -38178,102 +38504,116 @@ x3dom.shader.ShadowRenderingShader.prototype.generateFragmentShader = function (
     shader += "uniform mat4 inverseProj;\n";
     shader += "varying vec2 vPosition;\n";
     shader += "uniform sampler2D sceneMap;\n";
-    for ( var i = 0; i < 5; i++ )
-    {shader += "uniform float cascade" + i + "_Depth;\n";}
+    for ( var i = 0; i < 5; i++ ) { shader += "uniform float cascade" + i + "_Depth;\n"; }
 
     for ( var l = 0; l < shadowedLights.length; l++ )
     {
-        shader +=    "uniform float light" + l + "_On;\n" +
-                "uniform float light" + l + "_Type;\n" +
-                "uniform vec3  light" + l + "_Location;\n" +
-                "uniform vec3  light" + l + "_Direction;\n" +
-                "uniform vec3  light" + l + "_Attenuation;\n" +
-                "uniform float light" + l + "_Radius;\n" +
-                "uniform float light" + l + "_BeamWidth;\n" +
-                "uniform float light" + l + "_CutOffAngle;\n" +
-                "uniform float light" + l + "_ShadowIntensity;\n" +
-                "uniform float light" + l + "_ShadowOffset;\n" +
-                "uniform mat4 light" + l + "_ViewMatrix;\n";
+        shader += "uniform float light" + l + "_On;\n" +
+            "uniform float light" + l + "_Type;\n" +
+            "uniform vec3  light" + l + "_Location;\n" +
+            "uniform vec3  light" + l + "_Direction;\n" +
+            "uniform vec3  light" + l + "_Attenuation;\n" +
+            "uniform float light" + l + "_Radius;\n" +
+            "uniform float light" + l + "_BeamWidth;\n" +
+            "uniform float light" + l + "_CutOffAngle;\n" +
+            "uniform float light" + l + "_ShadowIntensity;\n" +
+            "uniform float light" + l + "_ShadowOffset;\n" +
+            "uniform mat4 light" + l + "_ViewMatrix;\n";
         for ( var j = 0; j < 6; j++ )
         {
             shader += "uniform mat4 light" + l + "_" + j + "_Matrix;\n";
             shader += "uniform sampler2D light" + l + "_" + j + "_ShadowMap;\n";
         }
-        for ( var j = 0; j < 5; j++ )
-        {shader += "uniform float light" + l + "_" + j + "_Split;\n";}
+        for ( var j = 0; j < 5; j++ ) { shader += "uniform float light" + l + "_" + j + "_Split;\n"; }
     }
-    if ( !x3dom.caps.FP_TEXTURES )
-    {shader +=     x3dom.shader.rgbaPacking();}
+    if ( !x3dom.caps.FP_TEXTURES ) { shader += x3dom.shader.rgbaPacking(); }
 
     shader += x3dom.shader.shadowRendering();
 
     shader += x3dom.shader.gammaCorrectionDecl( {} );  //TODO shader properties?
 
-    shader +=     "void main(void) {\n" +
-                "    float shadowValue = 1.0;\n" +
-                "    vec2 texCoordsSceneMap = (vPosition + 1.0)*0.5;\n" +
-                "    vec4 projCoords = texture2D(sceneMap, texCoordsSceneMap);\n" +
-                "    if (projCoords != vec4(1.0,1.0,1.0,0.0)){\n";
+    if ( properties.FOG ) { shader += x3dom.shader.fog(); }
+
+    shader +=
+        "void main(void) {\n" +
+        "    vec4 color = vec4( 1.0 );\n" +
+        //reconstruct world and view coordinates from scene map
+        "    vec2 texCoordsSceneMap = (vPosition + 1.0)*0.5;\n" +
+        "    vec4 projCoords = texture2D(sceneMap, texCoordsSceneMap);\n" +
+        "    if ( projCoords == vec4(1.0, 1.0, 1.0, 0.0) ){ gl_FragColor = vec4( 1.0 ); return; }\n";
     if ( !x3dom.caps.FP_TEXTURES )
     {
-        shader +=     "    projCoords.z = unpackDepth(projCoords);\n" +
-                    "    projCoords.w = 1.0;\n";
+        shader +=
+                "        projCoords.z = unpackDepth(projCoords);\n" +
+                "        projCoords.w = 1.0;\n";
     }
-
-    //reconstruct world and view coordinates from scene map
-    shader +=     "    projCoords = projCoords / projCoords.w;\n" +
-                "    projCoords.xy = vPosition;\n" +
-                "    vec4 eyeCoords = inverseProj*projCoords;\n" +
-                "    vec4 worldCoords = inverseViewProj*projCoords;\n" +
-                "    float lightInfluence = 0.0;\n";
+    shader +=
+            "    projCoords = projCoords / projCoords.w;\n" +
+            "    projCoords.xy = vPosition;\n" +
+            "    vec4 eyeCoords = inverseProj*projCoords;\n";
+    if ( properties.FOG )
+    {
+        shader +=
+            "    if (fogType < 2.0) {\n" +
+            "        vec3 eye = eyeCoords.xyz / eyeCoords.w;\n" +
+            "        float f0 = calcFog( eye );\n" +
+            "        color = vec4(  1.0 - f0, 1.0 - f0, 1.0 - f0, 1.0 );\n" +
+            "    }\n" +
+            "    else {\n";
+    }
+    shader +=
+        "    float shadowValue = 1.0;\n" +
+        //reconstruct world and view coordinates from scene map
+        "    vec4 worldCoords = inverseViewProj*projCoords;\n" +
+        "    float lightInfluence = 0.0;\n";
 
     for ( var l = 0; l < shadowedLights.length; l++ )
     {
         shader +=
-                "    lightInfluence = getLightInfluence(light" + l + "_Type, light" + l + "_ShadowIntensity, light" + l + "_On, light" + l + "_Location, light" + l + "_Direction, " +
-                        "light" + l + "_CutOffAngle, light" + l + "_BeamWidth, light" + l + "_Attenuation, light" + l + "_Radius, eyeCoords.xyz/eyeCoords.w);\n" +
-                "    if (lightInfluence != 0.0){\n" +
-                "        vec4 shadowMapValues;\n" +
-                "        float viewSampleDepth;\n";
+            "    lightInfluence = getLightInfluence(light" + l + "_Type, light" + l + "_ShadowIntensity, light" + l + "_On, light" + l + "_Location, light" + l + "_Direction, " +
+            "light" + l + "_CutOffAngle, light" + l + "_BeamWidth, light" + l + "_Attenuation, light" + l + "_Radius, eyeCoords.xyz/eyeCoords.w);\n" +
+            "    if (lightInfluence != 0.0){\n" +
+            "        vec4 shadowMapValues;\n" +
+            "        float viewSampleDepth;\n";
 
         if ( !x3dom.isa( shadowedLights[ l ], x3dom.nodeTypes.PointLight ) )
         {
             shader += "        getShadowValuesCascaded(shadowMapValues, viewSampleDepth, worldCoords, -eyeCoords.z/eyeCoords.w," +
-                                "light" + l + "_0_Matrix,light" + l + "_1_Matrix,light" + l + "_2_Matrix,light" + l + "_3_Matrix,light" + l + "_4_Matrix,light" + l + "_5_Matrix," +
-                                "light" + l + "_0_ShadowMap,light" + l + "_1_ShadowMap,light" + l + "_2_ShadowMap,light" + l + "_3_ShadowMap," +
-                                "light" + l + "_4_ShadowMap,light" + l + "_5_ShadowMap, light" + l + "_0_Split, light" + l + "_1_Split, light" + l + "_2_Split, light" + l + "_3_Split, \n" +
-                                "light" + l + "_4_Split);\n";
+                "light" + l + "_0_Matrix,light" + l + "_1_Matrix,light" + l + "_2_Matrix,light" + l + "_3_Matrix,light" + l + "_4_Matrix,light" + l + "_5_Matrix," +
+                "light" + l + "_0_ShadowMap,light" + l + "_1_ShadowMap,light" + l + "_2_ShadowMap,light" + l + "_3_ShadowMap," +
+                "light" + l + "_4_ShadowMap,light" + l + "_5_ShadowMap, light" + l + "_0_Split, light" + l + "_1_Split, light" + l + "_2_Split, light" + l + "_3_Split, \n" +
+                "light" + l + "_4_Split);\n";
         }
         else
         {
             shader += "        getShadowValuesPointLight(shadowMapValues, viewSampleDepth, light" + l + "_Location, worldCoords, light" + l + "_ViewMatrix, " +
-                                "light" + l + "_0_Matrix,light" + l + "_1_Matrix,light" + l + "_2_Matrix,light" + l + "_3_Matrix,light" + l + "_4_Matrix,light" + l + "_5_Matrix," +
-                                "light" + l + "_0_ShadowMap,light" + l + "_1_ShadowMap,light" + l + "_2_ShadowMap,light" + l + "_3_ShadowMap," +
-                                "light" + l + "_4_ShadowMap,light" + l + "_5_ShadowMap);\n";
+                "light" + l + "_0_Matrix,light" + l + "_1_Matrix,light" + l + "_2_Matrix,light" + l + "_3_Matrix,light" + l + "_4_Matrix,light" + l + "_5_Matrix," +
+                "light" + l + "_0_ShadowMap,light" + l + "_1_ShadowMap,light" + l + "_2_ShadowMap,light" + l + "_3_ShadowMap," +
+                "light" + l + "_4_ShadowMap,light" + l + "_5_ShadowMap);\n";
         }
 
         if ( !x3dom.caps.FP_TEXTURES )
         {
-            shader +=     "    shadowValue *= clamp(ESM(shadowMapValues.z, viewSampleDepth, light" + l + "_ShadowOffset), " +
-                        "                1.0 - light" + l + "_ShadowIntensity*lightInfluence, 1.0);\n";
+            shader += "    shadowValue *= clamp(ESM(shadowMapValues.z, viewSampleDepth, light" + l + "_ShadowOffset), " +
+                "                1.0 - light" + l + "_ShadowIntensity*lightInfluence, 1.0);\n";
         }
         else
         {
-            shader +=     "     shadowValue *= clamp(VSM(shadowMapValues.zy, viewSampleDepth, light" + l + "_ShadowOffset), " +
-                        "                1.0 - light" + l + "_ShadowIntensity*lightInfluence, 1.0);\n";
+            shader += "     shadowValue *= clamp(VSM(shadowMapValues.zy, viewSampleDepth, light" + l + "_ShadowOffset), " +
+                "                1.0 - light" + l + "_ShadowIntensity*lightInfluence, 1.0);\n";
         }
-        shader +=         "    }\n";
+        shader += "    }\n";
     }
 
-    shader +=     "}\n" +
+    shader += "    color = " + x3dom.shader.encodeGamma( {}, "vec4(shadowValue, shadowValue, shadowValue, 1.0)" ) + " ;\n";
+    if ( properties.FOG ) { shader += "    }\n"; }
     // In principle we should fix the place where this is multplied in instead
     // of overcompensating for the subsequent error from here. This way of doing
     // gamma correction explots the rule that (a*b)^x = a^x * b^x (x being the
     // gamma coefficient), i.e. the umbra is corrected for now, the penumbra
     // is incorrect and full light is zero here so unaffected as well.
-                "    gl_FragColor = " + x3dom.shader.encodeGamma( {}, "vec4(shadowValue, shadowValue, shadowValue, 1.0)" ) + ";\n" +
-                "}\n";
-
+    shader += "    gl_FragColor = color;\n" +
+        "}\n";
     var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
     gl.shaderSource( fragmentShader, shader );
     gl.compileShader( fragmentShader );
@@ -38484,25 +38824,49 @@ x3dom.shader.BlurShader.prototype.generateFragmentShader = function ( gl )
                     "    vec2 offset;\n" +
                     "    if (horizontal) offset = vec2(pixelSizeHor, 0.0);\n" +
                     "    else offset = vec2(0.0, pixelSizeVert);\n" +
-                    "    float depth = unpackDepth(texture2D(texture, texCoords));\n" +
+                    "    vec4 packedDepth = texture2D(texture, texCoords);\n" +
+                    "    const vec4 clearColor = vec4(1.0, 1.0, 1.0, 0.0);\n" +
+                    "    if ( packedDepth == clearColor ) { discard; };\n" +
+                    "    float depth = unpackDepth(packedDepth);\n" +
                     "    if (filterSize == 3){\n" +
+                    "        vec4 packedDn1 = texture2D(texture, texCoords-offset);\n" +
+                    "        vec4 packedDp1 = texture2D(texture, texCoords+offset);\n" +
+                    //"        if ( packedDn1 == clearColor || packedDp1 == clearColor ) { discard; };\n" +
+                    "        if ( (packedDn1 - clearColor) * (packedDp1 - clearColor) == vec4(0.0) ) { discard; };\n" +
                     "        depth = depth * 0.3844;\n" +
-                    "        depth += 0.3078*unpackDepth(texture2D(texture, texCoords-offset));\n" +
-                    "        depth += 0.3078*unpackDepth(texture2D(texture, texCoords+offset));\n" +
+                    "        depth += 0.3078*unpackDepth(packedDn1);\n" +
+                    "        depth += 0.3078*unpackDepth(packedDp1);\n" +
                     "    } else if (filterSize == 5){\n" +
+                    "        vec4 packedDn1 = texture2D(texture, texCoords-offset);\n" +
+                    "        vec4 packedDp1 = texture2D(texture, texCoords+offset);\n" +
+                    "        vec4 packedDn2 = texture2D(texture, texCoords-2.0*offset);\n" +
+                    "        vec4 packedDp2 = texture2D(texture, texCoords+2.0*offset);\n" +
+                    "        if ( packedDn1 == clearColor || packedDp1 == clearColor || " +
+                    "             packedDn2 == clearColor || packedDp2 == clearColor ) { discard; };\n" +
+                    // "        if ( ( packedDn1 - clearColor ) * ( packedDp1 - clearColor ) * " +
+                    // "             ( packedDn2 - clearColor ) * ( packedDp2 - clearColor ) == vec4(0.0) ) { discard; };\n" +
                     "        depth = depth * 0.2921;\n" +
-                    "        depth += 0.2339*unpackDepth(texture2D(texture, texCoords-offset));\n" +
-                    "        depth += 0.2339*unpackDepth(texture2D(texture, texCoords+offset));\n" +
-                    "        depth += 0.1201*unpackDepth(texture2D(texture, texCoords-2.0*offset));\n" +
-                    "        depth += 0.1201*unpackDepth(texture2D(texture, texCoords+2.0*offset));\n" +
+                    "        depth += 0.2339*unpackDepth(packedDn1);\n" +
+                    "        depth += 0.2339*unpackDepth(packedDp1);\n" +
+                    "        depth += 0.1201*unpackDepth(packedDn2);\n" +
+                    "        depth += 0.1201*unpackDepth(packedDp2);\n" +
                     "    } else if (filterSize == 7){\n" +
+                    "        vec4 packedDn1 = texture2D(texture, texCoords-offset);\n" +
+                    "        vec4 packedDp1 = texture2D(texture, texCoords+offset);\n" +
+                    "        vec4 packedDn2 = texture2D(texture, texCoords-2.0*offset);\n" +
+                    "        vec4 packedDp2 = texture2D(texture, texCoords+2.0*offset);\n" +
+                    "        vec4 packedDn3 = texture2D(texture, texCoords-3.0*offset);\n" +
+                    "        vec4 packedDp3 = texture2D(texture, texCoords+3.0*offset);\n" +
+                    "        if ( packedDn1 == clearColor || packedDp1 == clearColor || " +
+                    "             packedDn2 == clearColor || packedDp2 == clearColor || " +
+                    "             packedDn3 == clearColor || packedDp3 == clearColor ) { discard; };\n" +
                     "        depth = depth * 0.2161;\n" +
-                    "        depth += 0.1907*unpackDepth(texture2D(texture, texCoords-offset));\n" +
-                    "        depth += 0.1907*unpackDepth(texture2D(texture, texCoords+offset));\n" +
-                    "        depth += 0.1311*unpackDepth(texture2D(texture, texCoords-2.0*offset));\n" +
-                    "        depth += 0.1311*unpackDepth(texture2D(texture, texCoords+2.0*offset));\n" +
-                    "        depth += 0.0702*unpackDepth(texture2D(texture, texCoords-3.0*offset));\n" +
-                    "        depth += 0.0702*unpackDepth(texture2D(texture, texCoords+3.0*offset));\n" +
+                    "        depth += 0.1907*unpackDepth(packedDn1);\n" +
+                    "        depth += 0.1907*unpackDepth(packedDp1);\n" +
+                    "        depth += 0.1311*unpackDepth(packedDn2);\n" +
+                    "        depth += 0.1311*unpackDepth(packedDp2);\n" +
+                    "        depth += 0.0702*unpackDepth(packedDn3);\n" +
+                    "        depth += 0.0702*unpackDepth(packedDp3);\n" +
                     "    }\n" +
                     "    gl_FragColor = packDepth(depth);\n" +
                     "}\n";
@@ -39520,7 +39884,7 @@ x3dom.registerNodeType(
                     } );
                 }
 
-                if ( this._vf[ name ] &&
+                if ( this._vf[ name ] !== undefined &&
                     !xmlNode.attributes[ name ] && !xmlNode.attributes[ name.toLowerCase() ] )
                 {
                     var str = "";
@@ -40573,6 +40937,37 @@ x3dom.registerNodeType(
              */
             this.addField_SFVec3f( ctx, "bboxSize", -1, -1, -1 );
 
+            /**
+             * Flag to enable display of the bounding box
+             * @var {x3dom.fields.SFVec3f} bboxDisplay
+             * @memberof x3dom.nodeTypes.X3DBoundedObject
+             * @initvalue false
+             * @field x3d
+             * @instance
+             */
+            this.addField_SFBool( ctx, "bboxDisplay", false );
+
+            /**
+            * Size of additional margin around the bounding box scaled up by the diameter.
+            * @var {x3dom.fields.SFFloat} bboxMargin
+            * @memberof x3dom.nodeTypes.X3DBoundedObject
+            * @initvalue 0.01
+            * @range [-inf, inf]
+            * @field x3dom
+            * @instance
+            */
+            this.addField_SFFloat( ctx, "bboxMargin", 0.01 );
+
+            /**
+             * Color of the bounding box
+             * @var {x3dom.fields.SFColor} bboxColor
+             * @memberof x3dom.nodeTypes.X3DBoundedObject
+             * @initvalue 1, 1, 0
+             * @field x3dom
+             * @instance
+             */
+            this.addField_SFColor( ctx, "bboxColor", 1, 1, 0 );
+
             this._graph = {
                 boundedNode  : this,    // backref to node object
                 localMatrix  : x3dom.fields.SFMatrix4f.identity(),   // usually identity
@@ -40586,6 +40981,8 @@ x3dom.registerNodeType(
             };
 
             this._render = true;
+            this._bboxNode = null;
+            this._bboxColor = new x3dom.fields.SFColor();
         },
         {
             fieldChanged : function ( fieldName )
@@ -40616,13 +41013,13 @@ x3dom.registerNodeType(
             {
                 var vol = this._graph.volume;
 
-                if ( !this.volumeValid() && this.renderFlag && this.renderFlag() )
+                if ( !this.volumeValid() && ( this._vf.bboxDisplay || this.renderFlag && this.renderFlag() ) )
                 {
                     for ( var i = 0, n = this._childNodes.length; i < n; i++ )
                     {
                         var child = this._childNodes[ i ];
                         // render could be undefined, but undefined != true
-                        if ( !child || child.renderFlag && child.renderFlag() !== true )
+                        if ( !child || child.renderFlag && child.renderFlag() !== true && !child._vf.bboxDisplay )
                         {continue;}
 
                         var childVol = child.getVolume();
@@ -40724,11 +41121,60 @@ x3dom.registerNodeType(
                 }
                 //nothing changed
                 return this._render;
+            },
+
+            getBboxNode : function ()
+            {
+                if ( this._bboxNode == null )
+                {
+                    var bbDom = x3dom.bboxDom.cloneNode( true );
+                    this._bboxNode = this._nameSpace.setupTree( bbDom, this._xmlNode.parentElement );
+                }
+                var bbox = this._graph.volume;
+                bboxNode = this._bboxNode;
+                bboxNode._vf.translation = bbox.center;
+                var size = bbox.max.subtract( bbox.min );
+                var margin = bbox.diameter * this._vf.bboxMargin;
+                bboxNode._vf.scale.set( size.x + margin, size.y + margin, size.z + margin );
+                bboxNode.fieldChanged( "scale" );
+                if ( !this._bboxColor.equals( this._vf.bboxColor, 0.01 ) )
+                {
+                    this._bboxColor.setValues( this._vf.bboxColor );
+                    var mat = this._bboxNode._cf.children.nodes[ 0 ]._cf.appearance.node._cf.material.node;
+                    mat._vf.emissiveColor = this._bboxColor.multiply( 0.8 );
+                    mat._vf.diffuseColor = this._bboxColor.multiply( 0.2 );
+                    mat.fieldChanged( "emissiveColor" );
+                }
+                return this._bboxNode;
+            },
+
+            collectBbox : function ( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes )
+            {
+                if ( this._vf.bboxDisplay )
+                {
+                    var bboxNode = this.getBboxNode();
+                    bboxNode.collectDrawableObjects( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+                }
             }
         }
     )
 );
 
+x3dom.bboxDom = new DOMParser().parseFromString(
+    "<Transform>" +
+        "<Shape isPickable='false'>" +
+        "  <Appearance>" +
+        //    "<LineProperties lineWidthScaleFactor='0'></LineProperties>" +
+        "   <Material transparency='0.6' specularColor='0.3 0.3 0.3' diffuseColor='0 0.5 0' emissiveColor='1 0.5 0'></Material>" +
+        "   </Appearance>" +
+        "  <Box size='1 1 1'></Box>" +
+        // "<IndexedLineSet coordIndex='0 1 -1 1 2 -1 2 3 -1 3 0 -1 6 7 -1 7 4 -1 4 5 -1 5 6 -1 0 6 -1 1 7 -1 2 4 -1 3 5 -1'>" +
+        //   "<Color color='0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0 0 1 0'/>" +
+        //   "<Coordinate point='-0.5 -0.5 0.5 0.5 -0.5 0.5 0.5 0.5 0.5 -0.5 0.5 0.5 0.5 0.5 -0.5 -0.5 0.5 -0.5 -0.5 -0.5 -0.5 0.5 -0.5 -0.5'/>" +
+        // "</IndexedLineSet>" +
+        "</Shape>" +
+    "</Transform>",
+    "text/xml" ).children[ 0 ];
 /** @namespace x3dom.nodeTypes */
 /*
  * X3DOM JavaScript Library
@@ -40784,13 +41230,6 @@ x3dom.registerNodeType(
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
 
-                // check if sub-graph can be culled away or render flag was set to false
-                planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
-                if ( planeMask < 0 )
-                {
-                    return;
-                }
-
                 var cnode,
                     childTransform;
 
@@ -40806,6 +41245,16 @@ x3dom.registerNodeType(
                 else
                 {
                     childTransform = this.transformMatrix( transform );
+                }
+
+                // add bbox before cull
+                this.collectBbox( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+
+                // check if sub-graph can be culled away or render flag was set to false
+                planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
+                if ( planeMask < 0 )
+                {
+                    return;
                 }
 
                 var n = this._childNodes.length;
@@ -40896,14 +41345,14 @@ x3dom.registerNodeType(
             {
                 var vol = this._graph.volume;
 
-                if ( !this.volumeValid() && this.renderFlag && this.renderFlag() )
+                if ( !this.volumeValid() && ( this._vf.bboxDisplay || this.renderFlag && this.renderFlag() ) )
                 {
                     if ( this._vf.whichChoice >= 0 &&
                         this._vf.whichChoice < this._childNodes.length )
                     {
                         var child = this._childNodes[ this._vf.whichChoice ];
 
-                        var childVol = ( child && child.renderFlag && child.renderFlag() === true ) ? child.getVolume() : null;
+                        var childVol = ( child && ( child._vf.bboxDisplay || child.renderFlag && child.renderFlag() ) ) ? child.getVolume() : null;
 
                         if ( childVol && childVol.isValid() )
                         {vol.extendBounds( childVol.min, childVol.max );}
@@ -40921,12 +41370,6 @@ x3dom.registerNodeType(
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
 
-                if ( this._vf.whichChoice < 0 || this._vf.whichChoice >= this._childNodes.length ||
-                    ( planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask ) ) < 0 )
-                {
-                    return;
-                }
-
                 var cnode,
                     childTransform;
 
@@ -40941,6 +41384,14 @@ x3dom.registerNodeType(
                 else
                 {
                     childTransform = this.transformMatrix( transform );
+                }
+
+                this.collectBbox( childTransform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+
+                if ( this._vf.whichChoice < 0 || this._vf.whichChoice >= this._childNodes.length ||
+                    ( planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask ) ) < 0 )
+                {
+                    return;
                 }
 
                 if ( ( cnode = this._childNodes[ this._vf.whichChoice ] ) )
@@ -41067,14 +41518,14 @@ x3dom.registerNodeType(
             {
                 var vol = this._graph.volume;
 
-                if ( !this.volumeValid() && this.renderFlag && this.renderFlag() )
+                if ( !this.volumeValid() && ( this._vf.bboxDisplay || this.renderFlag && this.renderFlag() ) )
                 {
                     this._graph.localMatrix = this._trafo;
 
                     for ( var i = 0, n = this._childNodes.length; i < n; i++ )
                     {
                         var child = this._childNodes[ i ];
-                        if ( !child || child.renderFlag && child.renderFlag() !== true )
+                        if ( !child || child.renderFlag && child.renderFlag() !== true && !child._vf.bboxDisplay )
                         {continue;}
 
                         var childVol = child.getVolume();
@@ -45981,6 +46432,11 @@ x3dom.registerNodeType(
                         shape.setAppDirty();
                     } );
                 }
+                if ( fieldName == "sortType" )
+                {
+                    this._origSortType = this._vf.sortType;
+                    this.checkSortType();
+                }
             },
 
             nodeChanged : function ()
@@ -46009,7 +46465,7 @@ x3dom.registerNodeType(
 
             checkSortType : function ()
             {
-                if ( this._vf.sortType == "auto" )
+                if ( this._origSortType == "auto" )
                 {
                     if ( this._cf.material.node && ( this._cf.material.node._vf.transparency > 0 ||
                         this._cf.material.node._vf.backTransparency && this._cf.material.node._vf.backTransparency > 0 ) )
@@ -47327,12 +47783,6 @@ x3dom.registerNodeType(
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
 
-                if ( !this._cf.geometry.node ||
-                    drawableCollection.cull( transform, graphState, singlePath, planeMask ) <= 0 )
-                {
-                    return false;
-                }
-
                 if ( singlePath && !this._graph.globalMatrix )
                 {this._graph.globalMatrix = transform;}
 
@@ -47343,6 +47793,14 @@ x3dom.registerNodeType(
 
                 this._clipPlanes = clipPlanes;
 
+                this.collectBbox( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+
+                if ( !this._cf.geometry.node ||
+                    drawableCollection.cull( transform, graphState, singlePath, planeMask ) <= 0 )
+                {
+                    return false;
+                }
+
                 drawableCollection.addShape( this, transform, graphState );
 
                 return true;
@@ -47352,7 +47810,7 @@ x3dom.registerNodeType(
             {
                 var vol = this._graph.volume;
 
-                if ( !this.volumeValid() && this.renderFlag && this.renderFlag() )
+                if ( !this.volumeValid() && ( this._vf.bboxDisplay || this.renderFlag && this.renderFlag() ) )
                 {
                     var geo = this._cf.geometry.node;
                     var childVol = geo ? geo.getVolume() : null;
@@ -54566,6 +55024,7 @@ x3dom.registerNodeType(
 
             /**
              * The centerOfRotation field specifies a center about which to rotate the user's eyepoint when in EXAMINE mode.
+             * The coordinates are provided in world coordinates for x3dom, currently.
              * @var {x3dom.fields.SFVec3f} centerOfRotation
              * @memberof x3dom.nodeTypes.Viewpoint
              * @initvalue 0,0,0
@@ -55597,6 +56056,8 @@ x3dom.registerNodeType(
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
 
+                this.collectBbox( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+
                 planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
                 if ( planeMask < 0 )
                 {
@@ -55771,12 +56232,6 @@ x3dom.registerNodeType(
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
 
-                planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
-                if ( planeMask < 0 )
-                {
-                    return;
-                }
-
                 var cnode,
                     childTransform;
 
@@ -55791,6 +56246,14 @@ x3dom.registerNodeType(
                 else
                 {
                     childTransform = this.transformMatrix( transform );
+                }
+
+                this.collectBbox( childTransform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
+
+                planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
+                if ( planeMask < 0 )
+                {
+                    return;
                 }
 
                 for ( var i = 0, n = this._childNodes.length; i < n; i++ )
@@ -55862,6 +56325,8 @@ x3dom.registerNodeType(
 
                 if ( singlePath && ( invalidateCache = invalidateCache || this.cacheInvalid() ) )
                 {this.invalidateCache();}
+
+                this.collectBbox( transform, drawableCollection, singlePath, invalidateCache, planeMask, clipPlanes );
 
                 planeMask = drawableCollection.cull( transform, this.graphState(), singlePath, planeMask );
                 if ( planeMask < 0 )
@@ -55988,7 +56453,7 @@ x3dom.registerNodeType(
             {
                 var vol = this._graph.volume;
 
-                if ( !this.volumeValid() && this.renderFlag && this.renderFlag() )
+                if ( !this.volumeValid() && ( this._vf.bboxDisplay || this.renderFlag && this.renderFlag() ) )
                 {
                     var child,
                         childVol;
@@ -55997,7 +56462,7 @@ x3dom.registerNodeType(
                     {
                         child = this._childNodes[ this._lastRangePos ];
 
-                        childVol = ( child && child.renderFlag && child.renderFlag() === true ) ? child.getVolume() : null;
+                        childVol = ( child && ( child._vf.bboxDisplay || child.renderFlag && child.renderFlag() ) ) ? child.getVolume() : null;
 
                         if ( childVol && childVol.isValid() )
                         {vol.extendBounds( childVol.min, childVol.max );}
@@ -56006,7 +56471,7 @@ x3dom.registerNodeType(
                     {  // first time we're here
                         for ( var i = 0, n = this._childNodes.length; i < n; i++ )
                         {
-                            if ( !( child = this._childNodes[ i ] ) || child.renderFlag && child.renderFlag() !== true )
+                            if ( !( child = this._childNodes[ i ] ) || child.renderFlag && child.renderFlag() !== true  && !child._vf.bboxDisplay )
                             {continue;}
 
                             childVol = child.getVolume();
@@ -65190,14 +65655,17 @@ x3dom.registerNodeType(
                     {
                         hasTexCoord = true;
                         texCoords = texCoordNode._vf.point;
-                        if ( !hasTexCoordInd )
+                        var nTexCoords = hasTexCoordInd ?
+                            Math.max( ...texCoordInd ) + 1 : positions.length;
+                        var i,
+                            lastTexCoord = texCoords.length;
+                        for ( i = lastTexCoord; i < nTexCoords; i++ )
                         {
-                            var i,
-                                lastTexCoord = texCoords.length;
-                            for ( i = lastTexCoord; i < positions.length; i++ )
-                            {
-                                texCoords.push( texCoords[ i % lastTexCoord ] );
-                            }
+                            x3dom.debug.logWarning(
+                                "IFS " + ( this._DEF || "" ) +
+                                ": more tex. coords. required, guessing " +
+                                i + 1 + "th coord." );
+                            texCoords.push( texCoords[ i % lastTexCoord ] );
                         }
 
                         if ( x3dom.isa( texCoordNode, x3dom.nodeTypes.TextureCoordinate3D ) )
@@ -65905,14 +66373,13 @@ x3dom.registerNodeType(
                         {
                             hasTexCoord = true;
                             texCoords = texCoordNode._vf.point;
-                            if ( !hasTexCoordInd )
+                            var nTexCoords = hasTexCoordInd ?
+                                Math.max( ...texCoordInd ) + 1 : positions.length;
+                            var i,
+                                lastTexCoord = texCoords.length;
+                            for ( i = lastTexCoord; i < nTexCoords; i++ )
                             {
-                                var i,
-                                    lastTexCoord = texCoords.length;
-                                for ( i = lastTexCoord; i < positions.length; i++ )
-                                {
-                                    texCoords.push( texCoords[ i % lastTexCoord ] );
-                                }
+                                texCoords.push( texCoords[ i % lastTexCoord ] );
                             }
 
                             if ( x3dom.isa( texCoordNode, x3dom.nodeTypes.TextureCoordinate3D ) )
@@ -66539,6 +67006,16 @@ x3dom.registerNodeType(
              */
             this.addField_SFString( ctx, "buffer", "" );
 
+            /**
+             * indicate draco compression of buffer
+             * @var {x3dom.fields.SFBool} draco
+             * @memberof x3dom.nodeTypes.BufferGeometry
+             * @initvalue false
+             * @field x3dom
+             * @instance
+             */
+            this.addField_SFBool( ctx, "draco", false );
+
             this.addField_MFNode( "views", x3dom.nodeTypes.BufferView );
             this.addField_MFNode( "accessors", x3dom.nodeTypes.BufferAccessor );
 
@@ -66681,14 +67158,24 @@ x3dom.registerNodeType(
             this.addField_SFInt32( ctx, "byteLength", 0 );
 
             /**
-             * The buffer id
-             * @var {x3dom.fields.SFInt32} id
+             * The buffer idx
+             * @var {x3dom.fields.SFInt32} idx
              * @memberof x3dom.nodeTypes.BufferView
              * @initvalue 0
              * @field x3dom
              * @instance
              */
-            this.addField_SFInt32( ctx, "id", 0 );
+            this.addField_SFInt32( ctx, "idx", 0 );
+
+            /**
+             * The buffer draco geometry unique id
+             * @var {x3dom.fields.SFInt32} dracoId
+             * @memberof x3dom.nodeTypes.BufferView
+             * @initvalue 0
+             * @field x3dom
+             * @instance
+             */
+            this.addField_SFInt32( ctx, "dracoId", 0 );
         },
         {
             parentAdded : function ( parent )
@@ -66798,7 +67285,7 @@ x3dom.registerNodeType(
 
             /**
              * Attribute normalization
-             * @var {x3dom.fields.SFInt32} normalized
+             * @var {x3dom.fields.SFBool} normalized
              * @memberof x3dom.nodeTypes.BufferAccessor
              * @initvalue false
              * @field x3dom

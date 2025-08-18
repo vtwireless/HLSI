@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: ElevationGrid</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: ElevationGrid</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                         3.3
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Geometry3DExt
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-experimental">experimental</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            ElevationGrid
+            
+
+            </h2>
+
+        
+        <div class="class-description">The ElevationGrid node specifies a uniform rectangular grid of varying height in the Y=0 plane of the local coordinate system.The geometry is described by a scalar array of height values that specify the height of a surface above each point of the grid.The xDimension and zDimension fields indicate the number of elements of the grid height array in the X and Z directions.Both xDimension and zDimension shall be greater than or equal to zero.If either the xDimension or the zDimension is less than two, the ElevationGrid contains no quadrilaterals.The vertex locations for the rectangles are defined by the height field and the xSpacing and zSpacing fields</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;ElevationGrid
+
+                
+                attrib='x3dom.nodeTypes.X3DVertexAttributeNode'
+                
+                ccw='true'
+                
+                color='x3dom.nodeTypes.X3DColorNode'
+                
+                colorPerVertex='true'
+                
+                creaseAngle='0'
+                
+                height='[]'
+                
+                lit='true'
+                
+                metadata='X3DMetadataObject'
+                
+                normal='x3dom.nodeTypes.Normal'
+                
+                normalPerVertex='true'
+                
+                solid='true'
+                
+                texCoord='x3dom.nodeTypes.X3DTextureCoordinateNode'
+                
+                useGeoCache='true'
+                
+                xSpacing='1.0'
+                
+                zDimension='0'
+                
+                zSpacing='1.0'
+                
+
+                &gt;&lt;/ElevationGrid&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DGeometryNode.html">X3DGeometryNode</a>(12)
+                </li>
+            
+
+            <li class="inheritance-lvl-2">
+                <b>ElevationGrid</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="ElevationGrid"><span class="type-signature"></span>ElevationGrid<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for ElevationGrid
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>attrib</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DVertexAttributeNode.html">X3DVertexAttributeNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>ccw</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DGeometryNode.html">X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The ccw field defines the ordering of the vertex coordinates of the geometry with respect to user-given or automatically generated normal vectors used in the lighting model equations.</td>
+        </tr>
+        
+        <tr>
+            <td>color</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DColorNode.html">X3DColorNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The color field specifies per-vertex or per-quadrilateral colours for the ElevationGrid node depending on the value of colorPerVertex.If the color field is NULL, the ElevationGrid node is rendered with the overall attributes of the Shape node enclosing the ElevationGrid node.</td>
+        </tr>
+        
+        <tr>
+            <td>colorPerVertex</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The colorPerVertex field determines whether colours specified in the color field are applied to each vertex or each quadrilateral of the ElevationGrid node.If colorPerVertex is FALSE and the color field is not NULL, the color field shall specify a node derived from X3DColorNode containing at least (xDimension-1)×(zDimension-1) colours; one for each quadrilateral.If colorPerVertex is TRUE and the color field is not NULL, the color field shall specify a node derived from X3DColorNode containing at least xDimension × zDimension colours, one for each vertex.</td>
+        </tr>
+        
+        <tr>
+            <td>creaseAngle</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The creaseAngle field affects how default normals are generated.If the angle between the geometric normals of two adjacent faces is less than the crease angle, normals shall be calculated so that the faces are shaded smoothly across the edge; otherwise, normals shall be calculated so that a lighting discontinuity across the edge is produced.Crease angles shall be greater than or equal to 0.0 angle base units.</td>
+        </tr>
+        
+        <tr>
+            <td>height</td>
+
+            <td>
+               
+
+                MFFloat
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The height field is an xDimension by zDimension array of scalar values representing the height above the grid for each vertex.</td>
+        </tr>
+        
+        <tr>
+            <td>lit</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DGeometryNode.html">X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether this geometry should be rendered with or without lighting.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>normal</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="Normal.html">Normal</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The normal field specifies per-vertex or per-quadrilateral normals for the ElevationGrid node.If the normal field is NULL, the browser shall automatically generate normals, using the creaseAngle field to determine if and how normals are smoothed across the surface.</td>
+        </tr>
+        
+        <tr>
+            <td>normalPerVertex</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The normalPerVertex field determines whether normals are applied to each vertex or each quadrilateral of the ElevationGrid node depending on the value of normalPerVertex.If normalPerVertex is FALSE and the normal node is not NULL, the normal field shall specify a node derived from X3DNormalNode containing at least (xDimension−1)×(zDimension−1) normals; one for each quadrilateral.If normalPerVertex is TRUE and the normal field is not NULL, the normal field shall specify a node derived from X3DNormalNode containing at least xDimension × zDimension normals; one for each vertex.</td>
+        </tr>
+        
+        <tr>
+            <td>solid</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DGeometryNode.html">X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether backface-culling is used. If solid is TRUE only front-faces are drawn.</td>
+        </tr>
+        
+        <tr>
+            <td>texCoord</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DTextureCoordinateNode.html">X3DTextureCoordinateNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The texCoord field specifies per-vertex texture coordinates for the ElevationGrid node. If texCoord is NULL, default texture coordinates are applied to the geometry.</td>
+        </tr>
+        
+        <tr>
+            <td>useGeoCache</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DGeometryNode.html">X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Most geo primitives use geo cache and others might later on, but one should be able to disable cache per geometry node.Defaults to global useGeoCache setting parameter.</td>
+        </tr>
+        
+        <tr>
+            <td>xSpacing</td>
+
+            <td>
+               
+
+                SFDouble
+            </td>
+
+            <td>
+                
+                1.0</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>zDimension</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Defines the grid size in z.</td>
+        </tr>
+        
+        <tr>
+            <td>zSpacing</td>
+
+            <td>
+               
+
+                SFDouble
+            </td>
+
+            <td>
+                
+                1.0</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:17 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

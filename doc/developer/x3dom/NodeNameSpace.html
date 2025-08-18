@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: NodeNameSpace</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: NodeNameSpace</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+        <a href="#Methods"><h3>&#10152; Methods:</h3></a>
+        <ul>
+            
+            <li>
+                <a href="#addNode">&#10152; addNode </a>
+            </li>
+            
+            <li>
+                <a href="#addSpace">&#10152; addSpace </a>
+            </li>
+            
+            <li>
+                <a href="#externProtoDeclare">&#10152; externProtoDeclare </a>
+            </li>
+            
+            <li>
+                <a href="#getNamedElement">&#10152; getNamedElement </a>
+            </li>
+            
+            <li>
+                <a href="#getNamedNode">&#10152; getNamedNode </a>
+            </li>
+            
+            <li>
+                <a href="#getURL">&#10152; getURL </a>
+            </li>
+            
+            <li>
+                <a href="#importNodes">&#10152; importNodes </a>
+            </li>
+            
+            <li>
+                <a href="#loadExternProtoAsync">&#10152; loadExternProtoAsync </a>
+            </li>
+            
+            <li>
+                <a href="#protoDeclare">&#10152; protoDeclare </a>
+            </li>
+            
+            <li>
+                <a href="#protoInstance">&#10152; protoInstance </a>
+            </li>
+            
+            <li>
+                <a href="#removeNode">&#10152; removeNode </a>
+            </li>
+            
+            <li>
+                <a href="#removeSpace">&#10152; removeSpace </a>
+            </li>
+            
+            <li>
+                <a href="#routeLateRoutes">&#10152; routeLateRoutes </a>
+            </li>
+            
+            <li>
+                <a href="#setBaseURL">&#10152; setBaseURL </a>
+            </li>
+            
+            <li>
+                <a href="#setupTree">&#10152; setupTree </a>
+            </li>
+            
+        </ul>
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            NodeNameSpace
+            
+
+            </h2>
+
+        
+    </header>
+
+    <article>
+        
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+
+            <li class="inheritance-lvl-0">
+                <b>NodeNameSpace</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="NodeNameSpace"><span class="type-signature"></span>NodeNameSpace<span class="signature">(name, document)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace constructor
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>name</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>document</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+
+        
+        <br>
+        <br>
+        <h3 class="subsection-title">Methods<a name="Methods" href="#">&#10548;</a></h3>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="addNode"><span class="type-signature"></span>addNode<span class="signature">(node, name)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Add Node
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>node</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>name</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="addSpace"><span class="type-signature"></span>addSpace<span class="signature">(space)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Add Space
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>space</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="externProtoDeclare"><span class="type-signature"></span>externProtoDeclare<span class="signature">(domNode)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace externProtoDeclareadds initial proto declaration to available prototype array
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domNode</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the regular syntax ProtoInstance dom node</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="getNamedElement"><span class="type-signature"></span>getNamedElement<span class="signature">(name)</span><span class="type-signature"> &rarr; {null}</span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Get Named Element
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>name</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Returns:</h5>
+        
+        
+
+
+<!--dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+	</dd>
+</dl-->
+
+        
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="getNamedNode"><span class="type-signature"></span>getNamedNode<span class="signature">(name)</span><span class="type-signature"> &rarr; {*}</span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Get Named Node
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>name</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Returns:</h5>
+        
+        
+
+
+<!--dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+	</dd>
+</dl-->
+
+        
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="getURL"><span class="type-signature"></span>getURL<span class="signature">(url)</span><span class="type-signature"> &rarr; {*}</span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Get URL
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>url</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Returns:</h5>
+        
+        
+
+
+<!--dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+	</dd>
+</dl-->
+
+        
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="importNodes"><span class="type-signature"></span>importNodes<span class="signature">(subNameSpace)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace importNodes
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>subNameSpace</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">Added by microaaron for IMPORT/EXPORT supported, 2021.11</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="loadExternProtoAsync"><span class="type-signature"></span>loadExternProtoAsync<span class="signature">(protoDeclaration, protoInstanceDom, domNode, parentDom)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace loadExternProtoAsynccalled from protoInstance to load an extern protoDeclaration, and then instance the node.ExternProto declaration if required.
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>protoDeclaration</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the initial protoDeclaration stub, is replaced after loading</td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>protoInstanceDom</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the short syntax proto instance dom node</td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domNode</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the regular syntax ProtoInstance dom node</td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>parentDom</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the parent dom node</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Returns:</h5>
+        
+        
+<div class="param-desc">
+    null - if downloading fails
+</div>
+
+
+
+        
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="protoDeclare"><span class="type-signature"></span>protoDeclare<span class="signature">(domNode)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace protoDeclareprocesses ProtoDeclare node, called from setupTree.generates a new protoDeclaration, and then uses it to register the new node to x3dom
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domNode</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the ProtoDeclaration dom node</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="protoInstance"><span class="type-signature"></span>protoInstance<span class="signature">(domNode, domParent)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace protoInstancecalled from setupTree to process a ProtoInstance node. creates another dom node in short syntax.This short dom node is then processed back in setupTree. Additionally, it triggers loading anExternProto declaration if required.
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domNode</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the ProtoInstance dom node</td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domParent</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description">the parent dom node</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="removeNode"><span class="type-signature"></span>removeNode<span class="signature">(name)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Remove Node
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>name</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="removeSpace"><span class="type-signature"></span>removeSpace<span class="signature">(space)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Remove Space
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>space</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="routeLateRoutes"><span class="type-signature"></span>routeLateRoutes<span class="signature">()</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace routeLateRoutes
+        </div>
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="setBaseURL"><span class="type-signature"></span>setBaseURL<span class="signature">(url)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Set Base URL
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>url</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="setupTree"><span class="type-signature"></span>setupTree<span class="signature">(domNode, parent)</span><span class="type-signature"> &rarr; {*}</span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            NodeNameSpace Setup Tree
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>domNode</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>parent</code></td>
+            
+            
+            <td class="param-table-type">
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="param-table-description"></td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Returns:</h5>
+        
+        
+
+
+<!--dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+	</dd>
+</dl-->
+
+        
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+        
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:16 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

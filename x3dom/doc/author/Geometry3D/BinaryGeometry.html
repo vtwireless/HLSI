@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Scene Author API Documentation: Node: BinaryGeometry</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../author/index.html">Scene Author API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../author/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../author/nodes.html" class="">
+        Nodes
+    </a></li>
+
+    <li><a href="../../author/components.html" class="">
+        Components
+    </a></li>
+
+    <li><a href="../../author/runtime.html">
+        Runtime
+    </a></li>
+
+    <li><a href="../../author/configuration.html">
+        Configuration
+    </a></li>
+
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Node: BinaryGeometry</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    <a href="index.html">Geometry3D</a>
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+
+            </h2>
+
+        
+        <div class="class-description">The BinaryGeometry node can load binary data exported by AOPT.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;BinaryGeometry
+
+                
+                binormal='""'
+                
+                binormalType='"Float32"'
+                
+                ccw='true'
+                
+                color='""'
+                
+                colorType='"Float32"'
+                
+                compressed='false'
+                
+                coord='""'
+                
+                coordType='"Float32"'
+                
+                idsPerVertex='false'
+                
+                index='""'
+                
+                indexType='"Uint16"'
+                
+                lit='true'
+                
+                metadata='X3DMetadataObject'
+                
+                normal='""'
+                
+                normalAsSphericalCoordinates='false'
+                
+                normalPerVertex='true'
+                
+                normalType='"Float32"'
+                
+                numTexCoordComponents='2'
+                
+                position='0,0,0'
+                
+                primType='['TRIANGLES']'
+                
+                rgbaColors='false'
+                
+                size='1,1,1'
+                
+                solid='true'
+                
+                tangent='""'
+                
+                tangentType='"Float32"'
+                
+                texCoord='""'
+                
+                texCoordType='"Float32"'
+                
+                useGeoCache='true'
+                
+                vertexCount='[0]'
+                
+
+                &gt;&lt;/BinaryGeometry&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="../Core/X3DNode.html">Core/X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="../Rendering/X3DGeometryNode.html">Rendering/X3DGeometryNode</a>(12)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DSpatialGeometryNode.html">X3DSpatialGeometryNode</a>(14)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="X3DBinaryContainerGeometryNode.html">X3DBinaryContainerGeometryNode</a>(3)
+                </li>
+            
+
+            <li class="inheritance-lvl-4">
+                <b>BinaryGeometry</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            
+
+            
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+
+            
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>binormal</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>binormalType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the binormals.</td>
+        </tr>
+        
+        <tr>
+            <td>ccw</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Rendering/X3DGeometryNode.html">Rendering/X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The ccw field defines the ordering of the vertex coordinates of the geometry with respect to user-given or automatically generated normal vectors used in the lighting model equations.</td>
+        </tr>
+        
+        <tr>
+            <td>color</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The url to the binary file, that contains the colors.</td>
+        </tr>
+        
+        <tr>
+            <td>colorType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the colors.</td>
+        </tr>
+        
+        <tr>
+            <td>compressed</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Flag that specifies whether the binary files are GZip compressed.</td>
+        </tr>
+        
+        <tr>
+            <td>coord</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The url to the binary file, that contains the mesh coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>coordType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>idsPerVertex</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Flag that specifies whether vertex IDs are given as texture coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>index</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The url to the binary file, that contains the index data.</td>
+        </tr>
+        
+        <tr>
+            <td>indexType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Uint16"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the index data.</td>
+        </tr>
+        
+        <tr>
+            <td>lit</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Rendering/X3DGeometryNode.html">Rendering/X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether this geometry should be rendered with or without lighting.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>normal</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The url to the binary file, that contains the normals.</td>
+        </tr>
+        
+        <tr>
+            <td>normalAsSphericalCoordinates</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether the normals are encoded as spherical coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>normalPerVertex</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether normals are stored per vertex or per face.</td>
+        </tr>
+        
+        <tr>
+            <td>normalType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the normals.</td>
+        </tr>
+        
+        <tr>
+            <td>numTexCoordComponents</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                2</a>
+                
+            </td>
+			
+            <td>[1, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the number of texture coordinates per vertex.</td>
+        </tr>
+        
+        <tr>
+            <td>position</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBinaryContainerGeometryNode.html">X3DBinaryContainerGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>primType</td>
+
+            <td>
+               
+
+                MFString
+            </td>
+
+            <td>
+                
+                ['TRIANGLES']</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBinaryContainerGeometryNode.html">X3DBinaryContainerGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>rgbaColors</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Enables RGBA colors.</td>
+        </tr>
+        
+        <tr>
+            <td>size</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBinaryContainerGeometryNode.html">X3DBinaryContainerGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>solid</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Rendering/X3DGeometryNode.html">Rendering/X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether backface-culling is used. If solid is TRUE only front-faces are drawn.</td>
+        </tr>
+        
+        <tr>
+            <td>tangent</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>tangentType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the tangents.</td>
+        </tr>
+        
+        <tr>
+            <td>texCoord</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The url to the binary file, that contains the texture coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>texCoordType</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "Float32"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the byte format of the texture coordinates.</td>
+        </tr>
+        
+        <tr>
+            <td>useGeoCache</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Rendering/X3DGeometryNode.html">Rendering/X3DGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Most geo primitives use geo cache and others might later on, but one should be able to disable cache per geometry node.Defaults to global useGeoCache setting parameter.</td>
+        </tr>
+        
+        <tr>
+            <td>vertexCount</td>
+
+            <td>
+               
+
+                MFInt32
+            </td>
+
+            <td>
+                
+                [0]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DBinaryContainerGeometryNode.html">X3DBinaryContainerGeometryNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:16 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>
