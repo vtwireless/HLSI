@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src="https://d3js.org/d3.v4.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagram_base.js></script>
+<script src=BER_plot.js></script>
+
+<body>
+<div id="modCodeSlider" style="margin-left: 1%; margin-top:3%; width: 100%;"></div>
+<div id="gainSlider" style="margin-left: 1%; margin-top:3%; width: 100%;"></div>
+
+<button onclick="buttonPressedClearPoints()">clear message</button> 
+
+<div id="constellationParent" style="width: 100%; height: 100%;"></div>
+<div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
+<div id="rateSlider" style="margin-left: 1%; margin-top:2; width: 100%;"></div>
+
+
+</body>
+
+<script>
+
+
+
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: .1, // dB
+    gn_min: 0, // volts
+    gn_max: 10, // volts
+    mcs_init: 2, // array index int
+  });
+  var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: 0, // dB
+    gn_min: -30,
+    gn_max: 30,
+  });
+  noise.gn = 0;
+
+  let BER_stats = new MessageStats();
+  
+
+
+Slider(sig, 'mcs_simple', null, "modCodeSlider");
+Slider(sig, 'gn', null, "gainSlider");
+let frozenFlag1 = false;
+constellationDiagram(300, 25,"constellationParent", frozenFlag1);
+BER_plot()
+
+
+
+
+
+
+
+// }
+ // use the clear all circles button
+function buttonPressedClearPoints(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+
+}
+
+
+</script>
+
+</html>

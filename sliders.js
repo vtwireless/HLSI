@@ -1,26 +1,3 @@
-/**
- * The `Slider` function creates sliders to change various signal parameters based on valid values,
- * with validation and setup for different types of sliders.
- *
- * @param {Object} sig - A signal object, likely containing information about frequency, bandwidth,
- *                       gain, modulation scheme, and noise level. This object is used to set up
- *                       the range of values for each slider.
- * @param {string} parameter - The type of parameter for which a slider is being created. Valid
- *                             parameters could include options like "frequency", "bandwidth",
- *                             "gain", etc.
- * @param {HTMLElement|string|null} [n=null] - Represents the HTML input range element or a CSS
- *                                            selector for the node that the slider will attach to.
- *                                            If `null`, a new `<p>` and `<input>` range element
- *                                            will be created and appended to the body.
- * @param {string|null} [append_to_id=null] - The ID of the element to which the created slider
- *                                           should be appended. If specified, the slider is
- *                                           appended to the element with this ID; otherwise,
- *                                           it is appended to the body.
- *
- * @returns {Object} A set of sliders, each set up with labels, limits, and callbacks for value
- *                   changes. The function validates the parameter to ensure that only accepted
- *                   values are used for creating sliders.
- */
 
 //
 // Make parameter changing sliders
@@ -43,16 +20,11 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-/* This part of the `Slider` function is performing parameter validation. It checks if the `parameter`
-passed to the function is one of the valid parameter values: "freq", "bw", "gn", "mcs", or "noise".
-If the `parameter` is not one of these values, it logs an error message indicating that the
-parameter type is invalid. This validation ensures that only valid parameters are accepted for
-creating the sliders in the function. */
 function Slider(sig, parameter, n = null, append_to_id = null) {
   {
     let gotPar = false;
 
-    ["freq", "bw", "gn", "mcs", "noise"].forEach(function (par) {
+    ["freq", "bw", "gn", "mcs", "noise", "mcs_simple"].forEach(function (par) {
       if (parameter === par) {
         gotPar = true;
         return;
@@ -111,11 +83,20 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
   ) {
     if (sig.name.length > 0) labelText = sig.name + " " + labelText;
 
-    // set range INPUT limit attributes
-    n.min = sig[par + "_min"]; // example: sig.freq_min
-    n.max = sig[par + "_max"];
-    n.step = sig[par + "_step"];
-    n.value = sig[par];
+    if (par !== "mcs_simple") {
+      // set range INPUT limit attributes
+      n.min = sig[par + "_min"]; // example: sig.freq_min
+      n.max = sig[par + "_max"];
+      n.step = sig[par + "_step"];
+      n.value = sig[par];
+    } else {
+      // set range INPUT limit attributes
+      n.min = 0;
+      n.max = 6;
+      n.step = 1;
+      n.value = sig["mcs"];
+      let msc_mask = 0;
+    }
 
     // Prefix this input with a label.
     let label = document.createElement("label");
@@ -144,7 +125,34 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
     n.oninput = function () {
       // Set the varying parameter.  For example: sig.freq
       // This calls the parameter setter.
-      sig[par] = parseValue(n.value);
+      if (par !== "mcs_simple") {
+        sig[par] = parseValue(n.value);
+      } else {
+        msc_mask = parseValue(n.value);
+        switch (msc_mask) {
+          case 0:
+            sig["mcs"] = 0; // BPSK
+            break;
+          case 1:
+            sig["mcs"] = 2; // QPSK
+            break;
+          case 2:
+            sig["mcs"] = 5; // 16QAM
+            break;
+          case 3:
+            sig["mcs"] = 7; // 32QAM
+            break;
+          case 4:
+            sig["mcs"] = 8; // 64QAM
+            break;
+          case 5:
+            sig["mcs"] = 9; // 128QAM
+            break;
+          case 6:
+            sig["mcs"] = 10; // 256QAM
+            break;
+        }
+      }
     };
 
     if (typeof unit === "string") {
@@ -157,16 +165,50 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
       }
 
       var outputUnitsCallback = function (sig, val) {
-        return d3.format(".2f")(val * scale) + units;
+        if (par !== "mcs_simple") {
+          return d3.format(".2f")(val * scale) + units;
+        } else {
+          console.log("reached");
+          msc_mask = parseValue(n.value);
+          // switch (msc_mask) {
+          //   case 0:
+          //     sig["mcs"] = 0; // BPSK
+          //     break;
+          //   case 1:
+          //     sig["mcs"] = 2; // QPSK
+          //     break;
+          //   case 2:
+          //     sig["mcs"] = 5; // 16QAM
+          //     break;
+          //   case 3:
+          //     sig["mcs"] = 7; // 32QAM
+          //     break;
+          //   case 4:
+          //     sig["mcs"] = 8; // 64QAM
+          //     break;
+          //   case 5:
+          //     sig["mcs"] = 9; // 128QAM
+          //     break;
+          //   case 6:
+          //     sig["mcs"] = 10; // 256QAM
+          //     break;
+          // }
+        }
       };
     }
     // In this case unit is a function.
     else var outputUnitsCallback = unit;
-
-    sig.onChange(par, function (sig, val) {
-      n.value = val;
-      output.value = outputUnitsCallback(sig, val);
-    });
+    if (par !== "mcs_simple") {
+      sig.onChange(par, function (sig, val) {
+        n.value = val;
+        output.value = outputUnitsCallback(sig, val);
+      });
+    } else {
+      sig.onChange("mcs", function (sig, val) {
+        // n.value = val;
+        output.value = outputUnitsCallback(sig, val);
+      });
+    }
 
     // Initialize.
     n.oninput();
@@ -194,6 +236,35 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
           d3.format(".2f")(conf.schemes[val].rate) +
           " b/s/Hz)"
         );
+      });
+      break;
+    case "mcs_simple": // modulation scheme - input range slider
+      makeSlider(sig, n, "Mod Code", parameter, 1.0, function (sig, val) {
+        let msc_simple_name;
+        switch (sig["mcs"]) {
+          case 0:
+            msc_simple_name = "BPSK"; // BPSK
+            break;
+          case 2:
+            msc_simple_name = "QPSK"; // QPSK
+            break;
+          case 5:
+            msc_simple_name = "16QAM"; // 16QAM
+            break;
+          case 7:
+            msc_simple_name = "32QAM"; // 32QAM
+            break;
+          case 8:
+            msc_simple_name = "64QAM"; // 64QAM
+            break;
+          case 9:
+            msc_simple_name = "128QAM"; // 128QAM
+            break;
+          case 10:
+            msc_simple_name = "256QAM"; // 256QAM
+            break;
+        }
+        return msc_simple_name;
       });
       break;
     case "noise": // noise floor 'volume' - emulated by gain value

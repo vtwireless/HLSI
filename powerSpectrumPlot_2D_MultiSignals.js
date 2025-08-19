@@ -1,15 +1,3 @@
-/**
- * The `PowerSpectrumPlot_2D` function generates a power spectrum plot with one or more signals based
- * on the provided options and signal parameters.
- *
- * @param {Object} [opts] - An options object for configuring the plot.
- * @param {boolean} [opts.has_signal=true] - A flag indicating whether signals should be included in the plot.
- * If `true`, signals will be displayed; if `false`, they will be omitted.
- * @param {boolean} [opts.has_interferer=true] - A flag indicating whether an interferer signal should be included.
- * If `true`, the plot will display the interferer signal; if `false`, it will exclude it.
- * @returns {void} This function does not return a value. It generates a Power Spectrum Plot based on the
- * specified options and updates the visualization according to changes in signal parameters and noise levels.
- */
 
 "use strict"; // A must for debugging code.
 
@@ -311,7 +299,7 @@ function PowerSpectrumPlot_2D(
       let df = sig.freq_plot_max - sig.freq_plot_min;
       let fc = -0.5 + (sig.freq - sig.freq_plot_min) / df;
       let bw = sig.bw / df;
-      //console.log(sig.bw, "]]]]]]]]]]]]]]]]]]]]]");
+      console.log(sig.bw, "]]]]]]]]]]]]]]]]]]]]]");
 
       // let gn = sig.gn;
       //calc Pathlaws again
@@ -334,8 +322,8 @@ function PowerSpectrumPlot_2D(
       //calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx);
       let mode = document.getElementById("mode").value;
 
-      //console.log(pattern_rx, theta_rx, phi_rx);
-      //console.log(pattern_tx, theta_tx, phi_tx);
+      console.log(pattern_rx, theta_rx, phi_rx);
+      console.log(pattern_tx, theta_tx, phi_tx);
 
       let lambda = 299.792458e6 / sig["_freq"];
       var dist = document.getElementById("rec_trans_dist").innerHTML;
@@ -378,7 +366,7 @@ function PowerSpectrumPlot_2D(
 
       // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
       var test_var = x3d_pr - 10 * Math.log10(sig.bw);
-      //console.log("PSD..............Anuj", test_var);
+      console.log("PSD..............Anuj", test_var);
       let gn = test_var;
       //test_var is psd value
 
@@ -568,8 +556,9 @@ function PowerSpectrumPlot_2D(
     sig.onChange("freq", update_plot);
     sig.onChange("bw", update_plot);
     sig.onChange("gn", update_plot);
+    // sig.onChange("mcs", update_plot);
   });
-  //console.log(sigs);
+  console.log(sigs);
   // update_plot() will be called by the callbacks that are set just
   // above.
 }
