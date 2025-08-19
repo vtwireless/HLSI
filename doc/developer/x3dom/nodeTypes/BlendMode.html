@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: BlendMode</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: BlendMode</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Shape
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            BlendMode
+            
+
+            </h2>
+
+        
+        <div class="class-description">The BlendMode controls blending and alpha test.Pixels can be drawn using a function that blends the incoming (source) RGBA values with the RGBA values that are already in the frame buffer (the destination values).</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;BlendMode
+
+                
+                alphaFunc='"none"'
+                
+                alphaFuncValue='0'
+                
+                color='1,1,1'
+                
+                colorTransparency='0'
+                
+                destFactor='"one_minus_src_alpha"'
+                
+                equation='"none"'
+                
+                metadata='X3DMetadataObject'
+                
+                srcFactor='"src_alpha"'
+                
+
+                &gt;&lt;/BlendMode&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DAppearanceChildNode.html">X3DAppearanceChildNode</a>(9)
+                </li>
+            
+
+            <li class="inheritance-lvl-2">
+                <b>BlendMode</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="BlendMode"><span class="type-signature"></span>BlendMode<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for BlendMode
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>alphaFunc</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "none"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>alphaFuncValue</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[none, never, less, equal, lequal, greater, notequal, gequal, always]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The alphaFunc defines how fragments which do not fulfill a certain condition are handled.</td>
+        </tr>
+        
+        <tr>
+            <td>color</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>This is the constant color used by blend modes constant.</td>
+        </tr>
+        
+        <tr>
+            <td>colorTransparency</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>This is the constant alpha used by blend modes constant.</td>
+        </tr>
+        
+        <tr>
+            <td>destFactor</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "one_minus_src_alpha"</a>
+                
+            </td>
+			
+            <td>[none, zero, one, dst_color, src_color, one_minus_dst_color, one_minus_src_color, src_alpha, one_minus_src_alpha, dst_alpha, one_minus_dst_alpha, src_alpha_saturate, constant_color, one_minus_constant_color, constant_alpha, one_minus_constant_alpha]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The frame buffer pixel is scaled according to the method defined by the destination factor.</td>
+        </tr>
+        
+        <tr>
+            <td>equation</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "none"</a>
+                
+            </td>
+			
+            <td>[none, func_add, func_subtract, func_reverse_subtract, min, max, logic_op]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>An additional equation used to combine source, destination and the constant value.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>srcFactor</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                "src_alpha"</a>
+                
+            </td>
+			
+            <td>[none, zero, one, dst_color, src_color, one_minus_dst_color, one_minus_src_color, src_alpha, one_minus_src_alpha, dst_alpha, one_minus_dst_alpha, src_alpha_saturate, constant_color, one_minus_constant_color, constant_alpha, one_minus_constant_alpha]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The incoming pixel is scaled according to the method defined by the source factor.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:16 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Scene Author API Documentation: Node: RefinementTexture</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../author/index.html">Scene Author API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../author/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../author/nodes.html" class="">
+        Nodes
+    </a></li>
+
+    <li><a href="../../author/components.html" class="">
+        Components
+    </a></li>
+
+    <li><a href="../../author/runtime.html">
+        Runtime
+    </a></li>
+
+    <li><a href="../../author/configuration.html">
+        Configuration
+    </a></li>
+
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Node: RefinementTexture</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    <a href="index.html">Texturing</a>
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+
+            </h2>
+
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;RefinementTexture
+
+                
+                autoRefinement='true'
+                
+                background='x3dom.nodeTypes.X3DBackgroundNode'
+                
+                crossOrigin='""'
+                
+                depthMap='false'
+                
+                dimensions='[128,128,4]'
+                
+                excludeNodes='x3dom.nodeTypes.X3DNode'
+                
+                eyeToScreenDistance='0.041'
+                
+                fog='x3dom.nodeTypes.X3DFogNode'
+                
+                format=''jpg''
+                
+                interpupillaryDistance='0.064'
+                
+                iterations='7'
+                
+                lensCenter='0.05329'
+                
+                maxLevel='this._vf.iterations'
+                
+                metadata='X3DMetadataObject'
+                
+                oculusRiftVersion='1'
+                
+                origChannelCount='0'
+                
+                repeatS='true'
+                
+                repeatT='true'
+                
+                scale='true'
+                
+                scene='x3dom.nodeTypes.X3DNode'
+                
+                showNormals='false'
+                
+                stamp0='"gpuii/stamps/0.gif"'
+                
+                stamp1='"gpuii/stamps/1.gif"'
+                
+                stereoMode=''NONE''
+                
+                textureProperties='x3dom.nodeTypes.TextureProperties'
+                
+                update=''NONE''
+                
+                url='[]'
+                
+                viewpoint='x3dom.nodeTypes.X3DViewpointNode'
+                
+                vScreenSize='0.07074'
+                
+
+                &gt;&lt;/RefinementTexture&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="../Core/X3DNode.html">Core/X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="../Shape/X3DAppearanceChildNode.html">Shape/X3DAppearanceChildNode</a>(9)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DTextureNode.html">X3DTextureNode</a>(7)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="RenderedTexture.html">RenderedTexture</a>(1)
+                </li>
+            
+
+            <li class="inheritance-lvl-4">
+                <b>RefinementTexture</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            
+
+            
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+
+            
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>autoRefinement</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Defines whether texture refinement should be managed by another component.</td>
+        </tr>
+        
+        <tr>
+            <td>background</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="../EnvironmentalEffects/X3DBackgroundNode.html">EnvironmentalEffects/X3DBackgroundNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets a background texture.</td>
+        </tr>
+        
+        <tr>
+            <td>crossOrigin</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Cross Origin Mode</td>
+        </tr>
+        
+        <tr>
+            <td>depthMap</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Determines if textures shall be treated as depth map.If it is TRUE, then the generated texture will also contain the depth buffer.</td>
+        </tr>
+        
+        <tr>
+            <td>dimensions</td>
+
+            <td>
+               
+
+                MFInt32
+            </td>
+
+            <td>
+                
+                [128,128,4]</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the width, height, color components (and number of MRTs).</td>
+        </tr>
+        
+        <tr>
+            <td>excludeNodes</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Defines a list of sibling nodes that should be ignored.</td>
+        </tr>
+        
+        <tr>
+            <td>eyeToScreenDistance</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.041</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the eye to screen distance in m for stereo rendering.</td>
+        </tr>
+        
+        <tr>
+            <td>fog</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="../EnvironmentalEffects/X3DFogNode.html">EnvironmentalEffects/X3DFogNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets a fog node.</td>
+        </tr>
+        
+        <tr>
+            <td>format</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'jpg'</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the image format of the dataset.</td>
+        </tr>
+        
+        <tr>
+            <td>interpupillaryDistance</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.064</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the eye distance for stereo rendering.</td>
+        </tr>
+        
+        <tr>
+            <td>iterations</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                7</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Maximum level that should be loaded (if GSM is smaller than on DSL6000)</td>
+        </tr>
+        
+        <tr>
+            <td>lensCenter</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0.05329</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the lens Position on Screen.</td>
+        </tr>
+        
+        <tr>
+            <td>maxLevel</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                iterations</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Maximum level that should be loaded (if GSM is smaller than on DSL6000)</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>oculusRiftVersion</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Very experimental field to change between DK1 and DK2.</td>
+        </tr>
+        
+        <tr>
+            <td>origChannelCount</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the channel count of the texture. 0 means the system should figure out the count automatically.</td>
+        </tr>
+        
+        <tr>
+            <td>repeatS</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether the texture is repeated in s direction.</td>
+        </tr>
+        
+        <tr>
+            <td>repeatT</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether the texture is repeated in t direction.</td>
+        </tr>
+        
+        <tr>
+            <td>scale</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether the texture is scaled to the next highest power of two. (Needed, when texture repeat is enabled and texture size is non power of two)</td>
+        </tr>
+        
+        <tr>
+            <td>scene</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets a separate, potentially independent, subscene. If unset, the same scene is used.</td>
+        </tr>
+        
+        <tr>
+            <td>showNormals</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies whether normals are shown.</td>
+        </tr>
+        
+        <tr>
+            <td>stamp0</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                gif"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the first stamp texture.</td>
+        </tr>
+        
+        <tr>
+            <td>stamp1</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                gif"</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the second stamp texture.</td>
+        </tr>
+        
+        <tr>
+            <td>stereoMode</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'NONE'</a>
+                
+            </td>
+			
+            <td>["NONE","LEFT_EYE","RIGHT_EYE"]</td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets render information for stereo rendering.</td>
+        </tr>
+        
+        <tr>
+            <td>textureProperties</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="TextureProperties.html">TextureProperties</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets a TextureProperty node.</td>
+        </tr>
+        
+        <tr>
+            <td>update</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'NONE'</a>
+                
+            </td>
+			
+            <td>["NONE", "NEXT_FRAME_ONLY", "ALWAYS"]</td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies when the texture is updated.</td>
+        </tr>
+        
+        <tr>
+            <td>url</td>
+
+            <td>
+               
+
+                MFString
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DTextureNode.html">X3DTextureNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the url to a resource.</td>
+        </tr>
+        
+        <tr>
+            <td>viewpoint</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                <a href="../Navigation/X3DViewpointNode.html">Navigation/X3DViewpointNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the viewpoint that is used to render the texture content.</td>
+        </tr>
+        
+        <tr>
+            <td>vScreenSize</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.07074</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="RenderedTexture.html">RenderedTexture</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the vertical screen size in m for stereo rendering.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

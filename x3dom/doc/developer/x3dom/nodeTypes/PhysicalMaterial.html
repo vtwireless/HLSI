@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: PhysicalMaterial</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: PhysicalMaterial</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    Shape
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            PhysicalMaterial
+            
+
+            </h2>
+
+        
+        <div class="class-description">This is the base node type for all Material nodes.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;PhysicalMaterial
+
+                
+                alphaCutoff='0.5'
+                
+                alphaMode=''OPAQUE''
+                
+                ambientIntensity='0.2'
+                
+                baseColorFactor='1,1,1,1'
+                
+                baseColorTexture=''
+                
+                diffuseColor='0.8,0.8,0.8'
+                
+                diffuseFactor='1,1,1'
+                
+                emissiveColor='0,0,0'
+                
+                emissiveFactor='0,0,0'
+                
+                emissiveTexture=''
+                
+                glossinessFactor='1'
+                
+                metadata='X3DMetadataObject'
+                
+                metallicFactor='0.0'
+                
+                model='roughnessMetallic'
+                
+                normalBias='-1,-1, 1'
+                
+                normalScale='1'
+                
+                normalSpace=''TANGENT''
+                
+                normalTexture=''
+                
+                occlusionRoughnessMetallic=''
+                
+                occlusionTexture=''
+                
+                roughnessFactor='0.2'
+                
+                roughnessMetallicTexture=''
+                
+                shininess='0.2'
+                
+                specularColor='0,0,0'
+                
+                specularFactor='1,1,1'
+                
+                specularGlossinessTexture=''
+                
+                transparency='0'
+                
+                unlit='false'
+                
+
+                &gt;&lt;/PhysicalMaterial&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DAppearanceChildNode.html">X3DAppearanceChildNode</a>(9)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="X3DMaterialNode.html">X3DMaterialNode</a>(3)
+                </li>
+            
+
+            <li class="inheritance-lvl-3">
+                <b>PhysicalMaterial</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="PhysicalMaterial"><span class="type-signature"></span>PhysicalMaterial<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for X3DMaterialNode
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>alphaCutoff</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.5</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Specifies the cutoff threshold when in `MASK` alpha mode.If the alpha value is greater than or equal to this value thenit is rendered as fully opaque, otherwise, it is rendered as fully transparent.A value greater than 1.0 will render the entire material as fully transparent.This value is ignored for other modes.</td>
+        </tr>
+        
+        <tr>
+            <td>alphaMode</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'OPAQUE'</a>
+                
+            </td>
+			
+            <td>[OPAQUE, BLEND, MASK]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The material's alpha rendering mode enumeration specifying the interpretationof the alpha value of the main factor and texture.</td>
+        </tr>
+        
+        <tr>
+            <td>ambientIntensity</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.2</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The ambientIntensity field specifies how much ambient light from light sources this surface shall reflect.Ambient light is omnidirectional and depends only on the number of light sources, not their positions with respect to the surface.Ambient colour is calculated as ambientIntensity × diffuseColor.</td>
+        </tr>
+        
+        <tr>
+            <td>baseColorFactor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1,1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The RGBA components of the base color of the material. The fourth component (A) is thealpha coverage of the material. The `alphaMode` property specifies how alpha is interpreted.These values are linear. If a baseColorTexture is specified,this value is multiplied with the texel values.</td>
+        </tr>
+        
+        <tr>
+            <td>baseColorTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The base color texture in the met. rough. model. This texture contains RGB(A) components in sRGB color space.The first three components (RGB) specify the base color of the material.If the fourth component (A) is present, it represents the alpha coverage of the material.Otherwise, an alpha of 1.0 is assumed. The `alphaMode` property specifieshow alpha is interpreted. The stored texels must not be premultiplied.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseColor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                0.8,0.8,0.8</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The diffuseColor field reflects all X3D light sources depending on the angle of the surface with respect to the light source.The more directly the surface faces the light, the more diffuse light reflects.The emissiveColor field models "glowing" objects.This can be useful for displaying pre-lit models (where the light energy of the room is computed explicitly), or for displaying scientific data.</td>
+        </tr>
+        
+        <tr>
+            <td>diffuseFactor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The RGBA components of the reflected diffuse color of the material used in the spec.-gloss. model.Metals have a diffuse value of '0.0, 0.0, 0.0'. The fourth component (A) is the opacity of the material.The values are linear.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveColor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The emissiveColor field models "glowing" objects.This can be useful for displaying pre-lit models (where the light energy of the room is computed explicitly), or for displaying scientific data.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveFactor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The RGB components of the emissive color of the material. These values are linear.If an emissiveTexture is specified, this value is multiplied with the texel values.</td>
+        </tr>
+        
+        <tr>
+            <td>emissiveTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The emissive map controls the color and intensity of the light being emitted by the material.This texture contains RGB components in sRGB color space.If a fourth component (A) is present, it is ignored.</td>
+        </tr>
+        
+        <tr>
+            <td>glossinessFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The glossiness or smoothness of the material used in the spec.-gloss. model.A value of 1.0 means the material has full glossiness or is perfectly smooth.A value of 0.0 means the material has no glossiness or is perfectly rough. This value is linear.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>metallicFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.0</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The metalness of the material. A value of 1.0 means the material is a metal.A value of 0.0 means the material is a dielectric. Values in between are for blendingbetween metals and dielectrics such as dirty metallic surfaces. This value is linear.If a roughnessMetallicTexture is specified, this value is multiplied withthe metallic texel values.</td>
+        </tr>
+        
+        <tr>
+            <td>model</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                roughnessMetallic</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The material model used. Valid values are "roughnessMetallic" and "specularGlossiness".</td>
+        </tr>
+        
+        <tr>
+            <td>normalBias</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                -1,-1, 1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Bias to apply to normal sampled from normalTexture</td>
+        </tr>
+        
+        <tr>
+            <td>normalScale</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Scale to apply to normal sampled from normalTexture. NYI</td>
+        </tr>
+        
+        <tr>
+            <td>normalSpace</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                'TANGENT'</a>
+                
+            </td>
+			
+            <td>[TANGENT, OBJECT]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Space in which normals of the normalTexture are defined. Valid values are "TANGENT" and "OBJECT".</td>
+        </tr>
+        
+        <tr>
+            <td>normalTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>A tangent space normal map. The texture contains RGB components in linear space.Each texel represents the XYZ components of a normal vector in tangent space.Red [0 to 255] maps to X [-1 to 1]. Green [0 to 255] maps to Y [-1 to 1].Blue [128 to 255] maps to Z [1/255 to 1]. The normal vectors use OpenGL conventionswhere +X is right and +Y is up. +Z points toward the viewer. In GLSL,this vector would be unpacked like so:`float3 normalVector = tex2D(<sampled normal map texture value>, texCoord) * 2 - 1`.Client implementations should normalize the normal vectors before using them in lighting equations.</td>
+        </tr>
+        
+        <tr>
+            <td>occlusionRoughnessMetallic</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies a texture with the packing Occlusion (R), Roughness (G), Metallic (B)</td>
+        </tr>
+        
+        <tr>
+            <td>occlusionTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The occlusion map texture. The occlusion values are sampled from the R channel.Higher values indicate areas that should receive full indirect lighting and lowervalues indicate no indirect lighting. These values are linear. If other channelsare present (GBA), they are ignored for occlusion calculations.</td>
+        </tr>
+        
+        <tr>
+            <td>roughnessFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.2</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The roughness of the material. A value of 1.0 means the material is completely rough.A value of 0.0 means the material is completely smooth. This value is linear.If a roughnessMetallicTexture is specified, this value is multiplied withthe roughness texel values.</td>
+        </tr>
+        
+        <tr>
+            <td>roughnessMetallicTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The metallic-roughness texture. The metalness values are sampled from the B channel.The roughness values are sampled from the G channel. These values are linear.If other channels are present (R or A), they are ignored for metallic-roughness calculations.</td>
+        </tr>
+        
+        <tr>
+            <td>shininess</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.2</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The specularColor and shininess fields determine the specular highlights (e.g., the shiny spots on an apple).When the angle from the light to the surface is close to the angle from the surface to the viewer, the specularColor is added to the diffuse and ambient colour calculations.Lower shininess values produce soft glows, while higher values result in sharper, smaller highlights.</td>
+        </tr>
+        
+        <tr>
+            <td>specularColor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The specularColor and shininess fields determine the specular highlights (e.g., the shiny spots on an apple).When the angle from the light to the surface is close to the angle from the surface to the viewer, the specularColor is added to the diffuse and ambient colour calculations.Lower shininess values produce soft glows, while higher values result in sharper, smaller highlights.</td>
+        </tr>
+        
+        <tr>
+            <td>specularFactor</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The specular RGB color of the material used in the spec.-gloss. model. This value is linear.</td>
+        </tr>
+        
+        <tr>
+            <td>specularGlossinessTexture</td>
+
+            <td>
+               
+
+                <a href="X3DTextureNode.html">X3DTextureNode</a>
+            </td>
+
+            <td>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The specular-glossiness texture is a RGBA texture, containing the specular color (RGB) in sRGB spaceand the glossiness value (A) in linear space.</td>
+        </tr>
+        
+        <tr>
+            <td>transparency</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+                <a href="X3DMaterialNode.html">X3DMaterialNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The transparency field specifies how "clear" an object is, with 1.0 being completely transparent, and 0.0 completely opaque.</td>
+        </tr>
+        
+        <tr>
+            <td>unlit</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Set the material to unlitFinal color is the product of baseColorFactor, baseColorTexture, and vertex color (if any)</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

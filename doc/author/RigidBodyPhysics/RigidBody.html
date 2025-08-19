@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Scene Author API Documentation: Node: RigidBody</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../author/index.html">Scene Author API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../author/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../author/nodes.html" class="">
+        Nodes
+    </a></li>
+
+    <li><a href="../../author/components.html" class="">
+        Components
+    </a></li>
+
+    <li><a href="../../author/runtime.html">
+        Runtime
+    </a></li>
+
+    <li><a href="../../author/configuration.html">
+        Configuration
+    </a></li>
+
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Node: RigidBody</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                        <a href="http://www.web3d.org/files/specifications/19775-1/V3.3/Part01/components/rigidbodyphysics.html#RigidBody">3.3</a>
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    <a href="index.html">RigidBodyPhysics</a>
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-experimental">experimental</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+
+            </h2>
+
+        
+        <div class="class-description">The RigidBody node describes a body and its properties that can be affected by the physics model. A body is modelled as a collection of shapes that describe mass distribution rather than renderable geometry. Bodies are connected together using Joints and are represented by geometry.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;RigidBody
+
+                
+                angularDampingFactor='0.001'
+                
+                angularVelocity='0,0,0'
+                
+                autoDamp='false'
+                
+                autoDisable='false'
+                
+                centerOfMass='0,0,0'
+                
+                disableAngularSpeed='0'
+                
+                disableLinearSpeed='0'
+                
+                disableTime='0'
+                
+                enabled='true'
+                
+                finiteRotationAxis='0,0,0'
+                
+                fixed='false'
+                
+                forces='[]'
+                
+                geometry='x3dom.nodeTypes.X3DNBodyCollidableNode'
+                
+                inertia='[1,0,0,0,1,0,0,0,1]'
+                
+                linearDampingFactor='0.001'
+                
+                linearVelocity='0,0,0'
+                
+                mass='1'
+                
+                massDensityModel='x3dom.nodeTypes.Shape'
+                
+                metadata='X3DMetadataObject'
+                
+                orientation='0,0,1,0'
+                
+                position='0,0,0'
+                
+                torques='[]'
+                
+                useFiniteRotation='false'
+                
+                useGlobalGravity='true'
+                
+
+                &gt;&lt;/RigidBody&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="../Core/X3DNode.html">Core/X3DNode</a>(18)
+                </li>
+            
+
+            <li class="inheritance-lvl-1">
+                <b>RigidBody</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            
+
+            
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+
+            
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>angularDampingFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.001</a>
+                
+            </td>
+			
+            <td>[0,1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Angular damping factor.</td>
+        </tr>
+        
+        <tr>
+            <td>angularVelocity</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The velocity fields are used to provide a constant velocity value to the object every frame. If both forces and velocity are defined, the velocity is used only on the first frame that the node is active, and then the forces are applied.</td>
+        </tr>
+        
+        <tr>
+            <td>autoDamp</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The application of damping is controlled through the use of the autoDamp field. When the value is FALSE, no damping is applied. When the value is TRUE, rotational and translational damping is calculated and applied.</td>
+        </tr>
+        
+        <tr>
+            <td>autoDisable</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>By default, this automatic disabling is turned off. It may be enabled by setting the autoDisable field to TRUE.</td>
+        </tr>
+        
+        <tr>
+            <td>centerOfMass</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td>(-inf, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Center of mass for calculations</td>
+        </tr>
+        
+        <tr>
+            <td>disableAngularSpeed</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>disableLinearSpeed</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>disableTime</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>enabled</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The enabled field controls whether the information in this node is submitted to the physics engine for processing. If the enabled field is set TRUE, the node is submitted to the physics engine. If the enabled field is set FALSE, the node is not submitted to the physics engine for processing.</td>
+        </tr>
+        
+        <tr>
+            <td>finiteRotationAxis</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The finiteRotationAxis field specifies a vector around which the object rotates.</td>
+        </tr>
+        
+        <tr>
+            <td>fixed</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The fixed field is used to indicate that this body does not move. Any calculations involving collisions with this body should take into account that this body does not move. This is useful for representing objects such as the ground, walls etc that can be collided with, have an effect on other objects, but are not capable of moving themselves.</td>
+        </tr>
+        
+        <tr>
+            <td>forces</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The torques and forces fields define zero or more sets of torque and force values that are applied to the object every frame. These are continuously applied until reset to zero by the user.</td>
+        </tr>
+        
+        <tr>
+            <td>geometry</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DNBodyCollidableNode.html">X3DNBodyCollidableNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>The geometry field is used to connect the body modelled by the physics engine implementation to the real geometry of the scene through the use of collidable nodes. This allows the geometry to be connected directly to the physics model as well as collision detection. Collidable nodes have their location set to the same location as the body instance in which they are located. Their position and location are not relative to this object, unless otherwise defined.</td>
+        </tr>
+        
+        <tr>
+            <td>inertia</td>
+
+            <td>
+               
+
+                MFFloat
+            </td>
+
+            <td>
+                
+                [1,0,0,0,1,0,0,0,1]</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The inertia field represents a 3x2 inertia tensor matrix. If the set values are less than six items, the results are implementation dependent. If the value set is greater than six values, only the first six values of the array are used.</td>
+        </tr>
+        
+        <tr>
+            <td>linearDampingFactor</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.001</a>
+                
+            </td>
+			
+            <td>[0,1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Linear damping factor.</td>
+        </tr>
+        
+        <tr>
+            <td>linearVelocity</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td>(-inf, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Linear velocity.</td>
+        </tr>
+        
+        <tr>
+            <td>mass</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The mass field indicates the mass of the body in mass base units. All bodies shall have a non-zero mass, with the default value of 1 mass base unit.</td>
+        </tr>
+        
+        <tr>
+            <td>massDensityModel</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="../Shape/Shape.html">Shape/Shape</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The massDensityModel field is used to describe the geometry type and dimensions used to calculate the mass density in the physics model. This geometry has no renderable property, other than for defining the model of the mass density. It is not rendered, nor modified by the physics model.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>orientation</td>
+
+            <td>
+               
+
+                SFRotation
+            </td>
+
+            <td>
+                
+                0,0,1,0</a>
+                
+            </td>
+			
+            <td>[0,1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The position and orientation fields are used to set the initial conditions of this body's location in world space. After the initial conditions have been set, these fields are used to report the current information based on the most recent physics model evaluation.</td>
+        </tr>
+        
+        <tr>
+            <td>position</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,0,0</a>
+                
+            </td>
+			
+            <td>(-inf, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The position and orientation fields are used to set the initial conditions of this body's location in world space. After the initial conditions have been set, these fields are used to report the current information based on the most recent physics model evaluation.</td>
+        </tr>
+        
+        <tr>
+            <td>torques</td>
+
+            <td>
+               
+
+                MFVec3f
+            </td>
+
+            <td>
+                
+                []</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The torques and forces fields define zero or more sets of torque and force values that are applied to the object every frame. These are continuously applied until reset to zero by the user.</td>
+        </tr>
+        
+        <tr>
+            <td>useFiniteRotation</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The useFiniteRotation field is used to influence the way the body's rotation is calculated. In very fast rotating objects, such as a wheel of a car, an infinitely small time step can cause the modelling to explode. The default value is to use the faster infinite mode.</td>
+        </tr>
+        
+        <tr>
+            <td>useGlobalGravity</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The useGlobalGravity field is used to indicate whether this particular body should be influenced by the containing RigidBodyCollection's gravity setting. A value of TRUE indicates that the gravity is used, a value of FALSE indicates that it is not used. This only applies to this body instance. Contained sub-bodies shall not be affected by this setting.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

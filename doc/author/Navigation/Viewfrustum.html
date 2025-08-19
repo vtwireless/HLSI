@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Scene Author API Documentation: Node: Viewfrustum</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../author/index.html">Scene Author API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../author/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../author/nodes.html" class="">
+        Nodes
+    </a></li>
+
+    <li><a href="../../author/components.html" class="">
+        Components
+    </a></li>
+
+    <li><a href="../../author/runtime.html">
+        Runtime
+    </a></li>
+
+    <li><a href="../../author/configuration.html">
+        Configuration
+    </a></li>
+
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Node: Viewfrustum</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <td>
+                X3DOM
+            </td><td></td>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    <a href="index.html">Navigation</a>
+                    
+                </td>
+            </tr>
+            
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+
+            </h2>
+
+        
+        <div class="class-description">The Viewfrustum node allows to define a camera position and projection utilizing a standard OpenGL projection/modelview pair.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;Viewfrustum
+
+                
+                bind='false'
+                
+                description='""'
+                
+                farClippingPlane='-1'
+                
+                isActive='false'
+                
+                metadata='X3DMetadataObject'
+                
+                modelview='1,0,0,0'
+                
+                navigationInfo='null'
+                
+                nearClippingPlane='-1'
+                
+                projection='1,0,0,0'
+                
+                viewAll='false'
+                
+
+                &gt;&lt;/Viewfrustum&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="../Core/X3DNode.html">Core/X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="../Core/X3DChildNode.html">Core/X3DChildNode</a>(12)
+                </li>
+            
+                <li class="inheritance-lvl-2">
+                    <a href="../Core/X3DBindableNode.html">Core/X3DBindableNode</a>(5)
+                </li>
+            
+                <li class="inheritance-lvl-3">
+                    <a href="X3DViewpointNode.html">X3DViewpointNode</a>(4)
+                </li>
+            
+
+            <li class="inheritance-lvl-4">
+                <b>Viewfrustum</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            
+
+            
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+
+            
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>bind</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DBindableNode.html">Core/X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Pushes/pops the node on/from the top of the bindable stack</td>
+        </tr>
+        
+        <tr>
+            <td>description</td>
+
+            <td>
+               
+
+                SFString
+            </td>
+
+            <td>
+                
+                ""</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DBindableNode.html">Core/X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Description of the bindable node</td>
+        </tr>
+        
+        <tr>
+            <td>farClippingPlane</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the far clipping plane, alias for zFar</td>
+        </tr>
+        
+        <tr>
+            <td>isActive</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DBindableNode.html">Core/X3DBindableNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td></td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>modelview</td>
+
+            <td>
+               
+
+                SFMatrix4f
+            </td>
+
+            <td>
+                
+                1,0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Camera modelview matrix</td>
+        </tr>
+        
+        <tr>
+            <td>navigationInfo</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                null</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Defines a dedicated NavigationInfo node for this X3DViewpointNode. The specified NavigationInfo node receivesa set_bind TRUE event at the time when the parent node is bound and receives a set_bind FALSE at the timewhen the parent node is unbound.</td>
+        </tr>
+        
+        <tr>
+            <td>nearClippingPlane</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Specifies the near clipping plane, alias for zNear</td>
+        </tr>
+        
+        <tr>
+            <td>projection</td>
+
+            <td>
+               
+
+                SFMatrix4f
+            </td>
+
+            <td>
+                
+                1,0,0,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Camera projection matrix</td>
+        </tr>
+        
+        <tr>
+            <td>viewAll</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DViewpointNode.html">X3DViewpointNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>When the viewAll field is set to TRUE or a viewpoint is bound with viewAll field TRUE,the current view is modified to change the centerOfRotation field to match center of the bounding box for the entire visible scene,and the orientation field is modified to aim at that point. Finally, the zoom position or fieldofview is adjusted to containthe entire scene in the current viewing window. If needed, the near and far clipping planes shall be adjusted to allow viewingthe entire scene. When the value of the viewAll field is changed from TRUE to FALSE, no change in the current view occurs.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:19 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

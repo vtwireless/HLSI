@@ -1,5 +1,7 @@
-'use strict';
-
+/* This code defines an object named `AverageThroughputPlot_BarChart` in JavaScript. The object
+contains methods for initializing a bar chart, generating dataset, creating the chart on a canvas
+element, updating the plot with new data, and removing the plot. */
+"use strict";
 
 //
 // sig:
@@ -16,7 +18,13 @@ const AverageThroughputPlot_BarChart = {
   signal_list: [],
   avgThroughput_chart: null,
 
-  init: function (signal_list, canvas_id, labels, threshold = null, backgroundColors = null) {
+  init: function (
+    signal_list,
+    canvas_id,
+    labels,
+    threshold = null,
+    backgroundColors = null
+  ) {
     this.signal_list = signal_list;
     let data = this.generate_dataset(this.signal_list);
     this.dataset = data;
@@ -43,26 +51,34 @@ const AverageThroughputPlot_BarChart = {
     return rate;
   },
 
-  create_chart: function (canvas_id, labels, data, threshold, backgroundColors) {
-     // thresholdLine plugin block
-     this.thresholdLine = {
-      id: 'thresholdLine',
+  create_chart: function (
+    canvas_id,
+    labels,
+    data,
+    threshold,
+    backgroundColors
+  ) {
+    // thresholdLine plugin block
+    this.thresholdLine = {
+      id: "thresholdLine",
       beforeDatasetsDraw(chart, args, options) {
-        const { ctx, chartArea: { top, right, bottom, left, width, height },
-        scales: {x, y} } = chart;
+        const {
+          ctx,
+          chartArea: { top, right, bottom, left, width, height },
+          scales: { x, y },
+        } = chart;
 
         ctx.save();
-        ctx.strokeStyle = 'yellow';
+        ctx.strokeStyle = "yellow";
         ctx.setLineDash([10, 20]);
         if (threshold)
           ctx.strokeRect(left, y.getPixelForValue(threshold * 1e6), width, 0);
         ctx.restore();
-      }
-
-    }
+      },
+    };
 
     this.avgThroughput_chart = new Chart(document.getElementById(canvas_id), {
-      type: 'bar',
+      type: "bar",
       data: {
         labels: labels,
         datasets: [
@@ -70,41 +86,47 @@ const AverageThroughputPlot_BarChart = {
             label: "Data Rate (bits/sec)",
             barThickness: 50,
             maxBarThickness: 70,
-            backgroundColor: function() {
+            backgroundColor: function () {
               if (backgroundColors) {
                 return backgroundColors;
               }
-              return ["rgb(200,56,56)", "rgb(0,176,240)","rgb(36,124,76)","rgb(255,192,0)","#8e5ea2"];
+              return [
+                "rgb(200,56,56)",
+                "rgb(0,176,240)",
+                "rgb(36,124,76)",
+                "rgb(255,192,0)",
+                "#8e5ea2",
+              ];
             },
-            data: data
-          }
-        ]
+            data: data,
+          },
+        ],
       },
       options: {
         plugins: {
           legend: { display: false },
           title: {
             display: true,
-            text: 'Average Data Throughput',
-            color: "#fff"
+            text: "Average Data Throughput",
+            color: "#fff",
           },
           datalabels: {
-            anchor: 'end',
-            align: 'top',
+            anchor: "end",
+            align: "top",
             formatter: Math.round,
             font: {
-              weight: 'bold'
-            }
-          }
+              weight: "bold",
+            },
+          },
         },
 
         scales: {
           x: {
             ticks: {
-              color: "#fff"
+              color: "#fff",
             },
             grid: {
-              color: "#666"
+              color: "#666",
             },
             //   title: {
             //     display: true,
@@ -113,41 +135,45 @@ const AverageThroughputPlot_BarChart = {
             //   }
           },
           y: {
-            type: 'logarithmic',
+            type: "logarithmic",
             min: 100e3,
             max: 400e6,
             ticks: {
               display: true,
               color: "#fff",
-              callback:
-                function (value) {
-                  var val = [100e3, 400e3, 1e6, 2e6, 4e6, 10e6, 20e6, 40e6,
-                    100e6, 200e6, 400e6].includes(value) ? value : undefined;
-                  if (val == undefined) return undefined;
-                  let [s, u] = scale_units(val);
-                  return val * s + u;
-                }
+              callback: function (value) {
+                var val = [
+                  100e3, 400e3, 1e6, 2e6, 4e6, 10e6, 20e6, 40e6, 100e6, 200e6,
+                  400e6,
+                ].includes(value)
+                  ? value
+                  : undefined;
+                if (val == undefined) return undefined;
+                let [s, u] = scale_units(val);
+                return val * s + u;
+              },
             },
             grid: {
-              color: "#666"
+              color: "#666",
             },
             title: {
               display: true,
-              text: 'bits / sec',
+              text: "bits / sec",
               color: "#fff",
-            }
-          }
-        }
+            },
+          },
+        },
       },
-      plugins: [this.thresholdLine]
+      plugins: [this.thresholdLine],
     });
   },
 
   update_plot: function (data_bits = null) {
-
     if (data_bits == null) {
       for (let i = 0; i < signal_list.length; i++) {
-        AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[i] = 0;
+        AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[
+          i
+        ] = 0;
       }
       AverageThroughputPlot_BarChart.avgThroughput_chart.update();
       return;
@@ -157,7 +183,9 @@ const AverageThroughputPlot_BarChart = {
 
     for (let i = 0; i < bits.length; i++) {
       let dataRate = bits[i] / data_bits.timeElapsed;
-      AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[i] = dataRate;
+      AverageThroughputPlot_BarChart.avgThroughput_chart.data.datasets[0].data[
+        i
+      ] = dataRate;
     }
 
     AverageThroughputPlot_BarChart.avgThroughput_chart.update();
@@ -169,6 +197,5 @@ const AverageThroughputPlot_BarChart = {
       AverageThroughputPlot_BarChart.dataset = [];
       AverageThroughputPlot_BarChart.signal_list = [];
     }
-  }
-
-}
+  },
+};
