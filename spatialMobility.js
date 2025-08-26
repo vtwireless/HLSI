@@ -124,6 +124,34 @@ const Position = class {
   }
 };
 
+class RadioAirspace {
+  constructor() {
+    this.transmitters = [];      // Array to hold signal objects
+    this.txPositions = [];      // Array to hold antenna position objects
+    this.receivers = [];     // Array to hold antenna position objects
+    this.rxPositions = [];     // Array to hold antenna position objects
+  }
+
+  addTransmitter(signal) {
+    this.transmitters.push(signal);
+    // get antenna posistion 
+    let str = `tx_transform_${this.transmitters.length}`; // "signal_1"
+    // console.log("!!!!! rx transform name:", str);
+    let pos = getCoordinatesFromX3D(str);
+    this.txPositions.push(pos);
+  }
+
+  addReceiver(signal) {
+    this.receivers.push(signal);
+    // get antenna posistion
+    let str = `rx_transform_${this.receivers.length}`; // "signal_1"
+    // console.log("!!!!! rx transform name:", str);
+    let pos = getCoordinatesFromX3D(str);
+    this.rxPositions.push(pos);
+  }
+
+}
+
 // Calculates the path loss at a given point in space with given spherical coordinates theta and phi
 // Uses equation:
 // path_loss = 20log10(lambda/(4pi*distance)) + abs(fvert(theta,phi))^2 + abs(fhoriz(theta,phi))^2
@@ -145,6 +173,30 @@ function getRxZAngleDegrees() {
 function getTxZAngleDegrees() {
   return txAngles.Z;
 }
+
+// Retrieves the coordinates of a Transform node in an X3D file by its object name.
+  function getCoordinatesFromX3D(objectName) {
+
+    const transformNode = document.getElementById(objectName);
+    if (!transformNode) {
+     // console.error(`Object "${objectName}" not found in X3D file.`);
+      return null;
+    }
+
+    // Get the translation attribute of the Transform node
+    const translationAttr = transformNode.getAttribute("translation");
+
+    // Parse the translation attribute string into an array of coordinates
+    const coordinates = translationAttr.split(" ").map(parseFloat);
+    console.log(coordinates);
+    // receiverPos.x = coordinates[0];
+    // receiverPos.y = coordinates[1];
+    // receiverPos.z = coordinates[2];
+    // console.log(receiverPos);
+
+    // Return the coordinates as an object with x, y, and z properties
+    return { x: coordinates[0], y: coordinates[1], z: coordinates[2] };
+  }
 
 //TODO: the polarization has only been implemented when we assume both antennas are vertically polarized.  Need to implement the case when both antennas are horizontally polarized and when one is vertically polarized and the other is horizontally polarized. This can be done with an if, else if, else, where we put if tx horiz, if rx horiz, etc.  Note this must go in advancedcalculatePathLoss
 
