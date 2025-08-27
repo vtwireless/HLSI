@@ -514,7 +514,7 @@
             <!-- <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo> -->
 
             <!-- Labeled transmitter translation, but actually the blue rx -->
-            <transform id="tx_transform_1" translation="0 0 0">
+            <transform id="rx_transform_1" translation="0 0 0">
 
               <transform DEF='ant_1' translation='0 -2.5 0'>
                 <shape>
@@ -770,7 +770,7 @@
 
             <!--This is the red transmitter, not the blue receiver-->
             <!-- <transform translation='0 0 -12'> -->
-            <transform id="rx_transform_1" translation='0 0 -12'>
+            <transform id="tx_transform_1" translation='0 0 -12'>
               <transform translation='0 -2.5 0'>
                 <shape>
                   <appearance>
@@ -1034,7 +1034,7 @@
           </div>
           <!-- === TX (OG) Sliders === -->
           
-            <div id="og_tx_sliders">
+            <div id="og_rx_sliders">
 
             <div class="slider-row">
               <div class="slider-box">
@@ -1087,11 +1087,11 @@
   <div id="og_rx_sliders">
     <div class="slider-row">
       <div class="slider-box">
-        <label for="slider2ForMoveX" style="color: white;">Move East-West (RX)</label>
+        <label for="slider2ForMoveX" style="color: white;">Move East-West (TX)</label>
         <input type="range" id="slider2ForMoveX" min="-10" max="10" value="0" style="accent-color: red;">
       </div>
       <div class="slider-box">
-        <label for="slider2ForMoveY" style="color: white;">Move North-South (RX)</label>
+        <label for="slider2ForMoveY" style="color: white;">Move North-South (TX)</label>
         <input type="range" id="slider2ForMoveY" min="-12" max="12" value="-12" style="accent-color: red;">
       </div>
       <div class="slider-box">
@@ -1101,15 +1101,15 @@
     </div>
     <div class="slider-row">
       <div class="slider-box">
-        <label for="slider2ForRotateX" style="color: white;">Elevation (RX)</label>
+        <label for="slider2ForRotateX" style="color: white;">Elevation (TX)</label>
         <input type="range" id="slider2ForRotateX" min="0" max="360" value="0" style="accent-color: red;">
       </div>
       <div class="slider-box">
-        <label for="slider2ForRotateY" style="color: white;">Azimuth (RX)</label>
+        <label for="slider2ForRotateY" style="color: white;">Azimuth (TX)</label>
         <input type="range" id="slider2ForRotateY" min="0" max="360" value="0" style="accent-color: red;">
       </div>
       <div class="slider-box">
-        <label for="slider2ForTiltZ">RX Z (OG) Boresight Tilt</label>
+        <label for="slider2ForTiltZ">TX Z (OG) Boresight Tilt</label>
         <input type="range" id="slider2ForTiltZ" min="0" max="180" value="0" style="accent-color: red;">
       </div>
 
@@ -3554,7 +3554,7 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
   function updateOGRxTranslation() {
     const antenna = document.getElementById('tx_transform_1');
     if (antenna) {
-      antenna.setAttribute('translation', `${currentRxX} ${currentRxY} ${currentRxZ}`);
+      // antenna.setAttribute('translation', `${currentRxX} ${currentRxY} ${currentRxZ}`);
       
       getCoordinatesFromX3D("rx_transform_1");
       calcDistance(receiverPos, { x: currentRxX, y: currentRxY, z: currentRxZ });
@@ -3669,8 +3669,8 @@ function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransform
 
     if (targetTransformId === 'rx_transform_1') {
       // Update global positions for OG antennas
-      const txPos = getCoordinatesFromX3D("rx_transform_1");
-      const rxPos = getCoordinatesFromX3D("tx_transform_1");
+      const rxPos = getCoordinatesFromX3D("rx_transform_1");
+      const txPos = getCoordinatesFromX3D("tx_transform_1");
       receiverPos = txPos;
       translatorPos = rxPos;
       distance_tx_rx = Math.sqrt(
@@ -3810,8 +3810,8 @@ function toggleAntennaSliders(antenna) {
   // Set up sliders for main TX rotation (slider group 2)
   setupSlider('slider2ForRotateX', 'slider2ForRotateY', 'slider2ForTiltZ', 'txRotation');
 
-setupTranslationSlider('sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ', 'tx_transform_1', '2.5');
-  setupTranslationSlider('slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward', 'rx_transform_1', '2.5');
+setupTranslationSlider('sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ', 'rx_transform_1', '2.5');
+  setupTranslationSlider('slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward', 'tx_transform_1', '2.5');
   setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx2_transform');
   setupTranslationSlider('slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward', 'tx2_transform');
 setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_new_transform');
