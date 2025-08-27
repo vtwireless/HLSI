@@ -1145,16 +1145,16 @@
             <div style="display: flex; flex-direction: column; gap: 1rem;">
               <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
                 <button id="add-tx-antenna-btn" style="width: fit-content; align-self: row;">
-                  Add New Rx Antenna
+                  Add New Tx Antenna
                 </button>
 
                 <button id="remove-tx-antenna-btn" style="display: none; flex-direction: column; width: fit-content;">
-                  Remove Rx Antenna
+                  Remove Tx Antenna
                 </button>
 
                 <button id="reset-tx-antenna-btn" onclick="resetRotationSliders('tx')"
                   style="display: none; flex-direction: column; width: fit-content;">
-                  Reset Rx Antenna
+                  Reset Tx Antenna
                 </button>
 
             <button id="toggle-tx2-sliders" style="width: fit-content; text-align: center; display: none;"
@@ -1234,16 +1234,16 @@
               <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
 
                 <button id="add-rx-antenna-btn" style="width: fit-content; align-self: center;">
-                  Add New Tx Antenna
+                  Add New Rx Antenna
                 </button>
 
                 <button id="remove-rx-antenna-btn" style="display: none; width: fit-content;">
-                  Remove Tx Antenna
+                  Remove Rx Antenna
                 </button>
 
                 <button id="reset-rx-antenna-btn" onclick="resetRotationSliders('rx')"
                   style="display: none; flex-direction: column; width: fit-content;">
-                  Reset Tx Antenna
+                  Reset Rx Antenna
                 </button>
 
             <button id="toggle-rx2-sliders" style="width: fit-content; text-align: center; display: none;"
@@ -1285,8 +1285,9 @@
                       style="accent-color: limegreen;">
                   </div>
                   <div class="slider-box">
-                    <label for="slider3ForTiltZ">TX2 Z Boresight Tilt</label>
-                    <input type="range" id="slider3ForTiltZ" min="0" max="180" value="0">
+                    <label for="slider3ForTiltZ">Boresight Tilt (RX2)</label>
+                    <input type="range" id="slider3ForTiltZ" min="0" max="180" value="0"
+                    style="accent-color: limegreen;">
                   </div>
                 </div>
 
@@ -1488,7 +1489,7 @@
   let antennaCounter = { tx: 0, rx: 0 }; // max one new antenna per type
 
   document.getElementById('add-tx-antenna-btn').addEventListener('click', function () {
-  // addNewAntenna('tx');
+  addNewAntenna('tx');
   document.getElementById('sliderGroup_tx2').style.display = 'flex';
   document.getElementById('add-tx-antenna-btn').style.display = 'none';
   document.getElementById('remove-tx-antenna-btn').style.display = 'inline-block';
@@ -1510,7 +1511,8 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
 });
 
  document.getElementById('add-rx-antenna-btn').addEventListener('click', function () {
-  // addNewAntenna('rx');
+  addNewAntenna('rx');
+
   document.getElementById('sliderGroup_rx2').style.display = 'flex';
   document.getElementById('add-rx-antenna-btn').style.display = 'none';
   document.getElementById('remove-rx-antenna-btn').style.display = 'inline-block';
@@ -1518,10 +1520,10 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
   document.getElementById('toggle-rx2-sliders').style.display = 'inline-block'; // <-- Show hide button
   SinrPlot_BarChart.remove_plot(); // Clear SINR plot when adding new RX
   let linkList = [];
-  for (let i = 0; i < antennaCounter['rx'].length ; i++) {
-    linkList.push(`Link ${i }`);
+  for (let i = 0; i <= antennaCounter['rx'] ; i++) {
+    linkList.push(`Link ${i +1}`);
   }
-  SinrPlot_BarChart.init(signalList, "sinr-bar-chart",linkList );
+  SinrPlot_BarChart.init(airspace.receivers, "sinr-bar-chart",linkList );
 
 //   SinrPlot_BarChart.init(signalList, "sinr-bar-chart", [
 //   "Link 1",  // (Original RX ↔ Original TX)
@@ -1917,9 +1919,10 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   // sig4['name'] = "comm_link_4";
 
   
+// commenting this out to allow airspace to be the main variable to check links
+// var signalList = [sig1, sig2, sig3, sig4]; 
 
-var signalList = [sig1, sig2, sig3, sig4]; 
-
+// signal list now handled by airspace
 let airspace = new RadioAirspace();
 airspace.addTransmitter(sig1);
 airspace.addReceiver(sig2);
@@ -2172,21 +2175,21 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
       document.getElementById("scriptController2").style.display = "none";
     }
   });
-  ThroughputPlot(signalList);
+  ThroughputPlot(airspace.receivers);
   var funcs = null;
 
   // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-SinrPlot_BarChart.init(signalList, "sinr-bar-chart", [
+SinrPlot_BarChart.init(airspace.receivers, "sinr-bar-chart", [
   "Link 1",  // (Original RX ↔ Original TX)
   // "Link 2",  //  (New RX ↔ New TX)"
   // "Link 3",  // (Original RX ↔ New TX)
   // "L4 (NrxOgTx)"   // (Original TX ↔ New RX)
 ]);  
 
-SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1"]);
+SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-bar-chart", ["Link 1"]);
 
   function matrixMultiply(matrixA, matrixB) {
     if (matrixA[0].length !== matrixB.length) {
@@ -3039,13 +3042,13 @@ updateAllAntennaAnglesAndPathLoss();
   }
 
   //Newly added. Allows for slider value updates to be updated
-  document.getElementById("add-tx-antenna-btn").addEventListener("click", () => {
-    addNewAntenna('tx');
-  });
+  // document.getElementById("add-tx-antenna-btn").addEventListener("click", () => {
+  //   addNewAntenna('tx');
+  // });
 
-  document.getElementById("add-rx-antenna-btn").addEventListener("click", () => {
-    addNewAntenna('rx');
-  });
+  // document.getElementById("add-rx-antenna-btn").addEventListener("click", () => {
+  //   addNewAntenna('rx');
+  // });
 
 
   
