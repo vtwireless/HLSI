@@ -1858,57 +1858,57 @@ function selectModelRX2() {
 
   let phi_offset = 0;
   // Receiver (Blue signal)
-  var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
-    bw_max: 4.0e7,
-    // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
-    bw_min: 0,
-    bw_init: 4.0e6, // Hz
-    gn_init: -10, // dB
-    gn_min: -10, // dB
-    gn_max: 90,
-    mcs_init: 6, // array index int
-    freq_init: 1785.0e6
-  });
+  // var airspace.transmitters[0] = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+  //   // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
+  //   bw_max: 4.0e7,
+  //   // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
+  //   bw_min: 0,
+  //   bw_init: 4.0e6, // Hz
+  //   gn_init: -10, // dB
+  //   gn_min: -10, // dB
+  //   gn_max: 90,
+  //   mcs_init: 6, // array index int
+  //   freq_init: 1785.0e6
+  // });
 
 
   // each link requires a new signal, so this establishes link2
-  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-  bw_max: 4.0e7,
-  bw_min: 0,
-  bw_init: 4.0e6,
-  gn_init: -10,
-  gn_min: -10,
-  gn_max: 90,
-  mcs_init: 6,
-  freq_init: 1785.0e6
-});
+//   var airspace.receivers[0] = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+//   bw_max: 4.0e7,
+//   bw_min: 0,
+//   bw_init: 4.0e6,
+//   gn_init: -10,
+//   gn_min: -10,
+//   gn_max: 90,
+//   mcs_init: 6,
+//   freq_init: 1785.0e6
+// });
 
 
-  // each link requires a new signal, so this establishes link3
-var sig3 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-  bw_max: 4.0e7,
-  bw_min: 0,
-  bw_init: 4.0e6,
-  gn_init: -10,
-  gn_min: -10,
-  gn_max: 90,
-  mcs_init: 6,
-  freq_init: 1785.0e6
-});
+//   // each link requires a new signal, so this establishes link3
+// var sig3 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+//   bw_max: 4.0e7,
+//   bw_min: 0,
+//   bw_init: 4.0e6,
+//   gn_init: -10,
+//   gn_min: -10,
+//   gn_max: 90,
+//   mcs_init: 6,
+//   freq_init: 1785.0e6
+// });
 
 
-  // each link requires a new signal, so this establishes link4
-var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-  bw_max: 4.0e7,
-  bw_min: 0,
-  bw_init: 4.0e6,
-  gn_init: -10,
-  gn_min: -10,
-  gn_max: 90,
-  mcs_init: 6,
-  freq_init: 1785.0e6
-});
+//   // each link requires a new signal, so this establishes link4
+// var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+//   bw_max: 4.0e7,
+//   bw_min: 0,
+//   bw_init: 4.0e6,
+//   gn_init: -10,
+//   gn_min: -10,
+//   gn_max: 90,
+//   mcs_init: 6,
+//   freq_init: 1785.0e6
+// });
 
 
   let distance_tx_rx = 0;
@@ -1924,16 +1924,16 @@ var sig4 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
 // signal list now handled by airspace
 let airspace = new RadioAirspace();
-airspace.addTransmitter(sig1);
-airspace.addReceiver(sig2);
+airspace.addTransmitter();
+airspace.addReceiver();
 
 
 var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
 
-  Slider(sig1, 'freq', '#freq1');
-  Slider(sig1, 'bw', '#bw1');
-  Slider(sig1, 'gn', '#gn1');
-  Slider(sig1, 'mcs', '#mcs1');
+  Slider(airspace.transmitters[0], 'freq', '#freq1');
+  Slider(airspace.transmitters[0], 'bw', '#bw1');
+  Slider(airspace.transmitters[0], 'gn', '#gn1');
+  Slider(airspace.transmitters[0], 'mcs', '#mcs1');
 
 //   Slider(sig2, 'freq', '#freq2');
 // Slider(sig2, 'bw', '#bw2');
@@ -1957,17 +1957,17 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
   //function calculate SINR as freq slider moved
   let slider_params = ['freq', 'bw', 'gn', 'mcs'];
   slider_params.forEach(param => {
-    sig1._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
-    CalculateSINR_BasedOn_ReceivedPower(sig1, sig1['_' + param]);
-      sig2._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower2);
-  CalculateSINR_BasedOn_ReceivedPower2(sig2, sig2['_' + param]);
+    airspace.transmitters[0]._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
+    CalculateSINR_BasedOn_ReceivedPower(airspace.transmitters[0], airspace.transmitters[0]['_' + param]);
+      airspace.receivers[0]._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower2);
+  CalculateSINR_BasedOn_ReceivedPower2(airspace.receivers[0], airspace.receivers[0]['_' + param]);
   })
 
   
   // Slider(noise, 'gn', '#gn2');
 
   Label(
-    sig1,
+    airspace.receivers[0],
     "sinr",
     {
       prefix: "Signal-to-Noise Ratio: SNR = ",
@@ -1985,7 +1985,7 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
   updatePathLoss();
 
   // HoppingInterferer(interferer, '#hoppingInterferer');
-  CapacityBanner(sig1, '#capacityBanner');
+  CapacityBanner(airspace.transmitters[0], '#capacityBanner');
 
   function onModeChange() {
     let mode = document.getElementById("mode").value;
@@ -2073,14 +2073,14 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
     if (selection == 'a4' || selection == 'a5') {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
-        sig1.nonlinearModel = true;
+        airspace.transmitters[0].nonlinearModel = true;
       });
     } else {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "none";
       });
-      sig1.nonlinearModel = false;
-      sig1.iip3Point = null;
+      airspace.transmitters[0].nonlinearModel = false;
+      airspace.transmitters[0].iip3Point = null;
     }
   }
 
@@ -2089,14 +2089,14 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
     let selection = document.getElementById("strategy").value;
 
     if (selection == '') {
-      sig1.bandwidthMultiplier = 1;
-      sig1.nonlinearModel = false;
-      sig1.iip3Point = null;
+      airspace.transmitters[0].bandwidthMultiplier = 1;
+      airspace.transmitters[0].nonlinearModel = false;
+      airspace.transmitters[0].iip3Point = null;
     }
 
     // ideal receiver filter with wider bandwidth than the received signal
     if (selection == 'a0') {
-      sig1.bandwidthMultiplier = 1;
+      airspace.transmitters[0].bandwidthMultiplier = 1;
     }
 
     // ideal receiver filter with equal bandwidth multiplier for all signals
@@ -2104,7 +2104,7 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
       let bwMultiplier = document.getElementById("multiplier").value;
       if (bwMultiplier && bwMultiplier.length > 0) {
         let bw_m = Number(bwMultiplier);
-        sig1.bandwidthMultiplier = bw_m;
+        airspace.transmitters[0].bandwidthMultiplier = bw_m;
       } else {
         return;
       }
@@ -2121,13 +2121,13 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
       //   bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
       //   bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
 
-      //   sig1.bandwidthMultiplier = Number(bwMultiplier1);
+      //   airspace.transmitters[0].bandwidthMultiplier = Number(bwMultiplier1);
 
       // }
       if (bwMultiplier1 &&
         bwMultiplier1.length > 0) {
 
-        sig1.bandwidthMultiplier = Number(bwMultiplier1);
+        airspace.transmitters[0].bandwidthMultiplier = Number(bwMultiplier1);
 
       } else {
         return;
@@ -2144,12 +2144,12 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
       //   iip3_1.length > 0 && iip3_2.length > 0 &&
       //   iip3_3.length > 0 && iip3_4.length > 0) {
 
-      //   sig1.iip3Point = Number(iip3_1);
+      //   airspace.transmitters[0].iip3Point = Number(iip3_1);
 
       // }
       if (iip3_1 && iip3_1.length > 0) {
 
-        sig1.iip3Point = Number(iip3_1);
+        airspace.transmitters[0].iip3Point = Number(iip3_1);
 
       } else {
         return;
@@ -2159,12 +2159,12 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
     // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
     // occupying the enter frequency range
     if (selection == 'a5') {
-      sig1.bandwidthMultiplier = -Infinity;
+      airspace.transmitters[0].bandwidthMultiplier = -Infinity;
 
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)
-    sig1.triggerCallbacks();
+    airspace.transmitters[0].triggerCallbacks();
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
     CalculateSINR_BasedOn_ReceivedPower();
@@ -2329,25 +2329,25 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
 
     let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
     let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
-    //calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    //calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx);
     let mode = document.getElementById("mode").value;
 
     //console.log(pattern_rx, theta_rx, phi_rx);
     //console.log(pattern_tx, theta_tx, phi_tx);
     // beginner mode
     if (mode === 'beginner') {
-      calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx)
+      calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx)
     }
     else {
 
-      calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
+      calculatePathLossAdvanced(airspace.transmitters[0], theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
     }
     // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
-    // var x3d_bw=sig1.bw/1000000;
+    // var x3d_bw=airspace.transmitters[0].bw/1000000;
     // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
     // var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
     //connection b/w x3d and slider
-    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    // airspace.transmitters[0].gn=x3d_pr - 10 * Math.log10(x3d_bw);
     PowerSpectrumPlot_2D()
     // //console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
     //sinr value is changed where the formula is re-evaluated based on receiver 
@@ -2390,7 +2390,7 @@ function updatePathLossNewAntennas() {
 
   // Calculate path loss and update DOM for new antennas
   calculatePathLossAdvanced2(
-    sig2,
+    airspace.receivers[0],
     theta_rx,
     phi_rx,
     theta_tx,
@@ -2400,7 +2400,7 @@ function updatePathLossNewAntennas() {
     pattern_tx2
   );
 
-  // Update SINR for sig2
+  // Update SINR for airspace.receivers[0]
   CalculateSINR_BasedOn_ReceivedPower2();
 }
 
@@ -2514,39 +2514,39 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
   //this is the main function that outputs the value seen.  it uses 
   function CalculateSINR_BasedOn_ReceivedPower() {
     let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
-    if (sig1.nonlinearModel == false) {
-      let t_ccip = sig1.calculateSINR(null, false)[0];
+    if (airspace.transmitters[0].nonlinearModel == false) {
+      let t_ccip = airspace.transmitters[0].calculateSINR(null, false)[0];
       //console.log(t_ccip,"@@###@#@#@")
-      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
-      band = sig1.bw;
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
-      //console.log("Sinr",sig1._sinr,10*Math.log10(band));
+      // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
+      band = airspace.transmitters[0].bw;
+      airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      //console.log("Sinr",airspace.transmitters[0]._sinr,10*Math.log10(band));
       // keeping this fix since ccip doesn't consider path loss and this will
-      if (sig1._sinr >= conf.schemes[sig1._mcs].SNR) {
-        sig1._rate = sig1._bw * conf.schemes[sig1._mcs].rate;
+      if (airspace.transmitters[0]._sinr >= conf.schemes[airspace.transmitters[0]._mcs].SNR) {
+        airspace.transmitters[0]._rate = airspace.transmitters[0]._bw * conf.schemes[airspace.transmitters[0]._mcs].rate;
       } else {
-        sig1._rate = 0.1;
+        airspace.transmitters[0]._rate = 0.1;
       }
 
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
+      airspace.transmitters[0]._callbacks.sinr.forEach(function (callback) {
+        callback(airspace.transmitters[0], airspace.transmitters[0]._sinr);
       });
-      //console.log("Rate",sig1._rate)
+      //console.log("Rate",airspace.transmitters[0]._rate)
 
     }
     else {
-      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
-      band = sig1.bw;
-      sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
+      // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(airspace.transmitters[0]._non_linear_ccip);
+      band = airspace.transmitters[0].bw;
+      airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      airspace.transmitters[0]._callbacks.sinr.forEach(function (callback) {
+        callback(airspace.transmitters[0], airspace.transmitters[0]._sinr);
       });
     }
 
-    sig1._callbacks.sinr.forEach(cb => cb(sig1, sig1._sinr));
+    airspace.transmitters[0]._callbacks.sinr.forEach(cb => cb(airspace.transmitters[0], airspace.transmitters[0]._sinr));
 
     // 2) notify the rate (spectral‐efficiency) plot:
-    sig1._callbacks.rate.forEach(cb => cb(sig1, sig1._rate));
+    airspace.transmitters[0]._callbacks.rate.forEach(cb => cb(airspace.transmitters[0], airspace.transmitters[0]._rate));
 
 
   }
@@ -2556,27 +2556,27 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
  //function for link 2 SINR
   function CalculateSINR_BasedOn_ReceivedPower2() {
   let power_Receiver_dB = document.getElementById("power_rx_db_2").innerHTML;
-  if (sig2.nonlinearModel == false) {
-    let t_ccip = sig2.calculateSINR(null, false)[0];
-    let band = sig2.bw;
-    sig2._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
-    if (sig2._sinr >= conf.schemes[sig2._mcs].SNR) {
-      sig2._rate = sig2._bw * conf.schemes[sig2._mcs].rate;
+  if (airspace.receivers[0].nonlinearModel == false) {
+    let t_ccip = airspace.receivers[0].calculateSINR(null, false)[0];
+    let band = airspace.receivers[0].bw;
+    airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+    if (airspace.receivers[0]._sinr >= conf.schemes[airspace.receivers[0]._mcs].SNR) {
+      airspace.receivers[0]._rate = airspace.receivers[0]._bw * conf.schemes[airspace.receivers[0]._mcs].rate;
     } else {
-      sig2._rate = 0.1;
+      airspace.receivers[0]._rate = 0.1;
     }
-    sig2._callbacks.sinr.forEach(function (callback) {
-      callback(sig2, sig2._sinr);
+    airspace.receivers[0]._callbacks.sinr.forEach(function (callback) {
+      callback(airspace.receivers[0], airspace.receivers[0]._sinr);
     });
   } else {
-    let band = sig2.bw;
-    sig2._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
-    sig2._callbacks.sinr.forEach(function (callback) {
-      callback(sig2, sig2._sinr);
+    let band = airspace.receivers[0].bw;
+    airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+    airspace.receivers[0]._callbacks.sinr.forEach(function (callback) {
+      callback(airspace.receivers[0], airspace.receivers[0]._sinr);
     });
   }
-  sig2._callbacks.sinr.forEach(cb => cb(sig2, sig2._sinr));
-  sig2._callbacks.rate.forEach(cb => cb(sig2, sig2._rate));
+  airspace.receivers[0]._callbacks.sinr.forEach(cb => cb(airspace.receivers[0], airspace.receivers[0]._sinr));
+  airspace.receivers[0]._callbacks.rate.forEach(cb => cb(airspace.receivers[0], airspace.receivers[0]._rate));
 }
 
 
@@ -2802,7 +2802,7 @@ console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y},
       //console.log("Invalid input for theta/phi");
       return;
     }
-    calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
+    calculatePathLossAdvanced(airspace.transmitters[0], theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
   }
 
 

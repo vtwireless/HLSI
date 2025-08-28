@@ -132,8 +132,22 @@ class RadioAirspace {
     this.rxPositions = [];     // Array to hold antenna position objects
   }
 
-  addTransmitter(signal) {
-    this.transmitters.push(signal);
+  addTransmitter() {
+    var sigBase = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+        // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
+        bw_max: 4.0e7,
+        // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
+        bw_min: 0,
+        bw_init: 4.0e6, // Hz
+        gn_init: -10, // dB
+        gn_min: -10, // dB
+        gn_max: 90,
+        mcs_init: 6, // array index int
+        freq_init: 1785.0e6
+      });
+    sigBase.name = "Transmitter " + (this.transmitters.length + 1);
+    this.transmitters.push(sigBase);
+    
     // get antenna posistion 
     let str = `tx_transform_${this.transmitters.length}`; // "signal_1"
     // console.log("!!!!! rx transform name:", str);
@@ -141,8 +155,21 @@ class RadioAirspace {
     this.txPositions.push(pos);
   }
 
-  addReceiver(signal) {
-    this.receivers.push(signal);
+  addReceiver() {
+    var sigBase = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+        // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
+        bw_max: 4.0e7,
+        // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
+        bw_min: 0,
+        bw_init: 4.0e6, // Hz
+        gn_init: -10, // dB
+        gn_min: -10, // dB
+        gn_max: 90,
+        mcs_init: 6, // array index int
+        freq_init: 1785.0e6
+      });
+    sigBase.name = "Receiver " + (this.receivers.length + 1);
+    this.receivers.push(sigBase);
     // get antenna posistion
     let str = `rx_transform_${this.receivers.length}`; // "signal_1"
     // console.log("!!!!! rx transform name:", str);
