@@ -693,6 +693,7 @@ function Signal(sig, name = "", opts = null) {
         });
 
         console.log("ccip linear" + ccip);
+        console.log("ccip db" + 10*Math.log10(ccip))
     
         // ccip is now the current interferer power summed for all
         // interferers including any noise interferers.

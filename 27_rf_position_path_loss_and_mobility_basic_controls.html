@@ -1977,12 +1977,12 @@ var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
 
 
   var receiverPos = new Position(0, 0, 0);
-  var translatorPos = new Position(0, 0, 0);
+  var transmitterPos = new Position(0, 0, 0);
   //setting default values of receiver power
   //overriding SNR and distance(tx and rx)
-  getCoordinatesFromX3D("rx_transform_1");
-  calcDistance(receiverPos, new Position(0, 0, 0));
-  updatePathLoss();
+   transmitterPos = getCoordinatesFromX3D("tx_transform_1");
+  // calcDistance(transmitterPos, new Position(0, 0, 0));
+  // updatePathLoss();
 
   // HoppingInterferer(interferer, '#hoppingInterferer');
   CapacityBanner(airspace.transmitters[0], '#capacityBanner');
@@ -2239,7 +2239,7 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
       x_initial * x_initial + y_initial * y_initial + z_initial * z_initial);
     //Here receiver means transmitter
     var rx_coordinates = getCoordinatesFromX3D("rx_transform_1");
-    var tx_cordinates = translatorPos;
+    var tx_cordinates = transmitterPos;
     var updated_z_vector = {
       x: -(rx_coordinates.x - tx_cordinates.x), y: -(rx_coordinates.y - tx_cordinates.y),
       z: -(rx_coordinates.z - tx_cordinates.z)
@@ -2336,11 +2336,11 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
     //console.log(pattern_tx, theta_tx, phi_tx);
     // beginner mode
     if (mode === 'beginner') {
-      calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx)
+      calculatePathLoss(airspace, theta_rx, phi_rx, pattern_rx)
     }
     else {
 
-      calculatePathLossAdvanced(airspace.transmitters[0], theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
+      calculatePathLossAdvanced(airspace,0,0, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
     }
     // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
     // var x3d_bw=airspace.transmitters[0].bw/1000000;
@@ -2486,7 +2486,7 @@ document.getElementById('slider4ForRotateY').addEventListener('input', updatePat
 document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
 
 
-
+// Add event listeners to all sliders to update SINR when moved
 [
   'sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ',
   'slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward',
@@ -2500,6 +2500,8 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
   const slider = document.getElementById(id);
   if (slider) {
     slider.addEventListener('input', () => {
+      updatePathLoss();
+
       // Only call if new antennas exist
       if (document.getElementById("tx_new_transform") && document.getElementById("rx_new_transform")) {
         CalculateSINR_OG_RX_New_TX();
@@ -2513,6 +2515,7 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
 
   //this is the main function that outputs the value seen.  it uses 
   function CalculateSINR_BasedOn_ReceivedPower() {
+    //Jackson: This needs to be an internal variable
     let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
     if (airspace.transmitters[0].nonlinearModel == false) {
       let t_ccip = airspace.transmitters[0].calculateSINR(null, false)[0];
@@ -2668,46 +2671,7 @@ function CalculateSINR_BasedOn_ReceivedPower4() {
 }
 
 
-// // Retrieves the coordinates of a Transform node in an X3D file by its object name.
-//   function getCoordinatesFromX3D(objectName) {
 
-//     const transformNode = document.getElementById(objectName);
-//     if (!transformNode) {
-//      // console.error(`Object "${objectName}" not found in X3D file.`);
-//       return null;
-//     }
-
-//     // Get the translation attribute of the Transform node
-//     const translationAttr = transformNode.getAttribute("translation");
-
-//     // Parse the translation attribute string into an array of coordinates
-//     const coordinates = translationAttr.split(" ").map(parseFloat);
-//     // //console.log(coordinates);
-//     receiverPos.x = coordinates[0];
-//     receiverPos.y = coordinates[1];
-//     receiverPos.z = coordinates[2];
-//     ////console.log(receiverPos);
-
-//     // Return the coordinates as an object with x, y, and z properties
-//     return { x: coordinates[0], y: coordinates[1], z: coordinates[2] };
-//   }
-
-  // Calculates the Euclidean distance between two 3D points and updates the UI.
-
-  function calcDistance(P1, P2) {
-    // P1 = (x1, y1, z1); P2 = (x2, y2, z2)
-    var a = P2.x - P1.x;
-    var b = P2.y - P1.y;
-    var c = P2.z - P1.z;
-
-    var distance = Math.sqrt(a * a + b * b + c * c);
-    distance_tx_rx = distance;
-
-    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
-
-    //  Log the distance to the console
-console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y}, ${P1.z}] to [${P2.x}, ${P2.y}, ${P2.z}])`);
-  }
 
   PowerSpectrumPlot_2D();
 
@@ -2891,16 +2855,16 @@ console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y},
 
       let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
 
-      translatorPos.x = translationValue.x;
-      translatorPos.y = translationValue.y;
-      translatorPos.z = translationValue.z;
+      transmitterPos.x = translationValue.x;
+      transmitterPos.y = translationValue.y;
+      transmitterPos.z = translationValue.z;
 
-          console.log("translatorPos updated in processTranslationGizmoEvent:", translatorPos);
+          console.log("translatorPos updated in processTranslationGizmoEvent:", transmitterPos);
 
       getCoordinatesFromX3D("rx_transform_1");
-      calcDistance(receiverPos, translatorPos);
+      calcDistance(receiverPos, transmitterPos);
 
-      phi_offset = 90 - Math.atan2(12, translatorPos.x) * 180 / Math.PI;
+      phi_offset = 90 - Math.atan2(12, transmitterPos.x) * 180 / Math.PI;
       // update path loss
       updatePathLoss();
 
@@ -3450,7 +3414,7 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
       transmitterNode.getAttribute("axisRotation")
     );
 
-    calcDistance(translatorPos, receiverPos);
+    // calcDistance(transmitterPos, receiverPos);
 
     // 4. Apply initial rotations and translations (optional)
     applyRotationGizmoTransformations("rx");
@@ -3462,26 +3426,26 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
   let currentRxY = 0; 
 
 
-  document.getElementById('sliderForMoveX').addEventListener('input', function (event) {
-    currentRxX = parseFloat(event.target.value);
-    console.log("RX X moved to", currentRxX);
-    updateOGRxTranslation();
-  });
+  // document.getElementById('sliderForMoveX').addEventListener('input', function (event) {
+  //   currentRxX = parseFloat(event.target.value);
+  //   console.log("RX X moved to", currentRxX);
+  //   updateOGRxTranslation();
+  // });
 
-  //legacy code was currentrxZ, however it represents the y axis
-  document.getElementById('sliderForMoveY').addEventListener('input', function (event) {
-    currentRxZ = parseFloat(event.target.value);
-        console.log("RX Y moved to", currentRxZ);
+  // //legacy code was currentrxZ, however it represents the y axis
+  // document.getElementById('sliderForMoveY').addEventListener('input', function (event) {
+  //   currentRxZ = parseFloat(event.target.value);
+  //       console.log("RX Y moved to", currentRxZ);
 
-    updateOGRxTranslation();
-  });
+  //   updateOGRxTranslation();
+  // });
 
-  document.getElementById('sliderForMoveZ').addEventListener('input', function (event) {
-    currentRxY = parseFloat(event.target.value);
-        console.log("RX Z moved to", currentRxY);
+  // document.getElementById('sliderForMoveZ').addEventListener('input', function (event) {
+  //   currentRxY = parseFloat(event.target.value);
+  //       console.log("RX Z moved to", currentRxY);
 
-    updateOGRxTranslation();
-  });
+  //   updateOGRxTranslation();
+  // });
 
 
 
@@ -3555,9 +3519,11 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
     const antenna = document.getElementById('tx_transform_1');
     if (antenna) {
       // antenna.setAttribute('translation', `${currentRxX} ${currentRxY} ${currentRxZ}`);
-      
-      getCoordinatesFromX3D("rx_transform_1");
-      calcDistance(receiverPos, { x: currentRxX, y: currentRxY, z: currentRxZ });
+      // incorrect this happens before the antennas are moved
+      transmitterPos = getCoordinatesFromX3D("tx_transform_1");
+      receiverPos = getCoordinatesFromX3D("rx_transform_1");
+
+      calcDistance(receiverPos, transmitterPos);
           //console.log("updateOGRxTranslation: RX moved to", { x: currentRxX, y: currentRxY, z: currentRxZ });
               updateAllAntennaAnglesAndPathLoss();
 
@@ -3568,14 +3534,14 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
 
   function updateAllAntennaAnglesAndPathLoss() {
   // Get RX and TX positions
-const txPos = getCoordinatesFromX3D("rx_transform_1");
-  const rxPos = { x: currentRxX, y: currentRxY, z: currentRxZ };
-  distance_tx_rx = Math.sqrt(
-  Math.pow(txPos.x - rxPos.x, 2) +
-  Math.pow(txPos.y - rxPos.y, 2) +
-  Math.pow(txPos.z - rxPos.z, 2)
-);
-updatePathLoss();
+const txPos = getCoordinatesFromX3D("tx_transform_1");
+const rxPos = getCoordinatesFromX3D("rx_transform_1");
+//   distance_tx_rx = Math.sqrt(
+//   Math.pow(txPos.x - rxPos.x, 2) +
+//   Math.pow(txPos.y - rxPos.y, 2) +
+//   Math.pow(txPos.z - rxPos.z, 2)
+// );
+// updatePathLoss();
 
   // Get RX and TX rotation matrices (3x3)
   // For RX
@@ -3635,7 +3601,7 @@ const dirVec = [dx, dy, dz];
   document.getElementById('angle-phi-table-tx-rel').textContent = phi_tx.toFixed(2);
 
   // Update path loss and pattern lookup
-  updatePathLoss();
+  // updatePathLoss();
 }
 
 // sets up the antennas on the page.  had issues with getting the antennas, so an offset was implemented to make sure they spawned properly in the x3d scene.  Although not a perfect method, this did solve the issue at least visually, not sure of any code issues that may arise from this, if any.
@@ -3658,7 +3624,7 @@ function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransform
     target.setAttribute("translation", `${x} ${y} ${z}`);
 
      if (targetTransformId === 'tx_new_transform' || targetTransformId === 'rx_new_transform') {
-      updateAllAntennaAnglesAndPathLossNew();
+      // updateAllAntennaAnglesAndPathLossNew();
       if (typeof updatePathLossNewAntennas === 'function') {
         updatePathLossNewAntennas();
       }
@@ -3672,7 +3638,7 @@ function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransform
       const rxPos = getCoordinatesFromX3D("rx_transform_1");
       const txPos = getCoordinatesFromX3D("tx_transform_1");
       receiverPos = txPos;
-      translatorPos = rxPos;
+      transmitterPos = rxPos;
       distance_tx_rx = Math.sqrt(
         Math.pow(txPos.x - rxPos.x, 2) +
         Math.pow(txPos.y - rxPos.y, 2) +

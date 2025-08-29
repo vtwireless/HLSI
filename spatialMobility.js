@@ -177,6 +177,8 @@ class RadioAirspace {
     this.rxPositions.push(pos);
   }
 
+
+
 }
 
 // Calculates the path loss at a given point in space with given spherical coordinates theta and phi
@@ -227,7 +229,7 @@ function getTxZAngleDegrees() {
 
 //TODO: the polarization has only been implemented when we assume both antennas are vertically polarized.  Need to implement the case when both antennas are horizontally polarized and when one is vertically polarized and the other is horizontally polarized. This can be done with an if, else if, else, where we put if tx horiz, if rx horiz, etc.  Note this must go in advancedcalculatePathLoss
 
-function calculatePathLoss(sig, theta, phi, distance, pattern) {
+function calculatePathLoss(airspace, theta, phi, pattern) {
   //console.log("========== calculatePathLoss Called ==========");
 
   // 1. Check input arguments (ESSENTIAL)
@@ -239,7 +241,12 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
   //            "pattern:", pattern);
 
   // 2. Wavelength
-  let lambda = 299.792458e6 / sig["_freq"];
+  let rx_pos = getCoordinatesFromX3D("rx_transform_1");
+  let tx_pos = getCoordinatesFromX3D("tx_transform_1");
+
+  let distance = calcDistance(tx_pos, rx_pos);
+
+  let lambda = 299.792458e6 / airspace.transmitters[0]["_freq"];
 
   // 3. Z-angle tilt (degrees -> radians -> cos²z)
   let zRadians = (rxAngles.Z * Math.PI) / 180;
@@ -276,8 +283,8 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
   }
 
   // 6. EIRP (Effective Isotropic Radiated Power)
-  let eirp_vert_dB = sig._gn + fvert_tx_dB;
-  let eirp_horiz_dB = sig._gn + fhoriz_tx_dB;
+  let eirp_vert_dB = airspace.transmitters[0]._gn + fvert_tx_dB;
+  let eirp_horiz_dB = airspace.transmitters[0]._gn + fhoriz_tx_dB;
   //console.log("TX gain (sig._gn):", sig._gn);
 //console.log("TX vertical pattern gain (fvert_tx_dB):", fvert_tx_dB);
 //console.log("TX horizontal pattern gain (fhoriz_tx_dB):", fhoriz_tx_dB);
@@ -305,6 +312,8 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
   if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) !== Infinity) {
     document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
   }
+    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+
 
   //console.log("===============================================");
 }
@@ -312,17 +321,23 @@ function calculatePathLoss(sig, theta, phi, distance, pattern) {
 
 
 function calculatePathLossAdvanced(
-  sig,
+  airspace,
+  transmitterIndex,
+  receiverIndex,
   theta_rx,
   phi_rx,
   theta_tx,
   phi_tx,
-  distance,
   pattern_rx,
   pattern_tx
 ) {
+  let string = "rx_transform_"+(receiverIndex + 1);
+  let rx_pos = getCoordinatesFromX3D("rx_transform_"+(receiverIndex + 1));
+  let tx_pos = getCoordinatesFromX3D("tx_transform_"+(transmitterIndex + 1));
+
+  let distance = calcDistance(tx_pos, rx_pos);
   // Compute wavelength in meters
-  let lambda = 299.792458e6 / sig["_freq"];
+  let lambda = 299.792458e6 / airspace.transmitters[transmitterIndex]["_freq"];
 
   // Get antenna pattern values
   let antenna_pattern = getAntennaPatternValue(theta_rx, phi_rx, pattern_rx);
@@ -351,8 +366,8 @@ let tx_pattern = getAntennaPatternValue(theta_tx, phi_tx_flipped, pattern_tx);
   let tiltHoriz = 1 - cos2z;
 
   // Effective isotropic radiated power at antenna of the transmitter
-  let eirp_vert_dB = sig._gn + fvert_tx_dB;
-  let eirp_horiz_dB = sig._gn + fhoriz_tx_dB;
+  let eirp_vert_dB = airspace.transmitters[transmitterIndex]._gn + fvert_tx_dB;
+  let eirp_horiz_dB = airspace.transmitters[transmitterIndex]._gn + fhoriz_tx_dB;
 
   // Path loss
   let pathLoss_dB = 20 * Math.log10((4 * Math.PI * distance) / lambda);
@@ -372,6 +387,7 @@ let tx_pattern = getAntennaPatternValue(theta_tx, phi_tx_flipped, pattern_tx);
   if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) !== Infinity) {
     document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
   }
+    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   console.log("Link 1 | RX pattern gain at (theta, phi):", theta_rx, phi_rx, pattern_rx);
 }
@@ -567,4 +583,19 @@ function calculatePathLossAdvanced4(
 }
 
 
+  function calcDistance(P1, P2) {
+    // P1 = (x1, y1, z1); P2 = (x2, y2, z2)
+    var a = P2.x - P1.x;
+    var b = P2.y - P1.y;
+    var c = P2.z - P1.z;
 
+    var distance = Math.sqrt(a * a + b * b + c * c);
+    distance_tx_rx = distance;
+
+    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+
+    //  Log the distance to the console
+console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y}, ${P1.z}] to [${P2.x}, ${P2.y}, ${P2.z}])`);
+
+    return distance;
+  }
