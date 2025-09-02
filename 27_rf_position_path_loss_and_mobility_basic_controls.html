@@ -1489,7 +1489,7 @@
   let antennaCounter = { tx: 0, rx: 0 }; // max one new antenna per type
 
   document.getElementById('add-tx-antenna-btn').addEventListener('click', function () {
-  addNewAntenna('tx');
+  addNewAntennaX3DElement('tx',airpsace);
   document.getElementById('sliderGroup_tx2').style.display = 'flex';
   document.getElementById('add-tx-antenna-btn').style.display = 'none';
   document.getElementById('remove-tx-antenna-btn').style.display = 'inline-block';
@@ -1511,19 +1511,22 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
 });
 
  document.getElementById('add-rx-antenna-btn').addEventListener('click', function () {
-  addNewAntenna('rx');
-
+  addNewAntennaX3DElement('rx',airspace);
   document.getElementById('sliderGroup_rx2').style.display = 'flex';
-  document.getElementById('add-rx-antenna-btn').style.display = 'none';
+  // document.getElementById('add-rx-antenna-btn').style.display = 'none';
   document.getElementById('remove-rx-antenna-btn').style.display = 'inline-block';
   document.getElementById('reset-rx-antenna-btn').style.display = 'inline-block';
   document.getElementById('toggle-rx2-sliders').style.display = 'inline-block'; // <-- Show hide button
   SinrPlot_BarChart.remove_plot(); // Clear SINR plot when adding new RX
+  // airspace.addReceiver(); // Add new receiver to airspace
+  airspace.numReceivers = airspace.numReceivers + 1; // Increment the number of receivers
   let linkList = [];
   for (let i = 0; i <= antennaCounter['rx'] ; i++) {
     linkList.push(`Link ${i +1}`);
   }
-  SinrPlot_BarChart.init(airspace.receivers, "sinr-bar-chart",linkList );
+  signalData = airspace.receivers.slice(0,airspace.numReceivers); // Recompute signals for all links
+  SinrPlot_BarChart.init(signalData, "sinr-bar-chart",linkList );
+    updatePathLoss();
 
 //   SinrPlot_BarChart.init(signalList, "sinr-bar-chart", [
 //   "Link 1",  // (Original RX ↔ Original TX)
@@ -1925,10 +1928,12 @@ function selectModelRX2() {
 // signal list now handled by airspace
 let airspace = new RadioAirspace();
 airspace.addTransmitter();
-airspace.addReceiver();
+for (let i = 0; i < 5; i++) {
+  airspace.addReceiver();
+}
+airspace.numReceivers = 1; // Start with one receiver
 
-
-var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
+var noise = Signal(conf.noise, "Noise", { gn_init: 120 })
 
   Slider(airspace.transmitters[0], 'freq', '#freq1');
   Slider(airspace.transmitters[0], 'bw', '#bw1');
@@ -2319,6 +2324,7 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
 
   // Updates the Path Loss
   function updatePathLoss() {
+    
     let pattern_rx = document.getElementById("antenna_pattern").value;
     let pattern_tx = document.getElementById("tx_pattern").value;
 
@@ -2339,8 +2345,10 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
       calculatePathLoss(airspace, theta_rx, phi_rx, pattern_rx)
     }
     else {
+      for (let i = 0; i < airspace.numReceivers; i++) {
 
-      calculatePathLossAdvanced(airspace,0,0, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
+      calculatePathLossAdvanced(airspace,0,i, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
+      }
     }
     // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
     // var x3d_bw=airspace.transmitters[0].bw/1000000;
@@ -2356,6 +2364,7 @@ SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-ba
     //console.log("TX theta/phi used for pattern lookup:", theta_tx, phi_tx);
 
     CalculateSINR_BasedOn_ReceivedPower();
+
   }
 
 
@@ -2515,24 +2524,42 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
 
   //this is the main function that outputs the value seen.  it uses 
   function CalculateSINR_BasedOn_ReceivedPower() {
-    //Jackson: This needs to be an internal variable
-    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    for (let i = 0; i < airspace.numReceivers; i++) {
+    // let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    let pattern_rx = document.getElementById("antenna_pattern").value;
+    let pattern_tx = document.getElementById("tx_pattern").value;
+
+    let theta_rx = Number(document.getElementById("angle-theta-table-rx-rel").innerText) || 0;
+    let phi_rx = Number(document.getElementById("angle-phi-table-rx-rel").innerText) || 0;
+    // console.log("ThetaRX(UPDATED)): " + theta_rx);
+    //console.log("PhiRX(UPDATED): " + phi_rx);
+
+    let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
+    let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
+    //calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    let mode = document.getElementById("mode").value;
+
+    let power_Receiver_dB = calculatePathLossAdvanced(airspace,0,i, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
+
     if (airspace.transmitters[0].nonlinearModel == false) {
       let t_ccip = airspace.transmitters[0].calculateSINR(null, false)[0];
       //console.log(t_ccip,"@@###@#@#@")
       // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
-      band = airspace.transmitters[0].bw;
-      airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      band = airspace.receivers[i].bw;
+      // airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      airspace.receivers[i]._sinr = Number(power_Receiver_dB)  - (-noise.gn);
       //console.log("Sinr",airspace.transmitters[0]._sinr,10*Math.log10(band));
       // keeping this fix since ccip doesn't consider path loss and this will
-      if (airspace.transmitters[0]._sinr >= conf.schemes[airspace.transmitters[0]._mcs].SNR) {
-        airspace.transmitters[0]._rate = airspace.transmitters[0]._bw * conf.schemes[airspace.transmitters[0]._mcs].rate;
+
+      //TODO: make this also 0 when tx and rx are different schemes
+      if (airspace.receivers[i]._sinr >= conf.schemes[airspace.receivers[i]._mcs].SNR) {
+        airspace.receivers[i]._rate = airspace.receivers[i]._bw * conf.schemes[airspace.receivers[i]._mcs].rate;
       } else {
-        airspace.transmitters[0]._rate = 0.1;
+        airspace.receivers[i]._rate = 0.1;
       }
 
-      airspace.transmitters[0]._callbacks.sinr.forEach(function (callback) {
-        callback(airspace.transmitters[0], airspace.transmitters[0]._sinr);
+      airspace.receivers[i]._callbacks.sinr.forEach(function (callback) {
+        callback(airspace.receivers[i], airspace.receivers[i]._sinr);
       });
       //console.log("Rate",airspace.transmitters[0]._rate)
 
@@ -2540,12 +2567,12 @@ document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathL
     else {
       // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(airspace.transmitters[0]._non_linear_ccip);
       band = airspace.transmitters[0].bw;
-      airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      airspace.transmitters[0]._sinr = Number(power_Receiver_dB)  - (-noise.gn);
       airspace.transmitters[0]._callbacks.sinr.forEach(function (callback) {
         callback(airspace.transmitters[0], airspace.transmitters[0]._sinr);
       });
     }
-
+  }
     airspace.transmitters[0]._callbacks.sinr.forEach(cb => cb(airspace.transmitters[0], airspace.transmitters[0]._sinr));
 
     // 2) notify the rate (spectral‐efficiency) plot:
@@ -3007,11 +3034,11 @@ updateAllAntennaAnglesAndPathLoss();
 
   //Newly added. Allows for slider value updates to be updated
   // document.getElementById("add-tx-antenna-btn").addEventListener("click", () => {
-  //   addNewAntenna('tx');
+  //   addNewAntennaX3DElement('tx');
   // });
 
   // document.getElementById("add-rx-antenna-btn").addEventListener("click", () => {
-  //   addNewAntenna('rx');
+  //   addNewAntennaX3DElement('rx');
   // });
 
 
@@ -3019,20 +3046,20 @@ updateAllAntennaAnglesAndPathLoss();
 
 
   // spawns in the new antennas
-  function addNewAntenna(type) {
+  function addNewAntennaX3DElement(type, airspace) {
     if (antennaCounter[type] >= 1) return;
 
     const scene = document.querySelector("scene");
     const isTx = type === 'tx';
     const label = isTx ? 'TX' : 'RX';
-    const idSuffix = `${type}_new`;
+    const idSuffix = `${type}`;
     const switchId = `${idSuffix}_switch`;
 
     const xInit = 15;
     const yInit = -15 + (isTx ? 0 : 15);
 
     const outerTransform = document.createElement('transform');
-    outerTransform.setAttribute('id', `${idSuffix}_transform`);
+    outerTransform.setAttribute('id', `${idSuffix}_transform_${(airspace.numReceivers+1)}`);
     outerTransform.setAttribute('translation', `${xInit} -2.5 ${yInit}`);
 
     // Rod
@@ -3197,7 +3224,7 @@ gizmoTransform.appendChild(outerTriangle);
     const rotXId = isTx ? 'slider4ForRotateX' : 'slider3ForRotateX';
     const rotYId = isTx ? 'slider4ForRotateY' : 'slider3ForRotateY';
     const rotZId = isTx ? 'slider4ForTiltZ' : 'slider3ForTiltZ';
-    const transformId = `${idSuffix}_transform`;
+    const transformId = `${idSuffix}_transform_${(airspace.numReceivers+1)}`;
 
     document.getElementById(moveXId).value = xInit;
     document.getElementById(moveYId).value = yInit;
@@ -3414,7 +3441,7 @@ window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 's
       transmitterNode.getAttribute("axisRotation")
     );
 
-    // calcDistance(transmitterPos, receiverPos);
+  updatePathLoss();    // calcDistance(transmitterPos, receiverPos);
 
     // 4. Apply initial rotations and translations (optional)
     applyRotationGizmoTransformations("rx");
@@ -3778,7 +3805,7 @@ function toggleAntennaSliders(antenna) {
 
 setupTranslationSlider('sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ', 'rx_transform_1', '2.5');
   setupTranslationSlider('slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward', 'tx_transform_1', '2.5');
-  setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx2_transform');
+  setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_transform_2');
   setupTranslationSlider('slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward', 'tx2_transform');
 setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_new_transform');
 

@@ -130,9 +130,11 @@ class RadioAirspace {
     this.txPositions = [];      // Array to hold antenna position objects
     this.receivers = [];     // Array to hold antenna position objects
     this.rxPositions = [];     // Array to hold antenna position objects
+    this.numReceivers = 0;
   }
 
-  addTransmitter() {
+  addTransmitter(signal = null) {
+    if (signal == null) {
     var sigBase = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
         // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
         bw_max: 4.0e7,
@@ -145,6 +147,9 @@ class RadioAirspace {
         mcs_init: 6, // array index int
         freq_init: 1785.0e6
       });
+    } else {
+      var sigBase = signal;
+    }
     sigBase.name = "Transmitter " + (this.transmitters.length + 1);
     this.transmitters.push(sigBase);
     
@@ -155,7 +160,8 @@ class RadioAirspace {
     this.txPositions.push(pos);
   }
 
-  addReceiver() {
+  addReceiver(signal = null) {
+    if (signal == null) {
     var sigBase = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
         // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
         bw_max: 4.0e7,
@@ -168,6 +174,9 @@ class RadioAirspace {
         mcs_init: 6, // array index int
         freq_init: 1785.0e6
       });
+    } else {
+      var sigBase = signal;
+    }
     sigBase.name = "Receiver " + (this.receivers.length + 1);
     this.receivers.push(sigBase);
     // get antenna posistion
@@ -177,8 +186,14 @@ class RadioAirspace {
     this.rxPositions.push(pos);
   }
 
+  // getReceivedPower(txIndex, rxIndex, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx) {
+  //   pathLoss = calculatePathLossAdvanced(this, txIndex, rxIndex, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
 
 
+
+  //   // Placeholder for received power calculation
+  //   return -100; // dBm
+  // }
 }
 
 // Calculates the path loss at a given point in space with given spherical coordinates theta and phi
@@ -314,6 +329,7 @@ function calculatePathLoss(airspace, theta, phi, pattern) {
   }
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
+    return pathLoss_dB;
 
   //console.log("===============================================");
 }
@@ -331,7 +347,6 @@ function calculatePathLossAdvanced(
   pattern_rx,
   pattern_tx
 ) {
-  let string = "rx_transform_"+(receiverIndex + 1);
   let rx_pos = getCoordinatesFromX3D("rx_transform_"+(receiverIndex + 1));
   let tx_pos = getCoordinatesFromX3D("tx_transform_"+(transmitterIndex + 1));
 
@@ -390,6 +405,7 @@ let tx_pattern = getAntennaPatternValue(theta_tx, phi_tx_flipped, pattern_tx);
     document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
 
   console.log("Link 1 | RX pattern gain at (theta, phi):", theta_rx, phi_rx, pattern_rx);
+  return p_receiver_dB;
 }
 
 
