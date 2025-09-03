@@ -326,8 +326,8 @@ function PowerSpectrumPlot_2D(
       // console.log(pattern_tx, theta_tx, phi_tx);
 
       let lambda = 299.792458e6 / sig["_freq"];
-      var dist = document.getElementById("rec_trans_dist").innerHTML;
-      document.getElementById("path_loss").value = (
+      var dist = document.getElementById("rec_trans_dist1").innerHTML;
+      document.getElementById("path_loss1").value = (
         20 * Math.log10((4 * Math.PI * dist) / lambda)
       ).toFixed(2);
 

@@ -232,7 +232,7 @@ function getTxZAngleDegrees() {
 
     // Parse the translation attribute string into an array of coordinates
     const coordinates = translationAttr.split(" ").map(parseFloat);
-    console.log(coordinates);
+    // console.log(coordinates);
     // receiverPos.x = coordinates[0];
     // receiverPos.y = coordinates[1];
     // receiverPos.z = coordinates[2];
@@ -259,7 +259,7 @@ function calculatePathLoss(airspace, theta, phi, pattern) {
   let rx_pos = getCoordinatesFromX3D("rx_transform_1");
   let tx_pos = getCoordinatesFromX3D("tx_transform_1");
 
-  let distance = calcDistance(tx_pos, rx_pos);
+  let distance = calcDistance(tx_pos, rx_pos, airspace);
 
   let lambda = 299.792458e6 / airspace.transmitters[0]["_freq"];
 
@@ -323,11 +323,11 @@ function calculatePathLoss(airspace, theta, phi, pattern) {
   //console.log("[Received Power] FINAL (dB):", p_receiver_dB.toFixed(2));
 
   // 11. Update DOM
-  document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
+  document.getElementById("path_loss1").innerHTML = pathLoss_dB.toFixed(2);
   if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) !== Infinity) {
-    document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
+    document.getElementById("power_rx_db1").innerHTML = p_receiver_dB.toFixed(2);
   }
-    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+    document.getElementById("rec_trans_dist1").innerHTML = distance.toFixed(2);
 
     return pathLoss_dB;
 
@@ -350,7 +350,7 @@ function calculatePathLossAdvanced(
   let rx_pos = getCoordinatesFromX3D("rx_transform_"+(receiverIndex + 1));
   let tx_pos = getCoordinatesFromX3D("tx_transform_"+(transmitterIndex + 1));
 
-  let distance = calcDistance(tx_pos, rx_pos);
+  let distance = calcDistance(tx_pos, rx_pos,airspace);
   // Compute wavelength in meters
   let lambda = 299.792458e6 / airspace.transmitters[transmitterIndex]["_freq"];
 
@@ -398,11 +398,11 @@ let tx_pattern = getAntennaPatternValue(theta_tx, phi_tx_flipped, pattern_tx);
   let p_receiver_dB = 10 * Math.log10(p_receiver_vert_linear + p_receiver_horiz_linear + 1e-12);
 
   // Update DOM
-   document.getElementById("path_loss").innerHTML = pathLoss_dB.toFixed(2);
-  if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) !== Infinity) {
-    document.getElementById("power_rx_db").innerHTML = p_receiver_dB.toFixed(2);
-  }
-    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+    document.getElementById(`path_loss${airspace.numReceivers}`).innerHTML = pathLoss_dB.toFixed(2);  
+    if (!isNaN(p_receiver_dB) && Math.abs(p_receiver_dB) !== Infinity) {
+    document.getElementById(`power_rx_db${airspace.numReceivers}`).innerHTML = p_receiver_dB.toFixed(2);
+    }
+    document.getElementById(`rec_trans_dist${airspace.numReceivers}`).innerHTML = distance.toFixed(2);
 
   console.log("Link 1 | RX pattern gain at (theta, phi):", theta_rx, phi_rx, pattern_rx);
   return p_receiver_dB;
@@ -599,7 +599,7 @@ function calculatePathLossAdvanced4(
 }
 
 
-  function calcDistance(P1, P2) {
+  function calcDistance(P1, P2, airspace = null) {
     // P1 = (x1, y1, z1); P2 = (x2, y2, z2)
     var a = P2.x - P1.x;
     var b = P2.y - P1.y;
@@ -607,8 +607,8 @@ function calculatePathLossAdvanced4(
 
     var distance = Math.sqrt(a * a + b * b + c * c);
     distance_tx_rx = distance;
-
-    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+    if (airspace == null) return distance;
+    document.getElementById(`rec_trans_dist${airspace.numReceivers}`).innerHTML = distance.toFixed(2);
 
     //  Log the distance to the console
 console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y}, ${P1.z}] to [${P2.x}, ${P2.y}, ${P2.z}])`);
