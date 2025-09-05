@@ -1182,18 +1182,18 @@
                 <!-- === Basic TX2 Sliders === -->
                 <div class="slider-row">
                   <div class="slider-box">
-                    <label for="slider4ForMoveX" style="color: white;">Move East-West (TX2)</label>
-                    <input type="range" id="slider4ForMoveX" min="-20" max="20" value="15"
+                    <label for="null" style="color: white;">Move East-West (TX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="15"
                       style="accent-color: #ff6600;">
                   </div>
                   <div class="slider-box">
-                    <label for="slider4ForMoveY" style="color: white;">Move North-South (TX2)</label>
-                    <input type="range" id="slider4ForMoveY" min="-20" max="20" value="-2.5"
+                    <label for="null" style="color: white;">Move North-South (TX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="-2.5"
                       style="accent-color: #ff6600;">
                   </div>
                   <div class="slider-box">
-                    <label for="slider3ForZupward" style="color: white;">Move Up-Down</label>
-                    <input type="range" id="slider3ForZupward" min="0" max="10" value="0"
+                    <label for="null" style="color: white;">Move Up-Down</label>
+                    <input type="range" id="null" min="0" max="10" value="0"
                       style="accent-color: #ff6600;">
                   </div>
                 </div>
@@ -1270,18 +1270,18 @@
               <div id="sliderGroup_rx2" style="display: none; flex-direction: column; gap: 1rem;">
                 <div class="slider-row">
                   <div class="slider-box">
-                    <label for="slider3ForMoveX" style="color: white;">Move East-West (RX2)</label>
-                    <input type="range" id="slider3ForMoveX" min="-20" max="20" value="15"
+                    <label for="null" style="color: white;">Move East-West (RX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="15"
                       style="accent-color: limegreen;">
                   </div>
                   <div class="slider-box">
-                    <label for="slider3ForMoveY" style="color: white;">Move North-South (RX2)</label>
-                    <input type="range" id="slider3ForMoveY" min="-20" max="20" value="-2.5"
+                    <label for="null" style="color: white;">Move North-South (RX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="-2.5"
                       style="accent-color: limegreen;">
                   </div>
                   <div class="slider-box">
-                    <label for="slider4ForZupward">Move Up-Down</label>
-                    <input type="range" id="slider4ForZupward" min="0" max="10" value="0"
+                    <label for="null">Move Up-Down</label>
+                    <input type="range" id="null" min="0" max="10" value="0"
                       style="accent-color: limegreen;">
                   </div>
                 </div>
@@ -1310,7 +1310,9 @@
               </div>
             </div>
           </div>
-<div class="slider-row">
+
+          <div id="sliderContainer"></div>
+<!-- <div class="slider-row">
   <div class="slider-box">
     <label for="freq4"><b>Frequency</b></label>
     <input type="range" id="freq4" min="1700000000" max="1900000000" value="1785000000" step="1000000">
@@ -1331,7 +1333,7 @@
     <input type="range" id="mcs4" min="0" max="10" value="6" step="1">
     <output id="mcs4_val">r8/9 16-QAM (3.56 b/s/Hz)</output>
   </div>
-</div>
+</div> -->
 
 
 
@@ -1525,25 +1527,23 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
 
  document.getElementById('add-rx-antenna-btn').addEventListener('click', function () {
   airspace.numReceivers = airspace.numReceivers + 1; // Increment the number of receivers
-
-
   addNewAntennaX3DElement('rx',airspace);
-  document.getElementById('sliderGroup_rx2').style.display = 'flex';
+  // document.getElementById('sliderGroup_rx2').style.display = 'flex';
   // document.getElementById('add-rx-antenna-btn').style.display = 'none';
   document.getElementById('remove-rx-antenna-btn').style.display = 'inline-block';
   document.getElementById('reset-rx-antenna-btn').style.display = 'inline-block';
-  document.getElementById('toggle-rx2-sliders').style.display = 'inline-block'; // <-- Show hide button
+  // document.getElementById('toggle-rx2-sliders').style.display = 'inline-block'; // <-- Show hide button
   
     const parent = document.getElementById("receiver_pattern_options");
 
     const rx2PatternOptions = document.createElement("div");
-    rx2PatternOptions.id = "rx2_pattern_options";
+    rx2PatternOptions.id = `rx${airspace.numReceivers}_pattern_options`;
 
     rx2PatternOptions.innerHTML = `
         <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: 1rem;">
           <div style="width: 28px; height: 15px; background: limegreen;"></div>
-          <label for="rx2_pattern"><b>Type of RX2 Pattern:</b></label>
-          <select id="rx2_pattern">
+          <label for="rx${airspace.numReceivers}_pattern"><b>Type of RX2 Pattern:</b></label>
+          <select id="rx${airspace.numReceivers}_pattern">
             <option value="vertical_isotropic">Vertical Isotropic</option>
             <option value="horizontal_isotropic">Horizontal Isotropic</option>
             <option value="halfwave">Half-wave dipole</option>
@@ -1551,14 +1551,14 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
             <option value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
           </select>
 
-          <label><input type="checkbox" id="vertical_rx2" value="vertical"> Vertical</label>
-          <label><input type="checkbox" id="horizontal_rx2" value="horizontal"> Horizontal</label>
+          <label><input type="checkbox" id="vertical_rx${airspace.numReceivers}" value="vertical"> Vertical</label>
+          <label><input type="checkbox" id="horizontal_rx${airspace.numReceivers}" value="horizontal"> Horizontal</label>
 
-          <label for="theta_rx2_manual">Theta (0-180)</label>
-          <input id="theta_rx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+          <label for="theta_rx${airspace.numReceivers}_manual">Theta (0-180)</label>
+          <input id="theta_rx${airspace.numReceivers}_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
 
-          <label for="phi_rx2_manual">Phi (0-360)</label>
-          <input id="phi_rx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+          <label for="phi_rx${airspace.numReceivers}_manual">Phi (0-360)</label>
+          <input id="phi_rx${airspace.numReceivers}_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
 
           <input type="button" value="Apply" onclick="manualInputRX2()">
         </div>
@@ -1587,9 +1587,7 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
   const parentContainer = document.getElementById('receiver_pattern_options'); // Replace with the correct parent ID
   parentContainer.appendChild(newDiv);
 
-
-
-  
+  generateSliderGroup("sliderContainer", `dynamicSliderGroup${airspace.numReceivers}`, airspace);
 
   SinrPlot_BarChart.remove_plot(); // Clear SINR plot when adding new RX
   // airspace.addReceiver(); // Add new receiver to airspace
@@ -1600,7 +1598,7 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
   signalData = airspace.receivers.slice(0,airspace.numReceivers); // Recompute signals for all links
   SinrPlot_BarChart.init(signalData, "sinr-bar-chart",linkList );
     updatePathLoss();
- 
+
 });
 
   // === Remove RX Antenna Button ===
@@ -2477,27 +2475,25 @@ function getAntennaAngles(txId, rxId, txRotId, rxRotId) {
 
 
 // calls for New antennas sliders to update SINR2
-document.getElementById('slider3ForMoveX').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider3ForMoveY').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForZupward').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForMoveX').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForMoveY').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider3ForZupward').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForMoveX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForMoveY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForZupward').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForMoveX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForMoveY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForZupward').addEventListener('input', updatePathLossNewAntennas);
 
-document.getElementById('slider3ForRotateX').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider3ForRotateY').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider3ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForRotateX').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForRotateY').addEventListener('input', updatePathLossNewAntennas);
-document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForRotateX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForRotateY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForRotateX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForRotateY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
 
 
 // Add event listeners to all sliders to update SINR when moved
 [
   'sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ',
   'slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward',
-  'slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward',
-  'slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward',
   'sliderForRotateX', 'sliderForRotateY', 'sliderForTiltZ',
   'slider2ForRotateX', 'slider2ForRotateY', 'slider2ForTiltZ',
   'slider3ForRotateX', 'slider3ForRotateY', 'slider3ForTiltZ',
@@ -3215,17 +3211,17 @@ gizmoTransform.appendChild(outerTriangle);
     scene.appendChild(outerTransform);
 
     // Setup sliders
-    const moveXId = isTx ? 'slider4ForMoveX' : 'slider3ForMoveX';
-    const moveYId = isTx ? 'slider4ForMoveY' : 'slider3ForMoveY';
-    const moveZId = isTx ? 'slider3ForZupward' : 'slider4ForZupward';
+    // const moveXId = isTx ? 'slider4ForMoveX' : 'slider3ForMoveX';
+    // const moveYId = isTx ? 'slider4ForMoveY' : 'slider3ForMoveY';
+    // const moveZId = isTx ? 'slider3ForZupward' : 'slider4ForZupward';
     const rotXId = isTx ? 'slider4ForRotateX' : 'slider3ForRotateX';
     const rotYId = isTx ? 'slider4ForRotateY' : 'slider3ForRotateY';
     const rotZId = isTx ? 'slider4ForTiltZ' : 'slider3ForTiltZ';
     const transformId = `${idSuffix}_transform_${(airspace.numReceivers)}`;
 
-    document.getElementById(moveXId).value = xInit;
-    document.getElementById(moveYId).value = yInit;
-    setupTranslationSlider(moveXId, moveYId, moveZId, transformId);
+    // document.getElementById(moveXId).value = xInit;
+    // document.getElementById(moveYId).value = yInit;
+    // setupTranslationSlider(moveXId, moveYId, moveZId, transformId);
     setupSlider(rotXId, rotYId, rotZId, `${idSuffix}Rotation`);
 
     // RX2
@@ -3468,7 +3464,7 @@ gizmoTransform.appendChild(outerTriangle);
   //   currentRxY = parseFloat(event.target.value);
   //       console.log("RX Z moved to", currentRxY);
 
-  //   updateOGRxTranslation();
+  // //   updateOGRxTranslation();
   // });
 
 
@@ -3633,12 +3629,13 @@ function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransform
   const sliderX = document.getElementById(sliderXId);
   const sliderY = document.getElementById(sliderYId);
   const sliderZ = document.getElementById(sliderZId);
-  const target = document.getElementById(targetTransformId);
+  let target = document.getElementById(targetTransformId);
 
   if (!sliderX || !sliderY || !sliderZ || !target) {
     console.warn(`Slider or transform not found: ${sliderXId}, ${sliderYId}, ${sliderZId}, ${targetTransformId}`);
     return;
   }
+// add input to the function
 
   function updateTranslation() {
     const x = parseFloat(sliderX.value);
@@ -3647,36 +3644,12 @@ function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransform
 
     target.setAttribute("translation", `${x} ${y} ${z}`);
 
-     if (targetTransformId === 'tx_new_transform' || targetTransformId === 'rx_new_transform') {
-      // updateAllAntennaAnglesAndPathLossNew();
-      if (typeof updatePathLossNewAntennas === 'function') {
-        updatePathLossNewAntennas();
-      }
-
-            CalculateSINR_OG_RX_New_TX();
-
-    }
-
-    if (targetTransformId === 'rx_transform_1') {
-      // Update global positions for OG antennas
-      const rxPos = getCoordinatesFromX3D("rx_transform_1");
-      const txPos = getCoordinatesFromX3D("tx_transform_1");
-      receiverPos = txPos;
-      transmitterPos = rxPos;
-      distance_tx_rx = Math.sqrt(
-        Math.pow(txPos.x - rxPos.x, 2) +
-        Math.pow(txPos.y - rxPos.y, 2) +
-        Math.pow(txPos.z - rxPos.z, 2)
-      );
-      updateAllAntennaAnglesAndPathLoss();
-      updatePathLoss();
-    }
-    // You can add similar logic for 'tx_transform_1' if needed
+    updatePathLoss();
   }
 
-  sliderX.addEventListener("input", updateTranslation);
-  sliderY.addEventListener("input", updateTranslation);
-  sliderZ.addEventListener("input", updateTranslation);
+    sliderX.addEventListener("input", updateTranslation);
+    sliderY.addEventListener("input", updateTranslation);
+    sliderZ.addEventListener("input", updateTranslation);
 }
 
   function removeNewAntennas() {
@@ -3721,53 +3694,6 @@ const mcsRates = [
   "r1/2", "r2/3", "r3/4", "r5/6", "r2/3", "r3/4", "r8/9", "r2/3", "r3/4", "r5/6", "r8/9"
 ];
 
-  // TX2 (sig3)
-document.getElementById('freq3').addEventListener('input', function () {
-  sig3.freq = Number(this.value);
-  document.getElementById('freq3_val').textContent = (sig3.freq / 1e6).toFixed(2) + " MHz";
-  updatePathLossNewAntennas();
-});
-document.getElementById('bw3').addEventListener('input', function () {
-  sig3.bw = Number(this.value);
-  document.getElementById('bw3_val').textContent = (sig3.bw / 1e6).toFixed(2) + " MHz";
-  updatePathLossNewAntennas();
-});
-document.getElementById('gn3').addEventListener('input', function () {
-  sig3.gn = Number(this.value);
-  document.getElementById('gn3_val').textContent = sig3.gn.toFixed(2) + " dBm";
-  updatePathLossNewAntennas();
-});
-document.getElementById('mcs3').addEventListener('input', function () {
-  sig3._mcs = Number(this.value);
-  const idx = sig3._mcs;
-  document.getElementById('mcs3_val').textContent =
-    (mcsRates[idx] || "") + " " + (mcsDescriptions[idx] || "");
-  updatePathLossNewAntennas();
-});
-
-// RX2 (sig4)
-document.getElementById('freq4').addEventListener('input', function () {
-  sig4.freq = Number(this.value);
-  document.getElementById('freq4_val').textContent = (sig4.freq / 1e6).toFixed(2) + " MHz";
-  updatePathLossNewAntennas();
-});
-document.getElementById('bw4').addEventListener('input', function () {
-  sig4.bw = Number(this.value);
-  document.getElementById('bw4_val').textContent = (sig4.bw / 1e6).toFixed(2) + " MHz";
-  updatePathLossNewAntennas();
-});
-document.getElementById('gn4').addEventListener('input', function () {
-  sig4.gn = Number(this.value);
-  document.getElementById('gn4_val').textContent = sig4.gn.toFixed(2) + " dBm";
-  updatePathLossNewAntennas();
-});
-document.getElementById('mcs4').addEventListener('input', function () {
-  sig4._mcs = Number(this.value);
-  const idx = sig4._mcs;
-  document.getElementById('mcs4_val').textContent =
-    (mcsRates[idx] || "") + " " + (mcsDescriptions[idx] || "");
-  updatePathLossNewAntennas();
-});
 
 
 function toggleAntennaSliders(antenna) {
@@ -3802,16 +3728,16 @@ function toggleAntennaSliders(antenna) {
 
 setupTranslationSlider('sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ', 'rx_transform_1', '2.5');
   setupTranslationSlider('slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward', 'tx_transform_1', '2.5');
-  setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_transform_2');
-  setupTranslationSlider('slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward', 'tx2_transform');
+  // setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_transform_2');
+  // setupTranslationSlider('slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward', 'tx2_transform');
 // setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_new_transform');
 
 
-function generateSliderGroup(containerId, groupId) {
+function generateSliderGroup(containerId, groupId, airspace = null) {
     const container = document.getElementById(containerId);
     const sliderConfig = [
               {
-                  id: "sliderForMoveX",
+                  id: `slider${(airspace.numReceivers+1)}ForMoveX`,
                   label: "Move East-West",
                   min: -10,
                   max: 10,
@@ -3819,7 +3745,7 @@ function generateSliderGroup(containerId, groupId) {
                   color: "#acccf6"
               },
               {
-                  id: "sliderForMoveY",
+                  id: `slider${(airspace.numReceivers+1)}ForMoveY`,
                   label: "Move North-South",
                   min: -12,
                   max: 12,
@@ -3827,7 +3753,7 @@ function generateSliderGroup(containerId, groupId) {
                   color: "#acccf6"
               },
               {
-                  id: "sliderForMoveZ",
+                  id: `slider${(airspace.numReceivers+1)}ForMoveZ`,
                   label: "Move Up-Down",
                   min: 0,
                   max: 10,
@@ -3835,7 +3761,7 @@ function generateSliderGroup(containerId, groupId) {
                   color: "#acccf6"
               },
               {
-                  id: "sliderForRotateX",
+                  id: `slider${(airspace.numReceivers+1)}ForRotateX`,
                   label: "Elevation (Up-Down)",
                   min: 0,
                   max: 360,
@@ -3843,7 +3769,7 @@ function generateSliderGroup(containerId, groupId) {
                   color: "#acccf6"
               },
               {
-                  id: "sliderForRotateY",
+                  id: `slider${(airspace.numReceivers+1)}ForRotateY`,
                   label: "Azimuth (Left-Right)",
                   min: 0,
                   max: 360,
@@ -3851,7 +3777,7 @@ function generateSliderGroup(containerId, groupId) {
                   color: "#acccf6"
               },
               {
-                  id: "sliderForTiltZ",
+                  id: `slider${(airspace.numReceivers+1)}ForTiltZ`,
                   label: "Boresight Tilt",
                   min: 0,
                   max: 180,
@@ -3866,23 +3792,57 @@ function generateSliderGroup(containerId, groupId) {
 
     // Start building the slider group HTML
     let htmlContent = `<div id="${groupId}" class="slider-group">`;
-      
-    sliderConfig.forEach(slider => {
-        htmlContent += `
-            <div class="slider-box">
-                <label for="${slider.id}">${slider.label}</label>
-                <input type="range" id="${slider.id}" 
-                       min="${slider.min}" max="${slider.max}" 
-                       value="${slider.value}" 
-                       style="accent-color: ${slider.color};">
-            </div>
-        `;
-    });
+      if(airspace) {
+        htmlContent += `<label> Receiver ${airspace.numReceivers}</label>`;
 
-    htmlContent += `</div>`;
+      }
+
+// Group the first 3 sliders into one row
+htmlContent += `<div class="slider-row">`;
+sliderConfig.slice(0, 3).forEach(slider => {
+    htmlContent += `
+        <div class="slider-box">
+            <label for="${slider.id}">${slider.label}</label>
+            <input type="range" id="${slider.id}" 
+                   min="${slider.min}" max="${slider.max}" 
+                   value="${slider.value}" 
+                   style="accent-color: ${slider.color};">
+        </div>
+    `;
+});
+htmlContent += `</div>`; // Close the first row
+
+// Group the next 3 sliders into another row
+htmlContent += `<div class="slider-row">`;
+sliderConfig.slice(3, 6).forEach(slider => {
+    htmlContent += `
+        <div class="slider-box">
+            <label for="${slider.id}">${slider.label}</label>
+            <input type="range" id="${slider.id}" 
+                   min="${slider.min}" max="${slider.max}" 
+                   value="${slider.value}" 
+                   style="accent-color: ${slider.color};">
+        </div>
+    `;
+});
+htmlContent += `</div>`; // Close the second row
+
+htmlContent += `</div>`; // Close the slider group
+
 
     // Append the generated HTML to the container
     container.innerHTML += htmlContent;
+    let sliderValue = airspace.numReceivers+1;
+    let transformValue = 0;
+    for (let i = 2; i <= airspace.numReceivers; i++) {
+      sliderValue = i+1;
+      transformValue = i;
+      setupTranslationSlider(`slider${sliderValue}ForMoveX`, 
+      `slider${sliderValue}ForMoveY`, 
+      `slider${sliderValue}ForMoveZ`, 
+      `rx_transform_${transformValue}`);
+    }
+    
 }
 
 

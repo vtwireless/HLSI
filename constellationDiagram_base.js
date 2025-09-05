@@ -88,7 +88,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
           // Add a button to the SVG
       svg.append("foreignObject")
-        .attr("x", width - 60) // Position the button near the top-right corner
+        .attr("x", width - 80) // Position the button near the top-right corner
         .attr("y", 10)
         .attr("width", 80)
         .attr("height", 30)
@@ -278,7 +278,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           let xErrorDist = Math.abs(translatedTargets[i].x - constellationTargets[i].x); 
           let yErrorDist = Math.abs(translatedTargets[i].y - constellationTargets[i].y); 
 
-          let freezeBoxX = .98;
+          let freezeBoxX = .92;
           let freezeBoxY = 1.18;
           let freezeBoxWidth = .5;
           let freezeBoxHeight = .25;
