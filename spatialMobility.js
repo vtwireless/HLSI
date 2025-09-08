@@ -611,7 +611,7 @@ function calculatePathLossAdvanced4(
     document.getElementById(`rec_trans_dist${airspace.numReceivers}`).innerHTML = distance.toFixed(2);
 
     //  Log the distance to the console
-console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y}, ${P1.z}] to [${P2.x}, ${P2.y}, ${P2.z}])`);
+    console.log(`Cartesian distance: ${distance.toFixed(4)} (from [${P1.x}, ${P1.y}, ${P1.z}] to [${P2.x}, ${P2.y}, ${P2.z}])`);
 
     return distance;
   }
