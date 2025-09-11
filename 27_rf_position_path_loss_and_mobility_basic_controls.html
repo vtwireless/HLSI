@@ -1536,10 +1536,10 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
   
     const parent = document.getElementById("receiver_pattern_options");
 
-    const rx2PatternOptions = document.createElement("div");
-    rx2PatternOptions.id = `rx${airspace.numReceivers}_pattern_options`;
+    const rxPatternOptions = document.createElement("div");
+    rxPatternOptions.id = `rx${airspace.numReceivers}_pattern_options`;
 
-    rx2PatternOptions.innerHTML = `
+    rxPatternOptions.innerHTML = `
         <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: 1rem;">
           <div style="width: 28px; height: 15px; background: limegreen;"></div>
           <label for="rx${airspace.numReceivers}_pattern"><b>Type of RX${airspace.numReceivers} Pattern:</b></label>
@@ -1564,7 +1564,7 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
         </div>
     `;
 
-    parent.appendChild(rx2PatternOptions);
+    parent.appendChild(rxPatternOptions);
 
   
   const newDiv = document.createElement('div');
@@ -1592,6 +1592,8 @@ document.getElementById('remove-tx-antenna-btn').addEventListener('click', funct
   for (let i = 2; i <= airspace.numReceivers; i++) {
     const patternSlider = document.getElementById(`rx${i}_pattern`);
     patternSlider.addEventListener("change", selectModel);
+    document.getElementById(`vertical_rx${i}`).addEventListener("change", selectModel);
+    document.getElementById(`horizontal_rx${i}`).addEventListener("change", selectModel);
   }
 
 
@@ -2726,11 +2728,15 @@ function CalculateSINR_BasedOn_ReceivedPower4() {
     const rx_isCheckedHorizontal = rx_horizontalCheckbox.checked ? 1 : 0;
     const tx_isCheckedVertical = tx_verticalCheckbox.checked ? 1 : 0;
     const tx_isCheckedHorizontal = tx_horizontalCheckbox.checked ? 1 : 0;
+    let verticalSelected = 0;
+    let horizontalSelected = 0;
+    // set receiver model loop
     for (let targetIndex = 2; targetIndex <= airspace.numReceivers; targetIndex++) {
-      const type = 'rx';
+      verticalSelected = document.getElementById(`vertical_rx${targetIndex}`).checked ? 1 : 0;
+      horizontalSelected = document.getElementById(`horizontal_rx${targetIndex}`).checked ? 1 : 0;
       const selectedPattern = document.getElementById(`rx${targetIndex}_pattern`).selectedIndex;
-      const selectedModelNumber =(selectedPattern) * 4 + 2 * rx_isCheckedVertical + rx_isCheckedHorizontal;
-      document.getElementById(`${type}_switch${targetIndex}`).setAttribute("whichchoice", selectedModelNumber);
+      const selectedModelNumber =(selectedPattern) * 4 + 2 * verticalSelected + horizontalSelected;
+      document.getElementById(`rx_switch${targetIndex}`).setAttribute("whichchoice", selectedModelNumber);
     }
     const modelNumber_rx = (selectedValue_rx) * 4 + 2 * rx_isCheckedVertical + rx_isCheckedHorizontal;
     let modelNumber_tx = 0;
