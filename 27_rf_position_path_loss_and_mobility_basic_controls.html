@@ -1623,24 +1623,24 @@ document.getElementById('remove-rx-antenna-btn').addEventListener('click', funct
 });
 
 // Updates the Z slider display values for all antennas.  shown at the top of the x3d scene
-  function updateZSliderDisplays() {
-    document.getElementById('current1RotationZvalue').textContent = document.getElementById('sliderForTiltZ').value;
-    document.getElementById('current2RotationZvalue').textContent = document.getElementById('slider2ForTiltZ').value;
-    document.getElementById('current3RotationZvalue').textContent = document.getElementById('slider3ForTiltZ').value;
-    document.getElementById('current4RotationZvalue').textContent = document.getElementById('slider4ForTiltZ').value;
-  }
+  // function updateZSliderDisplays() {
+  //   document.getElementById('current1RotationZvalue').textContent = document.getElementById('sliderForTiltZ').value;
+  //   document.getElementById('current2RotationZvalue').textContent = document.getElementById('slider2ForTiltZ').value;
+  //   document.getElementById('current3RotationZvalue').textContent = document.getElementById('slider3ForTiltZ').value;
+  //   document.getElementById('current4RotationZvalue').textContent = document.getElementById('slider4ForTiltZ').value;
+  // }
 
 
   // Attach event listeners to update on input
-  ['sliderForTiltZ', 'slider2ForTiltZ', 'slider3ForTiltZ', 'slider4ForTiltZ'].forEach(id => {
-    const slider = document.getElementById(id);
-    if (slider) {
-      slider.addEventListener('input', updateZSliderDisplays);
-    }
-  });
+  // ['sliderForTiltZ', 'slider2ForTiltZ', 'slider3ForTiltZ', 'slider4ForTiltZ'].forEach(id => {
+  //   const slider = document.getElementById(id);
+  //   if (slider) {
+  //     slider.addEventListener('input', updateZSliderDisplays);
+  //   }
+  // });
 
   // Initialize display on load
-  document.addEventListener('DOMContentLoaded', updateZSliderDisplays);
+  // document.addEventListener('DOMContentLoaded', updateZSliderDisplays);
 
 
   // Updates the Z slider display values for all antennas.
@@ -1836,68 +1836,68 @@ window.txSliderReset = setupSlider('slider2ForRotateX', 'slider2ForRotateY', 'sl
 
   
  // when looking at the antenna pattern, checking the vertical/horizontal boxes will change the antenna model.  object rotations seen below are just to fix the direction of some models like the directional antenna
-function selectModelTX2() {
-    const patternDropdown = document.getElementById("tx2_pattern");
-    const vertical = document.getElementById("vertical_tx2").checked ? 2 : 0;
-    const horizontal = document.getElementById("horizontal_tx2").checked ? 1 : 0;
-    const patternIndex = patternDropdown.selectedIndex;
+// function selectModelTX2() {
+//     const patternDropdown = document.getElementById("tx2_pattern");
+//     const vertical = document.getElementById("vertical_tx2").checked ? 2 : 0;
+//     const horizontal = document.getElementById("horizontal_tx2").checked ? 1 : 0;
+//     const patternIndex = patternDropdown.selectedIndex;
 
-    let modelNumber = patternIndex * 4; // base antenna (no pattern)
-    if (vertical || horizontal) {
-      modelNumber += vertical + horizontal;
-    }
+//     let modelNumber = patternIndex * 4; // base antenna (no pattern)
+//     if (vertical || horizontal) {
+//       modelNumber += vertical + horizontal;
+//     }
 
-    const switchNode = document.getElementById("tx_new_switch");
-    if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
+//     const switchNode = document.getElementById("tx_new_switch");
+//     if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
 
-    // --- Rotate the cone for directional + vertical ---
-    const tx2Pattern = patternDropdown.value;
-    if (tx2Pattern === "dirAnt_sideLobe") {
-      // The cone is shown for whichChoice 16, 17, 18, 19
-      if ([16, 17, 18, 19].includes(modelNumber)) {
-        const coneTransform = switchNode.children[modelNumber];
-        if (coneTransform) {
-          if (document.getElementById("vertical_tx2").checked) {
-            coneTransform.setAttribute("rotation", "1 0 0 -1.5708"); // 90° about Y (azimuth)
-          } else {
-            coneTransform.setAttribute("rotation", "0 0 1 1.5707"); // default
-          }
-        }
-      }
-    }
-}
+//     // --- Rotate the cone for directional + vertical ---
+//     const tx2Pattern = patternDropdown.value;
+//     if (tx2Pattern === "dirAnt_sideLobe") {
+//       // The cone is shown for whichChoice 16, 17, 18, 19
+//       if ([16, 17, 18, 19].includes(modelNumber)) {
+//         const coneTransform = switchNode.children[modelNumber];
+//         if (coneTransform) {
+//           if (document.getElementById("vertical_tx2").checked) {
+//             coneTransform.setAttribute("rotation", "1 0 0 -1.5708"); // 90° about Y (azimuth)
+//           } else {
+//             coneTransform.setAttribute("rotation", "0 0 1 1.5707"); // default
+//           }
+//         }
+//       }
+//     }
+// }
 
 
  // when looking at the antenna pattern, checking the vertical/horizontal boxes will change the antenna model.  object rotations seen below are just to fix the direction of some models like the directional antenna
-function selectModelRX2() {
-    const patternDropdown = document.getElementById("rx2_pattern");
-    const vertical = document.getElementById("vertical_rx2").checked ? 2 : 0;
-    const horizontal = document.getElementById("horizontal_rx2").checked ? 1 : 0;
-    const patternIndex = patternDropdown.selectedIndex;
+// function selectModelRX2() {
+//     const patternDropdown = document.getElementById("rx2_pattern");
+//     const vertical = document.getElementById("vertical_rx2").checked ? 2 : 0;
+//     const horizontal = document.getElementById("horizontal_rx2").checked ? 1 : 0;
+//     const patternIndex = patternDropdown.selectedIndex;
 
-    let modelNumber = patternIndex * 4;
-    if (vertical || horizontal) {
-      modelNumber += vertical + horizontal;
-    }
+//     let modelNumber = patternIndex * 4;
+//     if (vertical || horizontal) {
+//       modelNumber += vertical + horizontal;
+//     }
 
-    const switchNode = document.getElementById("rx_new_switch");
-    if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
+//     const switchNode = document.getElementById("rx_new_switch");
+//     if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
 
-    // --- Rotate the cone for directional + vertical ---
-    const rx2Pattern = patternDropdown.value;
-    if (rx2Pattern === "dirAnt_sideLobe") {
-      if ([16, 17, 18, 19].includes(modelNumber)) {
-        const coneTransform = switchNode.children[modelNumber];
-        if (coneTransform) {
-          if (document.getElementById("vertical_rx2").checked) {
-            coneTransform.setAttribute("rotation", "1 0 0 1.5708");
-          } else {
-            coneTransform.setAttribute("rotation", "0 0 1 1.5707");
-          }
-        }
-      }
-    }
-}
+//     // --- Rotate the cone for directional + vertical ---
+//     const rx2Pattern = patternDropdown.value;
+//     if (rx2Pattern === "dirAnt_sideLobe") {
+//       if ([16, 17, 18, 19].includes(modelNumber)) {
+//         const coneTransform = switchNode.children[modelNumber];
+//         if (coneTransform) {
+//           if (document.getElementById("vertical_rx2").checked) {
+//             coneTransform.setAttribute("rotation", "1 0 0 1.5708");
+//           } else {
+//             coneTransform.setAttribute("rotation", "0 0 1 1.5707");
+//           }
+//         }
+//       }
+//     }
+// }
 
   // // Hook up TX2 controls
   // document.getElementById("tx2_pattern").addEventListener("change", selectModelTX2);
@@ -2765,7 +2765,7 @@ function CalculateSINR_BasedOn_ReceivedPower4() {
           if (document.getElementById("vertical_rx").checked) {
             coneTransform.setAttribute("rotation", "0 1 0 -1.5708"); // 90° about Y (azimuth)
           } else {
-            coneTransform.setAttribute("rotation", "0 0 1 1.5707"); // default
+            coneTransform.setAttribute("rotation", "0 0 1 0"); // default
           }
         }
       }
@@ -2777,13 +2777,13 @@ function CalculateSINR_BasedOn_ReceivedPower4() {
       const which = parseInt(txSwitch.getAttribute("whichchoice"));
       if ([16, 17, 18, 19].includes(which)) {
         const coneTransform = txSwitch.children[which];
-        if (coneTransform) {
-          if (document.getElementById("vertical_tx").checked) {
-            coneTransform.setAttribute("rotation", "1 0 0 1.5708");
-          } else {
-            coneTransform.setAttribute("rotation", "0 0 1 1.5707");
-          }
-        }
+        // if (coneTransform) {
+        //   if (document.getElementById("vertical_tx").checked) {
+        //     coneTransform.setAttribute("rotation", "1 0 0 1.5708");
+        //   } else {
+        //     coneTransform.setAttribute("rotation", "0 0 1 1.5707");
+        //   }
+        // }
       }
     }
 }
@@ -3178,14 +3178,11 @@ function CalculateSINR_BasedOn_ReceivedPower4() {
     gizmoTransform.setAttribute('id', `${idSuffix}_gizmo`);
 
     const outerTriangle = document.createElement('transform');
-outerTriangle.setAttribute('id', `${idSuffix}_triangleOuter`);
+    outerTriangle.setAttribute('id', `${idSuffix}_triangleOuter`);
 
-// Directional pattern: azimuth rotation 90° about Y axis
-// if (document.getElementById(isTx ? 'tx2_pattern' : 'rx2_pattern').value === 'dirAnt_sideLobe') {
-//   outerTriangle.setAttribute('rotation', '0 1 0 1.5708'); // 90° azimuth
-// } else {
-//   outerTriangle.setAttribute('rotation', '0 0 1 1.5708'); // default (boresight)
-// }
+  //Directional pattern: azimuth rotation 90° about Y axis
+    outerTriangle.setAttribute('rotation', '0 0 1 1.5708'); // 90° azimuth
+
 
 const innerTriangle = document.createElement('transform');
 innerTriangle.setAttribute('rotation', isTx ? '1 0 0 1.5708' : '1 0 0 -1.5708'); // TX flips 180°
@@ -3228,9 +3225,9 @@ gizmoTransform.appendChild(outerTriangle);
     // const moveXId = isTx ? 'slider4ForMoveX' : 'slider3ForMoveX';
     // const moveYId = isTx ? 'slider4ForMoveY' : 'slider3ForMoveY';
     // const moveZId = isTx ? 'slider3ForZupward' : 'slider4ForZupward';
-    const rotXId = isTx ? 'slider4ForRotateX' : 'slider3ForRotateX';
-    const rotYId = isTx ? 'slider4ForRotateY' : 'slider3ForRotateY';
-    const rotZId = isTx ? 'slider4ForTiltZ' : 'slider3ForTiltZ';
+    // const rotXId = isTx ? 'slider4ForRotateX' : 'slider3ForRotateX';
+    // const rotYId = isTx ? 'slider4ForRotateY' : 'slider3ForRotateY';
+    // const rotZId = isTx ? 'slider4ForTiltZ' : 'slider3ForTiltZ';
     const transformId = `${idSuffix}_transform_${(airspace.numReceivers)}`;
 
     // document.getElementById(moveXId).value = xInit;
