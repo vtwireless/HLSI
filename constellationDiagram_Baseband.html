@@ -10,15 +10,14 @@
 <script src=constellationDiagram_baseband.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
 <script src=constellationDiagram.js></script>
-<script src=eyeDiagram.js></script>
+<script src=constellationDiagram_baseband.js></script>
 
 
 <body>
-  
+  <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a>
 
-
-<div id="voltageSlider" style="margin-left: 1%; margin-top:8%; width: 100%;"></div>
-<div id="noiseSlider" style="margin-left: 1%; margin-top:8%; width: 100%;"></div>
+<div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
+<div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 
 <button onclick="buttonPressedClearPoints()">clear message</button> 
 
@@ -154,7 +153,7 @@ noiseSlider = document.createElement("INPUT");
 
 // Slider(noise, 'gn', null, "noiseSlider");
 
-eyeDiagram()
+constellationDiagram_Baseband()
 
 
 
