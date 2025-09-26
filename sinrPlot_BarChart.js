@@ -39,8 +39,11 @@ const SinrPlot_BarChart = {
 
   generate_dataset: function (signal_list) {
     let dataset = [];
+    // starting at 1 to skip the transmitter signal
     for (let i = 0; i < signal_list.length; i++) {
       // add SINR value
+      // TODO fix to allow transmitted power from one antenna to another
+      // console.log(signal_list);
       let sinr = signal_list[i].sinr;
       dataset.push(sinr);
     }

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Scene Author API Documentation: Node: X3DLightNode</title>
+
+    
+
+    
+
+    <script src="../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../author/index.html">Scene Author API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../author/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../author/nodes.html" class="">
+        Nodes
+    </a></li>
+
+    <li><a href="../../author/components.html" class="">
+        Components
+    </a></li>
+
+    <li><a href="../../author/runtime.html">
+        Runtime
+    </a></li>
+
+    <li><a href="../../author/configuration.html">
+        Configuration
+    </a></li>
+
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Node: X3DLightNode</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                        <a href="http://www.web3d.org/files/specifications/19775-1/V3.3/Part01/components/lighting.html#X3DLightNode">3.3</a>
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    <a href="index.html">Lighting</a>
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-full">fully implemented</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+
+            </h2>
+
+        
+        <div class="class-description">The X3DLightNode abstract node type is the base type from which all node types that serve as light sources are derived.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;X3DLightNode
+
+                
+                ambientIntensity='0'
+                
+                color='1,1,1'
+                
+                global='false'
+                
+                intensity='1'
+                
+                metadata='X3DMetadataObject'
+                
+                on='true'
+                
+                shadowFilterSize='0'
+                
+                shadowIntensity='0'
+                
+                shadowMapSize='1024'
+                
+                shadowOffset='0'
+                
+                zFar='-1'
+                
+                zNear='-1'
+                
+
+                &gt;&lt;/X3DLightNode&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="../Core/X3DNode.html">Core/X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="../Core/X3DChildNode.html">Core/X3DChildNode</a>(12)
+                </li>
+            
+
+            <li class="inheritance-lvl-2">
+                <b>X3DLightNode</b>
+                
+                (4)
+                
+            </li>
+
+            
+                
+                <li class="inheritance-lvl-3">
+                    <a href="DirectionalLight.html">DirectionalLight</a>
+                </li>
+                
+                <li class="inheritance-lvl-3">
+                    <a href="PhysicalEnvironmentLight.html">PhysicalEnvironmentLight</a>
+                </li>
+                
+                <li class="inheritance-lvl-3">
+                    <a href="PointLight.html">PointLight</a>
+                </li>
+                
+                <li class="inheritance-lvl-3">
+                    <a href="SpotLight.html">SpotLight</a>
+                </li>
+                
+            
+            </ul>
+
+            
+            
+
+            
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+
+            
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>ambientIntensity</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The ambientIntensity specifies the intensity of the ambient emission from the light. Light intensity may range from 0.0 (no light emission) to 1.0 (full intensity).</td>
+        </tr>
+        
+        <tr>
+            <td>color</td>
+
+            <td>
+               
+
+                SFColor
+            </td>
+
+            <td>
+                
+                1,1,1</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The color field specifies the spectral colour properties of both the direct and ambient light emission as an RGB value.</td>
+        </tr>
+        
+        <tr>
+            <td>global</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Specifies whether the light is global or scoped.Global lights illuminate all objects that fall within their volume of lighting influence.Scoped lights only illuminate objects that are in the same transformation hierarchy as the light; i.e., only the children and descendants of its enclosing parent group are illuminated.</td>
+        </tr>
+        
+        <tr>
+            <td>intensity</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td>[0, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The intensity field specifies the brightness of the direct emission from the light. Light intensity may range from 0.0 (no light emission) to 1.0 (full intensity).</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="../Core/X3DNode.html">Core/X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>on</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The on field specifies whether the light is enabled or disabled.</td>
+        </tr>
+        
+        <tr>
+            <td>shadowFilterSize</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Sets the smoothness of the shadow umbra.</td>
+        </tr>
+        
+        <tr>
+            <td>shadowIntensity</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[o, 1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Defines the attenuation of the shadows</td>
+        </tr>
+        
+        <tr>
+            <td>shadowMapSize</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                1024</a>
+                
+            </td>
+			
+            <td>[0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the resolution of the used shadow map.</td>
+        </tr>
+        
+        <tr>
+            <td>shadowOffset</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Defines the shadow offset for the back projection of the shadow map.</td>
+        </tr>
+        
+        <tr>
+            <td>zFar</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the placement of the far plane of the light projection.Objects that are farther away from the light source than the far plane do not cast shadows.If the zFar value is not set, the far plane is placed automatically.</td>
+        </tr>
+        
+        <tr>
+            <td>zNear</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>-1 or [0, inf]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Specifies the placement of the near plane of the light projection.Objects that are closer to the light source than the near plane do not cast shadows.If the zNear value is not set, the near plane is placed automatically.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:19 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

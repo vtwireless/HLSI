@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src="https://d3js.org/d3.v4.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagram_base.js></script>
+<script src=BER_plot.js></script>
+
+<body>
+<div id="modCodeSlider" style="margin-left: 1%; margin-top:3%; width: 100%;"></div>
+<div id="gainSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+
+<button onclick="buttonPressedClearPoints()">clear message</button> 
+<div class="container">
+  <style>
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: left;
+      gap: 0.5rem; /* Adjust the gap to bring the graphs closer */
+      margin: 1rem;
+    }
+    #constellationParent, #BER_plotParent {
+      flex: 1;
+      text-align: center;
+      /* border: 1px solid #ccc; */
+      padding: 0.5rem; /* Reduce padding */
+      margin: 0; /* Remove margin */   
+      width: 100%; /* Adjust width to make them closer */
+    }
+    .modulation-table {
+        width: 10%;
+        border-collapse: collapse;
+        margin: 1rem auto;
+        font-family: Arial, sans-serif;
+        text-align: left;
+        border: 1px solid #ccc;
+    }
+
+    .modulation-table th, .modulation-table td {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+    }
+
+    .modulation-table th {
+        background-color: #747272;
+        font-weight: bold;
+    }
+
+    .color-box {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        display: inline-block;
+    }
+
+    </style>
+
+  <div id="constellationParent"></div>
+    <table class="modulation-table">
+      <thead>
+          <tr>
+              <th>Modulation Scheme</th>
+              <th>Color</th>
+          </tr>
+      </thead>
+      <tbody>
+          <tr>
+              <td>BPSK</td>
+              <td><div class="color-box" style="background-color: #c51b7d;"></div></td>
+          </tr>
+          <tr>
+              <td>QPSK</td>
+              <td><div class="color-box" style="background-color: #e9a3c9;"></div></td>
+          </tr>
+          <tr>
+              <td>16-QAM</td>
+              <td><div class="color-box" style="background-color: #fde0ef;"></div></td>
+          </tr>
+          <tr>
+              <td>32-QAM</td>
+              <td><div class="color-box" style="background-color: #f7f7f7;"></div></td>
+          </tr>
+          <tr>
+              <td>64-QAM</td>
+              <td><div class="color-box" style="background-color: #e6f5d0;"></div></td>
+          </tr>
+          <tr>
+              <td>128-QAM</td>
+              <td><div class="color-box" style="background-color: #a1d76a;"></div></td>
+          </tr>
+          <tr>
+              <td>256-QAM</td>
+              <td><div class="color-box" style="background-color: #4d9221;"></div></td>
+          </tr>
+      </tbody>
+  </table>
+  <div id="BER_plotParent"></div>
+</div>
+<div class="slider-container" id="rateSlider" ></div>
+
+
+</body>
+
+<script>
+
+
+
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: .1, // dB
+    gn_min: 0, // volts
+    gn_max: 10, // volts
+    mcs_init: 2, // array index int
+  });
+  var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: 0, // dB
+    gn_min: -30,
+    gn_max: 30,
+  });
+  noise.gn = 0;
+
+  let BER_stats = new MessageStats();
+  
+
+
+Slider(sig, 'mcs_simple', null, "modCodeSlider");
+Slider(sig, 'gn', null, "gainSlider");
+let frozenFlag1 = false;
+constellationDiagram(300, 25,"constellationParent", frozenFlag1);
+BER_plot()
+
+
+
+
+
+
+
+// }
+ // use the clear all circles button
+function buttonPressedClearPoints(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+
+}
+
+
+</script>
+
+</html>

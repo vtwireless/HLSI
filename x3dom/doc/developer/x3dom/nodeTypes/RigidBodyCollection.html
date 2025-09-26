@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    
+
+        <title>X3DOM Developer API Documentation: Class: RigidBodyCollection</title>
+
+    
+
+    
+
+    <script src="../../../../static/scripts/prettify/prettify.js"> </script>
+    <script src="../../../../static/scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="../../../static/styles/x3dom-docs-new.css">
+</head>
+
+<body>
+
+<div class="container page-header">
+    <div class="row">
+        <div class="col-xs-12">
+            <h2 style="display:inline;color:#266F97">official <img src="../../../static/images/x3dom_logo_without_claim.png" style="height:1em;vertical-align:top;"> documentation</h2>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:20px;">
+        <div class="col-xs-12">
+            <ol class="breadcrumb">
+                <li><a href="http://x3dom.org">x3dom.org</a></li>
+                <li><a href="../../../index.html">documentation</a></li>
+                <li>
+                        <a href="../../../developer/index.html">Developer API</a>
+                        
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="container" style="text-align:center">
+    <ul class="nav nav-pills" style="display: inline-block;">
+    <li><a href="../../../developer/index.html" class="">
+    Overview
+    </a></li>
+
+    
+
+    <li><a href="../../../developer/classes.html" class="">
+        Classes
+    </a></li>
+
+    <li><a href="../../../developer/namespaces.html" class="">
+        Namespaces
+    </a></li>
+    
+    </ul>
+</div>
+
+<div class="container">
+
+    
+        <h2 class="page-title">Class: RigidBodyCollection</h2>
+    
+
+    
+
+
+
+
+
+
+<div class="class-summary">
+    
+
+        <div class="well" style="width:300px;float:right;margin-left: 20px;">
+            <table class="table" style="margin-bottom:0">
+            <tr>
+            
+            <tr><td>
+                X3D:
+                </td>
+                <td>
+                    
+                         3.3
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>
+                Component:
+                </td><td>
+                    
+                    RigidBodyPhysics
+                    
+                </td>
+            </tr>
+            
+            
+            <tr><td>Status:</td>
+                <td><div class="status-experimental">experimental</div></td>
+            </tr>
+
+
+
+            
+        </table>
+        </div>
+    
+
+    <div class="well" style="width:300px;clear:right;float:right;margin-left: 20px;">
+
+        <h4>Quick Links</h4>
+
+        
+
+            <a href="#Fields">&#10152; Fields</a>
+            <br>
+
+        
+
+        <a href="#Properties">&#10152; Properties</a>
+
+        <br>
+
+        
+    </div>
+
+</div>
+
+
+
+
+<section>
+
+    <header>
+        <h3>
+            
+            <span class="ancestors"><a href="index.html">.nodeTypes</a>.</span>
+            
+            RigidBodyCollection
+            
+
+            </h2>
+
+        
+        <div class="class-description">The RigidBodyCollection node represents a system of bodies that will interact within a single physics model. The collection is not a renderable part of the scene graph nor are its children as a typical model may need to represent the geometry for physics separately, and in less detail, than those needed for visuals.</div>
+        
+    </header>
+
+    <article>
+        
+        
+        <h3 class="subsection-title">HTML Encoding and Default Values<a href="#">&#10548;</a></h3>
+        <div>
+            <code>
+                &lt;RigidBodyCollection
+
+                
+                autoDisable='false'
+                
+                bodies='x3dom.nodeTypes.RigidBody'
+                
+                constantForceMix='0.0001'
+                
+                contactSurfaceThickness='0'
+                
+                disableAngularSpeed='0'
+                
+                disableLinearSpeed='0'
+                
+                disableTime='0'
+                
+                enabled='true'
+                
+                errorCorrection='0.8'
+                
+                gravity='0,-9.8,0'
+                
+                iterations='1'
+                
+                joints='x3dom.nodeTypes.X3DRigidJointNode'
+                
+                maxCorrectionSpeed='-1'
+                
+                metadata='X3DMetadataObject'
+                
+                preferAccuracy='false'
+                
+
+                &gt;&lt;/RigidBodyCollection&gt
+            </code>
+        </div>
+        
+
+
+        <div class="container-overview">
+
+            <h3 class="subsection-title">Inheritance<a href="#">&#10548;</a></h3>
+            <ul>
+            
+                <li class="inheritance-lvl-0">
+                    <a href="X3DNode.html">X3DNode</a>(18)
+                </li>
+            
+                <li class="inheritance-lvl-1">
+                    <a href="X3DChildNode.html">X3DChildNode</a>(12)
+                </li>
+            
+
+            <li class="inheritance-lvl-2">
+                <b>RigidBodyCollection</b>
+                
+            </li>
+
+            
+            </ul>
+
+            
+            <br>
+            <h3 class="subsection-title">Constructor<a href="#">&#10548;</a></h3>
+            
+            
+
+<dl class="method-container">
+    <dt>
+    <h4 class="name method-container-header" id="RigidBodyCollection"><span class="type-signature"></span>RigidBodyCollection<span class="signature">(<span class="optional">ctx</span>)</span><span class="type-signature"></span><a class="upwardsLink" href="#">&#10548;</a></h4>
+    
+    </dt>
+    <dd>
+
+        
+        <div class="description">
+            Constructor for RigidBodyCollection
+        </div>
+        
+
+        
+
+        
+
+        
+        <br>
+        <h5>Parameters:</h5>
+        
+
+<div class="params">
+<table class="table table-striped">
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		<th>Argument</th>
+		
+		
+		
+		<th>Default</th>
+		
+
+		<th class="last">Description</th>
+	</tr>
+	
+
+        <tr>
+            
+                <td class="param-table-name"><code>ctx</code></td>
+            
+            
+            <td class="param-table-type">
+            
+                
+    <span class="param-type">
+        Object
+    </span>
+
+
+            
+            </td>
+            
+            
+                <td class="param-table-attributes">
+                
+                    &lt;optional><br>
+                
+                    
+                
+                </td>
+            
+            
+            
+                <td class="param-table-default">
+                
+                    null
+                
+                </td>
+            
+            
+            <td class="param-table-description">context object, containing initial settings like namespace</td>
+        </tr>
+	
+	
+</table>
+</div>
+        
+
+        
+
+        
+
+        
+        
+
+        
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    </dd>
+</dl>
+
+            
+        </div>
+
+
+        
+        <br>
+        <h3 class="subsection-title">Fields<a name="Fields" href="#">&#10548;</a></h3>
+
+        <div>
+            These are the X3D / X3DOM fields of this node. Values should usually be received / set as strings via
+            DOM functions (i.e., using
+            <code>setAttribute("myFieldName", "myFieldValue")</code> and
+            <code>getAttribute("myFieldName")</code>).
+        </div>
+
+        
+
+<div class="dataMemberOverviewContainer">
+    
+        <table class="table table-striped">
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Default Value</th>
+            <th>Range</th>
+            <th>Inheritance</th>
+            <th>Standard</th>
+            <th>Description</th>
+        </tr>
+
+        
+        <tr>
+            <td>autoDisable</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>bodies</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="RigidBody.html">RigidBody</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The bodies field contains a collection of the top-level nodes that comprise a set of bodies that should be evaluated as a single set of interactions.</td>
+        </tr>
+        
+        <tr>
+            <td>constantForceMix</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.0001</a>
+                
+            </td>
+			
+            <td>[0, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The constantForceMix field can be used to apply damping to the calculations by violating the normal constraints by applying a small, constant force to those calculations. This allows joints and bodies to be a fraction springy, as well as helping to eliminate numerical instability. The larger the value, the more soft each of the constraints being evaluated. A value of zero indicates hard constraints so that everything is exactly honoured. By combining the errorCorrection and constantForceMix fields, various effects, such as spring-driven or spongy connections, can be emulated.</td>
+        </tr>
+        
+        <tr>
+            <td>contactSurfaceThickness</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The contactSurfaceThickness field represents how far bodies may interpenetrate after a collision. This allows simulation of softer bodies that may deform somewhat during collision. The default value is zero.</td>
+        </tr>
+        
+        <tr>
+            <td>disableAngularSpeed</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>disableLinearSpeed</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>disableTime</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0</a>
+                
+            </td>
+			
+            <td>[0, inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The disable fields define conditions for when the body ceases to considered as part of the rigid body calculations and should be considered as at rest.</td>
+        </tr>
+        
+        <tr>
+            <td>enabled</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                true</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The enabled field is used to control whether the physics model for this collection should be run this frame.</td>
+        </tr>
+        
+        <tr>
+            <td>errorCorrection</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                0.8</a>
+                
+            </td>
+			
+            <td>[0,1]</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The errorCorrection field describes how quickly the system should resolve intersection errors due to floating point inaccuracies. This value ranges between 0 and 1. A value of 0 means no correction at all  while a value of 1 indicates that all errors should be corrected in a single step.</td>
+        </tr>
+        
+        <tr>
+            <td>gravity</td>
+
+            <td>
+               
+
+                SFVec3f
+            </td>
+
+            <td>
+                
+                0,-9.8,0</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The gravity field indicates direction and strength (in acceleration base units) of the local gravity vector for this collection of bodies. The default gravity is standard earth gravity of 9.8 meters/second2 downwards.</td>
+        </tr>
+        
+        <tr>
+            <td>iterations</td>
+
+            <td>
+               
+
+                SFInt32
+            </td>
+
+            <td>
+                
+                1</a>
+                
+            </td>
+			
+            <td>[0,inf)</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The iterations field is used to control how many iterations over the collections of joints and bodies are to be performed each time the model is evaluated. Rigid body physics is a process of iterative refinement in order to maintain reasonable performance. As the number of iterations grow, the more stable the final results are at the cost of increasing evaluation time. Since maintaining real-time performance is a trade off between accuracy and frame rate, this setting allows the user to control that trade off to a limited extent.</td>
+        </tr>
+        
+        <tr>
+            <td>joints</td>
+
+            <td>
+               
+
+                MFNode
+            </td>
+
+            <td>
+                
+                <a href="X3DRigidJointNode.html">X3DRigidJointNode</a></a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The joints field is used to register all the joints between the bodies contained in this collection. If a joint is connected between bodies in two different collections, the result is implementation-dependent. If a joint instance is registered with more than one collection, the results are implementation dependent. Joints not registered with any collection are not evaluated.</td>
+        </tr>
+        
+        <tr>
+            <td>maxCorrectionSpeed</td>
+
+            <td>
+               
+
+                SFFloat
+            </td>
+
+            <td>
+                
+                -1</a>
+                
+            </td>
+			
+            <td>[0, inf) or -1</td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3dom.png">
+                
+            </td>
+
+            <td>Maximal correction speed.</td>
+        </tr>
+        
+        <tr>
+            <td>metadata</td>
+
+            <td>
+               
+
+                SFNode
+            </td>
+
+            <td>
+                
+                X3DMetadataObject</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+                <a href="X3DNode.html">X3DNode</a></a>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>Field to add metadata information</td>
+        </tr>
+        
+        <tr>
+            <td>preferAccuracy</td>
+
+            <td>
+               
+
+                SFBool
+            </td>
+
+            <td>
+                
+                false</a>
+                
+            </td>
+			
+            <td></td>
+
+            <td>
+                
+            </td>
+
+            <td>
+                
+                    <img src="../../../static/images/x3d.png">
+                
+            </td>
+
+            <td>The preferAccuracy field is used to provide a performance hint to the underlying evaluation about whether the user prefers to have very accurate models or fast models. Accuracy comes at a large penalty in both speed and memory usage, but may not be needed most of the time. The default setting is to optimize for speed rather than accuracy.</td>
+        </tr>
+        
+        </table>
+    
+
+</div>
+        
+
+        
+
+    </article>
+
+</section>
+
+
+
+
+
+</div>
+
+
+<div class="container">
+    <footer>
+        This X3DOM documentation was generated with the help of <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Tue Aug 01 2023 11:40:18 GMT+0200 (Mitteleuropäische Sommerzeit)
+    </footer>
+</div>
+
+</body>
+</html>

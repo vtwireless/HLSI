@@ -27,7 +27,7 @@ let phiresolution = 5;
 function isovert(thetares, phires) {
   let patterns = [];
   if (90 % thetares !== 0) {
-    console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+    //console.log("Error! Theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -53,7 +53,7 @@ function isovert(thetares, phires) {
 function isohoriz(thetares, phires) {
   let patterns = [];
   if (90 % thetares !== 0) {
-    console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+    //console.log("Error! Theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -80,7 +80,7 @@ function isohoriz(thetares, phires) {
 function halfwave(thetares, phires) {
   let patterns = [];
   if (90 % thetares !== 0) {
-    console.log("Error! Theta resolution must divide evenly into 90 degrees.");
+    //console.log("Error! Theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -117,7 +117,7 @@ function halfwave(thetares, phires) {
 function sloop(thetares, phires) {
   let patterns = [];
   if (90 / thetares !== Math.round(90 / thetares)) {
-    console.log("Error!  theta resolution must divide evenly into 90 degrees.");
+    //console.log("Error!  theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -152,12 +152,12 @@ function sloop(thetares, phires) {
 function dirantv(thetares, phires, azbw, elbw, SLL) {
   let patterns = [];
   if (SLL > 0) {
-    console.log("Error! SLL must be <= 0.");
+    //console.log("Error! SLL must be <= 0.");
     return;
   }
 
   if (90 / thetares !== Math.round(90 / thetares)) {
-    console.log("Error! theta resolution must divide evenly into 90 degrees.");
+    //console.log("Error! theta resolution must divide evenly into 90 degrees.");
     return;
   }
 
@@ -171,27 +171,18 @@ function dirantv(thetares, phires, azbw, elbw, SLL) {
     Array.from({ length: phidim }).fill(0)
   );
 
-  for (let k = 1; k <= thetadim; k++) {
+   for (let k = 1; k <= thetadim; k++) {
     const theta = (Math.PI * thetares * (k - 1)) / 180;
     for (let m = 1; m <= phidim; m++) {
       const phi = (Math.PI * phires * (m - 1)) / 180;
+      // Main lobe centered at theta = 90°, phi = 90°
       if (
-        Math.abs(theta - Math.PI / 2) - (Math.PI * thetares) / 180 >
-        (Math.PI * (elbw / 2)) / 180
+        Math.abs(theta - Math.PI / 2) - (Math.PI * thetares) / 180 <= (Math.PI * (elbw / 2)) / 180 &&
+        Math.abs(phi - Math.PI / 2) <= ((azbw / 2) * Math.PI) / 180
       ) {
-        if (SLL !== -999) {
-          fvert[k - 1][m - 1] = 10 ** (SLL / 10);
-        }
-      } else if (
-        phi - (Math.PI * phires) / 180 > ((azbw / 2) * Math.PI) / 180 &&
-        2 * Math.PI - phi >
-          ((azbw / 2) * Math.PI) / 180 + (Math.PI * phires) / 1800
-      ) {
-        if (SLL !== -999) {
-          fvert[k - 1][m - 1] = 10 ** (SLL / 10);
-        }
-      } else {
         fvert[k - 1][m - 1] = 1;
+      } else if (SLL !== -999) {
+        fvert[k - 1][m - 1] = 10 ** (SLL / 10);
       }
     }
   }
@@ -234,8 +225,12 @@ function getAntennaPatternValue(theta, phi, pattern) {
 function lookupAntennaPatternValue(theta, phi, patterns) {
   let fvert = patterns[0];
   let fhoriz = patterns[1];
-  theta_index = Math.round(Number(theta) / thetaresolution) + 1;
-  phi_index = Math.round(Number(phi) / phiresolution) + 1;
+  let theta_index = Math.round(Number(theta) / thetaresolution);
+  let phi_index = Math.round(Number(phi) / phiresolution);
+
+  // Clamp indices to valid range
+  theta_index = Math.max(0, Math.min(fvert.length - 1, theta_index));
+  phi_index = Math.max(0, Math.min(fvert[0].length - 1, phi_index));
 
   let f_vert_val = fvert[theta_index][phi_index];
   let f_horiz_val = fhoriz[theta_index][phi_index];

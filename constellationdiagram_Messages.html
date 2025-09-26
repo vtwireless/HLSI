@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src="https://d3js.org/d3.v4.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagramManualTargets.js></script>
+<script src=constellationDiagram_Messages.js></script>
+
+
+
+<body>
+<!-- <div id="inPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div> 
+<button onclick="changeIPhase()">Change Phase</button>
+
+<div id="quadPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div> 
+<button onclick="changeQPhase()">Change Phase</button> -->
+
+<label for="userInput">Enter a string:</label>
+<input type="text" id="userInput">
+<button onclick="processInput()">Submit</button>
+
+<p id = "output"></p>
+<p id = "outputBinary"></p>
+
+
+
+<div id="modCodeSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+
+<div id="constellationParent" style="width: 100%; height: 100%;"></div>
+
+
+</body>
+
+<script>
+
+
+
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 3, // array index int
+    freq_init: 1785.0e6
+  });
+
+  var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 3, // array index int
+    freq_init: 1785.0e6
+  });
+  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 3, // array index int
+    freq_init: 1785.0e6
+  });
+
+
+var noise = Signal(conf.noiseIC_05, "Noise")
+noise.gn = -60.0;
+
+let constellationTargets = [
+                    { x: 1, y: 1 },
+                    { x: 1, y: -1 },
+                    { x: -1, y: 1 },
+                    { x: -1, y: -1 },
+                ];
+Slider(sig, 'mcs', null, "modCodeSlider");
+
+
+        // set the dimensions and margins of the graph
+        const margin = {top: 10, right: 30, bottom: 30, left: 60},
+                width = 460 - margin.left - margin.right,
+                height = 400 - margin.top - margin.bottom;
+  
+        // append the svg object to the body of the page
+        var svg = d3.select("#constellationParent")
+            .append("svg")
+            .attr("width", width + margin.left )
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", `translate(${margin.left}, ${margin.top})`);
+          svg.append("rect")
+          .attr("x",0)
+          .attr("y",0)
+          .attr("height", height )
+          .attr("width", width )
+          .style("fill", "#000000")
+          
+
+
+
+
+            
+        // Add X axis
+        var x = d3.scaleLinear()
+          .domain([-1.5, 1.5])
+          .range([ -.001, width * 1.01 ]);
+        svg.append("g")
+          // sends the line to the bottom
+          .attr("transform", "translate(0," + height + ")")
+          // make grid lines
+          .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
+  
+        // Add Y axis
+        var y = d3.scaleLinear()
+          .domain([-1.5, 1.5])
+          .range([ height, 0]);
+        svg.append("g")
+          // make grid lines
+          .call(d3.axisLeft(y).tickSize(-width*1).ticks(7))
+          // stroke lines
+          svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
+          svg.selectAll(".tick text").attr("fill", "#FFFFFF")
+
+  
+          // to draw the initial targets, will be overwritten when user changes targets is changed
+      svg.append('g')
+        .selectAll("dot")
+        .data(constellationTargets)
+        .enter()
+        .append("circle")
+          .attr("cx", function (d) { return x(d.x); } )
+          .attr("cy", function (d) { return y(d.y); } )
+          .attr("r", 4)
+          .style("fill","#00FF00")
+
+// }
+ // use the clear all circles button
+function processInput(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+  let inputText = document.getElementById("userInput").value;
+  let bitStream = stringToBinary(inputText);
+  document.getElementById("output").innerText = "You entered: " + inputText;
+
+  document.getElementById("outputBinary").innerText = "In Binary this is: " + bitStream;
+  let bits = splitDigits(bitStream);
+  console.log(bits)
+
+  let target = 0;
+
+
+  for (i = 0;i<8;i=i+2){
+    console.log("bit 0s place")
+    console.log(bits[i])
+    console.log("bit 1s place")
+    console.log(bits[i+1])
+    target = bits[i] * 2 + bits[i+1];
+    console.log("target index")
+    console.log(target)
+    let printData = constellationTargets[target]
+    console.log(printData)
+ 
+  }
+}
+
+function stringToBinary(str) {
+    return str.split('')
+              .map(char => char.charCodeAt(0).toString(2).padStart(8, '0')) 
+              .join(' ');
+}
+
+function splitDigits(num) {
+    let digits = [];
+    while (num >0) {
+        digits.unshift(num % 10); // Extract the last digit
+        num = Math.floor(num / 10); // Remove the last digit
+    }
+
+    if (digits.length % 8 < 8){
+      zerosToAdd = 8 - digits.length;
+      for (i= 0;i<zerosToAdd;i++){
+        digits.unshift(0);
+      }
+    }
+    return digits;
+}
+
+</script>
+
+</html>

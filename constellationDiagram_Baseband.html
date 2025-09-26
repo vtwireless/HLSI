@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src="https://d3js.org/d3.v4.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=constellationDiagram_baseband.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagram.js></script>
+<script src=constellationDiagram_baseband.js></script>
+
+
+<body>
+  <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a>
+
+<div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
+<div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
+
+<button onclick="buttonPressedClearPoints()">clear message</button> 
+
+<div style="display:inline-flex;">
+  <span style="font-size: 18px; margin-left: 8px;margin-right: 8px;">Differential Mode</span>
+  <label class="switch">
+    <input id="differentialMode" type="checkbox" onclick="differentialMode();">
+    <span class="slider round"></span>
+  </label>
+</div>
+
+<div id="constellationParent" style="width: 100%; height: 100%;"></div>
+
+
+</body>
+
+<script>
+
+
+
+// var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: .1, // dB
+    gn_min: 0, // volts
+    gn_max: 10, // volts
+    mcs_init: 1, // array index int
+    differentialMode: false,
+
+
+  });
+
+  var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: 0, // dB
+    gn_min: 0,
+    gn_max: 50,
+  });
+  noise.gn = 0;
+
+// Slider(sig, 'gn', null, "modCodeSlider");
+voltageSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      voltageSlider.type = "range";
+      voltageSlider.min = sig["gn" + "_min"]; // example: sig.freq_min
+      voltageSlider.max = sig["gn" + "_max"];
+      voltageSlider.step = sig["gn" + "_step"];
+      voltageSlider.value = sig["gn"];
+      let p = document.createElement("p");
+      p.appendChild(voltageSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("voltageSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      let label = document.createElement("label");
+      label.setAttribute("for", voltageSlider.id);
+      label.appendChild(document.createTextNode("Voltage"));
+
+      voltageSlider.parentNode.prepend(label);
+  
+      // below sets up the output value on the right of the slider
+      let output = document.createElement("output");
+      output.setAttribute("for", voltageSlider.id);
+      voltageSlider._output = output;
+      voltageSlider.parentNode.append(output);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      voltageSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      voltageSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        sig["gn"] = parseValue(voltageSlider.value);
+      };
+      var outputUnitsCallbackSig = function (sig, val) {
+         return d3.format(".2f")(val) + " Volts";
+      };
+
+  
+      sig.onChange("gn", function (sig1, gn) {
+        voltageSlider.value = gn;
+        output.value = outputUnitsCallbackSig(sig1, gn);
+      });
+
+noiseSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      noiseSlider.type = "range";
+      noiseSlider.min = noise["gn" + "_min"]; // example: sig.freq_min
+      noiseSlider.max = noise["gn" + "_max"];
+      noiseSlider.step = noise["gn" + "_step"];
+      noiseSlider.value = noise["gn"];
+      p = document.createElement("p");
+      p.appendChild(noiseSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("noiseSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      Noiselabel = document.createElement("label");
+      Noiselabel.setAttribute("for", noiseSlider.id);
+      Noiselabel.appendChild(document.createTextNode('Noise Power'));
+
+      noiseSlider.parentNode.prepend(Noiselabel);
+  
+      // below sets up the output value on the right of the slider
+      let NoiseOutput = document.createElement("output");
+      NoiseOutput.setAttribute("for", noiseSlider.id);
+      noiseSlider._output = NoiseOutput
+      noiseSlider.parentNode.append(NoiseOutput);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      noiseSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      noiseSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        noise["gn"] = parseValue(noiseSlider.value);
+      };
+      var outputUnitsCallback = function (noise, val) {
+         return d3.format(".2f")(val);
+      };
+
+  
+      noise.onChange("gn", function (noise, gn) {
+        noiseSlider.value = gn;
+        NoiseOutput.value = outputUnitsCallback(noise, gn);
+      });
+
+// Slider(noise, 'gn', null, "noiseSlider");
+
+constellationDiagram_Baseband()
+
+
+
+
+
+
+
+// }
+ // use the clear all circles button
+function buttonPressedClearPoints(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+
+}
+
+function differentialMode(){
+  if(document.getElementById("differentialMode").checked){
+    sig.differentialMode = true;
+  }else{
+    sig.differentialMode = false;
+  }
+  buttonPressedClearPoints();
+  sig.gn = sig.gn + 0.0001;
+  sig.gn = sig.gn - 0.0001;
+
+  }
+
+
+</script>
+
+</html>

@@ -12,23 +12,11 @@
   <link rel='stylesheet' type='text/css' href='./x3dom/x3dom.css'>
   </link>
   <link href='https://css.gg/minimize-alt.css' rel='stylesheet'>
-  <style>
-    output {
-      font-weight: bold;
-    }
-
-    .modes {
-      display: flex;
-      flex-direction: row;
-    }
-  </style>
   <script src=d3.v5.min.js></script>
   <script src=fft.js></script>
   <script src=common.js></script>
   <script src=signal.js></script>
-  <!-- <script src=sliders.js></script> -->
   <script src=slidersMultiSignals.js></script>
-  <!-- <script src=powerSpectrumPlot.js></script> -->
   <script type='text/javascript' src='./x3dom/x3dom.js'></script>
   <script src=powerSpectrumPlot_2D.js></script>
   <script src=powerSpectrumPlot_3D.js></script>
@@ -47,13 +35,39 @@
   <script src=codemirror.min.js></script>
   <script src=codeMirror_javascript.js></script>
   <script src=throughputPlotMultiSignals.js></script>
+
+  <!-- global variables for the angles of the antennas to be accessed by spatial mobility.  used for tilt values-->
+  <script> let rxAngles = { X: 0, Y: 0, Z: 0 }; </script>
+
+  <script> let txAngles = { X: 0, Y: 0, Z: 0 }; </script>
+
+  <script> let rxAngles2 = { X: 0, Y: 0, Z: 0 }; </script>
+
+  <script> let txAngles2 = { X: 0, Y: 0, Z: 0 }; </script>
+
+
   <script src=spatialMobility.js></script>
   <script src=hoppingInterferer.js></script>
   <script src="https://unpkg.com/d3-simple-slider"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 
+  <!--code mirror and gamepad-->
+  <script src="codeMirrorImplementation.js"></script>
+  <script src="gamepadImplementation.js"></script>
+
+
+
   <style>
+    output {
+      font-weight: bold;
+    }
+
+    .modes {
+      display: flex;
+      flex-direction: row;
+    }
+
     .grid-container-main {
       display: flex;
       flex-direction: column;
@@ -159,6 +173,58 @@
       text-align: center;
       padding: 8px;
     }
+
+    .slider-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .slider-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 150px;
+      color: white;
+    }
+
+    #editorContainer {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .CodeMirror {
+      width: 400px;
+      min-width: 400px;
+      max-width: 100%;
+      height: 400px;
+      min-height: 200px;
+      max-height: 600px;
+    }
+
+    .antenna-active {
+  box-shadow: 0 0 10px 3px #00e6ff, 0 0 5px 2px #fff;
+  border: 2px solid #00e6ff !important;
+  z-index: 10001;
+}
+
+.param-active {
+  box-shadow: 0 0 10px 3px #ffea00, 0 0 5px 2px #fff;
+  border: 2px solid #ffea00 !important;
+  z-index: 10001;
+}
+
+.pattern-highlight {
+  box-shadow: 0 0 10px 3px #ffea00, 0 0 5px 2px #fff;
+  border: 2px solid #ffea00 !important;
+  z-index: 10001;
+}
+
+.pattern-dropdown-highlight {
+  background: #3399ff !important;
+  color: #fff !important;
+}
   </style>
 </head>
 
@@ -225,11 +291,12 @@
         </p>
       </div>
     </div>
-
-
   </div>
 
-  <div style="width: 30%; display:inline-flex; margin-left:1%; margin-top: 1%;">
+
+
+
+  <div style="width: 0%; display:inline-flex; margin-left:1%; margin-top: 1%;">
     <div style="display: inline-flex;">
       <div style="width: 28px; height: 15px; background:rgba(163,36,36,255)"></div>
       <div style="margin-left: 5px; overflow: hidden; white-space: nowrap;">Transmitter</div>
@@ -242,120 +309,227 @@
   </div>
   </div>
 
-  <div>
-    <div id="tx_pattern_options">
-      <div style="width: 28px; height: 15px; background:rgba(163,36,36,255); margin:auto"></div>
-      <p><label for="tx_pattern">&nbsp;&nbsp;Type of Transmitter Pattern:</label> &nbsp;
-        <select id="tx_pattern">
-          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
-          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
-          <option id="halfwave" value="halfwave">Half-wave dipole</option>
-          <option id="sdipole" value="sdipole">Small dipole</option>
-          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
-        </select>
-      </p> &nbsp; &nbsp; &nbsp;
-      <p>
-        <label for="polarization">
-          <input type="checkbox" id="vertical_tx" value="vertical">
-          Vertical
-          <input type="checkbox" id="horizontal_tx" value="horizontal">
-          Horizontal
-        </label><br>
-      </p>&nbsp; &nbsp;
-      <p id="manual-angle-options-tx">
-        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="theta_tx_manual" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="phi_tx_manual" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+  <div id="patternBlockContainer" style="display: flex; flex-direction: column; gap: 1rem;">
 
-        <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
-      </p>
-    </div>
-    <div style="display: inline-flex; margin-left: 2em; font-size: large;">
-      <div style="width: 28px; height: 15px; background:rgba(0,176,240,255); margin:auto"></div>
-      <p><label for="antenna_pattern">&nbsp;&nbsp;Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
-        <select id="antenna_pattern">
-          <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
-          <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
-          <option id="halfwave" value="halfwave">Half-wave dipole</option>
-          <option id="sdipole" value="sdipole">Small dipole</option>
-          <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
-        </select>
-      </p> &nbsp; &nbsp; &nbsp;
-      <p>
-        <label for="polarization">
-          <input type="checkbox" id="vertical_rx" value="vertical">
-          Vertical
-          <input type="checkbox" id="horizontal_rx" value="horizontal">
-          Horizontal
-        </label><br>
-      </p>&nbsp; &nbsp;
-      <p id="manual-angle-options-rx">
-        <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="theta_rx_manual" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-        <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
-        <input style="width: 3.5rem; height: 1.2rem;" id="phi_rx_manual" type="text" value="20"
-          oninput="this.value = this.value
-        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
-
-        <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
-      </p>
-    </div>
     <div>
-      <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
-        <label for="path_loss">Path Loss (dB) : </label> &nbsp;
-        <label id="path_loss" for="path_loss"></label>
-        &nbsp; &nbsp; &nbsp;
-        <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
-        <label id="power_rx_db" for="power_rx_db"></label>
-        &nbsp; &nbsp; &nbsp;
-        <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
-        <label id="rec_trans_dist" for="rec_trans_dist"></label>
-        &nbsp; &nbsp; &nbsp;
+      <div id="tx_pattern_options">
+        <div style="width: 28px; height: 15px; background:rgba(163,36,36,255); margin:auto"></div>
+        <p><label for="tx_pattern">&nbsp;&nbsp;Type of Transmitter Pattern:</label> &nbsp;
+          <select id="tx_pattern">
+            <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+            <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+            <option id="halfwave" value="halfwave">Half-wave dipole</option>
+            <option id="sdipole" value="sdipole">Small dipole</option>
+            <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe
+            </option>
+          </select>
+        </p> &nbsp; &nbsp; &nbsp;
+        <p>
+          <label for="polarization">
+            <input type="checkbox" id="vertical_tx" value="vertical">
+            Vertical
+            <input type="checkbox" id="horizontal_tx" value="horizontal">
+            Horizontal
+          </label><br>
+        </p>&nbsp; &nbsp;
+        <p id="manual-angle-options-tx">
+          <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+          <input style="width: 3.5rem; height: 1.2rem;" id="theta_tx_manual" type="text" value="20"
+            oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+          <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+          <input style="width: 3.5rem; height: 1.2rem;" id="phi_tx_manual" type="text" value="20"
+            oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+
+          <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
+        </p>
       </div>
-      <!-- <button class="toggle-button" onclick="toggleSliders()">
+      <div style="display: inline-flex; margin-left: 2em; font-size: large;">
+        <div style="width: 28px; height: 15px; background:rgba(0,176,240,255); margin:auto"></div>
+        <p><label for="antenna_pattern">&nbsp;&nbsp;Type of Receiver Pattern:</label> &nbsp&nbsp&nbsp&nbsp&nbsp;
+          <select id="antenna_pattern">
+            <option id="vertical_isotropic" value="vertical_isotropic">Vertical Isotropic</option>
+            <option id="horizontal_isotropic" value="horizontal_isotropic">Horizontal Isotropic</option>
+            <option id="halfwave" value="halfwave">Half-wave dipole</option>
+            <option id="sdipole" value="sdipole">Small dipole</option>
+            <option id="dirAnt_sideLobe" value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe
+            </option>
+          </select>
+        </p> &nbsp; &nbsp; &nbsp;
+        <p>
+          <label for="polarization">
+            <input type="checkbox" id="vertical_rx" value="vertical">
+            Vertical
+            <input type="checkbox" id="horizontal_rx" value="horizontal">
+            Horizontal
+          </label><br>
+        </p>&nbsp; &nbsp;
+        <p id="manual-angle-options-rx">
+          <label for="theta_rx_manual">Theta (0-180)</label> &nbsp; &nbsp;
+          <input style="width: 3.5rem; height: 1.2rem;" id="theta_rx_manual" type="text" value="20"
+            oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+          <label for="phi_rx_manual">Phi (0-360)</label> &nbsp; &nbsp;
+          <input style="width: 3.5rem; height: 1.2rem;" id="phi_rx_manual" type="text" value="20"
+            oninput="this.value = this.value
+        .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" /> &nbsp; &nbsp;
+
+          <input id="apply" type="button" value="Apply" onclick="manualInput()"> &nbsp; &nbsp;
+        </p>
+      </div>
+        <div>
+          <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
+          <label for="path_loss1">Path Loss (dB) : </label> &nbsp;
+          <label id="path_loss1" for="path_loss1"></label>
+          &nbsp; &nbsp; &nbsp;
+          <label for="power_rx_db1">Power at Receiver (dB) : </label> &nbsp;
+          <label id="power_rx_db1" for="power_rx_db1"></label>
+          &nbsp; &nbsp; &nbsp;
+          <label for="rec_trans_dist_label1">Receiver - Transmitter Distance : </label> &nbsp;
+          <label id="rec_trans_dist1" for="rec_trans_dist1"></label>
+          &nbsp; &nbsp; &nbsp;
+
+
+        </div>
+      <!--Newly added tx2 pattern-->
+      <div id="tx2_pattern_options" style="display: none;">
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: 1rem;">
+          <div style="width: 28px; height: 15px; background: #ff6600;"></div>
+          <label for="tx2_pattern"><b>Type of TX2 Pattern:</b></label>
+          <select id="tx2_pattern">
+            <option value="vertical_isotropic">Vertical Isotropic</option>
+            <option value="horizontal_isotropic">Horizontal Isotropic</option>
+            <option value="halfwave">Half-wave dipole</option>
+            <option value="sdipole">Small dipole</option>
+            <option value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+          </select>
+
+          <label><input type="checkbox" id="vertical_tx2" value="vertical"> Vertical</label>
+          <label><input type="checkbox" id="horizontal_tx2" value="horizontal"> Horizontal</label>
+
+          <label for="theta_tx2_manual">Theta (0-180)</label>
+          <input id="theta_tx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <label for="phi_tx2_manual">Phi (0-360)</label>
+          <input id="phi_tx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <input type="button" value="Apply" onclick="manualInputTX2()">
+        </div>
+      </div>
+
+
+      <!-- <div id="rx2_pattern_options" style="display: none;">
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: 1rem;">
+          <div style="width: 28px; height: 15px; background: limegreen;"></div>
+          <label for="rx2_pattern"><b>Type of RX2 Pattern:</b></label>
+          <select id="rx2_pattern">
+            <option value="vertical_isotropic">Vertical Isotropic</option>
+            <option value="horizontal_isotropic">Horizontal Isotropic</option>
+            <option value="halfwave">Half-wave dipole</option>
+            <option value="sdipole">Small dipole</option>
+            <option value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+          </select>
+
+          <label><input type="checkbox" id="vertical_rx2" value="vertical"> Vertical</label>
+          <label><input type="checkbox" id="horizontal_rx2" value="horizontal"> Horizontal</label>
+
+          <label for="theta_rx2_manual">Theta (0-180)</label>
+          <input id="theta_rx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <label for="phi_rx2_manual">Phi (0-360)</label>
+          <input id="phi_rx2_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <input type="button" value="Apply" onclick="manualInputRX2()">
+        </div>
+      </div> -->
+
+      <div id="receiver_pattern_options">
+
+
+    <!-- Content goes here -->
+      </div>
+
+      <!-- <div>
+        <div style="display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;">
+          <label for="path_loss">Path Loss (dB) : </label> &nbsp;
+          <label id="path_loss" for="path_loss"></label>
+          &nbsp; &nbsp; &nbsp;
+          <label for="power_rx_db">Power at Receiver (dB) : </label> &nbsp;
+          <label id="power_rx_db" for="power_rx_db"></label>
+          &nbsp; &nbsp; &nbsp;
+          <label for="rec_trans_dist_label">Receiver - Transmitter Distance : </label> &nbsp;
+          <label id="rec_trans_dist" for="rec_trans_dist"></label>
+          &nbsp; &nbsp; &nbsp;
+
+
+        </div> -->
+
+        <!-- <table>
+          <tr>
+            <th>Distance</th>
+            <th>Path Loss</th>
+            <th>Power at Receiver</th>
+          </tr>
+          <tr>
+            <td id="rec_trans_dist" for="rec_trans_dist"> </td>
+            <td id="path_loss" for="path_loss"></td>
+            <td id="power_rx_db" for="power_rx_db"></td>
+          </tr>
+          <tr>
+            <td>dist temp</td>
+            <td>path loss temp</td>
+            <td id="power_rx_db_2" for="power_rx_db_2"></td>
+          </tr>
+        </table> -->
+        <!-- <button class="toggle-button" onclick="toggleSliders()">
         Toggle Sliders
       </button> -->
+      </div>
     </div>
+
   </div>
 
-  <div id="togglebutton" style="padding-top: 3%;">
-    <div id="toggleValueDisplay" style="padding-left: 30%;">You are Controlling: RX "Press to toggle"</div>
-    <div style="padding-left: 35%;">
-    <button class="toggle-button" id="toggle-button" onclick="toggleSliders()">
-      Toggle RX/TX
-    </button>
-  </div>
-  </div>
 
 
   <div style="display: flex;">
     <div id="x3dModelWindow" style="display: flex;flex-direction: column;">
       <div id="x3dMain" style="display: flex;">
-        <div id="sliderLeft" style="display: flex;flex-direction: row;">
-          <label for="sliderForVertical" style="writing-mode: tb-rl;transform: rotate(-180deg);">Move
-            North-South</label>
-          <input type="range" id="sliderForVertical" min="-12" max="12" step="any" value="0" class="vertical-slider" style="transform: rotate(180deg);">
-        </div>
+
 
         <x3d id='x3dElement' showStat='false' showLog='false' width='1020px' height='500px'>
-          <scene DEF='scene'>
-              <physicalenvironmentlight diffuse="simpleDiffuse.dds" specular="simpleSpecular.dds"></physicalenvironmentlight>
-              <Background backUrl='nz.png' bottomUrl='ny.png' frontUrl='pz.png' leftUrl='nx.png' rightUrl='px.png' topUrl='py.png'></Background>
-              <!-- Adjusted Viewpoint with modified position and orientation -->
-              <Viewpoint DEF="OverheadView" position="0 100 0" orientation="1 0 0 -1.57"
-                         zNear="0.1" zFar="1000" centerOfRotation="0 0 0" fieldOfView="0.78540"
-                         description="Overhead View"></Viewpoint>
-              <!-- <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo> -->
 
-            <!-- Transmitter and Antenna -->
-            <transform id="transmitterTranslation" translation="0 0 0">
+
+          <div id="zSliderDisplayRow"
+            style="display: flex; flex-direction: row; justify-content: center; gap: 2rem; margin-bottom: 1rem;">
+            <div>
+              <label for="sliderForTiltZ">RX Z (OG): </label> <!--Again, was originally coded as Tx but switched for continuity-->
+              <span id="current1RotationZvalue">0</span>
+            </div>
+            <div>
+              <label for="null">TX Z (OG): </label><!--Again, was originally coded as Rx but switched for continuity-->
+              <span id="current2RotationZvalue">0</span>
+            </div>
+            <div>
+              <label for="null">TX2 Z: </label>
+              <span id="current3RotationZvalue">0</span>
+            </div>
+            <div>
+              <label for="null">RX2 Z: </label>
+              <span id="current4RotationZvalue">0</span>
+            </div>
+          </div>
+          <Scene DEF='scene' id="mainScene">
+            <physicalenvironmentlight diffuse="simpleDiffuse.dds" specular="simpleSpecular.dds">
+            </physicalenvironmentlight>
+            <Background backUrl='nz.png' bottomUrl='ny.png' frontUrl='pz.png' leftUrl='nx.png' rightUrl='px.png'
+              topUrl='py.png'></Background>
+            <!-- Adjusted Viewpoint with modified position and orientation -->
+            <Viewpoint DEF="OverheadView" position="0 100 0" orientation="1 0 0 -1.57" zNear="0.1" zFar="1000"
+              centerOfRotation="0 0 0" fieldOfView="0.78540" description="Overhead View"></Viewpoint>
+            <!-- <NavigationInfo type='turntable' typeParams='0.0 0.0 0.1 1.5'></NavigationInfo> -->
+
+            <transform id="rx_transform_1" translation="0 0 0">
 
               <transform DEF='ant_1' translation='0 -2.5 0'>
                 <shape>
@@ -364,7 +538,6 @@
                   </Appearance>
                   <cylinder radius='0.25' height='5'></cylinder>
                 </shape>
-                <!-- <viewpoint></viewpoint> -->
               </transform>
 
               <matrixTransform id="rxRotation">
@@ -420,7 +593,7 @@
                       </shape>
                     </transform>
 
-                    <transform class="pattern-models">
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
                       <shape>
                         <Appearance>
                           <Material diffuseColor="0 0.6902 0.9412" />
@@ -439,7 +612,7 @@
                       </shape>
                     </transform>
 
-                    <transform class="pattern-models">
+                    <transform class="pattern-models" rotation="0 0 1 1.5707">
                       <shape>
                         <Appearance>
                           <Material diffuseColor="0 0.6902 0.9412" />
@@ -525,9 +698,9 @@
                       <inline id="inline-model" url='small_dip_pat.x3d' />
                     </transform>
 
-
+                    <!--Newly added, updated rotation for blue cone-->
                     <transform class="pattern-models">
-                      <Transform rotation="0 0 1 1.5707">
+                      <Transform rotation="-1 0 0 1.5707">
                         <shape>
                           <Appearance>
                             <Material diffuseColor="0 0 1" />
@@ -571,41 +744,48 @@
                       </Transform>
                       <inline id="inline-model" url='directional_pat.x3d' />
                     </transform>
-
-
                   </switch>
 
-                  <shape DEF='point'>
-                    <appearance>
-                      <material diffuseColor='1 0 0'></material>
-                      <lineProperties applied='TRUE' linewidthScaleFactor='0.01'></lineProperties>
-                    </appearance>
-                    <cylinder height='50' radius='0.1'></cylinder>
-                  </shape>
 
-
-
-
+                  <transform rotation="0 0 1 1.5708">
+                    <transform id="rx_triangleOuter" rotation="0 0 1 0">
+                      <transform rotation="1 0 0 1.5708">
+                        <shape DEF="point_rx">
+                          <appearance>
+                            <Material diffuseColor="0 0.6902 0.9412" transparency="0.7" />
+                          </appearance>
+                          <indexedFaceSet coordIndex="0 1 2 -1" solid="false">
+                            <coordinate point="0 4 0, -3 -3 0, 3 -3 0" />
+                          </indexedFaceSet>
+                        </shape>
+                      </transform>
+                    </transform>
+                  </transform>
 
                 </transform>
               </matrixTransform>
             </transform>
 
             <!-- GROUND PLANE, FOR BETTER ORIENTATION -->
+
+
+
             <transform translation='0 -5.5 0' rotation='1 0 0 -1.57'>
               <shape>
                 <appearance>
-                  <Material ambientIntensity='0.25' diffuseColor='0.510609 0.17264 0.059872' shininess='0.933333' specularColor='0.533333 0.533333 0.533333'/>
+                  <Material ambientIntensity='0.25' diffuseColor='0.510609 0.17264 0.059872' shininess='0.933333'
+                    specularColor='0.533333 0.533333 0.533333' />
                 </appearance>
                 <box solid='true' size='60 60 2'></box>
               </shape>
             </transform>
+
             <!--26 16 2-->
 
 
-            <!--This is the transmitter, not the receiver-->
+            <!--This is the red transmitter, not the blue receiver-->
             <!-- <transform translation='0 0 -12'> -->
-            <transform id="receiver" translation='0 0 -12'>
+            <transform id="tx_transform_1" translation='0 0 -12'>
               <transform translation='0 -2.5 0'>
                 <shape>
                   <appearance>
@@ -618,6 +798,7 @@
               <matrixTransform id="txRotation">
                 <transform id="receiver-temp" rotation="1 0 0 3.1415">
                   <switch id="tx-geometry" whichchoice="1">
+
                     <transform rotation="0 0 1 1.5707">
                       <shape>
                         <appearance>
@@ -771,12 +952,14 @@
                     </transform>
 
                     <transform rotation="0 0 1 1.5707">
+                      <transform rotation="1 0 0 1.5707">
                       <shape>
                         <appearance>
                           <material diffuseColor='1 0 0'></material>
                         </appearance>
                         <Cone bottomradius='1.5' height='3' />
                       </shape>
+                      </transform>
                     </transform>
 
                     <transform rotation="0 0 1 1.5707">
@@ -805,16 +988,40 @@
                         <appearance>
                           <material diffuseColor='1 0 0'></material>
                         </appearance>
-                        <Cone bottomradius='1.5' height='3' />
+                        <Cone bottomradius='1.5' height='3 ' />
                       </shape>
                       <transform rotation="0 0 1 1.5707">
                         <inline id="inline-model" url='directional_pat.x3d' />
                       </transform>
                     </transform>
                   </switch>
+
+
+                  <transform rotation="0 0 1 1.5708">
+                    <transform id="tx_triangleOuter" rotation="0 0 1 0">
+                      <transform rotation="1 0 0 -1.5708">
+                        <shape DEF="point_tx">
+                          <appearance>
+                            <Material diffuseColor="1 0 0" transparency="0.7" />
+                          </appearance>
+                          <indexedFaceSet coordIndex="0 1 2 -1" solid="false">
+                            <coordinate point="0 4 0, -3 -3 0, 3 -3 0" />
+                          </indexedFaceSet>
+                        </shape>
+                      </transform>
+                    </transform>
+                  </transform>
                 </transform>
               </matrixTransform>
             </transform>
+
+            <!------------------------------------>
+            <!--      Newly Added Antennas      -->
+            <!------------------------------------>
+
+
+
+
             <!-- TRANSLATION GIZMO (CONTAINING PLANE SENSOR AND SENSOR GEOMETRY) -->
             <group>
               <planeSensor id="transmitterPlane" autoOffset='true' axisRotation='1 0 0 -1.57' minPosition='-12 0'
@@ -825,207 +1032,884 @@
               <transform id='RotationHandleTransform2'>
               </transform>
             </Switch>
-          </scene>
+          </Scene>
         </x3d>
 
-        <div id="sliderRight" style="display: flex; flex-direction: row;">
+        <!-- =================== TX (Transmitter) Sliders =================== -->
 
-          <input type="range" id="sliderForRotateX" min="0" max="360" step="any" value="0" class="vertical-slider">
-          <label for="sliderForRotateX" style="writing-mode: tb-rl;transform: rotate(-180deg);">Point Antenna Up-Down
-            (Elevation)
-          </label>
-        </div>
-        <div id="sliderRight2" style="display: none;">
-          <label for="sliderForRotateY" style="writing-mode: tb-rl;transform: rotate(-180deg);">Point Receiver Up-Down
-            (Elevation)
-          </label>
-          <input type="range" id="slider2ForRotateX" min="0" max="360" step="any" value="0" class="vertical-slider"
-            style="accent-color: red">
-
-        </div>
-      </div>
-      <div id="sliderBottom">
-        <div id="sliderBottomLeft" style="
-      display: flex;
-      flex-direction: column;
-  ">
-          <input type="range" id="sliderForHorizontal" min="-10" max="10" step="any" value="0">
-          <label for="sliderForHorizontal">Move East-West
-          </label>
-        </div>
-        <div id="sliderBottomRight" style="
-      display: flex;
-      flex-direction: column;
-  ">
-          <input type="range" id="sliderForRotateY" min="0" max="360" step="any" value="0" style="transform: rotate(180deg);">
-          <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
-          </label>
-        </div>
-      </div>
-
-      <!-- Group 2 of Sliders (Initially hidden) -->
-      <div id="sliderGroup2" style="display: none;">
-
-        <div id="sliderBottom2">
-          <div id="sliderBottomRight2">
-            <input type="range" id="slider2ForRotateY" min="0" max="360" step="any" value="0" style="accent-color: red;transform: rotate(180deg);">
-            <label for="sliderForRotateY">Point Antenna Left-Right (Azimuth)
-            </label>
+        <!--Missmatch was made during coding.  Although labeled tx, this controls the blue receiver.  not the red transmitter.  Buttons names were updated properly but naming convention is wrong-->
+        <div id="sliderOrdering" style="display: flex; flex-direction: column; gap: 2rem;">
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; justify-content: center;">
+            <button id="initialTxReset" style="width: fit-content; align-self: row;"
+              onclick="resetRotationSlidersOG('tx')">
+              Reset RX Rotation
+            </button>
+             <button id="toggle-og_tx-sliders" onclick="toggleAntennaSliders('og_tx')">Hide Antenna Sliders</button>
           </div>
-        </div>
+          <!-- === TX (OG) Sliders === -->
+          
+            <div id="og_rx_sliders">
+
+            <div class="slider-row">
+              <div class="slider-box">
+                <label for="sliderForMoveX">Move East-West</label>
+                <input type="range" id="sliderForMoveX" min="-10" max="10" value="0"
+                  style="accent-color: #acccf6;">
+              </div>
+              <div class="slider-box">
+                <label for="sliderForMoveY">Move North-South</label>
+                <input type="range" id="sliderForMoveY" min="-12" max="12" value="0" style="accent-color: #acccf6;">
+              </div>
+              <div class="slider-box">
+                <label for="sliderForMoveZ">Move Up-Down</label>
+                <input type="range" id="sliderForMoveZ" min="0" max="10" value="0" style="accent-color: #acccf6 ;">
+              </div>
+            </div>
+
+            <div class="slider-row">
+              <div class="slider-box">
+                <label for="sliderForRotateX">Elevation (Up-Down)</label>
+                <input type="range" id="sliderForRotateX" min="0" max="360" value="0" style="accent-color: #acccf6;">
+              </div>
+              <div class="slider-box">
+                <label for="sliderForRotateY">Azimuth (Left-Right)</label>
+                <input type="range" id="sliderForRotateY" min="0" max="360" value="0" style="accent-color: #acccf6;">
+              </div>
+              <div class="slider-box">
+                <label for="sliderForTiltZ">Boresight Tilt</label>
+                <input type="range" id="sliderForTiltZ" min="0" max="180" value="0" style="accent-color: #acccf6;">
+              </div>
+            </div>
+          </div>
+          </div>
+         
+
+
+<div id="sliderGroup2" style="display: flex; flex-direction: column; justify-content: center; gap: 1rem;">
+  <!-- Centered row for both buttons -->
+  <div style="display: flex; justify-content: center; gap: 1rem;">
+    <button id="initialRxReset" style="width: fit-content; text-align: center;"
+      onclick="resetRotationSlidersOG('rx')">
+      Reset TX Rotation
+    </button>
+    <button id="toggle-og_rx-sliders" style="width: fit-content; text-align: center;"
+      onclick="toggleAntennaSliders('og_rx')">
+      Hide Antenna Sliders
+    </button>
+  </div>
+  <!-- Sliders group -->
+  <div id="og_rx_sliders">
+    <div class="slider-row">
+      <div class="slider-box">
+        <label for="slider2ForMoveX" style="color: white;">Move East-West (TX)</label>
+        <input type="range" id="slider2ForMoveX" min="-10" max="10" value="0" style="accent-color: red;">
       </div>
-
-      <div style="display: flex; flex-direction: row;">
-        <table id="angles-table-rx" width="100px" style="margin: 20px;">
-          <caption>RX-Details</caption>
-          <tr>
-            <th>Angle</th>
-            <th>Value</th>
-          </tr>
-          <tr>
-            <td>X<sub>absolute</sub></td>
-            <td id="angle-x-table-rx">0</td>
-          </tr>
-          <tr>
-            <td>Y<sub>absolute</sub></td>
-            <td id="angle-y-table-rx">0</td>
-          </tr>
-          <tr>
-            <td>Z<sub>absolute</sub></td>
-            <td id="angle-z-table-rx">0</td>
-          </tr>
-          <tr>
-            <td>&theta;<sub>absolute</sub></td>
-            <td id="angle-theta-table-rx">0</td>
-          </tr>
-          <tr>
-            <td>&Phi;<sub>absolute</sub></td>
-            <td id="angle-phi-table-rx">0</td>
-          </tr>
-          <tr>
-            <td>&theta;<sub>rx-tx</sub></td>
-            <td id="angle-theta-table-rx-rel">90</td>
-          </tr>
-          <tr>
-            <td>&Phi;<sub>rx-tx</sub></td>
-            <td id="angle-phi-table-rx-rel">90</td>
-          </tr>
-        </table>
-
-        <table id="angles-table-tx" width="100px" style="margin: 20px;">
-          <caption>TX-Details</caption>
-          <tr>
-            <th>Angle</th>
-            <th>Value</th>
-          </tr>
-          <tr>
-            <td>X<sub>absolute</sub></td>
-            <td id="angle-x-table-tx">0</td>
-          </tr>
-          <tr>
-            <td>Y<sub>absolute</sub></td>
-            <td id="angle-y-table-tx">0</td>
-          </tr>
-          <tr>
-            <td>Z<sub>absolute</sub></td>
-            <td id="angle-z-table-tx">0</td>
-          </tr>
-          <tr>
-            <td>&theta;<sub>absolute</sub></td>
-            <td id="angle-theta-table-tx">0</td>
-          </tr>
-          <tr>
-            <td>&Phi;<sub>absolute</sub></td>
-            <td id="angle-phi-table-tx">0</td>
-          </tr>
-          <tr>
-            <td>&theta;<sub>tx-rx</sub></td>
-            <td id="angle-theta-table-tx-rel">90</td>
-          </tr>
-          <tr>
-            <td>&Phi;<sub>tx-rx</sub></td>
-            <td id="angle-phi-table-tx-rel">90</td>
-          </tr>
-        </table>
-
+      <div class="slider-box">
+        <label for="slider2ForMoveY" style="color: white;">Move North-South (TX)</label>
+        <input type="range" id="slider2ForMoveY" min="-12" max="12" value="-12" style="accent-color: red;">
+      </div>
+      <div class="slider-box">
+        <label for="slider2ForZupward">Move Up-Down</label>
+        <input type="range" id="slider2ForZupward" min="0" max="10" value="0" style="accent-color: red;">
       </div>
     </div>
+    <div class="slider-row">
+      <div class="slider-box">
+        <label for="slider2ForRotateX" style="color: white;">Elevation (TX)</label>
+        <input type="range" id="slider2ForRotateX" min="0" max="360" value="0" style="accent-color: red;">
+      </div>
+      <div class="slider-box">
+        <label for="slider2ForRotateY" style="color: white;">Azimuth (TX)</label>
+        <input type="range" id="slider2ForRotateY" min="0" max="360" value="0" style="accent-color: red;">
+      </div>
+      <div class="slider-box">
+        <label for="slider2ForTiltZ">TX Z (OG) Boresight Tilt</label>
+        <input type="range" id="slider2ForTiltZ" min="0" max="180" value="0" style="accent-color: red;">
+      </div>
 
-    <div class="grid-container-main">
-      <div class="grid-container-item">
+      
+    </div>
+  </div>
+  <!-- <div class="slider-row" style="justify-content: center;">
+   <div class="slider-box">
+    <label for="freq2"></label>
+    <input type="range" id="freq2" min="1700000000" max="1900000000" value="1785000000" step="1000000">
+    <output id="freq2_val"></output>
+  </div>
+  <div class="slider-box">
+    <label for="bw2"></label>
+    <input type="range" id="bw2" min="1000000" max="40000000" value="4000000" step="1000000">
+    <output id="bw2_val"></output>
+  </div>
+  <div class="slider-box">
+    <label for="gn2"></label>
+    <input type="range" id="gn2" min="-10" max="90" value="-10" step="1">
+    <output id="gn2_val"></output>
+  </div>
+  <div class="slider-box">
+    <label for="mcs2"></label>
+    <input type="range" id="mcs2" min="0" max="10" value="6" step="1">
+    <output id="mcs2_val"></output>
+  </div>
+</div> -->
+</div>
+
+          <div id="addButtons" style="display: none;">
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                <button id="add-tx-antenna-btn" style="width: fit-content; align-self: row;">
+                  Add New Tx Antenna
+                </button>
+
+                <button id="remove-tx-antenna-btn" style="display: none; flex-direction: column; width: fit-content;">
+                  Remove Tx Antenna
+                </button>
+
+                <button id="reset-tx-antenna-btn" onclick="resetRotationSliders('tx')"
+                  style="display: none; flex-direction: column; width: fit-content;">
+                  Reset Tx Antenna
+                </button>
+
+            <button id="toggle-tx2-sliders" style="width: fit-content; text-align: center; display: none;"
+  onclick="toggleAntennaSliders('tx2')">
+  Hide Antenna Sliders
+</button>
+              </div>
+
+              <div id="sliderGroup_tx2" style="display: none; flex-direction: column; gap: 1rem;">
+                <!-- === Basic TX2 Sliders === -->
+                <div class="slider-row">
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Move East-West (TX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="15"
+                      style="accent-color: #ff6600;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Move North-South (TX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="-2.5"
+                      style="accent-color: #ff6600;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Move Up-Down</label>
+                    <input type="range" id="null" min="0" max="10" value="0"
+                      style="accent-color: #ff6600;">
+                  </div>
+                </div>
+
+                <div class="slider-row">
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Elevation (TX2)</label>
+                    <input type="range" id="null" min="0" max="360" value="0"
+                      style="accent-color: #ff6600;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Azimuth (TX2)</label>
+                    <input type="range" id="null" min="0" max="360" value="0"
+                      style="accent-color: #ff6600;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null">RX2 Z Boresight Tilt</label>
+                    <input type="range" id="null" min="0" max="180" value="0">
+                  </div>
+                </div>
+
+<!-- Add these inside #sliderGroup_tx2 for TX2 (New TX) -->
+<div class="slider-row">
+  <div class="slider-box">
+    <label for="freq3"><b>Frequency</b></label>
+    <input type="range" id="freq3" min="1700000000" max="1900000000" value="1785000000" step="1000000">
+    <output id="freq3_val">1785.00 MHz</output>
+  </div>
+  <div class="slider-box">
+    <label for="bw3"><b>Bandwidth</b></label>
+    <input type="range" id="bw3" min="1000000" max="40000000" value="4000000" step="1000000">
+    <output id="bw3_val">4.00 MHz</output>
+  </div>
+  <div class="slider-box">
+    <label for="gn3"><b>TX Power(Sig_gn)</b></label>
+    <input type="range" id="gn3" min="-10" max="90" value="-10" step="1">
+    <output id="gn3_val">-10.00 dBm</output>
+  </div>
+  <div class="slider-box">
+    <label for="mcs3"><b>Mod Code</b></label>
+    <input type="range" id="mcs3" min="0" max="10" value="6" step="1">
+    <output id="mcs3_val">r8/9 16-QAM (3.56 b/s/Hz)</output>
+  </div>
+</div>
+
+              </div>
+            </div>
 
 
-        <div class="grid-item">
-          <div class="grid-container">
-            <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-              <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+
+            <!-- === RX2 Button + Sliders === -->
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+
+                <button id="add-rx-antenna-btn" style="width: fit-content; align-self: center;">
+                  Add New Rx Antenna
+                </button>
+
+                <button id="remove-rx-antenna-btn" style="display: none; width: fit-content;">
+                  Remove Rx Antenna
+                </button>
+
+                <button id="reset-rx-antenna-btn" onclick="resetRotationSliders('rx')"
+                  style="display: none; flex-direction: column; width: fit-content;">
+                  Reset Rx Antenna
+                </button>
+
+            <button id="toggle-rx2-sliders" style="width: fit-content; text-align: center; display: none;"
+  onclick="toggleAntennaSliders('rx2')">
+  Hide Antenna Sliders
+</button>
+
+            </div>
+              <div id="sliderGroup_rx2" style="display: none; flex-direction: column; gap: 1rem;">
+                <div class="slider-row">
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Move East-West (RX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="15"
+                      style="accent-color: limegreen;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Move North-South (RX2)</label>
+                    <input type="range" id="null" min="-20" max="20" value="-2.5"
+                      style="accent-color: limegreen;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null">Move Up-Down</label>
+                    <input type="range" id="null" min="0" max="10" value="0"
+                      style="accent-color: limegreen;">
+                  </div>
+                </div>
+
+
+                <div class="slider-row">
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Elevation (RX2)</label>
+                    <input type="range" id="null" min="0" max="360" value="0"
+                      style="accent-color: limegreen;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null" style="color: white;">Azimuth (RX2)</label>
+                    <input type="range" id="null" min="0" max="360" value="0"
+                      style="accent-color: limegreen;">
+                  </div>
+                  <div class="slider-box">
+                    <label for="null">Boresight Tilt (RX2)</label>
+                    <input type="range" id="null" min="0" max="180" value="0"
+                    style="accent-color: limegreen;">
+                  </div>
+                </div>
+
+
+
+              </div>
+            </div>
+          </div>
+
+          <div id="sliderContainer"></div>
+<!-- <div class="slider-row">
+  <div class="slider-box">
+    <label for="freq4"><b>Frequency</b></label>
+    <input type="range" id="freq4" min="1700000000" max="1900000000" value="1785000000" step="1000000">
+    <output id="freq4_val">1785.00 MHz</output>
+  </div>
+  <div class="slider-box">
+    <label for="bw4"><b>Bandwidth</b></label>
+    <input type="range" id="bw4" min="1000000" max="40000000" value="4000000" step="1000000">
+    <output id="bw4_val">4.00 MHz</output>
+  </div>
+  <div class="slider-box">
+    <label for="gn4"><b>TX Power(Sig_gn)</b></label>
+    <input type="range" id="gn4" min="-10" max="90" value="-10" step="1">
+    <output id="gn4_val">-10.00 dBm</output>
+  </div>
+  <div class="slider-box">
+    <label for="mcs4"><b>Mod Code</b></label>
+    <input type="range" id="mcs4" min="0" max="10" value="6" step="1">
+    <output id="mcs4_val">r8/9 16-QAM (3.56 b/s/Hz)</output>
+  </div>
+</div> -->
+
+
+
+
+          <div style="display: flex; flex-direction: row;">
+            <table id="angles-table-rx" width="100px" style="margin: 20px;">
+              <caption>RX-Details</caption>
+              <tr>
+                <th>Angle</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>X<sub>absolute</sub></td>
+                <td id="angle-x-table-rx">0</td>
+              </tr>
+              <tr>
+                <td>Y<sub>absolute</sub></td>
+                <td id="angle-y-table-rx">0</td>
+              </tr>
+              <tr>
+                <td>Z<sub>absolute</sub></td>
+                <td id="angle-z-table-rx">0</td>
+              </tr>
+              <tr>
+                <td>&theta;<sub>absolute</sub></td>
+                <td id="angle-theta-table-rx">0</td>
+              </tr>
+              <tr>
+                <td>&Phi;<sub>absolute</sub></td>
+                <td id="angle-phi-table-rx">0</td>
+              </tr>
+              <tr>
+                <td>&theta;<sub>rx-tx</sub></td>
+                <td id="angle-theta-table-rx-rel">90</td>
+              </tr>
+              <tr>
+                <td>&Phi;<sub>rx-tx</sub></td>
+                <td id="angle-phi-table-rx-rel">90</td>
+              </tr>
+            </table>
+
+            <table id="angles-table-tx" width="100px" style="margin: 20px;">
+              <caption>TX-Details</caption>
+              <tr>
+                <th>Angle</th>
+                <th>Value</th>
+              </tr>
+              <tr>
+                <td>X<sub>absolute</sub></td>
+                <td id="angle-x-table-tx">0</td>
+              </tr>
+              <tr>
+                <td>Y<sub>absolute</sub></td>
+                <td id="angle-y-table-tx">0</td>
+              </tr>
+              <tr>
+                <td>Z<sub>absolute</sub></td>
+                <td id="angle-z-table-tx">0</td>
+              </tr>
+              <tr>
+                <td>&theta;<sub>absolute</sub></td>
+                <td id="angle-theta-table-tx">0</td>
+              </tr>
+              <tr>
+                <td>&Phi;<sub>absolute</sub></td>
+                <td id="angle-phi-table-tx">0</td>
+              </tr>
+              <tr>
+                <td>&theta;<sub>tx-rx</sub></td>
+                <td id="angle-theta-table-tx-rel">90</td>
+              </tr>
+              <tr>
+                <td>&Phi;<sub>tx-rx</sub></td>
+                <td id="angle-phi-table-tx-rel">90</td>
+              </tr>
+            </table>
+
+          </div>
+        </div>
+
+        <div class="grid-container-main">
+          <div class="grid-container-item">
+
+
+            <div class="grid-item">
+              <div class="grid-container">
+                <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+                  <canvas id="sinr-bar-chart" style="width: 100%; height: 100%;"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="grid-container-item">
+            <div class="grid-item">
+              <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
+                <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="grid-container-item">
+
+      <nav id="buttons-nav">
+        <button id="btnThroughput" onclick="toggleSection('throughput-multisignal')">Throughput Graph</button>
+        <button id="btnPsd" onclick="toggleSection('psd_svg_figure_parent')">PSD Graph</button>
+      </nav>
+      <div style="display: flex;">
+        <div style="display:inline-flex;">
+        </div>
         <div class="grid-item">
-          <div class="grid-item" id="sinr_parent" style="width: 360px; height: 320px;">
-            <canvas id="spectral-efficiency-bar-chart" style="width: 100%; height: 100%;"></canvas>
+          <div id="throughput-multisignal" class="hidden" style="width: 720px;">
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <nav id="buttons-nav">
-    <button id="btnThroughput" onclick="toggleSection('throughput-multisignal')">Throughput Graph</button>
-    <button id="btnPsd" onclick="toggleSection('psd_svg_figure_parent')">PSD Graph</button>
-  </nav>
-  <div style="display: flex;">
-    <div style="display:inline-flex;">
-    </div>
-    <div class="grid-item">
-      <div id="throughput-multisignal" class="hidden" style="width: 720px;">
-      </div>
-    </div>
-    <!-- <div class="linkinputs" style="display: none;"> -->
-    <div style="width: 25%;">
-      <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
-        <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
-        <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
-        <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
+        <!-- <div class="linkinputs" style="display: none;"> -->
+        <div style="width: 25%;">
+          <div class="bwMultiplierDiv" style="margin-top: 1rem; display: none;">
+            <div style="font-size: 110%; color: #ff6b6b; display: inline-block;">Link 1</div>
+            <label for="strategy" style="margin-left: 1rem;">BW mult.</label> &nbsp;
+            <input style="width: 3.5rem;" id="multiplier1" type="text" value="1" oninput="this.value = this.value
         .replace(/[^0-9.]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[0.].*/, '');" />
-      </div>
-      <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
-        <label for="strategy">IIP3</label> &nbsp;
-        <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
-          oninput="this.value = this.value
+          </div>
+          <div class="iip3Div" style="margin-top: 1rem; margin-left: 1rem; display: none;">
+            <label for="strategy">IIP3</label> &nbsp;
+            <input style="width: 3.5rem;" id="iip3_1" type="text" value="0"
+              oninput="this.value = this.value
         .replace(/[^0-9.-]/g, '').replace(/(\..*?)\..*/g, '$1').replace(/^0[^.]/, '0').replace(/^[-]*[0-9]+[.]*[0-9]*[-]/, '0');" />
+          </div>
+
+          <p>
+            <input type="range" id=freq1 />
+          </p>
+          <p>
+            <input type="range" id=bw1 style="display: none;" />
+          </p>
+          <p>
+            <input type="range" id=gn1 style="display: none;" />
+          </p>
+          <p>
+            <input type="range" id=mcs1 style="display: none;" />
+          </p>
+        </div>
+
+
+        <div style="width: 25%;">
+
+          <div type="text" id="sinr_div"></div>
+
+        </div>
+        <!-- </div> -->
+        <div class="grid-item">
+          <div id="psd_svg_figure_parent" class="hidden"></div>
+        </div>
       </div>
 
-      <p>
-        <input type="range" id=freq1 />
-      </p>
-      <p>
-        <input type="range" id=bw1 style="display: none;" />
-      </p>
-      <p>
-        <input type="range" id=gn1 style="display: none;"  />
-      </p>
-      <p>
-        <input type="range" id=mcs1 style="display: none;" />
-      </p>
-    </div>
+      <div id="editorContainer" style="max-width: 1000px; margin: 0 auto;">
+        <div id="editorInner">
+        <textarea id="antennaEditor" style="width: 100%; min-width: 1000px;"></textarea>
+      </div>
+      </div>
 
-
-    <div style="width: 25%;">
-
-      <div type="text" id="sinr_div"></div>
-
-    </div>
-    <!-- </div> -->
-    <div class="grid-item">
-      <div id="psd_svg_figure_parent" class="hidden"></div>
-    </div>
-  </div>
 </body>
 <script>
+
+  //=========================================================
+  //    Constants/Calculations/Setup
+  //=========================================================
+
+  let antennaCounter = { tx: 0, rx: 0 }; // max one new antenna per type
+
+  document.getElementById('add-tx-antenna-btn').addEventListener('click', function () {
+  addNewAntennaX3DElement('tx',airpsace);
+  document.getElementById('sliderGroup_tx2').style.display = 'flex';
+  document.getElementById('add-tx-antenna-btn').style.display = 'none';
+  document.getElementById('remove-tx-antenna-btn').style.display = 'inline-block';
+  document.getElementById('reset-tx-antenna-btn').style.display = 'inline-block';
+  document.getElementById('toggle-tx2-sliders').style.display = 'inline-block'; // <-- Show hide button
+});
+
+  // === Remove TX Antenna Button ===
+document.getElementById('remove-tx-antenna-btn').addEventListener('click', function () {
+  const antenna = document.getElementById('tx_new_transform');
+  if (antenna) antenna.remove();
+  document.getElementById('sliderGroup_tx2').style.display = 'none';
+  document.getElementById('tx2_pattern_options').style.display = 'none';
+  document.getElementById('remove-tx-antenna-btn').style.display = 'none';
+  document.getElementById('add-tx-antenna-btn').style.display = 'inline-block';
+  document.getElementById('reset-tx-antenna-btn').style.display = 'none';
+  document.getElementById('toggle-tx2-sliders').style.display = 'none'; // <-- Hide hide button
+  antennaCounter.tx = 0;
+}); 
+
+ document.getElementById('add-rx-antenna-btn').addEventListener('click', function () {
+  airspace.numReceivers = airspace.numReceivers + 1; // Increment the number of receivers
+  addNewAntennaX3DElement('rx',airspace);
+  // document.getElementById('sliderGroup_rx2').style.display = 'flex';
+  // document.getElementById('add-rx-antenna-btn').style.display = 'none';
+  document.getElementById('remove-rx-antenna-btn').style.display = 'inline-block';
+  document.getElementById('reset-rx-antenna-btn').style.display = 'inline-block';
+  // document.getElementById('toggle-rx2-sliders').style.display = 'inline-block'; // <-- Show hide button
+  
+    const parent = document.getElementById("receiver_pattern_options");
+
+    const rxPatternOptions = document.createElement("div");
+    rxPatternOptions.id = `rx${airspace.numReceivers}_pattern_options`;
+
+    rxPatternOptions.innerHTML = `
+        <div style="display: flex; flex-direction: row; align-items: center; gap: 0.75rem; margin-left: 1rem;">
+          <div style="width: 28px; height: 15px; background: limegreen;"></div>
+          <label for="rx${airspace.numReceivers}_pattern"><b>Type of RX${airspace.numReceivers} Pattern:</b></label>
+          <select id="rx${airspace.numReceivers}_pattern">
+            <option value="vertical_isotropic">Vertical Isotropic</option>
+            <option value="horizontal_isotropic">Horizontal Isotropic</option>
+            <option value="halfwave">Half-wave dipole</option>
+            <option value="sdipole">Small dipole</option>
+            <option value="dirAnt_sideLobe">Directional antenna with Flat beam and Side Lobe</option>
+          </select>
+
+          <label><input type="checkbox" id="vertical_rx${airspace.numReceivers}" value="vertical"> Vertical</label>
+          <label><input type="checkbox" id="horizontal_rx${airspace.numReceivers}" value="horizontal"> Horizontal</label>
+
+          <label for="theta_rx${airspace.numReceivers}_manual">Theta (0-180)</label>
+          <input id="theta_rx${airspace.numReceivers}_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <label for="phi_rx${airspace.numReceivers}_manual">Phi (0-360)</label>
+          <input id="phi_rx${airspace.numReceivers}_manual" type="text" value="20" style="width: 3.5rem; height: 1.2rem;">
+
+          <input type="button" value="Apply" onclick="manualInputRX2()">
+        </div>
+    `;
+
+    parent.appendChild(rxPatternOptions);
+
+  
+  const newDiv = document.createElement('div');
+  newDiv.style = "display: inline-flex; margin-left: 2em; font-size: large; margin-top: -1.5%;";
+
+  // Add the inner HTML content
+  newDiv.innerHTML = `
+    <label for="path_loss${airspace.numReceivers}">Path Loss (dB) : </label> &nbsp;
+    <label id="path_loss${airspace.numReceivers}" for="path_loss${airspace.numReceivers}"></label>
+    &nbsp; &nbsp; &nbsp;
+    <label for="power_rx_db${airspace.numReceivers}">Power at Receiver (dB) : </label> &nbsp;
+    <label id="power_rx_db${airspace.numReceivers}" for="power_rx_db${airspace.numReceivers}"></label>
+    &nbsp; &nbsp; &nbsp;
+    <label for="rec_trans_dist_label${airspace.numReceivers}">Receiver - Transmitter Distance : </label> &nbsp;
+    <label id="rec_trans_dist${airspace.numReceivers}" for="rec_trans_dist${airspace.numReceivers}"></label>
+    &nbsp; &nbsp; &nbsp;
+  `;
+
+  // Append the new div to the desired parent container
+  const parentContainer = document.getElementById('receiver_pattern_options'); // Replace with the correct parent ID
+  parentContainer.appendChild(newDiv);
+
+  generateSliderGroup("sliderContainer", `dynamicSliderGroup${airspace.numReceivers}`, airspace);
+
+  for (let i = 2; i <= airspace.numReceivers; i++) {
+    const patternSlider = document.getElementById(`rx${i}_pattern`);
+    patternSlider.addEventListener("change", selectModel);
+    document.getElementById(`vertical_rx${i}`).addEventListener("change", selectModel);
+    document.getElementById(`horizontal_rx${i}`).addEventListener("change", selectModel);
+  }
+
+
+  SinrPlot_BarChart.remove_plot(); // Clear SINR plot when adding new RX
+  // airspace.addReceiver(); // Add new receiver to airspace
+  let linkList = [];
+  for (let i = 1; i <= airspace.numReceivers ; i++) {
+    linkList.push(`Link ${i +1}`);
+  }
+  signalData = airspace.receivers.slice(0,airspace.numReceivers); // Recompute signals for all links
+  SinrPlot_BarChart.init(signalData, "sinr-bar-chart",linkList );
+    updatePathLoss();
+
+});
+
+  // === Remove RX Antenna Button ===
+document.getElementById('remove-rx-antenna-btn').addEventListener('click', function () {
+  const antenna = document.getElementById('rx_new_transform');
+  if (antenna) antenna.remove();
+  document.getElementById('sliderGroup_rx2').style.display = 'none';
+  document.getElementById('rx2_pattern_options').style.display = 'none';
+  document.getElementById('remove-rx-antenna-btn').style.display = 'none';
+  document.getElementById('add-rx-antenna-btn').style.display = 'inline-block';
+  document.getElementById('reset-rx-antenna-btn').style.display = 'none';
+  document.getElementById('toggle-rx2-sliders').style.display = 'none'; // <-- Hide hide button
+  antennaCounter.rx = 0;
+});
+
+// Updates the Z slider display values for all antennas.  shown at the top of the x3d scene
+  // function updateZSliderDisplays() {
+  //   document.getElementById('current1RotationZvalue').textContent = document.getElementById('sliderForTiltZ').value;
+  //   document.getElementById('current2RotationZvalue').textContent = document.getElementById('slider2ForTiltZ').value;
+  //   document.getElementById('current3RotationZvalue').textContent = document.getElementById('slider3ForTiltZ').value;
+  //   document.getElementById('current4RotationZvalue').textContent = document.getElementById('slider4ForTiltZ').value;
+  // }
+
+
+  // Attach event listeners to update on input
+  // ['sliderForTiltZ', 'slider2ForTiltZ', 'slider3ForTiltZ', 'slider4ForTiltZ'].forEach(id => {
+  //   const slider = document.getElementById(id);
+  //   if (slider) {
+  //     slider.addEventListener('input', updateZSliderDisplays);
+  //   }
+  // });
+
+  // Initialize display on load
+  // document.addEventListener('DOMContentLoaded', updateZSliderDisplays);
+
+
+  // Updates the Z slider display values for all antennas.
+  function resetRotationSliders(type) {
+  // --- 1. Reset sliders to zero ---
+  const prefix = type === 'tx' ? 'slider4' : 'slider3';
+  const rotationId = type === 'tx' ? 'tx_newRotation' : 'rx_newRotation';
+  const triangleId = type === 'tx' ? 'tx_new_triangleOuter' : 'rx_new_triangleOuter';
+
+  const sliderX = document.getElementById(`${prefix}ForRotateX`);
+  const sliderY = document.getElementById(`${prefix}ForRotateY`);
+  const sliderZ = document.getElementById(`${prefix}ForTiltZ`);
+
+  if (sliderX) { sliderX.value = 0; sliderX.dispatchEvent(new Event('input')); }
+  if (sliderY) { sliderY.value = 0; sliderY.dispatchEvent(new Event('input')); }
+  if (sliderZ) { sliderZ.value = 0; sliderZ.dispatchEvent(new Event('input')); }
+
+  // --- 2. Reset quaternion state for the new antenna ---
+  if (type === 'rx') {
+    antennaQuatState.rx_new.quat = { x: 0, y: 0, z: 0, w: 1 };
+    antennaQuatState.rx_new.prev3 = { x: 0, y: 0, z: 0 };
+    currentGizmoRotation_rx2 = new x3dom.fields.SFMatrix4f();
+    applyRotationGizmoTransformations('rx');
+  } else if (type === 'tx') {
+    antennaQuatState.tx_new.quat = { x: 0, y: 0, z: 0, w: 1 };
+    antennaQuatState.tx_new.prev4 = { x: 0, y: 0, z: 0 };
+    currentGizmoRotation_tx2 = new x3dom.fields.SFMatrix4f();
+    applyRotationGizmoTransformations('tx');
+  }
+
+  // --- 3. Explicitly set the rotation matrix to identity (neutral) ---
+  const x = 0, y = 0, z = 0;
+  const quatX = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(1, 0, 0), x * Math.PI / 180);
+  const quatY = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(0, 1, 0), y * Math.PI / 180);
+  const quatZ = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(0, 0, 1), z * Math.PI / 180);
+
+  const resultQuat = quatZ.multiply(quatY).multiply(quatX);
+  const matrix = resultQuat.toMatrix();
+
+  const transformNode = document.getElementById(rotationId);
+  if (transformNode) {
+    transformNode.setAttribute("matrix", matrix.toString());
+  }
+
+  // --- 4. Despawn and respawn the triangle in neutral orientation ---
+  const oldTriangle = document.getElementById(triangleId);
+  if (oldTriangle) oldTriangle.remove();
+
+  if (transformNode) {
+    // Outer transform for triangle (boresight rotation)
+    const outerTriangle = document.createElement('transform');
+    outerTriangle.setAttribute('id', triangleId);
+    outerTriangle.setAttribute('rotation', '0 0 1 1.5708'); // 90° about Z
+
+    // Inner transform for triangle shape (antenna orientation)
+    const innerTriangle = document.createElement('transform');
+    innerTriangle.setAttribute('rotation', type === 'tx' ? '1 0 0 1.5708' : '1 0 0 -1.5708');
+
+    // Triangle shape
+    const triangleShape = document.createElement('shape');
+    triangleShape.setAttribute('DEF', type === 'tx' ? 'point_tx_new' : 'point_rx_new');
+    const triangleAppearance = document.createElement('appearance');
+    const triangleMaterial = document.createElement('material');
+    triangleMaterial.setAttribute('diffuseColor', type === 'tx' ? '1 0 0' : '0 0.6902 0.9412');
+    triangleMaterial.setAttribute('transparency', '0.7');
+    triangleAppearance.appendChild(triangleMaterial);
+
+    const indexedFaceSet = document.createElement('indexedFaceSet');
+    indexedFaceSet.setAttribute('coordIndex', '0 1 2 -1');
+    indexedFaceSet.setAttribute('solid', 'false');
+    const coords = document.createElement('coordinate');
+    coords.setAttribute('point', '0 4 0, -3 -3 0, 3 -3 0');
+    indexedFaceSet.appendChild(coords);
+
+    triangleShape.appendChild(triangleAppearance);
+    triangleShape.appendChild(indexedFaceSet);
+    innerTriangle.appendChild(triangleShape);
+    outerTriangle.appendChild(innerTriangle);
+
+    // Add the new triangle to the rotation node
+    transformNode.appendChild(outerTriangle);
+
+    // --- 5. Reset local slider state for new antennas ---
+    if (type === 'rx' && window.rx2SliderReset) window.rx2SliderReset();
+    if (type === 'tx' && window.tx2SliderReset) window.tx2SliderReset();
+  }
+}
+
+
+
+// Another function to reset rotation sliders.  these are for the original antennas (OG), which are the ones that spawn in immedietly on advanced
+  function resetRotationSlidersOG(type) {
+  // --- 1. Reset sliders to zero ---
+  const prefix = type === 'tx' ? 'sliderFor' : 'slider2For';
+const rotationId = type === 'tx' ? 'rxRotation' : 'txRotation';
+const triangleId = type === 'tx' ? 'rx_triangleOuter' : 'tx_triangleOuter';
+
+  const sliderX = document.getElementById(`${prefix}RotateX`);
+  const sliderY = document.getElementById(`${prefix}RotateY`);
+  const sliderZ = document.getElementById(`${prefix}TiltZ`);
+
+  if (sliderX) { sliderX.value = 0; sliderX.dispatchEvent(new Event('input')); }
+  if (sliderY) { sliderY.value = 0; sliderY.dispatchEvent(new Event('input')); }
+  if (sliderZ) { sliderZ.value = 0; sliderZ.dispatchEvent(new Event('input')); }
+
+  // --- 2. Reset quaternion state for the OG antenna and gizmo ---
+  if (type === 'rx') {
+    antennaQuatState.rx.quat = { x: 0, y: 0, z: 0, w: 1 };
+    antennaQuatState.rx.prev1 = { x: 0, y: 0, z: 0 };
+    currentGizmoRotation_rx = new x3dom.fields.SFMatrix4f();
+    currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
+    applyRotationGizmoTransformations('rx');
+  } else if (type === 'tx') {
+    antennaQuatState.tx.quat = { x: 0, y: 0, z: 0, w: 1 };
+    antennaQuatState.tx.prev2 = { x: 0, y: 0, z: 0 };
+    currentGizmoRotation_tx = new x3dom.fields.SFMatrix4f();
+    currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
+    applyRotationGizmoTransformations('tx');
+  }
+
+  // --- 3. Explicitly set the rotation matrix to identity (neutral) ---
+  const x = 0, y = 0, z = 0;
+  const quatX = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(1, 0, 0), x * Math.PI / 180);
+  const quatY = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(0, 1, 0), y * Math.PI / 180);
+  const quatZ = x3dom.fields.Quaternion.axisAngle(new x3dom.fields.SFVec3f(0, 0, 1), z * Math.PI / 180);
+
+  const resultQuat = quatZ.multiply(quatY).multiply(quatX);
+  const matrix = resultQuat.toMatrix();
+
+  const transformNode = document.getElementById(rotationId);
+  if (transformNode) {
+    transformNode.setAttribute("matrix", matrix.toString());
+  }
+
+  // --- 4. Despawn and respawn the triangle in neutral orientation ---
+  const oldTriangle = document.getElementById(triangleId);
+  if (oldTriangle) oldTriangle.remove();
+
+  if (transformNode) {
+    // Outer transform for triangle (boresight rotation)
+    const outerTriangle = document.createElement('transform');
+    outerTriangle.setAttribute('id', triangleId);
+    outerTriangle.setAttribute('rotation', '0 0 1 1.5708'); // 90° about Z
+
+    // Inner transform for triangle shape (antenna orientation)
+    const innerTriangle = document.createElement('transform');
+    innerTriangle.setAttribute('rotation', type === 'tx' ? '1 0 0 -1.5708' : '1 0 0 1.5708');
+
+    // Triangle shape
+    const triangleShape = document.createElement('shape');
+    triangleShape.setAttribute('DEF', type === 'tx' ? 'point_tx' : 'point_rx');
+    const triangleAppearance = document.createElement('appearance');
+    const triangleMaterial = document.createElement('material');
+    triangleMaterial.setAttribute('diffuseColor', type === 'tx' ? '0 0.6902 0.9412' : '1 0 0');
+    triangleMaterial.setAttribute('transparency', '0.7');
+    triangleAppearance.appendChild(triangleMaterial);
+
+    const indexedFaceSet = document.createElement('indexedFaceSet');
+    indexedFaceSet.setAttribute('coordIndex', '0 1 2 -1');
+    indexedFaceSet.setAttribute('solid', 'false');
+    const coords = document.createElement('coordinate');
+    coords.setAttribute('point', '0 4 0, -3 -3 0, 3 -3 0');
+    indexedFaceSet.appendChild(coords);
+
+    triangleShape.appendChild(triangleAppearance);
+    triangleShape.appendChild(indexedFaceSet);
+    innerTriangle.appendChild(triangleShape);
+    outerTriangle.appendChild(innerTriangle);
+
+    // Add the new triangle to the rotation node
+    transformNode.appendChild(outerTriangle);
+
+    if (type === 'rx' && window.rxSliderReset) window.rxSliderReset();
+if (type === 'tx' && window.txSliderReset) window.txSliderReset();
+
+
+  }
+
+  // RX
+window.rxSliderReset = setupSlider('sliderForRotateX', 'sliderForRotateY', 'sliderForTiltZ', 'rxRotation');
+// TX
+window.txSliderReset = setupSlider('slider2ForRotateX', 'slider2ForRotateY', 'slider2ForTiltZ', 'txRotation');
+}
+
+
+
+
+  function enableAdvancedOptions() {
+    document.querySelectorAll('.advanced-only').forEach(el => {
+      el.style.display = 'flex';
+    });
+  }
+
+  
+ // when looking at the antenna pattern, checking the vertical/horizontal boxes will change the antenna model.  object rotations seen below are just to fix the direction of some models like the directional antenna
+// function selectModelTX2() {
+//     const patternDropdown = document.getElementById("tx2_pattern");
+//     const vertical = document.getElementById("vertical_tx2").checked ? 2 : 0;
+//     const horizontal = document.getElementById("horizontal_tx2").checked ? 1 : 0;
+//     const patternIndex = patternDropdown.selectedIndex;
+
+//     let modelNumber = patternIndex * 4; // base antenna (no pattern)
+//     if (vertical || horizontal) {
+//       modelNumber += vertical + horizontal;
+//     }
+
+//     const switchNode = document.getElementById("tx_new_switch");
+//     if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
+
+//     // --- Rotate the cone for directional + vertical ---
+//     const tx2Pattern = patternDropdown.value;
+//     if (tx2Pattern === "dirAnt_sideLobe") {
+//       // The cone is shown for whichChoice 16, 17, 18, 19
+//       if ([16, 17, 18, 19].includes(modelNumber)) {
+//         const coneTransform = switchNode.children[modelNumber];
+//         if (coneTransform) {
+//           if (document.getElementById("vertical_tx2").checked) {
+//             coneTransform.setAttribute("rotation", "1 0 0 -1.5708"); // 90° about Y (azimuth)
+//           } else {
+//             coneTransform.setAttribute("rotation", "0 0 1 1.5707"); // default
+//           }
+//         }
+//       }
+//     }
+// }
+
+
+ // when looking at the antenna pattern, checking the vertical/horizontal boxes will change the antenna model.  object rotations seen below are just to fix the direction of some models like the directional antenna
+// function selectModelRX2() {
+//     const patternDropdown = document.getElementById("rx2_pattern");
+//     const vertical = document.getElementById("vertical_rx2").checked ? 2 : 0;
+//     const horizontal = document.getElementById("horizontal_rx2").checked ? 1 : 0;
+//     const patternIndex = patternDropdown.selectedIndex;
+
+//     let modelNumber = patternIndex * 4;
+//     if (vertical || horizontal) {
+//       modelNumber += vertical + horizontal;
+//     }
+
+//     const switchNode = document.getElementById("rx_new_switch");
+//     if (switchNode) switchNode.setAttribute("whichChoice", modelNumber);
+
+//     // --- Rotate the cone for directional + vertical ---
+//     const rx2Pattern = patternDropdown.value;
+//     if (rx2Pattern === "dirAnt_sideLobe") {
+//       if ([16, 17, 18, 19].includes(modelNumber)) {
+//         const coneTransform = switchNode.children[modelNumber];
+//         if (coneTransform) {
+//           if (document.getElementById("vertical_rx2").checked) {
+//             coneTransform.setAttribute("rotation", "1 0 0 1.5708");
+//           } else {
+//             coneTransform.setAttribute("rotation", "0 0 1 1.5707");
+//           }
+//         }
+//       }
+//     }
+// }
+
+  // // Hook up TX2 controls
+  // document.getElementById("tx2_pattern").addEventListener("change", selectModelTX2);
+  // document.getElementById("vertical_tx2").addEventListener("change", selectModelTX2);
+  // document.getElementById("horizontal_tx2").addEventListener("change", selectModelTX2);
+
+  // // Hook up RX2 controls
+  // document.getElementById("rx2_pattern").addEventListener("change", selectModelRX2);
+  // document.getElementById("vertical_rx2").addEventListener("change", selectModelRX2);
+  // document.getElementById("horizontal_rx2").addEventListener("change", selectModelRX2);
+
+
 
   // nav_bar toggle
   const sections = {
@@ -1048,67 +1932,50 @@
     }
   }
 
-
-
-
-  'use strict';
-  //These values initiated while loading
-
-
-
   let phi_offset = 0;
-  // Receiver (Blue signal)
-  var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    // bw_max: 38.0e6, // Hz //this was 38 Hz, we needed to change this to 100
-    bw_max:4.0e7,
-    // bw_min: 4.0e6,  // Hz //this was 4 Hz, we needed to change this to -10
-    bw_min: 0,
-    bw_init: 4.0e6, // Hz
-    gn_init: -10, // dB
-    gn_min: -10, // dB
-    gn_max:90,
-    mcs_init: 6, // array index int
-    freq_init: 1785.0e6
-  });
+
 
   let distance_tx_rx = 0;
 
-  // sig1['name'] = "comm_link_1";
-  // sig2['name'] = "comm_link_2";
-  // sig3['name'] = "comm_link_3";
-  // sig4['name'] = "comm_link_4";
 
-  var signalList = [sig1];
-  var noise = Signal(conf.noise, "Noise", { gn_init: -120 })
+// signal list now handled by airspace
+let airspace = new RadioAirspace();
+airspace.addTransmitter();
+for (let i = 0; i < 5; i++) {
+  airspace.addReceiver();
+}
+airspace.numReceivers = 1; // Start with one receiver
 
-  Slider(sig1, 'freq', '#freq1');
-  Slider(sig1, 'bw', '#bw1');
-  Slider(sig1, 'gn', '#gn1');
-  Slider(sig1, 'mcs', '#mcs1');
+var noise = Signal(conf.noise, "Noise", { gn_init: 120 })
 
-  
- // updates sinr and pr values when ever there is a change in TX Slider
-  document.querySelector('#gn1').addEventListener('input', function() {
+  Slider(airspace.transmitters[0], 'freq', '#freq1');
+  Slider(airspace.transmitters[0], 'bw', '#bw1');
+  Slider(airspace.transmitters[0], 'gn', '#gn1');
+  Slider(airspace.transmitters[0], 'mcs', '#mcs1');
+
+  // updates sinr and pr values when ever there is a change in TX Slider
+  document.querySelector('#gn1').addEventListener('input', function () {
     updatePathLoss();
   });
 
-  document.querySelector('#freq1').addEventListener('input', function() {
+  document.querySelector('#freq1').addEventListener('input', function () {
     updatePathLoss();
   });
 
-  // gn1.addEventListener("change", updatePathLoss());
-  // Slider(sig1,'noise',"noise")
+
 
   //function calculate SINR as freq slider moved
   let slider_params = ['freq', 'bw', 'gn', 'mcs'];
   slider_params.forEach(param => {
-    sig1._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
-    CalculateSINR_BasedOn_ReceivedPower(sig1, sig1['_' + param]);
+    airspace.transmitters[0]._callbacks[param].push(CalculateSINR_BasedOn_ReceivedPower);
+    CalculateSINR_BasedOn_ReceivedPower(airspace.transmitters[0], airspace.transmitters[0]['_' + param]);
+
   })
-  // Slider(noise, 'gn', '#gn2');
+
+  
 
   Label(
-    sig1,
+    airspace.receivers[0],
     "sinr",
     {
       prefix: "Signal-to-Noise Ratio: SNR = ",
@@ -1118,28 +1985,15 @@
 
 
   var receiverPos = new Position(0, 0, 0);
-  var translatorPos = new Position(0, 0, 0);
+  var transmitterPos = new Position(0, 0, 0);
   //setting default values of receiver power
   //overriding SNR and distance(tx and rx)
-  getCoordinatesFromX3D("receiver");
-  calcDistance(receiverPos, new Position(0, 0, 0));
-  updatePathLoss();
+   transmitterPos = getCoordinatesFromX3D("tx_transform_1");
+  // calcDistance(transmitterPos, new Position(0, 0, 0));
+  // updatePathLoss();
 
   // HoppingInterferer(interferer, '#hoppingInterferer');
-  CapacityBanner(sig1, '#capacityBanner');
-
-  // function to listen to url changes
-  window.onload = function () {
-    const urlParams = new URLSearchParams(location.search);
-
-    for (const [key, value] of urlParams) {
-      let val = value.toLowerCase();
-      if (key == 'mode' && ['beginner', 'advanced'].includes(val)) {
-        document.getElementById(val).selected = "selected";
-        onModeChange();
-      }
-    }
-  };
+  CapacityBanner(airspace.transmitters[0], '#capacityBanner');
 
   function onModeChange() {
     let mode = document.getElementById("mode").value;
@@ -1152,7 +2006,9 @@
       document.getElementById("nonlinear").disabled = true;
       document.getElementById("multiplierDiv").style.display = "none";
       document.getElementById("default").selected = "selected";
-      document.getElementById('togglebutton').style.display = 'none';
+          document.getElementById("sliderGroup2").style.display = "none";
+
+
 
       document.getElementById("bw1").style.display = "none";
       document.getElementById("gn1").style.display = "none";
@@ -1170,15 +2026,16 @@
       });
 
       calculateSINR();
-
       document.getElementById('tx_pattern_options').style.display = 'none';
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", -1);
       document.getElementById("tx-geometry").setAttribute("whichChoice", 0);
       document.getElementById('manual-angle-options-tx').style.display = 'none';
       document.getElementById('manual-angle-options-rx').style.display = 'none';
-
+      document.getElementById("addButtons").style.display = "none";
+      removeNewAntennas();
 
     } else if (mode === 'advanced') {
+      document.getElementById("addButtons").style.display = "block";
       document.getElementById("ideal1").disabled = false;
       document.getElementById("ideal2").disabled = false;
       document.getElementById("ideal3").disabled = false;
@@ -1193,13 +2050,11 @@
       document.getElementById("rotation_gizmo").setAttribute("whichChoice", 0);
       document.getElementById('manual-angle-options-tx').style.display = 'block';
       document.getElementById('manual-angle-options-rx').style.display = 'block';
-      document.getElementById('togglebutton').style.display = 'block';
+          document.getElementById("sliderGroup2").style.display = "flex";
 
-
+           
     }
-
   }
-
 
   function onCategoryChange() {
     let selection = document.getElementById("strategy").value;
@@ -1226,39 +2081,30 @@
     if (selection == 'a4' || selection == 'a5') {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "inline-block";
-        sig1.nonlinearModel = true;
-
+        airspace.transmitters[0].nonlinearModel = true;
       });
     } else {
       Array.from(document.getElementsByClassName("iip3Div")).forEach(element => {
         element.style.display = "none";
       });
-      sig1.nonlinearModel = false;
-
-
-      sig1.iip3Point = null;
+      airspace.transmitters[0].nonlinearModel = false;
+      airspace.transmitters[0].iip3Point = null;
     }
-
   }
 
   // applies sinr calculation selection and triggers callbacks to calculate SINR
   function calculateSINR() {
-
     let selection = document.getElementById("strategy").value;
 
     if (selection == '') {
-      sig1.bandwidthMultiplier = 1;
-
-      sig1.nonlinearModel = false;
-
-      sig1.iip3Point = null;
-
+      airspace.transmitters[0].bandwidthMultiplier = 1;
+      airspace.transmitters[0].nonlinearModel = false;
+      airspace.transmitters[0].iip3Point = null;
     }
 
     // ideal receiver filter with wider bandwidth than the received signal
     if (selection == 'a0') {
-      sig1.bandwidthMultiplier = 1;
-
+      airspace.transmitters[0].bandwidthMultiplier = 1;
     }
 
     // ideal receiver filter with equal bandwidth multiplier for all signals
@@ -1266,9 +2112,7 @@
       let bwMultiplier = document.getElementById("multiplier").value;
       if (bwMultiplier && bwMultiplier.length > 0) {
         let bw_m = Number(bwMultiplier);
-
-        sig1.bandwidthMultiplier = bw_m;
-
+        airspace.transmitters[0].bandwidthMultiplier = bw_m;
       } else {
         return;
       }
@@ -1285,13 +2129,13 @@
       //   bwMultiplier1.length > 0 && bwMultiplier2.length > 0 &&
       //   bwMultiplier3.length > 0 && bwMultiplier4.length > 0) {
 
-      //   sig1.bandwidthMultiplier = Number(bwMultiplier1);
+      //   airspace.transmitters[0].bandwidthMultiplier = Number(bwMultiplier1);
 
       // }
       if (bwMultiplier1 &&
         bwMultiplier1.length > 0) {
 
-        sig1.bandwidthMultiplier = Number(bwMultiplier1);
+        airspace.transmitters[0].bandwidthMultiplier = Number(bwMultiplier1);
 
       } else {
         return;
@@ -1308,12 +2152,12 @@
       //   iip3_1.length > 0 && iip3_2.length > 0 &&
       //   iip3_3.length > 0 && iip3_4.length > 0) {
 
-      //   sig1.iip3Point = Number(iip3_1);
+      //   airspace.transmitters[0].iip3Point = Number(iip3_1);
 
       // }
       if (iip3_1 && iip3_1.length > 0) {
 
-        sig1.iip3Point = Number(iip3_1);
+        airspace.transmitters[0].iip3Point = Number(iip3_1);
 
       } else {
         return;
@@ -1323,12 +2167,12 @@
     // nonlinear frontend receiver filter with excess bandwidth (preselector filter bandwidth)
     // occupying the enter frequency range
     if (selection == 'a5') {
-      sig1.bandwidthMultiplier = -Infinity;
+      airspace.transmitters[0].bandwidthMultiplier = -Infinity;
 
     }
 
     // trigger callbacks for all signals - (sinr and rate calculations and update plots)
-    sig1.triggerCallbacks();
+    airspace.transmitters[0].triggerCallbacks();
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
     CalculateSINR_BasedOn_ReceivedPower();
@@ -1339,188 +2183,21 @@
       document.getElementById("scriptController2").style.display = "none";
     }
   });
-
-  ThroughputPlot(signalList);
-
+  ThroughputPlot(airspace.receivers);
   var funcs = null;
 
   // document.body.innerHTML+= `<div style="width: 720px; height: 320px;">
   //       <canvas id="spectral-efficiency-bar-chart" style="width: 720px"></canvas>
   //   </div>`
 
-  SinrPlot_BarChart.init(signalList, "sinr-bar-chart", ["Link 1"]);
-  SpectralEfficiencyPlot_BarChart.init(signalList, "spectral-efficiency-bar-chart", ["Link 1"]);
+SinrPlot_BarChart.init(airspace.receivers, "sinr-bar-chart", [
+  "Link 1",  // (Original RX ↔ Original TX)
+  // "Link 2",  //  (New RX ↔ New TX)"
+  // "Link 3",  // (Original RX ↔ New TX)
+  // "L4 (NrxOgTx)"   // (Original TX ↔ New RX)
+]);  
 
-  var currentGizmoRotation_rx = new x3dom.fields.SFMatrix4f();
-  var currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
-
-  var currentGizmoRotation_tx = new x3dom.fields.SFMatrix4f();
-  var currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
-
-  /*
-     * Callback function, invoked on translation gizmo output.
-     */
-  function processTranslationGizmoEvent(event) {
-
-    if (event.fieldName === 'translation_changed') {
-      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
-      let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
-
-      // console.log(event.value);
-
-      let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
-
-      translatorPos.x = translationValue.x;
-      console.log("ANuj", translationValue.x);
-      translatorPos.y = translationValue.y;
-      translatorPos.z = translationValue.z;
-
-
-      getCoordinatesFromX3D("receiver");
-      calcDistance(receiverPos, translatorPos);
-
-
-      phi_offset = 90 - Math.atan2(12, translatorPos.x) * 180 / Math.PI;
-
-      // update path loss
-      updatePathLoss();
-
-      //transform the affected sensor geometry
-      // document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
-      //document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
-      //transform the affected element
-      document.getElementById('transmitterTranslation').setFieldValue('translation', translationValue);
-      applyRotationGizmoTransformations("translation-module");
-    }
-  }
-
-  /*
-   * Callback function, invoked on rotation gizmo output.
-   */
-  function processRotationGizmoEvent(event, module) {
-    var sensorToWorldMatrix, rotationMatrixWorld;
-
-    if (event.fieldName === 'rotation_changed') {
-      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
-      sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
-      rotationMatrixWorld = sensorToWorldMatrix.mult(event.value.toMatrix());
-
-      //create an offset that applies the current rotation in world coordinates,
-      //but doesn't change the orientation of the coordinate system
-      if (module === "rx")
-        currentGizmoRotationOffset_rx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
-      else if (module === "tx")
-        currentGizmoRotationOffset_tx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
-
-      applyRotationGizmoTransformations(module);
-      console.log(module + " : First cond");
-    }
-
-    if (event.fieldName === 'isActive' && event.value === false) {
-      //incorporate the current rotation offset, interpreted globally, into the stored rotation value
-      if (module === "rx") {
-        currentGizmoRotation_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
-        //reset current rotation offset to zero rotation
-        currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
-      }
-      else if (module === "tx") {
-        currentGizmoRotation_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
-        //reset current rotation offset to zero rotation
-        currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
-      }
-
-
-      applyRotationGizmoTransformations(module);
-      console.log(module + " : Second cond");
-    }
-  }
-
-  function getRotationNode(module) {
-    if (module == "rx") {
-      return document.getElementById('rxRotation');
-    }
-    return document.getElementById('txRotation');
-  }
-
-  /*
-   * Applies the current transformations, computed from the rotation gizmo output, to the scene
-   */
-  function applyRotationGizmoTransformations(module) {
-    //var transmitterRotationNode = getRotationNode(module);
-
-    //incorporate the current rotation offset, interpreted globally, into the stored rotation value
-
-    let transformMatrix_rx, transformMatrix_tx;
-    if (module === "rx" || module === "translation-module") {
-      transformMatrix_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
-      let matrix_rx = [];
-      for (let i = 0; i < 3; i++) {
-        matrix_rx.push([transformMatrix_rx[`_${i}0`], transformMatrix_rx[`_${i}1`], transformMatrix_rx[`_${i}2`]]);
-      }
-      let angles_rx = transformMatrix_rx.getEulerAngles();
-
-      // convert angles from radians to degrees
-      let angleX_rx = ((angles_rx[0] * (180 / Math.PI)) + 360) % 360;
-      let angleY_rx = ((angles_rx[1] * (180 / Math.PI)) + 360) % 360;
-      let angleZ_rx = ((angles_rx[2] * (180 / Math.PI)) + 360) % 360;
-      let thetaPhi_rx = anglesToThetaPhi(matrix_rx, "rx");
-
-      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
-      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
-
-      // Print rotation angles in degrees
-      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-      //document.getElementById('angle-x-table').textContent = angleX_rx.toFixed(2);
-      document.getElementById('angle-x-table-rx').textContent = angleX_rx.toFixed(2);
-
-      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-      //document.getElementById('angle-y-table').textContent = angleY_rx.toFixed(2);
-      document.getElementById('angle-y-table-rx').textContent = angleY_rx.toFixed(2);
-
-      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-      //document.getElementById('angle-z-table').textContent = angleZ_rx.toFixed(2);
-      document.getElementById('angle-z-table-rx').textContent = angleZ_rx.toFixed(2);
-
-      //set matrix value in column major format, as required by the MatrixTransform node
-      document.getElementById('rxRotation').setFieldValue("matrix", transformMatrix_rx.transpose());
-    }
-    if (module === "tx" || module === "translation-module") {
-      transformMatrix_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
-      let matrix_tx = [];
-      for (let i = 0; i < 3; i++) {
-        matrix_tx.push([transformMatrix_tx[`_${i}0`], transformMatrix_tx[`_${i}1`], transformMatrix_tx[`_${i}2`]]);
-      }
-
-      // get the rotation angles in radians
-      let angles_tx = transformMatrix_tx.getEulerAngles();
-      let angleX_tx = ((angles_tx[0] * (180 / Math.PI)) + 360) % 360;
-      let angleY_tx = ((angles_tx[1] * (180 / Math.PI)) + 360) % 360;
-      let angleZ_tx = ((angles_tx[2] * (180 / Math.PI)) + 360) % 360;
-      let thetaPhi_tx = anglesToThetaPhi(matrix_tx, "tx");
-
-      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
-      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
-
-      // Print rotation angles in degrees
-      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
-      //document.getElementById('angle-x-table').textContent = angleX_tx.toFixed(2);
-      document.getElementById('angle-x-table-tx').textContent = angleX_tx.toFixed(2);
-
-      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
-      //document.getElementById('angle-y-table').textContent = angleY_tx.toFixed(2);
-      document.getElementById('angle-y-table-tx').textContent = angleY_tx.toFixed(2);
-
-      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
-      //document.getElementById('angle-z-table').textContent = angleZ_tx.toFixed(2);
-      document.getElementById('angle-z-table-tx').textContent = angleZ_tx.toFixed(2);
-
-      //set matrix value in column major format, as required by the MatrixTransform node
-      document.getElementById('txRotation').setFieldValue("matrix", transformMatrix_tx.transpose());
-    }
-
-    // update path loss
-    updatePathLoss();
-  }
+SpectralEfficiencyPlot_BarChart.init(airspace.receivers, "spectral-efficiency-bar-chart", ["Link 1"]);
 
   function matrixMultiply(matrixA, matrixB) {
     if (matrixA[0].length !== matrixB.length) {
@@ -1569,8 +2246,8 @@
     var magnitud1 = Math.sqrt(
       x_initial * x_initial + y_initial * y_initial + z_initial * z_initial);
     //Here receiver means transmitter
-    var rx_coordinates = getCoordinatesFromX3D("receiver");
-    var tx_cordinates = translatorPos;
+    var rx_coordinates = getCoordinatesFromX3D("rx_transform_1");
+    var tx_cordinates = transmitterPos;
     var updated_z_vector = {
       x: -(rx_coordinates.x - tx_cordinates.x), y: -(rx_coordinates.y - tx_cordinates.y),
       z: -(rx_coordinates.z - tx_cordinates.z)
@@ -1608,7 +2285,6 @@
       /*update angles of rx w.r.t tx*/
       document.getElementById('angle-theta-table-rx-rel').textContent = angles_updated[0].toFixed(2);
       document.getElementById('angle-phi-table-rx-rel').textContent = angles_updated[1].toFixed(2);
-      console.log("rx angles", angles_updated[0], angles_updated[1])
     }
 
     if (module === "translation-module" || module === "tx") {
@@ -1616,9 +2292,7 @@
       angles_updated[1] = (540 - angles_updated[1]) % 360;
       document.getElementById('angle-theta-table-tx-rel').textContent = angles_updated[0].toFixed(2);
       document.getElementById('angle-phi-table-tx-rel').textContent = angles_updated[1].toFixed(2);
-      console.log("tx angles", angles_updated[0], angles_updated[1])
     }
-
   }
 
   function calculatePolarAngles(x, y, z) {
@@ -1629,6 +2303,8 @@
     phi = phi * (180 / Math.PI);
     if (phi < 0)
       phi = phi + 360;
+
+      console.log(`Polar angles: theta = ${theta.toFixed(2)}°, phi = ${phi.toFixed(2)}°, radius = ${radius.toFixed(4)} (from [${x.toFixed(2)}, ${y.toFixed(2)}, ${z.toFixed(2)}])`);
     return [theta, phi];
   }
 
@@ -1642,145 +2318,389 @@
     theta = (270 - theta) % 180;
     if (phi < 0)
       phi = (phi + 360) % 360;
-    console.log("Theta(Original): " + theta);
-    console.log("Phi(Original): " + phi);
+    //console.log("Theta(Original): " + theta);
+    //console.log("Phi(Original): " + phi);
     return [theta, phi];
   }
 
-  function anglesToThetaPhi(matrix, module) {
-    let matrixB = [[0], [0], [1]];
-    console.log("module", module);
-    console.log(typeof (module));
-
-    let resultCoordMatrix = matrixMultiply(matrix, matrixB);
-    calculateUpdatedAngles(resultCoordMatrix[0], resultCoordMatrix[1],
-      resultCoordMatrix[2], module);
-    return calculateGlobalAngles(resultCoordMatrix[0], resultCoordMatrix[1],
-      resultCoordMatrix[2]);
-  }
+  
 
   // Updates the Path Loss
   function updatePathLoss() {
+    
     let pattern_rx = document.getElementById("antenna_pattern").value;
     let pattern_tx = document.getElementById("tx_pattern").value;
 
     let theta_rx = Number(document.getElementById("angle-theta-table-rx-rel").innerText) || 0;
     let phi_rx = Number(document.getElementById("angle-phi-table-rx-rel").innerText) || 0;
+    // console.log("ThetaRX(UPDATED)): " + theta_rx);
+    //console.log("PhiRX(UPDATED): " + phi_rx);
 
     let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
     let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
-    //calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    //calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx);
     let mode = document.getElementById("mode").value;
 
-    console.log(pattern_rx, theta_rx, phi_rx);
-    console.log(pattern_tx, theta_tx, phi_tx);
+    //console.log(pattern_rx, theta_rx, phi_rx);
+    //console.log(pattern_tx, theta_tx, phi_tx);
     // beginner mode
     if (mode === 'beginner') {
-      calculatePathLoss(sig1, theta_rx, phi_rx, distance_tx_rx, pattern_rx)
+      calculatePathLoss(airspace, theta_rx, phi_rx, pattern_rx)
     }
     else {
-      calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern_rx, pattern_tx);
-    }
+      for (let i = 0; i < airspace.numReceivers; i++) {
 
+      calculatePathLossAdvanced(airspace,0,i, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
+      }
+    }
     // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
-    // var x3d_bw=sig1.bw/1000000;
+    // var x3d_bw=airspace.transmitters[0].bw/1000000;
     // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
     // var test_var=x3d_pr - 10 * Math.log10(x3d_bw);
-
     //connection b/w x3d and slider
-    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
+    // airspace.transmitters[0].gn=x3d_pr - 10 * Math.log10(x3d_bw);
     PowerSpectrumPlot_2D()
-    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
-
-
-
+    // //console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",test_var);
     //sinr value is changed where the formula is re-evaluated based on receiver 
     //distance instead of sig gain
+    //console.log("RX theta/phi used for pattern lookup:", theta_rx, phi_rx);
+    //console.log("TX theta/phi used for pattern lookup:", theta_tx, phi_tx);
+
     CalculateSINR_BasedOn_ReceivedPower();
+
   }
 
-  function CalculateSINR_BasedOn_ReceivedPower() {
-    let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
-    if (sig1.nonlinearModel == false) {
-      let t_ccip = sig1.calculateSINR(null, false)[0];
-      console.log(t_ccip,"@@###@#@#@")
-      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
-      band=sig1.bw;
-      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
-      console.log("Sinr",sig1._sinr,10*Math.log10(band));
-      // keeping this fix since ccip doesn't consider path loss and this will
-      if(sig1._sinr >= conf.schemes[sig1._mcs].SNR){
-        sig1._rate = sig1._bw * conf.schemes[sig1._mcs].rate;
-      }else{
-        sig1._rate = 0.1;
+
+function updatePathLossNewAntennas() {
+  // New RX: rx_new_transform, New RX rotation: rx_newRotation
+  // New TX: tx_new_transform, New TX rotation: tx_newRotation
+  const txId = "tx_new_transform";
+  const rxId = "rx_new_transform";
+  const txRotId = "tx_newRotation";
+  const rxRotId = "rx_newRotation";
+
+  const { theta_tx, phi_tx, theta_rx, phi_rx } = getAntennaAngles(txId, rxId, txRotId, rxRotId);
+
+  // Get patterns
+  let pattern_rx2 = document.getElementById("rx2_pattern").value;
+  let pattern_tx2 = document.getElementById("tx2_pattern").value;
+
+  // Get positions for TX2 and RX2
+  let tx2Pos = getCoordinatesFromX3D(txId);
+  let rx2Pos = getCoordinatesFromX3D(rxId);
+
+  if (!tx2Pos || !rx2Pos) {
+    console.warn("TX2 or RX2 transform not found. Make sure you have added the new antennas.");
+    return;
+  }
+
+  let distance_tx2_rx2 = Math.sqrt(
+    Math.pow(tx2Pos.x - rx2Pos.x, 2) +
+    Math.pow(tx2Pos.y - rx2Pos.y, 2) +
+    Math.pow(tx2Pos.z - rx2Pos.z, 2)
+  );
+
+  // Calculate path loss and update DOM for new antennas
+  calculatePathLossAdvanced2(
+    airspace.receivers[0],
+    theta_rx,
+    phi_rx,
+    theta_tx,
+    phi_tx,
+    distance_tx2_rx2,
+    pattern_rx2,
+    pattern_tx2
+  );
+
+  // Update SINR for airspace.receivers[0]
+  CalculateSINR_BasedOn_ReceivedPower2();
+}
+
+
+
+function getAntennaAngles(txId, rxId, txRotId, rxRotId) {
+  const txPos = getCoordinatesFromX3D(txId);
+  const rxPos = getCoordinatesFromX3D(rxId);
+  if (!txPos || !rxPos) return { theta_tx: 0, phi_tx: 0, theta_rx: 0, phi_rx: 0 };
+
+  // Direction vector from TX to RX
+  const dx = rxPos.x - txPos.x;
+  const dy = rxPos.y - txPos.y;
+  const dz = rxPos.z - txPos.z;
+  const dirVec = [dx, dy, dz];
+
+  // Get rotation matrices
+  function getMatrix(rotId) {
+    const node = document.getElementById(rotId);
+    if (!node) return null;
+    const mat = node.getFieldValue('matrix');
+    let m = [];
+    for (let i = 0; i < 3; i++) {
+      m.push([mat[`_${i}0`], mat[`_${i}1`], mat[`_${i}2`]]);
+    }
+    return m;
+  }
+
+
+  function applyInverseRotation(matrix, vec) {
+    return [
+      matrix[0][0]*vec[0] + matrix[1][0]*vec[1] + matrix[2][0]*vec[2],
+      matrix[0][1]*vec[0] + matrix[1][1]*vec[1] + matrix[2][1]*vec[2],
+      matrix[0][2]*vec[0] + matrix[1][2]*vec[1] + matrix[2][2]*vec[2]
+    ];
+  }
+
+  // RX angles: direction vector in RX's local frame
+  const rxMatrix = getMatrix(rxRotId);
+  let dirVecInRx = rxMatrix ? applyInverseRotation(rxMatrix, dirVec) : dirVec;
+  const r_rx = Math.sqrt(dirVecInRx[0]**2 + dirVecInRx[1]**2 + dirVecInRx[2]**2);
+  const theta_rx = Math.acos(dirVecInRx[1] / r_rx) * (180 / Math.PI);
+
+  // TX angles: opposite direction vector in TX's local frame
+  const txMatrix = getMatrix(txRotId);
+  let dirVecInTx = txMatrix ? applyInverseRotation(txMatrix, [-dx, -dy, -dz]) : [-dx, -dy, -dz];
+  const r_tx = Math.sqrt(dirVecInTx[0]**2 + dirVecInTx[1]**2 + dirVecInTx[2]**2);
+  const theta_tx = Math.acos(dirVecInTx[1] / r_tx) * (180 / Math.PI);
+
+  // Determine if this is a new antenna (for Links 2, 3, 4)
+  const isNewAntenna = txId.includes('tx_new') || rxId.includes('rx_new');
+
+  let phi_rx, phi_tx;
+  if (isNewAntenna) {
+    // For new antennas, swap axes in atan2 and flip by 180°
+    phi_rx = (Math.atan2(dirVecInRx[0], dirVecInRx[2]) * (180 / Math.PI) + 180) % 360;
+    phi_tx = (Math.atan2(dirVecInTx[0], dirVecInTx[2]) * (180 / Math.PI) + 180) % 360;
+  } else {
+    // For OG antennas, use original calculation
+    phi_rx = Math.atan2(dirVecInRx[2], dirVecInRx[0]) * (180 / Math.PI);
+    phi_tx = Math.atan2(dirVecInTx[2], dirVecInTx[0]) * (180 / Math.PI);
+    if (phi_rx < 0) phi_rx += 360;
+    if (phi_tx < 0) phi_tx += 360;
+  }
+
+  return { theta_tx, phi_tx, theta_rx, phi_rx };
+}
+
+
+// calls for New antennas sliders to update SINR2
+// document.getElementById('slider3ForMoveX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForMoveY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForZupward').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForMoveX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForMoveY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForZupward').addEventListener('input', updatePathLossNewAntennas);
+
+// document.getElementById('slider3ForRotateX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForRotateY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider3ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForRotateX').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForRotateY').addEventListener('input', updatePathLossNewAntennas);
+// document.getElementById('slider4ForTiltZ').addEventListener('input', updatePathLossNewAntennas);
+
+
+// Add event listeners to all sliders to update SINR when moved
+[
+  'sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ',
+  'slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward',
+  'sliderForRotateX', 'sliderForRotateY', 'sliderForTiltZ',
+  'slider2ForRotateX', 'slider2ForRotateY', 'slider2ForTiltZ',
+  'slider3ForRotateX', 'slider3ForRotateY', 'slider3ForTiltZ',
+  'slider4ForRotateX', 'slider4ForRotateY', 'slider4ForTiltZ'
+].forEach(id => {
+  const slider = document.getElementById(id);
+  if (slider) {
+    slider.addEventListener('input', () => {
+      updatePathLoss();
+
+      // Only call if new antennas exist
+      if (document.getElementById("tx_new_transform") && document.getElementById("rx_new_transform")) {
+        CalculateSINR_OG_RX_New_TX();
+        CalculateSINR_OG_TX_New_RX();
       }
-      
-      
-      
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
+    });
+  }
+});
+
+
+
+  //this is the main function that outputs the value seen.  it uses 
+  function CalculateSINR_BasedOn_ReceivedPower() {
+    for (let i = 0; i < airspace.numReceivers; i++) {
+    // let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+    let pattern_rx = document.getElementById("antenna_pattern").value;
+    let pattern_tx = document.getElementById("tx_pattern").value;
+
+    let theta_rx = Number(document.getElementById("angle-theta-table-rx-rel").innerText) || 0;
+    let phi_rx = Number(document.getElementById("angle-phi-table-rx-rel").innerText) || 0;
+    // console.log("ThetaRX(UPDATED)): " + theta_rx);
+    //console.log("PhiRX(UPDATED): " + phi_rx);
+
+    let theta_tx = Number(document.getElementById("angle-theta-table-tx-rel").innerText) || 0;
+    let phi_tx = Number(document.getElementById("angle-phi-table-tx-rel").innerText) || 0;
+    //calculatePathLoss(airspace.transmitters[0], theta_rx, phi_rx, distance_tx_rx, pattern_rx);
+    let mode = document.getElementById("mode").value;
+
+    let power_Receiver_dB = calculatePathLossAdvanced(airspace,0,i, theta_rx, phi_rx, theta_tx, phi_tx, pattern_rx, pattern_tx);
+
+    if (airspace.transmitters[0].nonlinearModel == false) {
+      let t_ccip = airspace.transmitters[0].calculateSINR(null, false)[0];
+      //console.log(t_ccip,"@@###@#@#@")
+      // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(t_ccip); changing this line to a new formula based on 8/21/2024 discussion
+      band = airspace.receivers[i].bw;
+      // airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+      airspace.receivers[i]._sinr = Number(power_Receiver_dB)  - (-noise.gn);
+      //console.log("Sinr",airspace.transmitters[0]._sinr,10*Math.log10(band));
+      // keeping this fix since ccip doesn't consider path loss and this will
+
+      //TODO: make this also 0 when tx and rx are different schemes
+      if (airspace.receivers[i]._sinr >= conf.schemes[airspace.receivers[i]._mcs].SNR) {
+        airspace.receivers[i]._rate = airspace.receivers[i]._bw * conf.schemes[airspace.receivers[i]._mcs].rate;
+      } else {
+        airspace.receivers[i]._rate = 0.1;
+      }
+
+      airspace.receivers[i]._callbacks.sinr.forEach(function (callback) {
+        callback(airspace.receivers[i], airspace.receivers[i]._sinr);
       });
-      console.log("Rate",sig1._rate)
+      //console.log("Rate",airspace.transmitters[0]._rate)
 
     }
     else {
-      // sig1._sinr = Number(power_Receiver_dB) - 10 * Math.log10(sig1._non_linear_ccip);
-      band=sig1.bw;
-      sig1._sinr=Number(power_Receiver_dB)- 10*Math.log10(band)-(-120);
-      sig1._callbacks.sinr.forEach(function (callback) {
-        callback(sig1, sig1._sinr);
+      // airspace.transmitters[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(airspace.transmitters[0]._non_linear_ccip);
+      band = airspace.transmitters[0].bw;
+      airspace.transmitters[0]._sinr = Number(power_Receiver_dB)  - (-noise.gn);
+      airspace.transmitters[0]._callbacks.sinr.forEach(function (callback) {
+        callback(airspace.transmitters[0], airspace.transmitters[0]._sinr);
       });
     }
   }
+    airspace.transmitters[0]._callbacks.sinr.forEach(cb => cb(airspace.transmitters[0], airspace.transmitters[0]._sinr));
+
+    // 2) notify the rate (spectral‐efficiency) plot:
+    airspace.transmitters[0]._callbacks.rate.forEach(cb => cb(airspace.transmitters[0], airspace.transmitters[0]._rate));
+
+
+  }
 
 
 
-
-  window.onload = function () {
-    getCoordinatesFromX3D("receiver");
-    const transmitterNode = document.getElementById("transmitterPlane");
-    const axisRotationAttr = transmitterNode.getAttribute("axisRotation");
-
-    let transmitterObj = document.getElementById("transmitterPlane");
-    let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(transmitterObj.getAttribute("axisRotation"));
-    // let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
-
-    calcDistance(translatorPos, receiverPos);
-  };
-  function getCoordinatesFromX3D(objectName) {
-
-    const transformNode = document.getElementById(objectName);
-    if (!transformNode) {
-      console.error(`Object "${objectName}" not found in X3D file.`);
-      return null;
+ //function for link 2 SINR
+  function CalculateSINR_BasedOn_ReceivedPower2() {
+  let power_Receiver_dB = document.getElementById("power_rx_db_2").innerHTML;
+  if (airspace.receivers[0].nonlinearModel == false) {
+    let t_ccip = airspace.receivers[0].calculateSINR(null, false)[0];
+    let band = airspace.receivers[0].bw;
+    airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+    if (airspace.receivers[0]._sinr >= conf.schemes[airspace.receivers[0]._mcs].SNR) {
+      airspace.receivers[0]._rate = airspace.receivers[0]._bw * conf.schemes[airspace.receivers[0]._mcs].rate;
+    } else {
+      airspace.receivers[0]._rate = 0.1;
     }
-
-    // Get the translation attribute of the Transform node
-    const translationAttr = transformNode.getAttribute("translation");
-
-    // Parse the translation attribute string into an array of coordinates
-    const coordinates = translationAttr.split(" ").map(parseFloat);
-    // console.log(coordinates);
-    receiverPos.x = coordinates[0];
-    receiverPos.y = coordinates[1];
-    receiverPos.z = coordinates[2];
-    //console.log(receiverPos);
-
-    // Return the coordinates as an object with x, y, and z properties
-    return { x: coordinates[0], y: coordinates[1], z: coordinates[2] };
+    airspace.receivers[0]._callbacks.sinr.forEach(function (callback) {
+      callback(airspace.receivers[0], airspace.receivers[0]._sinr);
+    });
+  } else {
+    let band = airspace.receivers[0].bw;
+    airspace.receivers[0]._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+    airspace.receivers[0]._callbacks.sinr.forEach(function (callback) {
+      callback(airspace.receivers[0], airspace.receivers[0]._sinr);
+    });
   }
+  airspace.receivers[0]._callbacks.sinr.forEach(cb => cb(airspace.receivers[0], airspace.receivers[0]._sinr));
+  airspace.receivers[0]._callbacks.rate.forEach(cb => cb(airspace.receivers[0], airspace.receivers[0]._rate));
+}
 
-  function calcDistance(P1, P2) {
-    // P1 = (x1, y1, z1); P2 = (x2, y2, z2)
-    var a = P2.x - P1.x;
-    var b = P2.y - P1.y;
-    var c = P2.z - P1.z;
 
-    var distance = Math.sqrt(a * a + b * b + c * c);
-    distance_tx_rx = distance;
-    document.getElementById("rec_trans_dist").innerHTML = distance.toFixed(2);
+// Calculates SINR for Link 3
 
-  }
+function CalculateSINR_OG_RX_New_TX() {
+  // OG RX: tx_transform_1, OG RX rotation: rxRotation
+  // New TX: tx_new_transform, New TX rotation: tx_newRotation
+  const rxId = "tx_transform_1";
+  const txId = "tx_new_transform";
+  const rxRotId = "rxRotation";
+  const txRotId = "tx_newRotation";
+
+  // Get positions
+  const rxPos = getCoordinatesFromX3D(rxId);
+  const txPos = getCoordinatesFromX3D(txId);
+  if (!rxPos || !txPos) return;
+
+  // Direction vector from RX to TX
+  const dx = rxPos.x - txPos.x;
+  const dy = rxPos.y - txPos.y;
+  const dz = txPos.z - rxPos.z;
+
+  // Get angles
+  const { theta_tx, phi_tx, theta_rx, phi_rx } = getAntennaAngles(txId, rxId, txRotId, rxRotId);
+
+  const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+  const pattern_rx = document.getElementById("antenna_pattern").value;
+  const pattern_tx = document.getElementById("tx2_pattern").value;
+
+  // Use the new function for Link 3
+  calculatePathLossAdvanced3(sig3, theta_rx, phi_rx, theta_tx, phi_tx, distance, pattern_rx, pattern_tx);
+  CalculateSINR_BasedOn_ReceivedPower3();
+}
+
+
+// Calculates SINR for Link 4 
+function CalculateSINR_OG_TX_New_RX() {
+  // OG TX: receiver, OG TX rotation: txRotation
+  // New RX: rx_new_transform, New RX rotation: rx_newRotation
+  // const txId = "receiver";
+  // const rxId = "rx_new_transform";
+  const txId = "rx_transform_1";
+  const rxId = "rx_new_transform";
+  const txRotId = "txRotation";
+  const rxRotId = "rx_newRotation";
+
+  // Get positions
+  const txPos = getCoordinatesFromX3D(txId);
+  const rxPos = getCoordinatesFromX3D(rxId);
+  if (!txPos || !rxPos) return;
+
+  // Direction vector from TX to RX
+   const dx = rxPos.x - txPos.x;
+  const dy = rxPos.y - txPos.y;
+  const dz = rxPos.z - txPos.z;
+
+  // Get angles
+  const { theta_tx, phi_tx, theta_rx, phi_rx } = getAntennaAngles(txId, rxId, txRotId, rxRotId);
+
+  const distance = Math.sqrt(dx*dx + dy*dy + dz*dz);
+  const pattern_tx = document.getElementById("tx_pattern").value;
+  const pattern_rx = document.getElementById("rx2_pattern").value;
+
+  // Use the new function for Link 4
+  calculatePathLossAdvanced4(sig4, theta_rx, phi_rx, theta_tx, phi_tx, distance, pattern_rx, pattern_tx);
+  CalculateSINR_BasedOn_ReceivedPower4();
+}
+
+
+
+// Calculate SINR for link 3. not as fleshed out as link 1, might need to be updated 
+function CalculateSINR_BasedOn_ReceivedPower3() {
+  let power_Receiver_dB = document.getElementById("power_rx_db").innerHTML;
+  let band = sig3.bw;
+  sig3._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+  sig3._callbacks.sinr.forEach(cb => cb(sig3, sig3._sinr));
+  sig3._callbacks.rate.forEach(cb => cb(sig3, sig3._rate));
+}
+
+
+// Calculate SINR for link 4. not as fleshed out as link 1, might need to be updated 
+function CalculateSINR_BasedOn_ReceivedPower4() {
+  let power_Receiver_dB = document.getElementById("power_rx_db_2").innerHTML;
+  let band = sig4.bw;
+  sig4._sinr = Number(power_Receiver_dB) - 10 * Math.log10(band) - (-120);
+  sig4._callbacks.sinr.forEach(cb => cb(sig4, sig4._sinr));
+  sig4._callbacks.rate.forEach(cb => cb(sig4, sig4._rate));
+}
+
+
+
+
   PowerSpectrumPlot_2D();
 
   const rx_verticalCheckbox = document.getElementById("vertical_rx");
@@ -1796,22 +2716,33 @@
 
   tx_verticalCheckbox.addEventListener("change", selectModel);
   tx_horizontalCheckbox.addEventListener("change", selectModel);
+
+
   onModeChange();
 
-  function selectModel() {
+ function selectModel() {
+    
     const selectedValue_rx = document.getElementById("antenna_pattern").selectedIndex;
     const selectedValue_tx = document.getElementById("tx_pattern").selectedIndex;
     const rx_isCheckedVertical = rx_verticalCheckbox.checked ? 1 : 0;
     const rx_isCheckedHorizontal = rx_horizontalCheckbox.checked ? 1 : 0;
     const tx_isCheckedVertical = tx_verticalCheckbox.checked ? 1 : 0;
     const tx_isCheckedHorizontal = tx_horizontalCheckbox.checked ? 1 : 0;
+    let verticalSelected = 0;
+    let horizontalSelected = 0;
+    // set receiver model loop
+    for (let targetIndex = 2; targetIndex <= airspace.numReceivers; targetIndex++) {
+      verticalSelected = document.getElementById(`vertical_rx${targetIndex}`).checked ? 1 : 0;
+      horizontalSelected = document.getElementById(`horizontal_rx${targetIndex}`).checked ? 1 : 0;
+      const selectedPattern = document.getElementById(`rx${targetIndex}_pattern`).selectedIndex;
+      const selectedModelNumber =(selectedPattern) * 4 + 2 * verticalSelected + horizontalSelected;
+      document.getElementById(`rx_switch${targetIndex}`).setAttribute("whichchoice", selectedModelNumber);
+    }
     const modelNumber_rx = (selectedValue_rx) * 4 + 2 * rx_isCheckedVertical + rx_isCheckedHorizontal;
-    console.log(modelNumber_rx);
     let modelNumber_tx = 0;
     if (document.getElementById("mode").value != 'beginner')
       modelNumber_tx = (selectedValue_tx) * 4 + 2 * tx_isCheckedVertical + tx_isCheckedHorizontal;
-    console.log("test");
-    console.log(modelNumber_tx);
+
     document.getElementById("receiver-geometry").setAttribute("whichchoice", modelNumber_rx);
     if (document.getElementById("mode").value == 'beginner') {
       document.getElementById("tx-geometry").setAttribute("whichchoice", 0);
@@ -1819,8 +2750,43 @@
     else
       document.getElementById("tx-geometry").setAttribute("whichchoice", modelNumber_tx);
 
-  }
 
+
+    // --- Rotate the cone for directional + vertical ---
+    // RX
+    const rxPattern = document.getElementById("antenna_pattern").value;
+    if (rxPattern === "dirAnt_sideLobe") {
+      const rxSwitch = document.getElementById("receiver-geometry");
+      const which = parseInt(rxSwitch.getAttribute("whichchoice"));
+      // The cone is shown for whichChoice 16, 17, 18, 19
+      if ([16, 17, 18, 19].includes(which)) {
+        const coneTransform = rxSwitch.children[which];
+        if (coneTransform) {
+          if (document.getElementById("vertical_rx").checked) {
+            coneTransform.setAttribute("rotation", "0 1 0 -1.5708"); // 90° about Y (azimuth)
+          } else {
+            coneTransform.setAttribute("rotation", "0 0 1 0"); // default
+          }
+        }
+      }
+    }
+    // TX
+    const txPattern = document.getElementById("tx_pattern").value;
+    if (txPattern === "dirAnt_sideLobe") {
+      const txSwitch = document.getElementById("tx-geometry");
+      const which = parseInt(txSwitch.getAttribute("whichchoice"));
+      if ([16, 17, 18, 19].includes(which)) {
+        const coneTransform = txSwitch.children[which];
+        // if (coneTransform) {
+        //   if (document.getElementById("vertical_tx").checked) {
+        //     coneTransform.setAttribute("rotation", "1 0 0 1.5708");
+        //   } else {
+        //     coneTransform.setAttribute("rotation", "0 0 1 1.5707");
+        //   }
+        // }
+      }
+    }
+}
   function manualInput() {
     let theta_tx = Number(document.getElementById("theta_tx_manual").value);
     let phi_tx = Number(document.getElementById("phi_tx_manual").value);
@@ -1828,7 +2794,7 @@
     let phi_rx = Number(document.getElementById("phi_rx_manual").value);
     let pattern = document.getElementById("antenna_pattern").value;
 
-    console.log("Manual pattern is: " + pattern);
+    //console.log("Manual pattern is: " + pattern);
 
     document.getElementById('angle-theta-table-tx').textContent = theta_tx;
     document.getElementById('angle-phi-table-tx').textContent = phi_tx;
@@ -1838,259 +2804,1095 @@
 
     if (theta_tx < 0 || theta_tx > 180 || phi_tx < 0 || phi_tx > 360 ||
       theta_rx < 0 || theta_rx > 180 || phi_rx < 0 || phi_rx > 360) {
-      console.log("Invalid input for theta/phi");
+      //console.log("Invalid input for theta/phi");
       return;
     }
-    calculatePathLossAdvanced(sig1, theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
+    calculatePathLossAdvanced(airspace.transmitters[0], theta_rx, phi_rx, theta_tx, phi_tx, distance_tx_rx, pattern);
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    var verticalSlider = document.getElementById('sliderForVertical');
-    var horizontalSlider = document.getElementById('sliderForHorizontal');
-    var rotateXSlider = document.getElementById('sliderForRotateX');
-    var rotateYSlider = document.getElementById('sliderForRotateY');
-    var transmitterTransform = document.getElementById('rxRotation');
-
-    // var verticalSlider2 = document.getElementById('slider2ForVertical');
-    // var horizontalSlider2 = document.getElementById('slider2ForHorizontal');
-    var rotateXSlider2 = document.getElementById('slider2ForRotateX');
-    var rotateYSlider2 = document.getElementById('slider2ForRotateY');
-
-    if (!transmitterTransform) {
-      console.error('Transmitter Transform not found');
-      return;
-    }
-
-    verticalSlider.addEventListener('input', function () {
-      updateTranslation(verticalSlider.value, null);
-    });
-
-    horizontalSlider.addEventListener('input', function () {
-      updateTranslation(null, horizontalSlider.value);
-    });
-
-    rotateXSlider.addEventListener('input', function () {
-      updateRotation(rotateXSlider.value, null);
-    });
-
-    rotateYSlider.addEventListener('input', function () {
-      updateRotation(null, rotateYSlider.value);
-    });
-
-    // toggle
-
-    rotateXSlider2.addEventListener('input', function () {
-      updateRotation(rotateXSlider2.value, null);
-    });
-
-    rotateYSlider2.addEventListener('input', function () {
-      updateRotation(null, rotateYSlider2.value);
-    });
-
-    function updateTranslation(newX, newZ) {
-      var currentTranslation = transmitterTransform.getAttribute('translation');
-      var translationComponents = currentTranslation.split(' ');
-      if (newX !== null) translationComponents[0] = newX;
-      if (newZ !== null) translationComponents[2] = newZ;
-      transmitterTransform.setAttribute('translation', translationComponents.join(' '));
-      console.log('Updated translation:', translationComponents.join(' '));
-    }
-
-    function updateRotation(newX, newY) {
-      var currentRotation = transmitterTransform.getAttribute('rotation');
-      var rotationComponents = currentRotation ? currentRotation.split(' ') : [0, 0, 0, 0];
-
-      if (newX !== null) {
-        rotationComponents[3] = newX * Math.PI / 180; // Convert degrees to radians
-        rotationComponents[0] = 1; // Rotate around x-axis
-        rotationComponents[1] = 0;
-        rotationComponents[2] = 0;
-      }
-
-      if (newY !== null) {
-        rotationComponents[3] = newY * Math.PI / 180; // Convert degrees to radians
-        rotationComponents[0] = 0;
-        rotationComponents[1] = 1; // Rotate around y-axis
-        rotationComponents[2] = 0;
-      }
-
-      transmitterTransform.setAttribute('rotation', rotationComponents.join(' '));
-      console.log('Updated rotation:', rotationComponents.join(' '));
-    }
-  });
 
   let toggleValue = "RX";
 
   // Function to toggle the value
   function toggleSliders() {
-    // var x3d_pr =document.getElementById("power_rx_db").innerHTML;
-    // var x3d_bw=sig1.bw/1000000;
-    // // var x3d_gain=x3d_pr - 10 * Math.log10(x3d_bw);
-    // var anuj=x3d_pr - 10 * Math.log10(x3d_bw);
-    // sig1.gn=x3d_pr - 10 * Math.log10(x3d_bw);
-    // console.log(gn1.value," ajshdgbhjdhbvhjsabvhjfbsvurbvreuik",anuj);
-    // gn1.value=;
-    var div = document.getElementById('sliderGroup2');
-    // var div2 = document.getElementById('sliderGroup2Left');
-    var div3 = document.getElementById('sliderLeft');
-    var div4 = document.getElementById('sliderRight');
-    var div5 = document.getElementById('sliderBottom');
-    var div6 = document.getElementById('sliderRight2');
+
+    // const div3 = document.getElementById('sliderLeft');
+    //const div4 = document.getElementById('sliderRight');
+    //const div5 = document.getElementById('sliderBottom');
+    //const div6 = document.getElementById('sliderRight2');
+    const toggleValueDisplay = document.getElementById('toggleValueDisplay'); // make sure this ID exists too!
 
     if (div.style.display === 'none') {
       div.style.display = 'block';
-      // div2.style.display = 'block';
-      div3.style.display = 'none';
-      div4.style.display = 'none';
-      div5.style.display = 'none';
-      div6.style.display = 'block';
-
+      //div3.style.display = 'none';
+      // div4.style.display = 'none';
+      //div5.style.display = 'none';
+      //div6.style.display = 'block';
     } else {
       div.style.display = 'none';
-      // div2.style.display = 'none';
-      div3.style.display = 'flex';
-      div4.style.display = 'inherit';
-      div5.style.display = 'inherit';
-      div6.style.display = 'none'
+      //div3.style.display = 'flex';
+      //div4.style.display = 'inherit';
+      //.style.display = 'inherit';
+      //div6.style.display = 'none';
     }
-    toggleValue = (toggleValue === "RX") ? "TX" : "RX";
-    document.getElementById('toggle-button').style.backgroundColor = (toggleValue === "RX") ? "#00ffff" : "red";
-    console.log("Toggled Value:", toggleValue);
-    toggleValueDisplay.textContent = `You are Controlling: ${toggleValue} "Press to toggle"`;
 
+    
+  }
+
+
+  //=========================================================
+  //    Antenna Movement/Rotation and Sliders
+  //=========================================================
+
+  // Variables to store the current position of the translator
+  let currentGizmoRotation_rx = new x3dom.fields.SFMatrix4f();
+  let currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
+
+  let currentGizmoRotation_tx = new x3dom.fields.SFMatrix4f();
+  let currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
+
+  // rotation for gizmo.
+  let currentGizmoRotation_rx2 = new x3dom.fields.SFMatrix4f();
+  let currentGizmoRotation_tx2 = new x3dom.fields.SFMatrix4f();
+
+
+  // helps shape some of the antenna patterns in the proper direction
+  function updateTriangleBoresightRotation(antennaId, patternType) {
+    const tri = document.getElementById(`${antennaId}_triangleOuter`);
+    if (!tri) return;
+
+    if (patternType === 'horizontal_isotropic') {
+      tri.setAttribute('rotation', '0 0 1 1.5708'); // 90° about Z
+    }
+    else {
+      tri.setAttribute('rotation', '0 0 1 0'); // back to 0°
+    }
   }
 
 
 
-  let globalTransformMatrix = x3dom.fields.SFMatrix4f.identity();
-  let lastSliderValue = { X: 0, Y: 0, Z: 0 }; // to store the last slider values
-  const translationState = { X: 0, Y: 0, Z: 0 }; // to store translation states
-
-  // Helper function to apply rotation around Y axis to the current transformation matrix
-  function applyRotationY(angleInDegrees) {
-    const angleInRadians = angleInDegrees * (Math.PI / 180);
-    const rotationMatrixY = x3dom.fields.SFMatrix4f.rotationY(angleInRadians);
-    globalTransformMatrix = rotationMatrixY.mult(globalTransformMatrix);
-    return globalTransformMatrix;
+  // Read both pattern dropdowns and tilt the triangles
+  function applyPatternRotation() {
+    updateTriangleBoresightRotation('tx', document.getElementById('tx_pattern').value);
+    updateTriangleBoresightRotation('rx', document.getElementById('antenna_pattern').value);
   }
 
-  // Helper function to apply rotation around X axis to the current transformation matrix
-  function applyRotationX(angleInDegrees) {
-    const angleInRadians = angleInDegrees * (Math.PI / 180);
-    const rotationMatrixX = x3dom.fields.SFMatrix4f.rotationX(angleInRadians);
-    globalTransformMatrix = rotationMatrixX.mult(globalTransformMatrix);
-    return globalTransformMatrix;
+  // Hook it up when the user changes patterns
+  document.getElementById('tx_pattern').addEventListener('change', applyPatternRotation);
+  document.getElementById('antenna_pattern').addEventListener('change', applyPatternRotation);
+
+  applyPatternRotation();
+
+
+
+
+  function processTranslationGizmoEvent(event) {
+
+    if (event.fieldName === 'translation_changed') {
+      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
+      let sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
+
+      // //console.log(event.value);
+
+      let translationValue = sensorToWorldMatrix.multMatrixVec(event.value);
+
+      transmitterPos.x = translationValue.x;
+      transmitterPos.y = translationValue.y;
+      transmitterPos.z = translationValue.z;
+
+          console.log("translatorPos updated in processTranslationGizmoEvent:", transmitterPos);
+
+      getCoordinatesFromX3D("rx_transform_1");
+      calcDistance(receiverPos, transmitterPos);
+
+      phi_offset = 90 - Math.atan2(12, transmitterPos.x) * 180 / Math.PI;
+      // update path loss
+      updatePathLoss();
+
+      //transform the affected sensor geometry
+      // document.getElementById('translationHandleTransform').setFieldValue('translation', translationValue);
+      //document.getElementById('rotationHandleTransform').setFieldValue('translation', translationValue);
+      //transform the affected element
+      document.getElementById('tx_transform_1').setFieldValue('translation', translationValue);
+      applyRotationGizmoTransformations("translation-module");
+    }
   }
 
-  function setupSlider(sliderId, module, axis, isTranslation = false) {
-    document.getElementById(sliderId).addEventListener('input', function (event) {
-      const currentSliderValue = parseFloat(event.target.value);
-      const deltaValue = currentSliderValue - lastSliderValue[axis]; // Calculate the change in value
+  //Callback function, invoked on rotation gizmo output.
 
-      if (isTranslation) {
-        // Incrementally update the translation state
-        translationState[axis] = currentSliderValue;
+  function processRotationGizmoEvent(event, module) {
+    var sensorToWorldMatrix, rotationMatrixWorld;
 
-        // Create the translation event with the updated state
-        var translationEvent = {
-          fieldName: 'translation_changed',
-          target: { getAttribute: function (attr) { return '0 0 0 0'; } }, // Dummy function for example
-          value: new x3dom.fields.SFVec3f(
-            translationState.X,
-            translationState.Y,
-            translationState.Z
-          )
-        };
+    if (event.fieldName === 'rotation_changed') {
+      //convert the sensor's output from sensor coordinates to world coordinates (i.e., include its 'axisRotation')
+      sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(event.target.getAttribute("axisRotation"));
+      rotationMatrixWorld = sensorToWorldMatrix.mult(event.value.toMatrix());
 
-        processTranslationGizmoEvent(translationEvent);
-      } else {
-        // Rotation handling
-        let combinedRotationMatrix;
-        if (axis === 'Y') {
-          combinedRotationMatrix = applyRotationY(deltaValue); // Apply the change in value
-          globalTransformMatrix = combinedRotationMatrix;
-        } else {
-          const angleInRadiansX = deltaValue * (Math.PI / 180);
-          const rotationMatrixX = x3dom.fields.SFMatrix4f.rotationX(angleInRadiansX);
-          globalTransformMatrix = rotationMatrixX.mult(globalTransformMatrix);
-        }
+      //create an offset that applies the current rotation in world coordinates,
+      //but doesn't change the orientation of the coordinate system
+      if (module === "rx")
+        currentGizmoRotationOffset_rx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
+      else if (module === "tx")
+        currentGizmoRotationOffset_tx = rotationMatrixWorld.mult(sensorToWorldMatrix.inverse());
 
-        var rotationEvent = {
-          fieldName: 'rotation_changed',
-          value: {
-            toMatrix: function () {
-              return globalTransformMatrix;
-            }
-          },
-          target: {
-            getAttribute: function () {
-              return '0 0 0 0'; // Dummy target attribute
-            }
-          }
-        };
+      applyRotationGizmoTransformations(module);
+      //console.log(module + " : First cond");
+    }
 
-        processRotationGizmoEvent(rotationEvent, module);
+    if (event.fieldName === 'isActive' && event.value === false) {
+      //incorporate the current rotation offset, interpreted globally, into the stored rotation value
+      if (module === "rx") {
+        currentGizmoRotation_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
+        //reset current rotation offset to zero rotation
+        currentGizmoRotationOffset_rx = new x3dom.fields.SFMatrix4f();
+      }
+      else if (module === "tx") {
+        currentGizmoRotation_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
+        //reset current rotation offset to zero rotation
+        currentGizmoRotationOffset_tx = new x3dom.fields.SFMatrix4f();
       }
 
-      lastSliderValue[axis] = currentSliderValue; // Update the last slider value
 
-      updatePathLoss();
-    });
+      applyRotationGizmoTransformations(module);
+      //console.log(module + " : Second cond");
+    }
   }
+
+  function getRotationNode(module) {
+    if (module == "rx") {
+      return document.getElementById('rxRotation');
+    }
+    return document.getElementById('txRotation');
+  }
+
+  //Applies the current transformations, computed from the rotation gizmo output, to the scene
+  function applyRotationGizmoTransformations(module) {
+    //var transmitterRotationNode = getRotationNode(module);
+
+    //incorporate the current rotation offset, interpreted globally, into the stored rotation value
+
+    let transformMatrix_rx, transformMatrix_tx;
+    if (module === "rx" || module === "translation-module") {
+      transformMatrix_rx = currentGizmoRotationOffset_rx.mult(currentGizmoRotation_rx);
+      let matrix_rx = [];
+      for (let i = 0; i < 3; i++) {
+        matrix_rx.push([transformMatrix_rx[`_${i}0`], transformMatrix_rx[`_${i}1`], transformMatrix_rx[`_${i}2`]]);
+      }
+      let angles_rx = transformMatrix_rx.getEulerAngles();
+
+      // convert angles from radians to degrees
+      let angleX_rx = ((angles_rx[0] * (180 / Math.PI)) + 360) % 360;
+      let angleY_rx = ((angles_rx[1] * (180 / Math.PI)) + 360) % 360;
+      let angleZ_rx = ((angles_rx[2] * (180 / Math.PI)) + 360) % 360;
+      updateAllAntennaAnglesAndPathLoss();
+      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+
+      // Print rotation angles in degrees
+      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_rx.toFixed(2);
+      document.getElementById('angle-x-table-rx').textContent = angleX_rx.toFixed(2);
+
+      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_rx.toFixed(2);
+      document.getElementById('angle-y-table-rx').textContent = angleY_rx.toFixed(2);
+
+      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_rx.toFixed(2);
+      document.getElementById('angle-z-table-rx').textContent = angleZ_rx.toFixed(2);
+
+      //set matrix value in column major format, as required by the MatrixTransform node
+      document.getElementById('rxRotation').setFieldValue("matrix", transformMatrix_rx.transpose());
+    }
+    if (module === "tx" || module === "translation-module") {
+      transformMatrix_tx = currentGizmoRotationOffset_tx.mult(currentGizmoRotation_tx);
+      let matrix_tx = [];
+      for (let i = 0; i < 3; i++) {
+        matrix_tx.push([transformMatrix_tx[`_${i}0`], transformMatrix_tx[`_${i}1`], transformMatrix_tx[`_${i}2`]]);
+      }
+
+      // get the rotation angles in radians
+      let angles_tx = transformMatrix_tx.getEulerAngles();
+      let angleX_tx = ((angles_tx[0] * (180 / Math.PI)) + 360) % 360;
+      let angleY_tx = ((angles_tx[1] * (180 / Math.PI)) + 360) % 360;
+      let angleZ_tx = ((angles_tx[2] * (180 / Math.PI)) + 360) % 360;
+      updateAllAntennaAnglesAndPathLoss();
+      // document.getElementById('angle-theta-table-' + module).textContent = thetaPhi[0].toFixed(2);
+      // document.getElementById('angle-phi-table-' + module).textContent = thetaPhi[1].toFixed(2);
+
+      // Print rotation angles in degrees
+      // document.getElementById('angleX').textContent = 'Angle X: ' + angleX.toFixed(2);
+      //document.getElementById('angle-x-table').textContent = angleX_tx.toFixed(2);
+      document.getElementById('angle-x-table-tx').textContent = angleX_tx.toFixed(2);
+
+      // document.getElementById('angleY').textContent = 'Angle Y: ' + angleY.toFixed(2);
+      //document.getElementById('angle-y-table').textContent = angleY_tx.toFixed(2);
+      document.getElementById('angle-y-table-tx').textContent = angleY_tx.toFixed(2);
+
+      // document.getElementById('angleZ').textContent = 'Angle Z: ' + angleZ.toFixed(2);
+      //document.getElementById('angle-z-table').textContent = angleZ_tx.toFixed(2);
+      document.getElementById('angle-z-table-tx').textContent = angleZ_tx.toFixed(2);
+
+      //set matrix value in column major format, as required by the MatrixTransform node
+      document.getElementById('txRotation').setFieldValue("matrix", transformMatrix_tx.transpose());
+
+     
+  //document.getElementById('angle-theta-table-tx-rel').textContent = theta_tx.toFixed(2);
+  //document.getElementById('angle-phi-table-tx-rel').textContent = phi_tx.toFixed(2);
+
+    }
+
+    // update path loss
+    //updatePathLoss();
+  }
+
+
+
 
   
 
-  // Set up sliders for rotation
-  setupSlider('sliderForRotateX', 'rx', 'X');
-  setupSlider('sliderForRotateY', 'rx', 'Y');
-  // Set up sliders for translation
-  setupSlider('sliderForHorizontal', 'rx', 'X', true); // Horizontal translation
-  setupSlider('sliderForVertical', 'rx', 'Z', true); // Vertical translation
 
-  //Toggle
-  setupSlider('slider2ForRotateX', 'tx', 'X');
-  setupSlider('slider2ForRotateY', 'tx', 'Y');
+  // spawns in the new antennas
+  function addNewAntennaX3DElement(type, airspace) {
+    // if (antennaCounter[type] >= 1) return;
+
+    const scene = document.querySelector("scene");
+    const isTx = type === 'tx';
+    const label = isTx ? 'TX' : 'RX';
+    const idSuffix = `${type}`;
+    const switchId = `${idSuffix}_switch${airspace.numReceivers}`;
+
+    const xInit = 15;
+    const yInit = -15 + (isTx ? 0 : 15);
+
+    const outerTransform = document.createElement('transform');
+    outerTransform.setAttribute('id', `${idSuffix}_transform_${(airspace.numReceivers)}`);
+    outerTransform.setAttribute('translation', `${xInit} -2.5 ${(yInit)}`);
+
+    // Rod
+    const rodTransform = document.createElement('transform');
+    rodTransform.setAttribute('translation', '0 0 0');
+    const rod = document.createElement('shape');
+    const rodAppearance = document.createElement('appearance');
+    const rodMaterial = document.createElement('material');
+    rodMaterial.setAttribute('diffuseColor', isTx ? '1 0.4 0' : '0.196 0.804 0.196');
+    rodAppearance.appendChild(rodMaterial);
+    const rodCylinder = document.createElement('cylinder');
+    rodCylinder.setAttribute('radius', '0.25');
+    rodCylinder.setAttribute('height', '5');
+    rod.appendChild(rodAppearance);
+    rod.appendChild(rodCylinder);
+    rodTransform.appendChild(rod);
+
+    // Rotation wrapper
+    const rotationTransform = document.createElement('matrixTransform');
+    rotationTransform.setAttribute('id', `${idSuffix}Rotation${airspace.numReceivers}`);
+
+    // Pattern switch block
+    const switchNode = document.createElement('switch');
+    switchNode.setAttribute('id', switchId);
+    switchNode.setAttribute('whichChoice', '0');
+
+    const patternSnippets = [
+      // Vertical Isotropic
+      "", "<inline url='horiz_iso_pat.x3d'/>", "<inline url='vert_iso_pat.x3d'/>", "<inline url='vert_iso_pat.x3d'/><inline url='horiz_iso_pat.x3d'/>",
+      // Horizontal Isotropic
+      "", "<inline url='horiz_iso_pat.x3d'/>", "<inline url='vert_iso_pat.x3d'/>", "<inline url='vert_iso_pat.x3d'/><inline url='horiz_iso_pat.x3d'/>",
+      // Halfwave
+      "", "<inline url='halfwave_pat.x3d'/>", "<inline url='halfwave_pat.x3d'/>", "<inline url='halfwave_pat.x3d'/>",
+      // Small Dipole
+      "", "<inline url='small_dip_pat.x3d'/>", "<inline url='small_dip_pat.x3d'/>", "<inline url='small_dip_pat.x3d'/>",
+      // Directional
+      "", "<inline url='directional_pat.x3d'/>", "<inline url='directional_pat.x3d'/>", "<inline url='directional_pat.x3d'/>"
+    ];
+
+ for (let i = 0; i < 20; i++) {
+  const t = document.createElement('transform');
+  t.setAttribute('rotation', '0 0 1 1.5707');
+  const shape = document.createElement('shape');
+  const appearance = document.createElement('appearance');
+  const material = document.createElement('material');
+  material.setAttribute('diffuseColor', isTx ? '1 0 0' : '0 0 1');
+  appearance.appendChild(material);
+  shape.appendChild(appearance);
+
+  if (i >= 16) {
+    // Directional antenna (cone)
+    const azimuthTransform = document.createElement('transform');
+    azimuthTransform.setAttribute('rotation', isTx ? '0 1 0 -1.5708' : '0 1 0 1.5708'); // TX cone opposite direction
+
+    const boresightTransform = document.createElement('transform');
+    boresightTransform.setAttribute('rotation', '0 0 1 1.5707');
+
+    const cone = document.createElement('cone');
+    cone.setAttribute('bottomRadius', '1.5');
+    cone.setAttribute('height', '3');
+    shape.appendChild(cone);
+
+    boresightTransform.appendChild(shape);
+    azimuthTransform.appendChild(boresightTransform);
+
+    // Only append the nested transforms for the cone
+    t.appendChild(azimuthTransform);
+  } else {
+    // All other antennas: append shape directly
+    if (i >= 12) {
+      // Small dipole
+      const cyl = document.createElement('cylinder');
+      cyl.setAttribute('radius', '0.25');
+      cyl.setAttribute('height', '1');
+      shape.appendChild(cyl);
+      t.setAttribute('rotation', '0 0 1 3.1418');
+    } else if (i >= 8) {
+      // Halfwave dipole
+      const cyl = document.createElement('cylinder');
+      cyl.setAttribute('radius', '0.25');
+      cyl.setAttribute('height', '5');
+      shape.appendChild(cyl);
+      t.setAttribute('rotation', '0 0 1 3.1418');
+    } else {
+      // Isotropic (disk)
+      const disk = document.createElement('cylinder');
+      disk.setAttribute('radius', '0.8');
+      disk.setAttribute('height', '0.05');
+      shape.appendChild(disk);
+      t.setAttribute('rotation', '0 0 1 1.5707');
+    }
+    t.appendChild(shape);
+  }
+
+  // Only rotate the directional pattern (inline) for vertical (i == 18)
+  if (patternSnippets[i]) {
+    const inlineWrapper = document.createElement('transform');
+    if (i === 18) {
+      inlineWrapper.setAttribute('rotation', '0 0 1 -1.5708');
+    }
+    inlineWrapper.innerHTML = patternSnippets[i];
+    t.appendChild(inlineWrapper);
+  }
+
+  switchNode.appendChild(t);
+}
+    // Gizmo triangle and its wrapper
+    const gizmoTransform = document.createElement('transform');
+    gizmoTransform.setAttribute('id', `${idSuffix}_gizmo`);
+
+    const outerTriangle = document.createElement('transform');
+    outerTriangle.setAttribute('id', `${idSuffix}_triangleOuter`);
+
+  //Directional pattern: azimuth rotation 90° about Y axis
+    outerTriangle.setAttribute('rotation', '0 0 1 1.5708'); // 90° azimuth
 
 
-  // Set up sliders for translation
-  // setupSlider('slider2ForHorizontal', 'tx', 'X', true); // Horizontal translation
-  // setupSlider('slider2ForVertical', 'tx', 'Z', true); // Vertical translation
+const innerTriangle = document.createElement('transform');
+innerTriangle.setAttribute('rotation', isTx ? '1 0 0 1.5708' : '1 0 0 -1.5708'); // TX flips 180°
+
+const triangleShape = document.createElement('shape');
+triangleShape.setAttribute('DEF', `point_${type}`);
+const triangleAppearance = document.createElement('appearance');
+const triangleMaterial = document.createElement('material');
+triangleMaterial.setAttribute('diffuseColor', isTx ? '1 0 0' : '0 0.6902 0.9412');
+triangleMaterial.setAttribute('transparency', '0.7');
+triangleAppearance.appendChild(triangleMaterial);
+
+const indexedFaceSet = document.createElement('indexedFaceSet');
+indexedFaceSet.setAttribute('coordIndex', '0 1 2 -1');
+indexedFaceSet.setAttribute('solid', 'false');
+
+const coords = document.createElement('coordinate');
+coords.setAttribute('point', '0 4 0, -3 -3 0, 3 -3 0');
+
+indexedFaceSet.appendChild(coords);
+triangleShape.appendChild(triangleAppearance);
+triangleShape.appendChild(indexedFaceSet);
+innerTriangle.appendChild(triangleShape);
+outerTriangle.appendChild(innerTriangle);
+gizmoTransform.appendChild(outerTriangle);
+
+    // Combine all
+    rotationTransform.appendChild(switchNode);
+    rotationTransform.appendChild(gizmoTransform);
+
+    const gizmoTranslate = document.createElement('transform');
+    gizmoTranslate.setAttribute('translation', '0 2.5 0');
+    gizmoTranslate.appendChild(rotationTransform);
+
+    outerTransform.appendChild(rodTransform);
+    outerTransform.appendChild(gizmoTranslate);
+    scene.appendChild(outerTransform);
+
+    // Setup sliders
+    // const moveXId = isTx ? 'slider4ForMoveX' : 'slider3ForMoveX';
+    // const moveYId = isTx ? 'slider4ForMoveY' : 'slider3ForMoveY';
+    // const moveZId = isTx ? 'slider3ForZupward' : 'slider4ForZupward';
+    // const rotXId = isTx ? 'slider4ForRotateX' : 'slider3ForRotateX';
+    // const rotYId = isTx ? 'slider4ForRotateY' : 'slider3ForRotateY';
+    // const rotZId = isTx ? 'slider4ForTiltZ' : 'slider3ForTiltZ';
+    const transformId = `${idSuffix}_transform_${(airspace.numReceivers)}`;
+
+    // document.getElementById(moveXId).value = xInit;
+    // document.getElementById(moveYId).value = yInit;
+    // setupTranslationSlider(moveXId, moveYId, moveZId, transformId);
+    // setupSlider(rotXId, rotYId, rotZId, `${idSuffix}Rotation${(airspace.numReceivers)}`);
+
+    // RX2
+// window.rx2SliderReset = setupSlider('slider3ForRotateX', 'slider3ForRotateY', 'slider3ForTiltZ', 'rx_newRotation');
+// // TX2
+// window.tx2SliderReset = setupSlider('slider4ForRotateX', 'slider4ForRotateY', 'slider4ForTiltZ', 'tx_newRotation');
+
+    // Show correct pattern block
+    // const txBlock = document.getElementById("tx2_pattern_options");
+    // const rxBlock = document.getElementById("rx2_pattern_options");
+    // if (isTx && txBlock) txBlock.style.display = "block";
+    // if (!isTx && rxBlock) rxBlock.style.display = "block";
+
+    // antennaCounter[type]++;
+    //console.log(`Added ${label} antenna: ${idSuffix}`);
+  }
+
+  'use strict';
+  //These values initiated while loading
 
 
-  document.addEventListener('DOMContentLoaded', function () {
-    var rotateXSlider = document.getElementById('sliderForRotateX');
-    var rotateYSlider = document.getElementById('sliderForRotateY');
-    // var rotateZSlider = document.getElementById('sliderForRotateZ');
-    var slider2ForRotateX = document.getElementById('slider2ForRotateX')
+  function updateTriangleBoresightRotationNew(antennaId, patternType) {
+  const tri = document.getElementById(`${antennaId}_triangleOuter`);
+  if (!tri) return;
 
-    
+  if (patternType === 'horizontal_isotropic') {
+    // For directional, set azimuth rotation 90° about Y axis
+    tri.setAttribute('rotation', '0 1 0 0'); // 90° about Y axis
+  } else {
+    // Default/fallback: boresight rotation 90° about Z axis
+    tri.setAttribute('rotation', '0 0 1 1.5708');
+  }
+}
+
+  // document.getElementById('tx2_pattern').addEventListener('change', function () {
+  //   updateTriangleBoresightRotationNew('tx_new', this.value);
+  // });
+  // document.getElementById('rx2_pattern').addEventListener('change', function () {
+  //   updateTriangleBoresightRotationNew('rx_new', this.value);
+  // });
+
+  // updateTriangleBoresightRotationNew('tx_new', document.getElementById('tx2_pattern').value);
+  // updateTriangleBoresightRotationNew('rx_new', document.getElementById('rx2_pattern').value);
+
+
+  //=========================================================
+  //
+  //    SUBSECTION: Quaternions
+  //
+  //=========================================================
 
 
 
-    var objectTransform = document.getElementById('rotationHandleTransform');
+ // This object holds the quaternion state for both RX and TX antennas, including previous states for smooth transitions.
+  const antennaQuatState = {
+    rx: { quat: { x: 0, y: 0, z: 0, w: 1 }, prev1: { x: 0, y: 0, z: 0 } },
+    tx: { quat: { x: 0, y: 0, z: 0, w: 1 }, prev2: { x: 0, y: 0, z: 0 } },
+    rx_new: { quat: { x: 0, y: 0, z: 0, w: 1 }, prev3: { x: 0, y: 0, z: 0 } },
+    tx_new: { quat: { x: 0, y: 0, z: 0, w: 1 }, prev4: { x: 0, y: 0, z: 0 } },
+  };
 
-    if (!objectTransform) {
-      console.error('Rotation Handle Transform not found');
+
+// Converts a quaternion to axis-angle representation
+  function quatToAxisAngle(q) {
+    const angle = 2 * Math.acos(q.w);
+    const s = Math.sqrt(1 - q.w * q.w);
+    if (s < 0.0001) {
+      return { x: 0, y: 0, z: 1, angle: 0 };
+    } else {
+      return {
+        x: q.x / s,
+        y: q.y / s,
+        z: q.z / s,
+        angle: angle
+      };
+    }
+  }
+
+ // establishes many key features for the new antennas.  very long function but contains many of the key features for the new antennas.
+  function setupSlider(sliderXId, sliderYId, sliderZId, antennaTransformId) {
+    const sliderX = document.getElementById(sliderXId);
+    const sliderY = document.getElementById(sliderYId);
+    const sliderZ = document.getElementById(sliderZId);
+    const transformNode = document.getElementById(antennaTransformId);
+
+    if (!sliderX || !sliderY || !sliderZ || !transformNode) {
+      console.warn(`Missing slider or transform for ${antennaTransformId}`);
       return;
     }
 
-    rotateXSlider.addEventListener('input', function () {
-      var angleRadians = this.value * Math.PI / 180;
-      console.log('Rotate X:', angleRadians);
-    });
+    let currentQuat = { x: 0, y: 0, z: 0, w: 1 };
+    let prevAngles = { x: 0, y: 0, z: 0 };
 
-    rotateYSlider.addEventListener('input', function () {
-      var angleRadians = this.value * Math.PI / 180;
-      console.log('Rotate Y:', angleRadians);
-    });
+    function axisAngleToQuat(axis, angle) {
+      const s = Math.sin(angle / 2);
+      return {
+        x: axis.x * s,
+        y: axis.y * s,
+        z: axis.z * s,
+        w: Math.cos(angle / 2)
+      };
+    }
 
-    rotateZSlider.addEventListener('input', function () {
-      var angleRadians = this.value * Math.PI / 180;
-      console.log('Rotate Z:', angleRadians);
-      objectTransform.setAttribute('rotation', `0 0 1 ${angleRadians}`);
+    function multiplyQuats(a, b) {
+      return {
+        w: a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z,
+        x: a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y,
+        y: a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x,
+        z: a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w
+      };
+    }
 
-    });
-  });
+    function quatToMatrix(q) {
+      const { x, y, z, w } = q;
+      return new x3dom.fields.SFMatrix4f(
+        1 - 2 * y * y - 2 * z * z, 2 * x * y - 2 * z * w, 2 * x * z + 2 * y * w, 0,
+        2 * x * y + 2 * z * w, 1 - 2 * x * x - 2 * z * z, 2 * y * z - 2 * x * w, 0,
+        2 * x * z - 2 * y * w, 2 * y * z + 2 * x * w, 1 - 2 * x * x - 2 * y * y, 0,
+        0, 0, 0, 1
+      );
+    }
+
+   function updateRotation() {
+  const currentAngles = {
+    x: parseFloat(sliderX.value),
+    y: parseFloat(sliderY.value),
+    z: parseFloat(sliderZ.value)
+  };
+ 
+  // Always recalculate quaternion from scratch (not just delta)
+  const quatX = axisAngleToQuat({ x: 1, y: 0, z: 0 }, currentAngles.x * Math.PI / 180);
+  const quatY = axisAngleToQuat({ x: 0, y: 1, z: 0 }, currentAngles.y * Math.PI / 180);
+  const quatZ = axisAngleToQuat({ x: 0, y: 0, z: 1 }, currentAngles.z * Math.PI / 180);
+
+  // Combine rotations: Z * Y * X (order may depend on your convention)
+  currentQuat = multiplyQuats(quatZ, multiplyQuats(quatY, quatX));
+
+  const matrix = quatToMatrix(currentQuat);
+  transformNode.setAttribute("matrix", matrix.toString());
+
+  // --- Always update the angles table and path loss using the matrix ---
+  if (antennaTransformId === 'rx_newRotation') {
+    rxAngles2.X = currentAngles.x;
+    rxAngles2.Y = currentAngles.y;
+    rxAngles2.Z = currentAngles.z;
+    updateAllAntennaAnglesAndPathLossNew();
+    if (typeof updatePathLossNewAntennas === 'function') {
+      updatePathLossNewAntennas();
+    }
+  } else if (antennaTransformId === 'tx_newRotation') {
+    txAngles2.X = currentAngles.x;
+    txAngles2.Y = currentAngles.y;
+    txAngles2.Z = currentAngles.z;
+    updateAllAntennaAnglesAndPathLossNew();
+    if (typeof updatePathLossNewAntennas === 'function') {
+      updatePathLossNewAntennas();
+    }
+  }
+
+  if (antennaTransformId === 'rxRotation') {
+    rxAngles.X = currentAngles.x;
+    rxAngles.Y = currentAngles.y;
+    rxAngles.Z = currentAngles.z;
+    updateAllAntennaAnglesAndPathLoss();
+    if (typeof updatePathLoss === 'function') {
+      updatePathLoss();
+    }
+  } else if (antennaTransformId === 'txRotation') {
+    txAngles.X = currentAngles.x;
+    txAngles.Y = currentAngles.y;
+    txAngles.Z = currentAngles.z;
+    updateAllAntennaAnglesAndPathLoss();
+    if (typeof updatePathLoss === 'function') {
+      updatePathLoss();
+    }
+  }
+}
+
+    sliderX.addEventListener("input", updateRotation);
+    sliderY.addEventListener("input", updateRotation);
+    sliderZ.addEventListener("input", updateRotation);
+
+    function resetSliderRotation() {
+  currentQuat = { x: 0, y: 0, z: 0, w: 1 };
+  prevAngles = { x: 0, y: 0, z: 0 };
+}
+  return resetSliderRotation;
+
+  }
+
+
+
+  // function to listen to url changes
+  window.onload = function () {
+    // 1. Set mode from URL (beginner or advanced)
+    const urlParams = new URLSearchParams(location.search);
+    for (const [key, value] of urlParams) {
+      if (key === 'mode' && ['beginner', 'advanced'].includes(value.toLowerCase())) {
+        document.getElementById(value.toLowerCase()).selected = "selected";
+        onModeChange();
+      }
+    }
+
+    // 2. Initialize antenna coordinates
+    getCoordinatesFromX3D("rx_transform_1");
+
+    // 3. Get transmitter rotation and calculate distance
+    const transmitterNode = document.getElementById("transmitterPlane");
+    const sensorToWorldMatrix = x3dom.fields.SFMatrix4f.parseRotation(
+      transmitterNode.getAttribute("axisRotation")
+    );
+
+  updatePathLoss();    // calcDistance(transmitterPos, receiverPos);
+
+    // 4. Apply initial rotations and translations (optional)
+    applyRotationGizmoTransformations("rx");
+    applyRotationGizmoTransformations("tx");
+  };
+
+  let currentRxX = 0;
+  let currentRxZ = 0;
+  let currentRxY = 0; 
+
+
+  // document.getElementById('sliderForMoveX').addEventListener('input', function (event) {
+  //   currentRxX = parseFloat(event.target.value);
+  //   console.log("RX X moved to", currentRxX);
+  //   updateOGRxTranslation();
+  // });
+
+  // //legacy code was currentrxZ, however it represents the y axis
+  // document.getElementById('sliderForMoveY').addEventListener('input', function (event) {
+  //   currentRxZ = parseFloat(event.target.value);
+  //       console.log("RX Y moved to", currentRxZ);
+
+  //   updateOGRxTranslation();
+  // });
+
+  // document.getElementById('sliderForMoveZ').addEventListener('input', function (event) {
+  //   currentRxY = parseFloat(event.target.value);
+  //       console.log("RX Z moved to", currentRxY);
+
+  // //   updateOGRxTranslation();
+  // });
+
+
+
+  function updateAllAntennaAnglesAndPathLossNew() {
+  const tx2Pos = getCoordinatesFromX3D("tx_new_transform");
+  const rx2Pos = getCoordinatesFromX3D("rx_new_transform");
+
+  // If both antennas exist, compute relative angles
+  if (tx2Pos && rx2Pos) {
+   const dx = rx2Pos.x - tx2Pos.x;
+  const dy = rx2Pos.y - tx2Pos.y;
+  const dz = rx2Pos.z - tx2Pos.z;
+    const dirVec = [dx, dy, dz];
+
+    // RX2 rotation matrix
+    let rxMatrix2 = [];
+    const rxRotationNode2 = document.getElementById('rx_newRotation');
+    if (rxRotationNode2) {
+      const rxMatrix4 = rxRotationNode2.getFieldValue('matrix');
+      for (let i = 0; i < 3; i++) {
+        rxMatrix2.push([rxMatrix4[`_${i}0`], rxMatrix4[`_${i}1`], rxMatrix4[`_${i}2`]]);
+      }
+    }
+    function applyInverseRotation(matrix, vec) {
+      return [
+        matrix[0][0]*vec[0] + matrix[1][0]*vec[1] + matrix[2][0]*vec[2],
+        matrix[0][1]*vec[0] + matrix[1][1]*vec[1] + matrix[2][1]*vec[2],
+        matrix[0][2]*vec[0] + matrix[1][2]*vec[1] + matrix[2][2]*vec[2]
+      ];
+    }
+    let dirVecInRx2 = rxMatrix2.length === 3 ? applyInverseRotation(rxMatrix2, dirVec) : dirVec;
+    const r_rx2 = Math.sqrt(dirVecInRx2[0]**2 + dirVecInRx2[1]**2 + dirVecInRx2[2]**2);
+    const theta_rx2 = Math.acos(dirVecInRx2[1] / r_rx2) * (180 / Math.PI);
+    let phi_rx2 = Math.atan2(dirVecInRx2[2], dirVecInRx2[0]) * (180 / Math.PI);
+    if (phi_rx2 < 0) phi_rx2 += 360;
+
+    // Store for use in updatePathLossNewAntennas
+    window.theta_rx2 = theta_rx2;
+    window.phi_rx2 = phi_rx2;
+    // You can also update DOM here if you want to show these values
+
+    // (Optional) Do the same for TX2 if you want to display its angles
+
+    return;
+  }
+
+  // If only TX2 exists, update only TX2 absolute angles (relative to origin or default)
+  if (tx2Pos && !rx2Pos) {
+    // You can update TX2's absolute angles here if needed
+    // For example, set RX2-related DOM elements to "N/A"
+    // Or just skip relative calculations
+    return;
+  }
+
+  // If only RX2 exists, update only RX2 absolute angles (relative to origin or default)
+  if (!tx2Pos && rx2Pos) {
+    // You can update RX2's absolute angles here if needed
+    // For example, set TX2-related DOM elements to "N/A"
+    // Or just skip relative calculations
+    return;
+  }
+
+  // If neither exists, do nothing
+}
+  
+
+  
+
+
+  function updateOGRxTranslation() {
+    const antenna = document.getElementById('tx_transform_1');
+    if (antenna) {
+      // antenna.setAttribute('translation', `${currentRxX} ${currentRxY} ${currentRxZ}`);
+      // incorrect this happens before the antennas are moved
+      transmitterPos = getCoordinatesFromX3D("tx_transform_1");
+      receiverPos = getCoordinatesFromX3D("rx_transform_1");
+
+      calcDistance(receiverPos, transmitterPos);
+          //console.log("updateOGRxTranslation: RX moved to", { x: currentRxX, y: currentRxY, z: currentRxZ });
+              updateAllAntennaAnglesAndPathLoss();
+
+      //updatePathLoss();
+    }
+  }
+
+
+  function updateAllAntennaAnglesAndPathLoss() {
+  // Get RX and TX positions
+const txPos = getCoordinatesFromX3D("tx_transform_1");
+const rxPos = getCoordinatesFromX3D("rx_transform_1");
+//   distance_tx_rx = Math.sqrt(
+//   Math.pow(txPos.x - rxPos.x, 2) +
+//   Math.pow(txPos.y - rxPos.y, 2) +
+//   Math.pow(txPos.z - rxPos.z, 2)
+// );
+// updatePathLoss();
+
+  // Get RX and TX rotation matrices (3x3)
+  // For RX
+  let rxMatrix = [];
+  const rxRotationNode = document.getElementById('rxRotation');
+  if (rxRotationNode) {
+    const rxMatrix4 = rxRotationNode.getFieldValue('matrix');
+    for (let i = 0; i < 3; i++) {
+      rxMatrix.push([rxMatrix4[`_${i}0`], rxMatrix4[`_${i}1`], rxMatrix4[`_${i}2`]]);
+    }
+  }
+  // For TX
+  let txMatrix = [];
+  const txRotationNode = document.getElementById('txRotation');
+  if (txRotationNode) {
+    const txMatrix4 = txRotationNode.getFieldValue('matrix');
+    for (let i = 0; i < 3; i++) {
+      txMatrix.push([txMatrix4[`_${i}0`], txMatrix4[`_${i}1`], txMatrix4[`_${i}2`]]);
+    }
+  }
+
+  // Compute direction vector from RX to TX in world coordinates
+  // Invert direction: RX pattern should look from TX to RX (fat part of cone)
+const dx = txPos.x - rxPos.x;
+const dy = txPos.y - rxPos.y;
+const dz = -(txPos.z - rxPos.z);
+const dirVec = [dx, dy, dz];
+
+  // Transform direction vector into RX's local frame
+  function applyInverseRotation(matrix, vec) {
+    // Transpose = inverse for rotation matrices
+    return [
+      matrix[0][0]*vec[0] + matrix[1][0]*vec[1] + matrix[2][0]*vec[2],
+      matrix[0][1]*vec[0] + matrix[1][1]*vec[1] + matrix[2][1]*vec[2],
+      matrix[0][2]*vec[0] + matrix[1][2]*vec[1] + matrix[2][2]*vec[2]
+    ];
+  }
+  let dirVecInRx = rxMatrix.length === 3 ? applyInverseRotation(rxMatrix, dirVec) : dirVec;
+  let dirVecInTx = txMatrix.length === 3 ? applyInverseRotation(txMatrix, [-dx, -dy, -dz]) : [-dx, -dy, -dz];
+
+  // Calculate spherical angles for RX (theta/phi)
+  const r_rx = Math.sqrt(dirVecInRx[0]**2 + dirVecInRx[1]**2 + dirVecInRx[2]**2);
+  const theta_rx = Math.acos(dirVecInRx[1] / r_rx) * (180 / Math.PI);
+  let phi_rx = Math.atan2(dirVecInRx[2], dirVecInRx[0]) * (180 / Math.PI);
+  if (phi_rx < 0) phi_rx += 360;
+
+  // Calculate spherical angles for TX (theta/phi)
+  const r_tx = Math.sqrt(dirVecInTx[0]**2 + dirVecInTx[1]**2 + dirVecInTx[2]**2);
+  const theta_tx = Math.acos(dirVecInTx[1] / r_tx) * (180 / Math.PI);
+  let phi_tx = Math.atan2(dirVecInTx[2], dirVecInTx[0]) * (180 / Math.PI);
+  if (phi_tx < 0) phi_tx += 360;
+
+  // Update DOM
+  document.getElementById('angle-theta-table-rx-rel').textContent = theta_rx.toFixed(2);
+  document.getElementById('angle-phi-table-rx-rel').textContent = phi_rx.toFixed(2);
+  document.getElementById('angle-theta-table-tx-rel').textContent = theta_tx.toFixed(2);
+  document.getElementById('angle-phi-table-tx-rel').textContent = phi_tx.toFixed(2);
+
+  // Update path loss and pattern lookup
+  // updatePathLoss();
+}
+
+// sets up the antennas on the page.  had issues with getting the antennas, so an offset was implemented to make sure they spawned properly in the x3d scene.  Although not a perfect method, this did solve the issue at least visually, not sure of any code issues that may arise from this, if any.
+function setupTranslationSlider(sliderXId, sliderYId, sliderZId, targetTransformId, offset = 5) {
+  const sliderX = document.getElementById(sliderXId);
+  const sliderY = document.getElementById(sliderYId);
+  const sliderZ = document.getElementById(sliderZId);
+  let target = document.getElementById(targetTransformId);
+
+  if (!sliderX || !sliderY || !sliderZ || !target) {
+    console.warn(`Slider or transform not found: ${sliderXId}, ${sliderYId}, ${sliderZId}, ${targetTransformId}`);
+    return;
+  }
+// add input to the function
+
+  function updateTranslation() {
+    const x = parseFloat(sliderX.value);
+    const y = parseFloat(sliderZ.value) + 2.5 - offset;
+    const z = parseFloat(sliderY.value);
+
+    target.setAttribute("translation", `${x} ${y} ${z}`);
+
+    updatePathLoss();
+  }
+
+    sliderX.addEventListener("input", updateTranslation);
+    sliderY.addEventListener("input", updateTranslation);
+    sliderZ.addEventListener("input", updateTranslation);
+}
+
+  function removeNewAntennas() {
+    const txNode = document.getElementById("tx_new_transform");
+    const rxNode = document.getElementById("rx_new_transform");
+
+    if (txNode) txNode.remove();
+    if (rxNode) rxNode.remove();
+
+    // Reset counters so buttons can be used again
+    antennaCounter.tx = 0;
+    antennaCounter.rx = 0;
+
+    // Hide UI controls
+    const tx2 = document.getElementById("tx2_pattern_options");
+    const rx2 = document.getElementById("rx2_pattern_options");
+    const slider3 = document.getElementById("slider3");
+    const slider4 = document.getElementById("slider4");
+
+    if (tx2) tx2.style.display = "none";
+    if (rx2) rx2.style.display = "none";
+    if (slider3) slider3.style.display = "none";
+    if (slider4) slider4.style.display = "none";
+  }
+
+
+
+  function removeNewAntennas() {
+    const txNode = document.getElementById("tx_new_transform");
+    const rxNode = document.getElementById("rx_new_transform");
+
+    if (txNode) txNode.remove();
+    if (rxNode) rxNode.remove();
+
+    // Reset counters so buttons can be used again
+    antennaCounter.tx = 0;
+    antennaCounter.rx = 0;
+
+    // Hide UI controls
+    const tx2 = document.getElementById("tx2_pattern_options");
+    const rx2 = document.getElementById("rx2_pattern_options");
+    const slider3 = document.getElementById("slider3");
+    const slider4 = document.getElementById("slider4");
+
+    if (tx2) tx2.style.display = "none";
+    if (rx2) rx2.style.display = "none";
+    if (slider3) slider3.style.display = "none";
+    if (slider4) slider4.style.display = "none";
+  }
+
+
+  // Modulation code descriptions (example, update as needed)
+const mcsDescriptions = [
+  "BPSK (0.50 b/s/Hz)",
+  "QPSK (1.00 b/s/Hz)",
+  "QPSK (1.50 b/s/Hz)",
+  "QPSK (2.00 b/s/Hz)",
+  "16-QAM (2.50 b/s/Hz)",
+  "16-QAM (3.00 b/s/Hz)",
+  "16-QAM (3.56 b/s/Hz)",
+  "64-QAM (4.00 b/s/Hz)",
+  "64-QAM (4.50 b/s/Hz)",
+  "64-QAM (5.00 b/s/Hz)",
+  "256-QAM (5.50 b/s/Hz)"
+];
+const mcsRates = [
+  "r1/2", "r2/3", "r3/4", "r5/6", "r2/3", "r3/4", "r8/9", "r2/3", "r3/4", "r5/6", "r8/9"
+];
+
+
+
+function toggleAntennaSliders(antenna) {
+  // Use the correct container IDs for new antennas
+  let containerId = (antenna === 'tx2') ? 'sliderGroup_tx2'
+                  : (antenna === 'rx2') ? 'sliderGroup_rx2'
+                  : `${antenna}_sliders`;
+  const container = document.getElementById(containerId);
+  const btn = document.getElementById(`toggle-${antenna}-sliders`);
+  if (!container || !btn) return;
+
+  // Determine the default display style for this container
+  // OG antennas use "block" or "", new ones use "flex"
+  const isNew = (antenna === 'tx2' || antenna === 'rx2');
+  const showStyle = isNew ? "flex" : "block";
+
+  if (container.style.display === "none" || container.style.display === "") {
+    container.style.display = showStyle;
+    btn.textContent = "Hide Antenna Sliders";
+  } else {
+    container.style.display = "none";
+    btn.textContent = "Show Antenna Sliders";
+  }
+}
+
+
+  // Set up sliders for main RX rotation
+  setupSlider('sliderForRotateX', 'sliderForRotateY', 'sliderForTiltZ', 'rxRotation');
+
+  // Set up sliders for main TX rotation (slider group 2)
+  setupSlider('slider2ForRotateX', 'slider2ForRotateY', 'slider2ForTiltZ', 'txRotation');
+
+setupTranslationSlider('sliderForMoveX', 'sliderForMoveY', 'sliderForMoveZ', 'rx_transform_1', '2.5');
+  setupTranslationSlider('slider2ForMoveX', 'slider2ForMoveY', 'slider2ForZupward', 'tx_transform_1', '2.5');
+  // setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_transform_2');
+  // setupTranslationSlider('slider4ForMoveX', 'slider4ForMoveY', 'slider3ForZupward', 'tx2_transform');
+// setupTranslationSlider('slider3ForMoveX', 'slider3ForMoveY', 'slider4ForZupward', 'rx_new_transform');
+
+
+function generateSliderGroup(containerId, groupId, airspace = null) {
+    const container = document.getElementById(containerId);
+    const sliderConfig = [
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForMoveX`,
+                  label: "Move East-West",
+                  min: -10,
+                  max: 10,
+                  value: 0,
+                  color: "#acccf6"
+              },
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForMoveY`,
+                  label: "Move North-South",
+                  min: -12,
+                  max: 12,
+                  value: 0,
+                  color: "#acccf6"
+              },
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForMoveZ`,
+                  label: "Move Up-Down",
+                  min: 0,
+                  max: 10,
+                  value: 0,
+                  color: "#acccf6"
+              },
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForRotateX`,
+                  label: "Elevation (Up-Down)",
+                  min: 0,
+                  max: 360,
+                  value: 0,
+                  color: "#acccf6"
+              },
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForRotateY`,
+                  label: "Azimuth (Left-Right)",
+                  min: 0,
+                  max: 360,
+                  value: 0,
+                  color: "#acccf6"
+              },
+              {
+                  id: `slider${(airspace.numReceivers+1)}ForTiltZ`,
+                  label: "Boresight Tilt",
+                  min: 0,
+                  max: 180,
+                  value: 0,
+                  color: "#acccf6"
+              }
+          ];
+    if (!container) {
+        console.error(`Container with ID '${containerId}' not found.`);
+        return;
+    }
+
+    // Start building the slider group HTML
+    let htmlContent = `<div id="${groupId}" class="slider-group">`;
+      if(airspace) {
+        htmlContent += `<label> Receiver ${airspace.numReceivers}</label>`;
+
+      }
+
+// Group the first 3 sliders into one row
+htmlContent += `<div class="slider-row">`;
+sliderConfig.slice(0, 3).forEach(slider => {
+    htmlContent += `
+        <div class="slider-box">
+            <label for="${slider.id}">${slider.label}</label>
+            <input type="range" id="${slider.id}" 
+                   min="${slider.min}" max="${slider.max}" 
+                   value="${slider.value}" 
+                   style="accent-color: ${slider.color};">
+        </div>
+    `;
+});
+htmlContent += `</div>`; // Close the first row
+
+// Group the next 3 sliders into another row
+htmlContent += `<div class="slider-row">`;
+sliderConfig.slice(3, 6).forEach(slider => {
+    htmlContent += `
+        <div class="slider-box">
+            <label for="${slider.id}">${slider.label}</label>
+            <input type="range" id="${slider.id}" 
+                   min="${slider.min}" max="${slider.max}" 
+                   value="${slider.value}" 
+                   style="accent-color: ${slider.color};">
+        </div>
+    `;
+});
+htmlContent += `</div>`; // Close the second row
+
+htmlContent += `</div>`; // Close the slider group
+
+
+    // Append the generated HTML to the container
+    container.innerHTML += htmlContent;
+    let sliderValue = airspace.numReceivers+1;
+    let transformValue = 0;
+    for (let i = 2; i <= airspace.numReceivers; i++) {
+      sliderValue = i+1;
+      transformValue = i;
+      setupTranslationSlider(`slider${sliderValue}ForMoveX`, 
+      `slider${sliderValue}ForMoveY`, 
+      `slider${sliderValue}ForMoveZ`, 
+      `rx_transform_${transformValue}`);
+      // setupRotationSlider(`slider${sliderValue}ForRotateX`, 
+      // `slider${sliderValue}ForRotateY`, 
+      // `slider${sliderValue}ForTiltZ`, 
+      // `rxRotation${transformValue}`);
+      const rotXId = `slider${sliderValue}ForRotateX`;
+      const rotYId = `slider${sliderValue}ForRotateY`;  
+      const rotZId = `slider${sliderValue}ForTiltZ`;
+      setupSlider(`slider${sliderValue}ForRotateX`, 
+      `slider${sliderValue}ForRotateY`, 
+      `slider${sliderValue}ForTiltZ`, 
+      `rxRotation${(transformValue)}`);
+
+    }
+    
+}
+
 
 </script>
 
