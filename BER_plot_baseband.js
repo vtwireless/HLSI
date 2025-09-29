@@ -29,7 +29,7 @@ function BER_plot_baseband(){
           
       // Add X axis
       var x = d3.scaleLinear()
-        .domain([0, 10])
+        .domain([-5, 10])
         .range([ -.001, width * 1.01 ]);
       svg.append("g")
         // sends the line to the bottom
@@ -57,6 +57,8 @@ function BER_plot_baseband(){
       ebnoPoints = [
                   { x: ebnoDb, y: sig.BER },
                  ];
+      if ((ebnoPoints[0].x > -5)||(ebnoPoints[0].x > 10)) {
+
           svg.append('g')
             .selectAll("dot")
             .data(ebnoPoints)
@@ -66,7 +68,7 @@ function BER_plot_baseband(){
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 2.5)
               .style("fill","#c51b7d")
-
+      }
               // console.log(BER_stats);
       }, 1000);
 
