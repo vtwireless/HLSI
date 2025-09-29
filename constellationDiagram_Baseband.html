@@ -7,14 +7,15 @@
 <script src=common.js></script>
 <script src=label.js></script>
 <script src=sliders.js></script>
-<script src=constellationDiagram_baseband.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
-<script src=constellationDiagram.js></script>
 <script src=constellationDiagram_baseband.js></script>
+<script src=BER_plot_baseband.js></script>
+<script src=constellationDiagram_base.js></script>
+
 
 
 <body>
-  <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a>
+  <!-- <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a> -->
 
 <div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 <div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
@@ -30,19 +31,20 @@
 </div>
 
 <div id="constellationParent" style="width: 100%; height: 100%;"></div>
-
-
+<div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
+<div id="BERLabel" style="width: 100%; height: 100%;"></div>
 </body>
 
 <script>
 
+  let BER_stats = new MessageStats();
 
 
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: .1, // dB
     gn_min: 0, // volts
-    gn_max: 10, // volts
+    gn_max: 5, // volts
     mcs_init: 1, // array index int
     differentialMode: false,
 
@@ -51,10 +53,10 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: 0, // dB
-    gn_min: 0,
+    gn_min: .001,
     gn_max: 50,
   });
-  noise.gn = 0;
+  noise.gn = 1.0;
 
 // Slider(sig, 'gn', null, "modCodeSlider");
 voltageSlider = document.createElement("INPUT");
@@ -120,7 +122,7 @@ noiseSlider = document.createElement("INPUT");
       // below sets up the label on the left of the slider
       Noiselabel = document.createElement("label");
       Noiselabel.setAttribute("for", noiseSlider.id);
-      Noiselabel.appendChild(document.createTextNode('Noise Power'));
+      Noiselabel.appendChild(document.createTextNode('Noise Variance'));
 
       noiseSlider.parentNode.prepend(Noiselabel);
   
@@ -142,7 +144,7 @@ noiseSlider = document.createElement("INPUT");
         noise["gn"] = parseValue(noiseSlider.value);
       };
       var outputUnitsCallback = function (noise, val) {
-         return d3.format(".2f")(val);
+         return d3.format(`.2f`)(val);
       };
 
   
@@ -154,6 +156,8 @@ noiseSlider = document.createElement("INPUT");
 // Slider(noise, 'gn', null, "noiseSlider");
 
 constellationDiagram_Baseband()
+
+BER_plot_baseband()
 
 
 
