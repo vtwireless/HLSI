@@ -20,19 +20,21 @@
 <div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 <div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 
-<button onclick="buttonPressedClearPoints()">clear message</button> 
+<!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
 
-<div style="display:inline-flex;">
-  <span style="font-size: 18px; margin-left: 8px;margin-right: 8px;">Differential Mode</span>
+<div style="display:flex; align-items:center; gap:8px;">
+  <span style="font-size:16px;">Differential Mode</span>
   <label class="switch">
     <input id="differentialMode" type="checkbox" onclick="differentialMode();">
     <span class="slider round"></span>
   </label>
 </div>
 
+
+
 <div id="constellationParent" style="width: 100%; height: 100%;"></div>
 <div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
-<div id="BERLabel" style="width: 100%; height: 100%;"></div>
+<!-- <div id="BERLabel" style="width: 100%; height: 100%;"></div> -->
 </body>
 
 <script>
@@ -42,7 +44,7 @@
 
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: .1, // dB
+    gn_init: 1.5, // dB
     gn_min: 0, // volts
     gn_max: 5, // volts
     mcs_init: 1, // array index int
@@ -52,9 +54,9 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   });
 
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 0, // dB
+    gn_init: 1, // dB
     gn_min: .001,
-    gn_max: 50,
+    gn_max: 10,
   });
   noise.gn = 1.0;
 

@@ -144,7 +144,7 @@ function constellationDiagram_Baseband(){
             // console.log(1 + randn_bm() * variance)
             if(xVal<thresholdTarget[0].x) {
               BER_stats.messageErrors += 1;
-              console.log("Error!")
+              // console.log("Error!")
             }
             if(xVal<-voltageLimit) xVal = -voltageLimit
             
@@ -164,7 +164,7 @@ function constellationDiagram_Baseband(){
               let xVal = d.x + randn_bm() * variance;
               if(xVal>thresholdTarget[0].x) {
                 BER_stats.messageErrors += 1;
-                console.log("Error!")
+                // console.log("Error!")
               }
               if(xVal<-voltageLimit) xVal = -voltageLimit
 
