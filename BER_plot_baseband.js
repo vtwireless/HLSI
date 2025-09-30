@@ -62,13 +62,39 @@ function BER_plot_baseband(){
         .text("BER")
         .style("fill", "#cbcbcb");
         
+        // Plot a series of points at Eb/No values of 1-10
+        const points = [];
+        for (let i = 1; i <= 10; i++) {
+          let linearEbno = 10**(i/10);
+          let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
+          points.push({ x: i, y: ber });
+        }
 
+        svg.append('g')
+          .selectAll("dot")
+          .data(points)
+          .enter()
+          .append("circle")
+          .attr("cx", function (d) { return x(d.x); })
+          .attr("cy", function (d) { return y(d.y); })
+          .attr("r", 4)
+          .style("fill", "#4dac26");
 
       setInterval(() => {
-        ebno = Math.sqrt((sig.gn)**2/(noise.gn));
+        d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
+        svg.append('g')
+          .selectAll("dot")
+          .data(points)
+          .enter()
+          .append("circle")
+          .attr("cx", function (d) { return x(d.x); })
+          .attr("cy", function (d) { return y(d.y); })
+          .attr("r", 4)
+          .style("fill", "#4dac26");
+        ebno = Math.sqrt((sig.gn)**2/((noise.gn)));
         
         ebnoDb = 10*Math.log10(ebno);
-        console.log(ebnoDb + " dB")
+        // console.log(ebnoDb + " dB")
         if (sig.BER === 0) {
           sig.BER = 10**-6
         }
@@ -88,7 +114,7 @@ function BER_plot_baseband(){
               .style("fill","#d01c8b")
       }
               // console.log(BER_stats);
-      }, 1000);
+      }, 5000);
 
       sig.onChange("mcs", clearErrorRate);
       sig.onChange("gn", clearErrorRate);
@@ -97,11 +123,12 @@ function BER_plot_baseband(){
 
       function clearErrorRate() {
         BER_stats.reset()
+          d3.select("#iterationsLabel").text(`0`);
+          d3.select("#BERLabel").text(`0%`);
+          // d3.select("#ebnoLabel").text(`Eb/No (dB): ${ebnoDb}`);
         // console.log("Resetting BER stats");
         // console.log("Sent Messages: " + BER_stats.sentMessages);
         // console.log("Message Errors: " + BER_stats.messageErrors);
-
-
       }
 
 }
@@ -109,13 +136,32 @@ function BER_plot_baseband(){
   // helper functions
 
   
-  function randn_bm() {
-      let u = 0, v = 0;
-      while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-      while(v === 0) v = Math.random();
-      let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-      num = num / 10.0 + 0.5; // Translate to 0 -> 1
-      if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
-       num = num - 0.5; // added to center around 0
-      return num
-    }
+  // function randn_bm() {
+  //     let u = 0, v = 0;
+  //     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+  //     while(v === 0) v = Math.random();
+  //     let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+  //     num = num / 10.0 + 0.5; // Translate to 0 -> 1
+  //     if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
+  //      num = num - 0.5; // added to center around 0
+  //     return num
+  //   }
+
+// function erf_hastings(x) {
+//   hastings_R1 = R([0, 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429])
+//   return Math.sign(x) * (1 - Math.exp(-x * x) * hastings_R1(1 / (1 + 0.3275911 * Math.abs(x))));
+// }
+// function R(P, Q = []) {
+//   const l = P.length - 1, m = Q.length - 1;
+//   if (l === 5 && m < 0) return R_5(P);
+//   if (l === 4 && m === 4) return R_4_4(P, Q);
+//   if (l === 5 && m === 4) return R_5_4(P, Q);
+//   if (l === 5 && m === 5) return R_5_5(P, Q);
+//   if (l === 6 && m === 5) return R_6_5(P, Q);
+//   if (l === 8 && m === 7) return R_8_7(P, Q);
+//   throw new Error(`unsupported degree ${l},${m}`);
+// }
+
+// function R_5([p0, p1, p2, p3, p4, p5]) {
+//   return z => p0 + z * (p1 + z * (p2 + z * (p3 + z * (p4 + z * p5))));
+// }

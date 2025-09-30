@@ -7,8 +7,8 @@
 <script src=common.js></script>
 <script src=label.js></script>
 <script src=sliders.js></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
-<script src=constellationDiagram_baseband.js></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js"></script>
+ <script src=constellationDiagram_baseband.js></script>
 <script src=BER_plot_baseband.js></script>
 <script src=constellationDiagram_base.js></script>
 
@@ -32,7 +32,42 @@
 
 
 
-<div id="constellationParent" style="width: 100%; height: 100%;"></div>
+<div style="display: flex; align-items: flex-start; gap: 16px; justify-content: flex-start;">
+  <div id="constellationParent" style="width: 70%; height: 100%;"></div>
+  <table style="width: 80%; border-collapse: collapse; border: 1px solid black; text-align: left;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Parameter</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Iterations</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="iterationsLabel">0</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Measured BER</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="BERLabel">0%</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Eb/No</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Theoretical BER</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="tBERLabel">0%</td>
+      </tr>
+    </tbody>
+  </table>
+  <style>
+    table {
+      margin-top: 1%;
+      margin-bottom: auto;
+      margin-right: 10%;
+    }
+  </style>
+</div>
 <div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
 <!-- <div id="BERLabel" style="width: 100%; height: 100%;"></div> -->
 </body>
@@ -40,7 +75,6 @@
 <script>
 
   let BER_stats = new MessageStats();
-
 
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
@@ -124,7 +158,7 @@ noiseSlider = document.createElement("INPUT");
       // below sets up the label on the left of the slider
       Noiselabel = document.createElement("label");
       Noiselabel.setAttribute("for", noiseSlider.id);
-      Noiselabel.appendChild(document.createTextNode('Noise Variance'));
+      Noiselabel.appendChild(document.createTextNode('Noise Power'));
 
       noiseSlider.parentNode.prepend(Noiselabel);
   
@@ -186,8 +220,9 @@ function differentialMode(){
   sig.gn = sig.gn - 0.0001;
 
   }
+document.getElementById('differentialMode').checked = true;
 
-
+differentialMode();
 </script>
 
 </html>
