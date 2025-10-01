@@ -7,42 +7,80 @@
 <script src=common.js></script>
 <script src=label.js></script>
 <script src=sliders.js></script>
-<script src=constellationDiagram_baseband.js></script>
-<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
-<script src=constellationDiagram.js></script>
-<script src=constellationDiagram_baseband.js></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/12.4.0/math.min.js"></script>
+ <script src=constellationDiagram_baseband.js></script>
+<script src=BER_plot_baseband.js></script>
+<script src=constellationDiagram_base.js></script>
+
 
 
 <body>
-  <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a>
+  <!-- <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a> -->
 
 <div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 <div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 
-<button onclick="buttonPressedClearPoints()">clear message</button> 
+<!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
 
-<div style="display:inline-flex;">
-  <span style="font-size: 18px; margin-left: 8px;margin-right: 8px;">Differential Mode</span>
+<div style="display:flex; align-items:center; gap:8px;">
+  <span style="font-size:16px;">Differential Mode</span>
   <label class="switch">
     <input id="differentialMode" type="checkbox" onclick="differentialMode();">
     <span class="slider round"></span>
   </label>
 </div>
 
-<div id="constellationParent" style="width: 100%; height: 100%;"></div>
 
 
+<div style="display: flex; align-items: flex-start; gap: 16px; justify-content: flex-start;">
+  <div id="constellationParent" style="width: 70%; height: 100%;"></div>
+  <table style="width: 80%; border-collapse: collapse; border: 1px solid black; text-align: left;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Parameter</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left;">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Iterations</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="iterationsLabel">0</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Measured BER</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="BERLabel">0%</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Eb/No</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Theoretical BER</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="tBERLabel">0%</td>
+      </tr>
+    </tbody>
+  </table>
+  <style>
+    table {
+      margin-top: 1%;
+      margin-bottom: auto;
+      margin-right: 10%;
+    }
+  </style>
+</div>
+<div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
+<!-- <div id="BERLabel" style="width: 100%; height: 100%;"></div> -->
 </body>
 
 <script>
 
-
+  let BER_stats = new MessageStats();
 
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: .1, // dB
+    gn_init: 1.5, // dB
     gn_min: 0, // volts
-    gn_max: 10, // volts
+    gn_max: 5, // volts
     mcs_init: 1, // array index int
     differentialMode: false,
 
@@ -50,11 +88,11 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   });
 
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 0, // dB
-    gn_min: 0,
-    gn_max: 50,
+    gn_init: 1, // dB
+    gn_min: .001,
+    gn_max: 10,
   });
-  noise.gn = 0;
+  noise.gn = 1.0;
 
 // Slider(sig, 'gn', null, "modCodeSlider");
 voltageSlider = document.createElement("INPUT");
@@ -142,7 +180,7 @@ noiseSlider = document.createElement("INPUT");
         noise["gn"] = parseValue(noiseSlider.value);
       };
       var outputUnitsCallback = function (noise, val) {
-         return d3.format(".2f")(val);
+         return d3.format(`.2f`)(val);
       };
 
   
@@ -154,6 +192,8 @@ noiseSlider = document.createElement("INPUT");
 // Slider(noise, 'gn', null, "noiseSlider");
 
 constellationDiagram_Baseband()
+
+BER_plot_baseband()
 
 
 
@@ -180,8 +220,9 @@ function differentialMode(){
   sig.gn = sig.gn - 0.0001;
 
   }
+document.getElementById('differentialMode').checked = true;
 
-
+differentialMode();
 </script>
 
 </html>
