@@ -91,13 +91,15 @@ function BER_plot_baseband(){
           .attr("cy", function (d) { return y(d.y); })
           .attr("r", 4)
           .style("fill", "#4dac26");
-        ebno = Math.sqrt((sig.gn)**2/((noise.gn)));
+        if(sig.differentialMode) ebno = Math.sqrt((sig.gn)**2/((noise.gn)));
+        if(!sig.differentialMode) ebno = (.5*sig.gn)**2/((noise.gn));
         
         ebnoDb = 10*Math.log10(ebno);
         // console.log(ebnoDb + " dB")
         if (sig.BER === 0) {
           sig.BER = 10**-6
         }
+      
       ebnoPoints = [
                   { x: ebnoDb, y: sig.BER },
                  ];

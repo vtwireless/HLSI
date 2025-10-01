@@ -235,7 +235,10 @@ function constellationDiagram_Baseband(){
     noise.onChange("gn", update_constellation);
 
     function update_constellation(){
-      let ebno = ((sig.gn)/(noise.gn));
+      let offset = 1;
+      if(!sig.differentialMode) offset = .5;
+      // no squaring because immediately square rooted
+      let ebno = ((sig.gn*offset)/(noise.gn));
       let ebnoDb = 10*Math.log10(ebno);
       d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
       console.log(ebno + " linear")

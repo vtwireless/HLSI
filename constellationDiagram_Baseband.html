@@ -11,6 +11,8 @@
  <script src=constellationDiagram_baseband.js></script>
 <script src=BER_plot_baseband.js></script>
 <script src=constellationDiagram_base.js></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 
 
 
@@ -51,7 +53,7 @@
         <td style="border: 1px solid black; padding: 8px; text-align: left;" id="BERLabel">0%</td>
       </tr>
       <tr>
-        <td style="border: 1px solid black; padding: 8px; text-align: left;">Eb/No</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id = "ebnoDescription">Eb/No V<sup>2</sup></sup>/N<sub>0</sub> </td>
         <td style="border: 1px solid black; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
       </tr>
       <tr>
@@ -73,7 +75,7 @@
 </body>
 
 <script>
-
+// katex.render("f(x)^2", document.getElementById("ebnoDescription"), { throwOnError: false });
   let BER_stats = new MessageStats();
 
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
@@ -218,6 +220,10 @@ function differentialMode(){
   buttonPressedClearPoints();
   sig.gn = sig.gn + 0.0001;
   sig.gn = sig.gn - 0.0001;
+
+  document.getElementById("ebnoDescription").innerHTML = sig.differentialMode 
+    ? "Eb/No V<sup>2</sup>/N<sub>0</sub>" 
+    : "Eb/No (.5V)<sup>2</sup>/N<sub>0</sub>";
 
   }
 document.getElementById('differentialMode').checked = true;
