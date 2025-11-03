@@ -109,26 +109,14 @@ function BER_plot_baseband(){
           .attr("height", height);
 
       setInterval(() => {
-<<<<<<< Updated upstream
         d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
-        svg.append('g')
-          .selectAll("dot")
-          .data(points)
-          .enter()
-          .append("circle")
-          .attr("cx", function (d) { return x(d.x); })
-          .attr("cy", function (d) { return y(d.y); })
-          .attr("r", 4)
-          .style("fill", "#4dac26");
-        ebno = Math.sqrt((sig.gn)**2/((noise.gn)));
+
         
-=======
       d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
         if(sig.differentialMode) ebno = ((sig.gn)**2/((noise.gn)**2));
         if(!sig.differentialMode) ebno = (.5*sig.gn)**2/((noise.gn)**2);
 
->>>>>>> Stashed changes
         ebnoDb = 10*Math.log10(ebno);
         // console.log(ebnoDb + " dB")
         if (sig.BER === 0) {
