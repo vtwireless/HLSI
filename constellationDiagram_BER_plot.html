@@ -113,24 +113,25 @@
 
 
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: .1, // dB
-    gn_min: 0, // volts
-    gn_max: 10, // volts
+    gn_init: 1, // dB
+    gn_min: -5, 
+    gn_max: 10, 
     mcs_init: 2, // array index int
   });
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 0, // dB
-    gn_min: -30,
-    gn_max: 30,
+    gn_init: -15, // dB
+    gn_min: -20,
+    gn_max: 0,
   });
-  noise.gn = 0;
 
   let BER_stats = new MessageStats();
   
 
 
 Slider(sig, 'mcs_simple', null, "modCodeSlider");
-Slider(sig, 'gn', null, "gainSlider");
+Slider(sig, 'gn', null, "gainSlider", "Energy per Bit (dB)");
+Slider(noise, 'gn', null, "gainSlider", "Noise Slider (dB)");
+
 let frozenFlag1 = false;
 constellationDiagram(300, 25,"constellationParent", frozenFlag1);
 BER_plot()

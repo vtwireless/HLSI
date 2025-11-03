@@ -139,7 +139,7 @@ function constellationDiagram_Baseband(){
 
         }
 
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < messageRate; i++) {
 
         BER_stats.sentMessages = BER_stats.sentMessages + 2; // two bits sent per iteration
         let yValRand = (height/4)*(counter); // random y value within a band around center
@@ -235,11 +235,18 @@ function constellationDiagram_Baseband(){
     noise.onChange("gn", update_constellation);
 
     function update_constellation(){
+<<<<<<< Updated upstream
       let ebno = ((sig.gn)/(noise.gn));
       let ebnoDb = 10*Math.log10(ebno);
+=======
+      let offset = 1;
+      if(!sig.differentialMode) offset = .5;
+      let ebno = ((sig.gn*offset)**2/(noise.gn)**2);
+      let ebnoDb = 10*Math.log10((ebno));
+>>>>>>> Stashed changes
       d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
       console.log(ebno + " linear")
-      let tBER = .5 * (1-erf_hastings(Math.sqrt(ebno)));
+      let tBER = .5 * (1-erf_hastings(Math.sqrt(ebno)/Math.sqrt(2)));
       d3.select("#tBERLabel").text(`${tBER.toFixed(6)}`);
 
       let NewX = sig.gn

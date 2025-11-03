@@ -1,5 +1,5 @@
-
 function BER_plot(){
+  let ebno = sig.gn-noise.gn;
 
     let ebnoPoints = [
                   { x: sig.gn, y: sig.ber },
@@ -46,12 +46,42 @@ function BER_plot(){
         .call(d3.axisLeft(y).tickSize(-width*1).ticks(7))
         // stroke lines
         svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
-        svg.selectAll(".tick text").attr("fill", "#FFFFFF")          
+        svg.selectAll(".tick text").attr("fill", "#FFFFFF")           
 
+        const points = [];
+        for (let i = -5; i <= 20; i++) {
+          
+          let linearEbno = 10**(i/10);
+          let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
+          points.push({ x: i, y: ber });
+        }
 
+        const line = d3.line()
+          .x(d => x(d.x))
+          .y(d => y(d.y));
+
+        svg.append("path")
+          .datum(points)
+          .attr("fill", "none")
+          .attr("stroke", "#c51b7d")
+          .attr("stroke-width", 3)
+          .attr("stroke-dasharray", "4 4") // Creates a dashed line
+          .attr("d", line)
+          .attr("clip-path", "url(#clip)");
+
+        // Define a clipping path
+        svg.append("clipPath")
+          .attr("id", "clip")
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", width)
+          .attr("height", height);
+        
       setInterval(() => {
+        ebno = sig.gn-noise.gn;
       ebnoPoints = [
-                  { x: sig.gn, y: sig.BER },
+                  { x: ebno, y: sig.BER },
                  ];
         switch (sig["mcs"]) {
           case 0:
@@ -132,15 +162,7 @@ function BER_plot(){
               .style("fill","#4d9221")
             break;
         }
-        // svg.append('g')
-        //   .selectAll("dot")
-        //   .data(ebnoPoints)
-        //   .enter()
-        //   .append("circle")
-        //     .attr("cx", function (d) { return x(d.x); } )
-        //     .attr("cy", function (d) { return y(d.y); } )
-        //     .attr("r", 1.5)
-        //     .style("fill","#1b9e77")
+
       }, refreshRate);
 
       sig.onChange("mcs", clearErrorRate);

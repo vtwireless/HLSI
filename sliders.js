@@ -20,7 +20,7 @@
 //      or null and a HTML <p> and <input> range element are created
 //      and appended to the body.
 
-function Slider(sig, parameter, n = null, append_to_id = null) {
+function Slider(sig, parameter, n = null, append_to_id = null, custom_id = null) {
   {
     let gotPar = false;
 
@@ -216,7 +216,8 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
 
     //console.log("Made slider id=" + n.id + " :\n" + n.parentNode.innerHTML);
   }
-
+  if (custom_id == null) {
+    
   switch (parameter) {
     case "freq": // signal frequency - input range slider
       makeSlider(sig, n, "Frequency", parameter, 0.1, "Hz");
@@ -275,6 +276,66 @@ function Slider(sig, parameter, n = null, append_to_id = null) {
       console.log("Cannot setup slider of kind name=" + parameter);
       break;
   }
+} else {
+    switch (parameter) {
+    case "freq": // signal frequency - input range slider
+      makeSlider(sig, n, custom_id, parameter, 0.1, "Hz");
+      break;
+    case "bw": // signal bandwidth - input range slider
+      makeSlider(sig, n, custom_id, parameter, 1.0, "Hz");
+      break;
+    case "gn": // signal gain - input range slider
+      makeSlider(sig, n, custom_id, parameter, 1.0, "dB");
+      break;
+    case "mcs": // modulation scheme - input range slider
+      makeSlider(sig, n, custom_id, parameter, 1.0, function (sig, val) {
+        //console.log("val=" + val);
+        return (
+          conf.schemes[val].name +
+          " (" +
+          d3.format(".2f")(conf.schemes[val].rate) +
+          " b/s/Hz)"
+        );
+      });
+      break;
+    case "mcs_simple": // modulation scheme - input range slider
+      makeSlider(sig, n, custom_id, parameter, 1.0, function (sig, val) {
+        let msc_simple_name;
+        switch (sig["mcs"]) {
+          case 0:
+            msc_simple_name = "BPSK"; // BPSK
+            break;
+          case 2:
+            msc_simple_name = "QPSK"; // QPSK
+            break;
+          case 5:
+            msc_simple_name = "16QAM"; // 16QAM
+            break;
+          case 7:
+            msc_simple_name = "32QAM"; // 32QAM
+            break;
+          case 8:
+            msc_simple_name = "64QAM"; // 64QAM
+            break;
+          case 9:
+            msc_simple_name = "128QAM"; // 128QAM
+            break;
+          case 10:
+            msc_simple_name = "256QAM"; // 256QAM
+            break;
+        }
+        return msc_simple_name;
+      });
+      break;
+    case "noise": // noise floor 'volume' - emulated by gain value
+      makeSlider(sig, n, custom_id, "gn", 0.1, " dB/Hz");
+      break;
+    default:
+      // This should not happen.
+      console.log("Cannot setup slider of kind name=" + parameter);
+      break;
+  }
+}
 }
 
 Slider.nodeCount = 0;

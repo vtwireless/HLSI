@@ -234,12 +234,10 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
       }
       // console.log("1 second has passed");
       // const ebno = math.log10(math.abs(sig.sinr))
-      const ebno = (10 ** (sig.sinr/20)) 
-      const noisePower = 1/ebno
       // const noisePower = .1
       // console.log(ebno)
   
-      const variance = scaleFactor* Math.sqrt(noisePower)
+      const variance = 10**((noise.gn-sig.gn)/10)
       // console.log(variance)
 
 
@@ -266,8 +264,8 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
       for (let i = 0; i < messageRate; i++) {
         // creates a variable that can be edited if it goes out of bounds for x and y values
         let translatedTargets = constellationTargets.map(point => ({
-          x: point.x  +(2)*variance*randn_bm(),
-          y: point.y  +(2)*variance*randn_bm()
+          x: point.x  +variance*generateNormalRandom(),
+          y: point.y  +variance*generateNormalRandom()
         }));
         for (let i = 0; i < constellationTargets.length; i++) {
           BER_stats.sentMessages = BER_stats.sentMessages + 1;
@@ -275,18 +273,31 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           // console.log(translatedTargets[i])
           // console.log(translatedTargets)
 
-          let xErrorDist = Math.abs(translatedTargets[i].x - constellationTargets[i].x); 
-          let yErrorDist = Math.abs(translatedTargets[i].y - constellationTargets[i].y); 
+          // let xErrorDist = Math.abs(translatedTargets[i].x - constellationTargets[i].x); 
+          // let yErrorDist = Math.abs(translatedTargets[i].y - constellationTargets[i].y); 
+
+          distToTarget = ((constellationTargets[i].x - translatedTargets[i].x)**2 + (constellationTargets[i].y - translatedTargets[i].y)**2);
 
           let freezeBoxX = .92;
           let freezeBoxY = 1.18;
           let freezeBoxWidth = .5;
           let freezeBoxHeight = .25;
+          let errorDetected = false;
 
           let = printObject = [translatedTargets[i]]
 
-          if ( (xErrorDist > distance) || (yErrorDist > distance) ){
-            BER_stats.messageErrors = BER_stats.messageErrors + 1;
+          // if ( (xErrorDist > distance) || (yErrorDist > distance) ){
+          //   BER_stats.messageErrors = BER_stats.messageErrors + 1;
+          // }
+
+          
+          for (let target of constellationTargets) {
+            let tempErrorDist = ((target.x - translatedTargets[i].x)**2 + (target.y - translatedTargets[i].y)**2);
+
+            if (target !== constellationTargets[i] && (tempErrorDist < distToTarget)) {
+              BER_stats.messageErrors++;
+              errorDetected = true;
+            }
           }
 
           // console.log(printObject[0].x)
@@ -298,8 +309,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
 
 
-
-            if ( (xErrorDist > distance) || (yErrorDist > distance) ){
+            if ( errorDetected ){
               // console.log("Error!!!")
               // messageErrors = messageErrors + 1;
               svg.append('g')
@@ -379,7 +389,13 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
 
         // value below is the loop time in miliseconds
+        // console.log(BER_stats);
         sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
+
+        if (BER_stats.messageErrors === 0) {
+          sig.BER = 10**-6
+        }
+        
         // console.log("Bit Error Rate: " + sig.BER);
 
         // Update the BER display
@@ -462,6 +478,33 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
        num = num - 0.5; // added to center around 0
       return num
     }
+
+function generateNormalRandom(mean = 0, stdDev = 1) {
+      let u1 = Math.random();
+      let u2 = Math.random();
+      let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+      return z0 * stdDev + mean;
+  }
+
+function erf_hastings(x) {
+  hastings_R1 = R([0, 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429])
+  return Math.sign(x) * (1 - Math.exp(-x * x) * hastings_R1(1 / (1 + 0.3275911 * Math.abs(x))));
+}
+function R(P, Q = []) {
+  const l = P.length - 1, m = Q.length - 1;
+  if (l === 5 && m < 0) return R_5(P);
+  if (l === 4 && m === 4) return R_4_4(P, Q);
+  if (l === 5 && m === 4) return R_5_4(P, Q);
+  if (l === 5 && m === 5) return R_5_5(P, Q);
+  if (l === 6 && m === 5) return R_6_5(P, Q);
+  if (l === 8 && m === 7) return R_8_7(P, Q);
+  throw new Error(`unsupported degree ${l},${m}`);
+}
+
+function R_5([p0, p1, p2, p3, p4, p5]) {
+  return z => p0 + z * (p1 + z * (p2 + z * (p3 + z * (p4 + z * p5))));
+}
+
 
 
      // use the clear all circles button
