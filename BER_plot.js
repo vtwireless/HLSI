@@ -52,7 +52,7 @@ function BER_plot(){
         for (let i = -5; i <= 20; i++) {
           
           let linearEbno = 10**(i/10);
-          let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
+          let ber = qfunc(Math.sqrt(linearEbno));
           points.push({ x: i, y: ber });
         }
 
@@ -77,6 +77,40 @@ function BER_plot(){
           .attr("y", 0)
           .attr("width", width)
           .attr("height", height);
+
+        const points_QPSK = [];
+        for (let i = -5; i <= 20; i++) {
+          
+          let linearEbno = 10**(i/10);
+          // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
+          // points_QPSK.push({ x: i, y: ber });
+
+          let symbolErrorRate = 2*qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
+          points_QPSK.push({ x: i, y: symbolErrorRate });
+        }
+
+        const line_QPSK = d3.line()
+          .x(d => x(d.x))
+          .y(d => y(d.y));
+
+        svg.append("path")
+          .datum(points_QPSK)
+          .attr("fill", "none")
+          .attr("stroke", "#e9a3c9")
+          .attr("stroke-width", 3)
+          .attr("stroke-dasharray", "4 4") // Creates a dashed line
+          .attr("d", line_QPSK)
+          .attr("clip-path", "url(#clip)");
+
+        // Define a clipping path
+        svg.append("clipPath")
+          .attr("id", "clip")
+          .append("rect")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", width)
+          .attr("height", height);
+
         
       setInterval(() => {
         ebno = sig.gn-noise.gn;
@@ -167,6 +201,7 @@ function BER_plot(){
 
       sig.onChange("mcs", clearErrorRate);
       sig.onChange("gn", clearErrorRate);
+      noise.onChange("gn", clearErrorRate);
 
 
       function clearErrorRate() {
@@ -181,7 +216,29 @@ function BER_plot(){
 }
   
   // helper functions
+function erf_hastings(x) {
+  hastings_R1 = R([0, 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429])
+  return Math.sign(x) * (1 - Math.exp(-x * x) * hastings_R1(1 / (1 + 0.3275911 * Math.abs(x))));
+}
+function R(P, Q = []) {
+  const l = P.length - 1, m = Q.length - 1;
+  if (l === 5 && m < 0) return R_5(P);
+  if (l === 4 && m === 4) return R_4_4(P, Q);
+  if (l === 5 && m === 4) return R_5_4(P, Q);
+  if (l === 5 && m === 5) return R_5_5(P, Q);
+  if (l === 6 && m === 5) return R_6_5(P, Q);
+  if (l === 8 && m === 7) return R_8_7(P, Q);
+  throw new Error(`unsupported degree ${l},${m}`);
+}
 
+function R_5([p0, p1, p2, p3, p4, p5]) {
+  return z => p0 + z * (p1 + z * (p2 + z * (p3 + z * (p4 + z * p5))));
+}
+
+
+function qfunc(x) {
+    return 0.5 * (1 - erf_hastings(x / Math.sqrt(2)));
+}
   
   function randn_bm() {
       let u = 0, v = 0;

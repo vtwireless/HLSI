@@ -208,14 +208,16 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
         }
 
 
-        let scaleFactor = 0
+        let noiseNormalization = 0
         if(sig.mcs>1 && sig.mcs <5 ){
           // 4 QAM
-          scaleFactor = 2
+          energyPerSymbol = 10**(sig.gn/10);
+          noiseNormalization =  Math.sqrt(energyPerSymbol)
       } else if(sig.mcs <2){
           // BPSK
         bpskFlag = true;
-        scaleFactor = 2
+        energyPerSymbol = 10**(sig.gn/10);
+        noiseNormalization =  Math.sqrt(energyPerSymbol)
       } else if (sig.mcs >=5 && sig.mcs <7 ){
           // 16 QAM
           scaleFactor = .707
@@ -237,7 +239,8 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
       // const noisePower = .1
       // console.log(ebno)
   
-      const variance = 10**((noise.gn-sig.gn)/10)
+      const variance = (10**((noise.gn/2)/10)) / noiseNormalization;
+      // const variance = noise.gn/2;
       // console.log(variance)
 
 
@@ -486,24 +489,6 @@ function generateNormalRandom(mean = 0, stdDev = 1) {
       return z0 * stdDev + mean;
   }
 
-function erf_hastings(x) {
-  hastings_R1 = R([0, 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429])
-  return Math.sign(x) * (1 - Math.exp(-x * x) * hastings_R1(1 / (1 + 0.3275911 * Math.abs(x))));
-}
-function R(P, Q = []) {
-  const l = P.length - 1, m = Q.length - 1;
-  if (l === 5 && m < 0) return R_5(P);
-  if (l === 4 && m === 4) return R_4_4(P, Q);
-  if (l === 5 && m === 4) return R_5_4(P, Q);
-  if (l === 5 && m === 5) return R_5_5(P, Q);
-  if (l === 6 && m === 5) return R_6_5(P, Q);
-  if (l === 8 && m === 7) return R_8_7(P, Q);
-  throw new Error(`unsupported degree ${l},${m}`);
-}
-
-function R_5([p0, p1, p2, p3, p4, p5]) {
-  return z => p0 + z * (p1 + z * (p2 + z * (p3 + z * (p4 + z * p5))));
-}
 
 
 

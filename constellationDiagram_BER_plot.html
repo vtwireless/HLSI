@@ -113,13 +113,13 @@
 
 
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 1, // dB
+    gn_init: 0, // dB
     gn_min: -5, 
     gn_max: 10, 
-    mcs_init: 2, // array index int
+    mcs_init: 0, // array index int
   });
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: -15, // dB
+    gn_init: 0, // dB
     gn_min: -20,
     gn_max: 0,
   });
@@ -129,8 +129,8 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
 
 Slider(sig, 'mcs_simple', null, "modCodeSlider");
-Slider(sig, 'gn', null, "gainSlider", "Energy per Bit (dB)");
-Slider(noise, 'gn', null, "gainSlider", "Noise Slider (dB)");
+Slider(sig, 'gn', null, "gainSlider", "Energy per Symbol (dB)");
+Slider(noise, 'gn', null, "gainSlider", "Noise Power (dB)");
 
 let frozenFlag1 = false;
 constellationDiagram(300, 25,"constellationParent", frozenFlag1);
