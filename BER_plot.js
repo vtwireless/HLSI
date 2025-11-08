@@ -39,7 +39,7 @@ function BER_plot(){
 
       // Add Y axis
       var y = d3.scaleLog()
-        .domain([10**-6, 1])
+        .domain([10**-8, 1])
         .range([ height, 0]);
       svg.append("g")
         // make grid lines
@@ -102,14 +102,38 @@ function BER_plot(){
           .attr("d", line_QPSK)
           .attr("clip-path", "url(#clip)");
 
-        // Define a clipping path
-        svg.append("clipPath")
-          .attr("id", "clip")
-          .append("rect")
-          .attr("x", 0)
-          .attr("y", 0)
-          .attr("width", width)
-          .attr("height", height);
+        const points_16QAM = [];
+        for (let i = -5; i <= 20; i++) {
+          
+          let linearEbno = 10**(i/10);
+          // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
+          // points_QPSK.push({ x: i, y: ber });
+
+          
+          // let symbolErrorRate = 3 * qfunc((1/5)*Math.sqrt(linearEbno));
+
+          // 16 QAM
+          constellationTargets16QAM = [ { x: -1.000, y: -1.000 }, { x: -1.000, y: -0.333 }, { x: -1.000, y: 0.333 }, { x: -1.000, y: 1.000 }, { x: -0.333, y: -1.000 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1.000 }, { x: 0.333, y: -1.000 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1.000 }, { x: 1.000, y: -1.000 }, { x: 1.000, y: -0.333 }, { x: 1.000, y: 0.333 }, { x: 1.000, y: 1.000 } ];
+          symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets16QAM, linearEbno)
+          console.log("16 QAM SER at EbNo " + i + " dB: " + symbolErrorRate);
+          points_16QAM.push({ x: i, y: symbolErrorRate });
+        }
+
+        const line_16QAM = d3.line()
+          .x(d => x(d.x))
+          .y(d => y(d.y));
+
+        svg.append("path")
+          .datum(points_16QAM)
+          .attr("fill", "none")
+          .attr("stroke", "#fde0ef")
+          .attr("stroke-width", 3)
+          .attr("stroke-dasharray", "4 4") // Creates a dashed line
+          .attr("d", line_16QAM)
+          .attr("clip-path", "url(#clip)");
+
+
+
 
         
       setInterval(() => {
@@ -126,7 +150,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#c51b7d")
             break;
           case 2:
@@ -137,7 +161,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#e9a3c9")
             break;
           case 5:
@@ -148,7 +172,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#fde0ef")
             break;
           case 7:
@@ -159,7 +183,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#f7f7f7")
             break;
           case 8:
@@ -170,7 +194,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#e6f5d0")
             break;
           case 9:
@@ -181,7 +205,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#a1d76a")
             break;
           case 10:
@@ -192,7 +216,7 @@ function BER_plot(){
             .append("circle")
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
-              .attr("r", 2.5)
+              .attr("r", 4)
               .style("fill","#4d9221")
             break;
         }
@@ -250,3 +274,33 @@ function qfunc(x) {
        num = num - 0.5; // added to center around 0
       return num
     }
+
+
+function getExpectedSymbolErrorRate(constellation_targets, esno){
+  let qFuncValues = [];
+  for (let i = 0; i < constellation_targets.length; i++) {
+    for (let j = 0; j < constellation_targets.length; j++) {
+      if (j === i) continue;
+      // Perform operations with constellation_targets[j]
+      let distance = Math.sqrt(Math.pow(constellation_targets[i].x - constellation_targets[j].x, 2) + Math.pow(constellation_targets[i].y - constellation_targets[j].y, 2));
+      qFuncValues.push(qfunc(distance * Math.sqrt(esno/2)) );
+    }
+  }
+  let sumQFuncValues = qFuncValues.reduce((acc, val) => acc + val, 0);
+  return 1 / constellation_targets.length * sumQFuncValues;
+}
+
+// function getExpectedBitErrorRate(constellation_targets, esno){
+//   let qFuncValues = [];
+//   let bitErrorsPerSymbol = Math.log2(constellation_targets.length);
+//   for (let i = 0; i < constellation_targets.length; i++) {
+//     for (let j = 0; j < constellation_targets.length; j++) {
+//       if (j === i) continue;
+//       // Perform operations with constellation_targets[j]
+//       let distance = Math.sqrt(Math.pow(constellation_targets[i].x - constellation_targets[j].x, 2) + Math.pow(constellation_targets[i].y - constellation_targets[j].y, 2));
+//       qFuncValues.push(qfunc(distance * Math.sqrt(esno/2)) );
+//     }
+//   }
+//   let sumQFuncValues = qFuncValues.reduce((acc, val) => acc + val, 0);
+//   return 1 / constellation_targets.length * sumQFuncValues;
+// }

@@ -116,10 +116,10 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: 0, // dB
     gn_min: -5, 
     gn_max: 10, 
-    mcs_init: 0, // array index int
+    mcs_init: 2, // array index int
   });
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 0, // dB
+    gn_init: -10, // dB
     gn_min: -20,
     gn_max: 0,
   });

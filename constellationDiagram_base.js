@@ -207,33 +207,34 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           bpskFlag = 1;
         }
 
-
-        let noiseNormalization = 0
-        if(sig.mcs>1 && sig.mcs <5 ){
-          // 4 QAM
-          energyPerSymbol = 10**(sig.gn/10);
-          noiseNormalization =  Math.sqrt(energyPerSymbol)
-      } else if(sig.mcs <2){
-          // BPSK
-        bpskFlag = true;
-        energyPerSymbol = 10**(sig.gn/10);
-        noiseNormalization =  Math.sqrt(energyPerSymbol)
-      } else if (sig.mcs >=5 && sig.mcs <7 ){
+        let energyPerSymbol = 10**(sig.gn/10);
+        let noiseNormalization = Math.sqrt(energyPerSymbol)
+      
+      // old code for scaling based on modulation type
+        //   if(sig.mcs>1 && sig.mcs <5 ){
+      //     // 4 QAM
+          
+      // } else if(sig.mcs <2){
+      //     // BPSK
+      //   bpskFlag = true;
+        
+      if (sig.mcs >=5 && sig.mcs <7 ){
           // 16 QAM
-          scaleFactor = .707
-      } else if (sig.mcs == 7){
-          // 32 QAM
-          scaleFactor = .408
-      } else if(sig.mcs ==8){
-          // 64 QAM
-          scaleFactor = .353
-      } else if (sig.mcs == 9){
-          // 128 QAM
-          scaleFactor = .289
-      } else if(sig.mcs >9) {
-          // 256 QAM
-          scaleFactor = .25
+          noiseNormalization = Math.sqrt(energyPerSymbol*2)
       }
+      // } else if (sig.mcs == 7){
+      //     // 32 QAM
+      //     scaleFactor = .408
+      // } else if(sig.mcs ==8){
+      //     // 64 QAM
+      //     scaleFactor = .353
+      // } else if (sig.mcs == 9){
+      //     // 128 QAM
+      //     scaleFactor = .289
+      // } else if(sig.mcs >9) {
+      //     // 256 QAM
+      //     scaleFactor = .25
+      // }
       // console.log("1 second has passed");
       // const ebno = math.log10(math.abs(sig.sinr))
       // const noisePower = .1
@@ -396,13 +397,13 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
         sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
 
         if (BER_stats.messageErrors === 0) {
-          sig.BER = 10**-6
+          sig.BER = 10**-8;
         }
         
         // console.log("Bit Error Rate: " + sig.BER);
 
         // Update the BER display
-        berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(6)}`;
+        berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(8)}`;
           }
 
 
@@ -517,4 +518,5 @@ function setConstellationPosition(top, left, parent) {
   constellationParent.style.top = `${top}px`;
   constellationParent.style.left = `${left}px`;
 }
+
 
