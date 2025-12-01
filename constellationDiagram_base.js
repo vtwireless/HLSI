@@ -16,6 +16,10 @@ class MessageStats {
   }
 }
 
+let modTypeCode =  1; // default to PSK
+let sendingBits = 0; // 0 for symbols, 1 for bits
+
+
 function constellationDiagram(top , left,constellationName){
   
   setConstellationPosition(top, left, constellationName);
@@ -56,17 +60,24 @@ function constellationDiagram(top , left,constellationName){
             
         // Add X axis
         var x = d3.scaleLinear()
-          .domain([-1.5, 1.5])
+          .domain([-1.6, 1.6])
           .range([ -.001, width  ]);
         svg.append("g")
           // sends the line to the bottom
           .attr("transform", "translate(0," + height + ")")
           // make grid lines
           .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
+          // Add X axis label
+          svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", width/2)
+            .attr("y", height + margin.top + 15)
+            .text("In-Phase Normalized Energy per symbol")
+            .style("fill", "#FFFFFF");
   
         // Add Y axis
         var y = d3.scaleLinear()
-          .domain([-1.5, 1.5])
+          .domain([-1.6, 1.6])
           .range([ height, 0]);
         svg.append("g")
           // make grid lines
@@ -74,7 +85,14 @@ function constellationDiagram(top , left,constellationName){
           // stroke lines
           svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
           svg.selectAll(".tick text").attr("fill", "#FFFFFF")          
-
+          // Add Y axis label
+        svg.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `rotate(-90)`)
+          .attr("x", -height / 2)
+          .attr("y", -margin.left + 25)
+          .text("Quadrature-Phase Normalized Energy per symbol")
+          .style("fill", "#FFFFFF");
   
           // to draw the initial targets, will be overwritten when signal scheme is changed
       svg.append('g')
@@ -225,46 +243,65 @@ function constellationDiagram(top , left,constellationName){
     sig.onChange("mcs", update_constellation);
   
     function update_constellation(){
+      //////////// GENERATE TARGETS FOR PSK MODULATION ////////////
       // console.log(sig.mcs)
       // console.log("The modulation code has changed")
-      bpskFlag = false;
-      if(sig.mcs>1 && sig.mcs <5 ){
-        // 4 QAM
-      constellationTargets = [{ x: 1, y: 1 }, { x: 1, y: -1 },{ x: -1, y: 1 },{ x: -1, y: -1 },];
-      distance = 2/2;
-      // targetColor = "#e9a3c9";
-    } else if(sig.mcs <2){
-        // BPSK
-      bpskFlag = true;
-      constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
-      distance = 2/2;
-      // targetColor = "#c51b7d";
-    } else if (sig.mcs >=5 && sig.mcs <7 ){
-        // 16 QAM
-      constellationTargets = [ { x: -1.000, y: -1.000 }, { x: -1.000, y: -0.333 }, { x: -1.000, y: 0.333 }, { x: -1.000, y: 1.000 }, { x: -0.333, y: -1.000 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1.000 }, { x: 0.333, y: -1.000 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1.000 }, { x: 1.000, y: -1.000 }, { x: 1.000, y: -0.333 }, { x: 1.000, y: 0.333 }, { x: 1.000, y: 1.000 } ];
-      distance = .666/2;
-      // targetColor = "#fde0ef";
+      if (modTypeCode === 1) {
+        if(sig.mcs <2){
+          // PSK
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
-    } else if (sig.mcs == 7){
-        // 32 QAM
-    constellationTargets = [ { x: -1,y: -0.6 },{ x: -1,y: -0.2 },{ x: -1,y: 0.2 },{ x: -1,y: 0.6 },{ x: -0.6,y: -1 },{ x: -0.6,y: -0.6 },{ x: -0.6,y: -0.2 },{ x: -0.6,y: 0.2 },{ x: -0.6,y: 0.6 },{ x: -0.6,y: 1 },{ x: -0.2,y: -1 },{ x: -0.2,y: -0.6 },{ x: -0.2,y: -0.2 },{ x: -0.2,y: 0.2 },{ x: -0.2,y: 0.6 },{ x: -0.2,y: 1 },{ x: 0.2,y: -1 },{ x: 0.2,y: -0.6 },{ x: 0.2,y: -0.2 },{ x: 0.2,y: 0.2 },{ x: 0.2,y: 0.6 },{ x: 0.2,y: 1 },{ x: 0.6,y: -1 },{ x: 0.6,y: -0.6 },{ x: 0.6,y: -0.2 },{ x: 0.6,y: 0.2 },{ x: 0.6,y: 0.6 },{ x: 0.6,y: 1 },{ x: 1,y: -0.6 },{ x: 1,y: -0.2 },{ x: 1,y: 0.2 },{ x: 1,y: 0.6 }]
-    distance = .4/2;
-    // targetColor = "#f7f7f7";
+      } else if(sig.mcs >=2 && sig.mcs <4){
+          // QPSK
+        constellationTargets = [
+          { x: Math.cos(0), y: Math.sin(0) },
+          { x: Math.cos(Math.PI / 2), y: Math.sin(Math.PI / 2) },
+          { x: Math.cos(Math.PI), y: Math.sin(Math.PI) },
+          { x: Math.cos((3 * Math.PI) / 2), y: Math.sin((3 * Math.PI) / 2) },
+        ];      
+      } else if (sig.mcs >=5 && sig.mcs <7 ){
+          // 8 PSK
+        constellationTargets = [
+          { x: Math.cos(0), y: Math.sin(0) },
+          { x: Math.cos(Math.PI / 4), y: Math.sin(Math.PI / 4) },
+          { x: Math.cos(Math.PI / 2), y: Math.sin(Math.PI / 2) },
+          { x: Math.cos((3 * Math.PI) / 4), y: Math.sin((3 * Math.PI) / 4) },
+          { x: Math.cos(Math.PI), y: Math.sin(Math.PI) },
+          { x: Math.cos((5 * Math.PI) / 4), y: Math.sin((5 * Math.PI) / 4) },
+          { x: Math.cos((3 * Math.PI) / 2), y: Math.sin((3 * Math.PI) / 2) },
+          { x: Math.cos((7 * Math.PI) / 4), y: Math.sin((7 * Math.PI) / 4) }
+        ];
 
-    } else if(sig.mcs ==8){
-    constellationTargets = [{ x: -1,y: -1 },{ x: -1,y: -0.714 },{ x: -1,y: -0.429 },{ x: -1,y: -0.143 },{ x: -1,y: 0.143 },{ x: -1,y: 0.429 },{ x: -1,y: 0.714 },{ x: -1,y: 1 },{ x: -0.714,y: -1 },{ x: -0.714,y: -0.714 },{ x: -0.714,y: -0.429 },{ x: -0.714,y: -0.143 },{ x: -0.714,y: 0.143 },{ x: -0.714,y: 0.429 },{ x: -0.714,y: 0.714 },{ x: -0.714,y: 1 },{ x: -0.429,y: -1 },{ x: -0.429,y: -0.714 },{ x: -0.429,y: -0.429 },{ x: -0.429,y: -0.143 },{ x: -0.429,y: 0.143 },{ x: -0.429,y: 0.429 },{ x: -0.429,y: 0.714 },{ x: -0.429,y: 1 },{ x: -0.143,y: -1 },{ x: -0.143,y: -0.714 },{ x: -0.143,y: -0.429 },{ x: -0.143,y: -0.143 },{ x: -0.143,y: 0.143 },{ x: -0.143,y: 0.429 },{ x: -0.143,y: 0.714 },{ x: -0.143,y: 1 },{ x: 0.143,y: -1 },{ x: 0.143,y: -0.714 },{ x: 0.143,y: -0.429 },{ x: 0.143,y: -0.143 },{ x: 0.143,y: 0.143 },{ x: 0.143,y: 0.429 },{ x: 0.143,y: 0.714 },{ x: 0.143,y: 1 },{ x: 0.429,y: -1 },{ x: 0.429,y: -0.714 },{ x: 0.429,y: -0.429 },{ x: 0.429,y: -0.143 },{ x: 0.429,y: 0.143 },{ x: 0.429,y: 0.429 },{ x: 0.429,y: 0.714 },{ x: 0.429,y: 1 },{ x: 0.714,y: -1 },{ x: 0.714,y: -0.714 },{ x: 0.714,y: -0.429 },{ x: 0.714,y: -0.143 },{ x: 0.714,y: 0.143 },{ x: 0.714,y: 0.429 },{ x: 0.714,y: 0.714 },{ x: 0.714,y: 1 },{ x: 1,y: -1 },{ x: 1,y: -0.714 },{ x: 1,y: -0.429 },{ x: 1,y: -0.143 },{ x: 1,y: 0.143 },{ x: 1,y: 0.429 },{ x: 1,y: 0.714 },{ x: 1,y: 1 }]
-    distance = .286/2;  
-    // targetColor = "#e6f5d0";
+      } else if (sig.mcs == 7){
+          // 16 PSK
+      constellationTargets = Array.from({ length: 16 }, (_, i) => ({
+        x: Math.cos((2 * Math.PI * i) / 16),
+        y: Math.sin((2 * Math.PI * i) / 16),
+      }));
 
-    } else if (sig.mcs == 9){
-    constellationTargets = [{ x: -1,y: -0.636 },{ x: -1,y: -0.455 },{ x: -1,y: -0.273 },{ x: -1,y: -0.091 },{ x: -1,y: 0.091 },{ x: -1,y: 0.273 },{ x: -1,y: 0.455 },{ x: -1,y: 0.636 },{ x: -0.818,y: -0.636 },{ x: -0.818,y: -0.455 },{ x: -0.818,y: -0.273 },{ x: -0.818,y: -0.091 },{ x: -0.818,y: 0.091 },{ x: -0.818,y: 0.273 },{ x: -0.818,y: 0.455 },{ x: -0.818,y: 0.636 },{ x: -0.636,y: -1 },{ x: -0.636,y: -0.818 },{ x: -0.636,y: -0.636 },{ x: -0.636,y: -0.455 },{ x: -0.636,y: -0.273 },{ x: -0.636,y: -0.091 },{ x: -0.636,y: 0.091 },{ x: -0.636,y: 0.273 },{ x: -0.636,y: 0.455 },{ x: -0.636,y: 0.636 },{ x: -0.636,y: 0.818 },{ x: -0.636,y: 1 },{ x: -0.455,y: -1 },{ x: -0.455,y: -0.818 },{ x: -0.455,y: -0.636 },{ x: -0.455,y: -0.455 },{ x: -0.455,y: -0.273 },{ x: -0.455,y: -0.091 },{ x: -0.455,y: 0.091 },{ x: -0.455,y: 0.273 },{ x: -0.455,y: 0.455 },{ x: -0.455,y: 0.636 },{ x: -0.455,y: 0.818 },{ x: -0.455,y: 1 },{ x: -0.273,y: -1 },{ x: -0.273,y: -0.818 },{ x: -0.273,y: -0.636 },{ x: -0.273,y: -0.455 },{ x: -0.273,y: -0.273 },{ x: -0.273,y: -0.091 },{ x: -0.273,y: 0.091 },{ x: -0.273,y: 0.273 },{ x: -0.273,y: 0.455 },{ x: -0.273,y: 0.636 },{ x: -0.273,y: 0.818 },{ x: -0.273,y: 1 },{ x: -0.091,y: -1 },{ x: -0.091,y: -0.818 },{ x: -0.091,y: -0.636 },{ x: -0.091,y: -0.455 },{ x: -0.091,y: -0.273 },{ x: -0.091,y: -0.091 },{ x: -0.091,y: 0.091 },{ x: -0.091,y: 0.273 },{ x: -0.091,y: 0.455 },{ x: -0.091,y: 0.636 },{ x: -0.091,y: 0.818 },{ x: -0.091,y: 1 },{ x: 0.091,y: -1 },{ x: 0.091,y: -0.818 },{ x: 0.091,y: -0.636 },{ x: 0.091,y: -0.455 },{ x: 0.091,y: -0.273 },{ x: 0.091,y: -0.091 },{ x: 0.091,y: 0.091 },{ x: 0.091,y: 0.273 },{ x: 0.091,y: 0.455 },{ x: 0.091,y: 0.636 },{ x: 0.091,y: 0.818 },{ x: 0.091,y: 1 },{ x: 0.273,y: -1 },{ x: 0.273,y: -0.818 },{ x: 0.273,y: -0.636 },{ x: 0.273,y: -0.455 },{ x: 0.273,y: -0.273 },{ x: 0.273,y: -0.091 },{ x: 0.273,y: 0.091 },{ x: 0.273,y: 0.273 },{ x: 0.273,y: 0.455 },{ x: 0.273,y: 0.636 },{ x: 0.273,y: 0.818 },{ x: 0.273,y: 1 },{ x: 0.455,y: -1 },{ x: 0.455,y: -0.818 },{ x: 0.455,y: -0.636 },{ x: 0.455,y: -0.455 },{ x: 0.455,y: -0.273 },{ x: 0.455,y: -0.091 },{ x: 0.455,y: 0.091 },{ x: 0.455,y: 0.273 },{ x: 0.455,y: 0.455 },{ x: 0.455,y: 0.636 },{ x: 0.455,y: 0.818 },{ x: 0.455,y: 1 },{ x: 0.636,y: -1 },{ x: 0.636,y: -0.818 },{ x: 0.636,y: -0.636 },{ x: 0.636,y: -0.455 },{ x: 0.636,y: -0.273 },{ x: 0.636,y: -0.091 },{ x: 0.636,y: 0.091 },{ x: 0.636,y: 0.273 },{ x: 0.636,y: 0.455 },{ x: 0.636,y: 0.636 },{ x: 0.636,y: 0.818 },{ x: 0.636,y: 1 },{ x: 0.818,y: -0.636 },{ x: 0.818,y: -0.455 },{ x: 0.818,y: -0.273 },{ x: 0.818,y: -0.091 },{ x: 0.818,y: 0.091 },{ x: 0.818,y: 0.273 },{ x: 0.818,y: 0.455 },{ x: 0.818,y: 0.636 },{ x: 1,y: -0.636 },{ x: 1,y: -0.455 },{ x: 1,y: -0.273 },{ x: 1,y: -0.091 },{ x: 1,y: 0.091 },{ x: 1,y: 0.273 },{ x: 1,y: 0.455 },{ x: 1,y: 0.636 }]       
-    distance = .181/2;  
-    // targetColor = "#a1d76a";
+      } 
+    } else if (modTypeCode == 2){
+      //////////// GENERATE TARGETS FOR QAM MODULATION ////////////
+        if(sig.mcs <2){
+          // 2 QAM
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
-    } else if(sig.mcs >9) {
-    constellationTargets = [ { x: -1,y: -1 },{ x: -1,y: -0.867 },{ x: -1,y: -0.733 },{ x: -1,y: -0.6 },{ x: -1,y: -0.467 },{ x: -1,y: -0.333 },{ x: -1,y: -0.2 },{ x: -1,y: -0.067 },{ x: -1,y: 0.067 },{ x: -1,y: 0.2 },{ x: -1,y: 0.333 },{ x: -1,y: 0.467 },{ x: -1,y: 0.6 },{ x: -1,y: 0.733 },{ x: -1,y: 0.867 },{ x: -1,y: 1 },{ x: -0.867,y: -1 },{ x: -0.867,y: -0.867 },{ x: -0.867,y: -0.733 },{ x: -0.867,y: -0.6 },{ x: -0.867,y: -0.467 },{ x: -0.867,y: -0.333 },{ x: -0.867,y: -0.2 },{ x: -0.867,y: -0.067 },{ x: -0.867,y: 0.067 },{ x: -0.867,y: 0.2 },{ x: -0.867,y: 0.333 },{ x: -0.867,y: 0.467 },{ x: -0.867,y: 0.6 },{ x: -0.867,y: 0.733 },{ x: -0.867,y: 0.867 },{ x: -0.867,y: 1 },{ x: -0.733,y: -1 },{ x: -0.733,y: -0.867 },{ x: -0.733,y: -0.733 },{ x: -0.733,y: -0.6 },{ x: -0.733,y: -0.467 },{ x: -0.733,y: -0.333 },{ x: -0.733,y: -0.2 },{ x: -0.733,y: -0.067 },{ x: -0.733,y: 0.067 },{ x: -0.733,y: 0.2 },{ x: -0.733,y: 0.333 },{ x: -0.733,y: 0.467 },{ x: -0.733,y: 0.6 },{ x: -0.733,y: 0.733 },{ x: -0.733,y: 0.867 },{ x: -0.733,y: 1 },{ x: -0.6,y: -1 },{ x: -0.6,y: -0.867 },{ x: -0.6,y: -0.733 },{ x: -0.6,y: -0.6 },{ x: -0.6,y: -0.467 },{ x: -0.6,y: -0.333 },{ x: -0.6,y: -0.2 },{ x: -0.6,y: -0.067 },{ x: -0.6,y: 0.067 },{ x: -0.6,y: 0.2 },{ x: -0.6,y: 0.333 },{ x: -0.6,y: 0.467 },{ x: -0.6,y: 0.6 },{ x: -0.6,y: 0.733 },{ x: -0.6,y: 0.867 },{ x: -0.6,y: 1 },{ x: -0.467,y: -1 },{ x: -0.467,y: -0.867 },{ x: -0.467,y: -0.733 },{ x: -0.467,y: -0.6 },{ x: -0.467,y: -0.467 },{ x: -0.467,y: -0.333 },{ x: -0.467,y: -0.2 },{ x: -0.467,y: -0.067 },{ x: -0.467,y: 0.067 },{ x: -0.467,y: 0.2 },{ x: -0.467,y: 0.333 },{ x: -0.467,y: 0.467 },{ x: -0.467,y: 0.6 },{ x: -0.467,y: 0.733 },{ x: -0.467,y: 0.867 },{ x: -0.467,y: 1 },{ x: -0.333,y: -1 },{ x: -0.333,y: -0.867 },{ x: -0.333,y: -0.733 },{ x: -0.333,y: -0.6 },{ x: -0.333,y: -0.467 },{ x: -0.333,y: -0.333 },{ x: -0.333,y: -0.2 },{ x: -0.333,y: -0.067 },{ x: -0.333,y: 0.067 },{ x: -0.333,y: 0.2 },{ x: -0.333,y: 0.333 },{ x: -0.333,y: 0.467 },{ x: -0.333,y: 0.6 },{ x: -0.333,y: 0.733 },{ x: -0.333,y: 0.867 },{ x: -0.333,y: 1 },{ x: -0.2,y: -1 },{ x: -0.2,y: -0.867 },{ x: -0.2,y: -0.733 },{ x: -0.2,y: -0.6 },{ x: -0.2,y: -0.467 },{ x: -0.2,y: -0.333 },{ x: -0.2,y: -0.2 },{ x: -0.2,y: -0.067 },{ x: -0.2,y: 0.067 },{ x: -0.2,y: 0.2 },{ x: -0.2,y: 0.333 },{ x: -0.2,y: 0.467 },{ x: -0.2,y: 0.6 },{ x: -0.2,y: 0.733 },{ x: -0.2,y: 0.867 },{ x: -0.2,y: 1 },{ x: -0.067,y: -1 },{ x: -0.067,y: -0.867 },{ x: -0.067,y: -0.733 },{ x: -0.067,y: -0.6 },{ x: -0.067,y: -0.467 },{ x: -0.067,y: -0.333 },{ x: -0.067,y: -0.2 },{ x: -0.067,y: -0.067 },{ x: -0.067,y: 0.067 },{ x: -0.067,y: 0.2 },{ x: -0.067,y: 0.333 },{ x: -0.067,y: 0.467 },{ x: -0.067,y: 0.6 },{ x: -0.067,y: 0.733 },{ x: -0.067,y: 0.867 },{ x: -0.067,y: 1 },{ x: 0.067,y: -1 },{ x: 0.067,y: -0.867 },{ x: 0.067,y: -0.733 },{ x: 0.067,y: -0.6 },{ x: 0.067,y: -0.467 },{ x: 0.067,y: -0.333 },{ x: 0.067,y: -0.2 },{ x: 0.067,y: -0.067 },{ x: 0.067,y: 0.067 },{ x: 0.067,y: 0.2 },{ x: 0.067,y: 0.333 },{ x: 0.067,y: 0.467 },{ x: 0.067,y: 0.6 },{ x: 0.067,y: 0.733 },{ x: 0.067,y: 0.867 },{ x: 0.067,y: 1 },{ x: 0.2,y: -1 },{ x: 0.2,y: -0.867 },{ x: 0.2,y: -0.733 },{ x: 0.2,y: -0.6 },{ x: 0.2,y: -0.467 },{ x: 0.2,y: -0.333 },{ x: 0.2,y: -0.2 },{ x: 0.2,y: -0.067 },{ x: 0.2,y: 0.067 },{ x: 0.2,y: 0.2 },{ x: 0.2,y: 0.333 },{ x: 0.2,y: 0.467 },{ x: 0.2,y: 0.6 },{ x: 0.2,y: 0.733 },{ x: 0.2,y: 0.867 },{ x: 0.2,y: 1 },{ x: 0.333,y: -1 },{ x: 0.333,y: -0.867 },{ x: 0.333,y: -0.733 },{ x: 0.333,y: -0.6 },{ x: 0.333,y: -0.467 },{ x: 0.333,y: -0.333 },{ x: 0.333,y: -0.2 },{ x: 0.333,y: -0.067 },{ x: 0.333,y: 0.067 },{ x: 0.333,y: 0.2 },{ x: 0.333,y: 0.333 },{ x: 0.333,y: 0.467 },{ x: 0.333,y: 0.6 },{ x: 0.333,y: 0.733 },{ x: 0.333,y: 0.867 },{ x: 0.333,y: 1 },{ x: 0.467,y: -1 },{ x: 0.467,y: -0.867 },{ x: 0.467,y: -0.733 },{ x: 0.467,y: -0.6 },{ x: 0.467,y: -0.467 },{ x: 0.467,y: -0.333 },{ x: 0.467,y: -0.2 },{ x: 0.467,y: -0.067 },{ x: 0.467,y: 0.067 },{ x: 0.467,y: 0.2 },{ x: 0.467,y: 0.333 },{ x: 0.467,y: 0.467 },{ x: 0.467,y: 0.6 },{ x: 0.467,y: 0.733 },{ x: 0.467,y: 0.867 },{ x: 0.467,y: 1 },{ x: 0.6,y: -1 },{ x: 0.6,y: -0.867 },{ x: 0.6,y: -0.733 },{ x: 0.6,y: -0.6 },{ x: 0.6,y: -0.467 },{ x: 0.6,y: -0.333 },{ x: 0.6,y: -0.2 },{ x: 0.6,y: -0.067 },{ x: 0.6,y: 0.067 },{ x: 0.6,y: 0.2 },{ x: 0.6,y: 0.333 },{ x: 0.6,y: 0.467 },{ x: 0.6,y: 0.6 },{ x: 0.6,y: 0.733 },{ x: 0.6,y: 0.867 },{ x: 0.6,y: 1 },{ x: 0.733,y: -1 },{ x: 0.733,y: -0.867 },{ x: 0.733,y: -0.733 },{ x: 0.733,y: -0.6 },{ x: 0.733,y: -0.467 },{ x: 0.733,y: -0.333 },{ x: 0.733,y: -0.2 },{ x: 0.733,y: -0.067 },{ x: 0.733,y: 0.067 },{ x: 0.733,y: 0.2 },{ x: 0.733,y: 0.333 },{ x: 0.733,y: 0.467 },{ x: 0.733,y: 0.6 },{ x: 0.733,y: 0.733 },{ x: 0.733,y: 0.867 },{ x: 0.733,y: 1 },{ x: 0.867,y: -1 },{ x: 0.867,y: -0.867 },{ x: 0.867,y: -0.733 },{ x: 0.867,y: -0.6 },{ x: 0.867,y: -0.467 },{ x: 0.867,y: -0.333 },{ x: 0.867,y: -0.2 },{ x: 0.867,y: -0.067 },{ x: 0.867,y: 0.067 },{ x: 0.867,y: 0.2 },{ x: 0.867,y: 0.333 },{ x: 0.867,y: 0.467 },{ x: 0.867,y: 0.6 },{ x: 0.867,y: 0.733 },{ x: 0.867,y: 0.867 },{ x: 0.867,y: 1 },{ x: 1,y: -1 },{ x: 1,y: -0.867 },{ x: 1,y: -0.733 },{ x: 1,y: -0.6 },{ x: 1,y: -0.467 },{ x: 1,y: -0.333 },{ x: 1,y: -0.2 },{ x: 1,y: -0.067 },{ x: 1,y: 0.067 },{ x: 1,y: 0.2 },{ x: 1,y: 0.333 },{ x: 1,y: 0.467 },{ x: 1,y: 0.6 },{ x: 1,y: 0.733 },{ x: 1,y: 0.867 },{ x: 1,y: 1 }]
-    distance = .133/2;
-    // targetColor = "#3d9221";
+        distance = 2/2;
+        // targetColor = "#e9a3c9";
+      } else if(sig.mcs >=2 && sig.mcs <4){
+          // 4 QAM
+        constellationTargets = [ { x: .707, y: .707 }, { x: .707, y: -.707 },{ x: -.707, y: .707 },{ x: -.707, y: -.707 }];
+
+        // targetColor = "#c51b7d";
+      } else if (sig.mcs >=5 && sig.mcs <7 ){
+          // 8 QAM
+        constellationTargets =  [ { x: 1.414, y: 1.414 }, { x: 1.414, y: -1.414 }, { x: -1.414, y: 1.414 }, { x: -1.414, y: -1.414 }, { x: -.586, y: -.586 }, { x: .586, y: -.586 }, { x: -.586, y: .586 }, { x: .586, y: .586 } ];
+        // targetColor = "#f7f7f7";
+      } else if (sig.mcs ==7 ){
+        constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
+        distance = .666/2;
+        // targetColor = "#fde0ef";
+      }
 
     }
     targetColor = "#91bfdb";
@@ -287,34 +324,9 @@ function constellationDiagram(top , left,constellationName){
     function plotMessages(){
         let energyPerSymbol = 10**(sig.gn/10);
         let noiseNormalization = Math.sqrt(energyPerSymbol*2)
+        // let noiseNormalization = 1;
       
       // ------------- Modulation Specific Noise Normalization ---------//
-
-        //   if(sig.mcs>1 && sig.mcs <5 ){
-      //     // 4 QAM
-          
-      // if(sig.mcs <2){
-      // //     // BPSK
-      //     noiseNormalization = Math.sqrt(energyPerSymbol* 2)
-      // }
-        
-      // if (sig.mcs >=5 && sig.mcs <7 ){
-      //     // 16 QAM
-      //     noiseNormalization = Math.sqrt(energyPerSymbol*2)
-      // }
-      // } else if (sig.mcs == 7){
-      //     // 32 QAM
-      //     scaleFactor = .408
-      // } else if(sig.mcs ==8){
-      //     // 64 QAM
-      //     scaleFactor = .353
-      // } else if (sig.mcs == 9){
-      //     // 128 QAM
-      //     scaleFactor = .289
-      // } else if(sig.mcs >9) {
-      //     // 256 QAM
-      //     scaleFactor = .25
-      // }
 
   
       const variance = (10**((noise.gn/2)/10)) / noiseNormalization;   
@@ -329,16 +341,16 @@ function constellationDiagram(top , left,constellationName){
         }));
 
         for (let i = 0; i < constellationTargets.length; i++) {
-          BER_stats.sentMessages = BER_stats.sentMessages + 1;
+          BER_stats.sentMessages = (BER_stats.sentMessages + 1*(1-sendingBits) + sendingBits*modulationOrder); // if sending bits, each symbol is multiple bits
 
 
 
           distToTarget = ((constellationTargets[i].x - translatedTargets[i].x)**2 + (constellationTargets[i].y - translatedTargets[i].y)**2);
 
-          let freezeBoxX = .92;
-          let freezeBoxY = 1.18;
-          let freezeBoxWidth = .5;
-          let freezeBoxHeight = .25;
+          // let freezeBoxX = .92;
+          // let freezeBoxY = 1.18;
+          // let freezeBoxWidth = .5;
+          // let freezeBoxHeight = .25;
           let errorDetected = false;
 
           let = printObject = [translatedTargets[i]]
@@ -356,13 +368,6 @@ function constellationDiagram(top , left,constellationName){
             }
           }
 
-          // if (  !((printObject[0].x >= freezeBoxX &&
-          //       printObject[0].x <= freezeBoxX + freezeBoxWidth) &&
-          //       (printObject[0].y >= freezeBoxY &&
-          //       printObject[0].y <= freezeBoxY + freezeBoxHeight))){
-                  // console.log("Not in freeze box")
-
-
 
             if ( errorDetected ){
               // console.log(printObject)
@@ -375,18 +380,18 @@ function constellationDiagram(top , left,constellationName){
               .append("circle")
                 .attr("cx", function (d) { 
                   let xVal = d.x
-                  if (xVal> 1.5){
-                    xVal = 1.5 
-                  } else if(xVal < -1.5){
-                    xVal = -1.5
+                  if (xVal> 1.6){
+                    xVal = 1.6 
+                  } else if(xVal < -1.6){
+                    xVal = -1.6
                   }
                   return x(xVal); } )
                 .attr("cy", function (d) {
                   let yVal = d.y      
-                  if (yVal> 1.5){
-                    yVal = 1.5
-                  } else if (yVal < -1.5){
-                    yVal = -1.5
+                  if (yVal> 1.6){
+                    yVal = 1.6
+                  } else if (yVal < -1.6){
+                    yVal = -1.6
                   }
                   return y(yVal); } )
                 .attr("r", 2)
@@ -400,18 +405,18 @@ function constellationDiagram(top , left,constellationName){
               .append("circle")
               .attr("cx", function (d) { 
                 let xVal = d.x
-                if (xVal> 1.5){
-                  xVal = 1.5 
-                } else if(xVal < -1.5){
-                  xVal = -1.5
+                if (xVal> 1.6){
+                  xVal = 1.6
+                } else if(xVal < -1.6){
+                  xVal = -1.6
                 }
                 return x(xVal); } )
               .attr("cy", function (d) {
                 let yVal = d.y      
-                if (yVal> 1.5){
-                  yVal = 1.5
-                } else if (yVal < -1.5){
-                  yVal = -1.5
+                if (yVal> 1.6){
+                  yVal = 1.6
+                } else if (yVal < -1.6){
+                  yVal = -1.6
                 }
                 return y(yVal); } )
                 .attr("r", 2)
@@ -437,6 +442,7 @@ function constellationDiagram(top , left,constellationName){
   }
 
 
+
     document.getElementById("sendMessageButton").addEventListener("click", function() {
       plotMessages();
       
@@ -451,18 +457,42 @@ function constellationDiagram(top , left,constellationName){
       update_constellation();
     });
 
+
+    /////////////// MODULATION ORDER SELECTOR ///////////////
     // Add an event listener for the dropdown selector
-    document.getElementById("modulationType").addEventListener("change", function() {
+    document.getElementById("modulationOrder").addEventListener("change", function() {
       d3.select("#constellationParent").selectAll("circle").style("fill", "#ffffbf");
 
-      let modulationType = this.value;
       // d3.select("#modulationType").selectAll("circle").remove();
-      modulationType = parseInt(modulationType, 10);
-      sig.mcs = modulationType;
+      // modulationOrder = parseInt(modulationOrder, 10);
+      // console.log("Selected Modulation Order:", modulationOrder);
+      switch(modulationOrder){
+        case 1:
+          sig.mcs = 0;
+        break;
+        case 2:
+          sig.mcs = 3; 
+        break;
+        case 3:
+          sig.mcs = 5;
+        break;
+        case 4:
+          sig.mcs = 7;
+        break;
+      }
       // console.log(sig);
 
     });
-    
+
+    /////////////// MODULATION TYPE SELECTOR ///////////////
+    document.getElementById("modulationType").addEventListener("change", function() {
+      d3.select("#constellationParent").selectAll("circle").style("fill", "#ffffbf");
+
+      modTypeCode = parseInt(modulationType.value, 10);
+      // console.log("Selected Modulation Type:", modTypeCode);
+
+      update_constellation();
+    });
   }
   
 
@@ -496,26 +526,7 @@ function freeze() {
       button.text(frozenFlag ? "Run Continuously" : "freeze");
   }  // end of freeze function
   
-// function updateModulationType(modulationType) {
-//   // console.log("Selected Modulation Type:", modulationType);
-//   modulationType = parseInt(modulationType, 10);
-//   sig.mcs = modulationType;
-//   console.log(sig);
 
-// }
-
-
-
-
-
-// function freeze() {
-//   frozenFlag = !frozenFlag;
-//   console.log(frozenFlag);
-
-//   // Update the button text
-//   const button = d3.select("#constellationParent button");
-//   button.text(frozen ? "unfreeze" : "freeze");
-// }
 
 function setConstellationPosition(top, left, parent) {
   const constellationParent = document.getElementById(parent);

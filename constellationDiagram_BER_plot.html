@@ -77,21 +77,20 @@
 <div style="margin-left: 1%; margin-top: 1%;">
   <label for="modulationType">Select Modulation Type:</label>
   <select id="modulationType" >
-    <option value=0>BPSK</option>
-    <option value=3>QPSK</option>
-    <option value=5>16-QAM</option>
-    <option value=7>32-QAM</option>
-    <option value=8>64-QAM</option>
-    <option value=9>128-QAM</option>
-    <option value=11>256-QAM</option>
+    <option value=1>PSK</option>
+    <option value=2>QAM</option>
   </select>
 </div>
+<div id="modulationOrder" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
 
 <div id="gainSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
 <button id="sendMessageButton">Send Message</button>
 
 <button id = "clearMessagesButton">clear message</button> 
 <button id="freezeButton" onclick="freeze()">Run Continously</button>
+<button id="toggleBER_SERButton">Show BER</button>
+
+
 
 <div class="container">
   <style>
@@ -224,7 +223,7 @@
 
 <script>
 
-
+let modulationOrder = 1; // default value
 
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: 0, // dB
@@ -246,6 +245,54 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
 Slider(sig, 'gn', null, "gainSlider", "Energy per Symbol (dB)");
 Slider(noise, 'gn', null, "gainSlider", "Noise Power Spectral Density (dB)");
+
+modulationOrderSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      modulationOrderSlider.type = "range";
+      modulationOrderSlider.min = 1; // example: sig.freq_min
+      modulationOrderSlider.max = 4;
+      modulationOrderSlider.step = 1
+      modulationOrderSlider.value = 1;
+      let p = document.createElement("p");
+      p.appendChild(modulationOrderSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("modulationOrder").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      let label = document.createElement("label");
+      label.setAttribute("for", modulationOrderSlider.id);
+      label.appendChild(document.createTextNode("Modulation Order"));
+
+      modulationOrderSlider.parentNode.prepend(label);
+  
+      // below sets up the output value on the right of the slider
+      let output = document.createElement("output");
+      output.setAttribute("for", modulationOrderSlider.id);
+      modulationOrderSlider._output = output;
+      modulationOrderSlider.parentNode.append(output);
+      output.value = modulationOrderSlider.value;
+      // below tells css to make the slider look like the sliders were use to 
+      modulationOrderSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      modulationOrderSlider.oninput = function () {
+        // This calls the parameter setter.
+        modulationOrder = parseValue(modulationOrderSlider.value);
+      };
+      var outputUnitsCallbackSig = function (modulationOrder, val) {
+         return d3.format("d")(val);
+      };
+
+  modulationOrderSlider.addEventListener("input", function () {
+    console.log("Modulation Order changed to:", modulationOrder);
+    // Add any additional logic here to handle the change in modulation order
+    output.value = outputUnitsCallbackSig(modulationOrder, modulationOrderSlider.value);
+  });
+
+
 
 let frozenFlag = true;
 constellationDiagram(300, 25,"constellationParent");
