@@ -111,21 +111,9 @@ function constellationDiagram_Baseband(){
       // START OF LOOPING CODE
       let counter = 0;
       setInterval(() => {
-      // console.log("1 second has passed");
-      // const ebno = math.log10(math.abs(sig.sinr))
-      // let signalGainLinear = (10 ** (Math.abs(sig.gn)/10)) 
-      // let noisePowerLinear = (10 ** (Math.abs(noise.gn)/10));
-      // let noisePowerDb = sig.sinr - sig.gn;
-      // const noisePower = .1
 
-  
-      // const variance = 5
-      let variance = noise.gn;
-      // let variance = noise.gn;
+      let variance = noise.gn/2;
 
-      // console.log(sig.sinr)
-      // console.log(sinrLinear)
-      // console.log(variance)
       
       // console.log(ebno);
         if (counter == 5){
@@ -241,14 +229,15 @@ function constellationDiagram_Baseband(){
 
       let offset = 1;
       if(!sig.differentialMode) offset = .5;
-      let ebno = ((sig.gn*offset)**2/(noise.gn)**2);
+      let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
       let ebnoDb = 10*Math.log10((ebno));
       d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
       console.log(ebno + " linear")
-      let tBER = .5 * (1-erf_hastings(Math.sqrt(ebno)/Math.sqrt(2)));
+      let tBER = qfunc( Math.sqrt(2*offset*ebno) );
+
       d3.select("#tBERLabel").text(`${tBER.toFixed(6)}`);
 
-      let NewX = sig.gn
+      let NewX = sig.gn/Math.sqrt(2);
 
       if(sig.differentialMode){
         negativeTarget = [

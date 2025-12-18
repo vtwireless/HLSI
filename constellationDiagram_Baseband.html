@@ -82,8 +82,7 @@
 <div id="rateSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
 
 <!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
-
-<div style="display:flex; align-items:center; gap:8px;">
+<div style="display:flex; align-items:center; gap:8px; margin-left:1%;">
   <span style="font-size:16px;">Differential Mode</span>
   <label class="switch">
     <input id="differentialMode" type="checkbox" onclick="differentialMode();">
@@ -171,6 +170,7 @@ voltageSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       let label = document.createElement("label");
+      label.style.marginRight = "2%"; // Add a gap between the label and the slider
       label.setAttribute("for", voltageSlider.id);
       label.appendChild(document.createTextNode("Voltage"));
 
@@ -218,8 +218,9 @@ noiseSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       Noiselabel = document.createElement("label");
+      Noiselabel.style.marginRight = "1%"; // Add a gap between the label and the slider
       Noiselabel.setAttribute("for", noiseSlider.id);
-      Noiselabel.appendChild(document.createTextNode('Noise Power'));
+      Noiselabel.appendChild(document.createTextNode('Noise PSD'));
 
       noiseSlider.parentNode.prepend(Noiselabel);
   
@@ -241,7 +242,7 @@ noiseSlider = document.createElement("INPUT");
         noise["gn"] = parseValue(noiseSlider.value);
       };
       var outputUnitsCallbackNoise = function (noise, val) {
-         return d3.format(`.2f`)(val);
+         return d3.format(`.2f`)(val) + " W/Hz";
       };
 
   

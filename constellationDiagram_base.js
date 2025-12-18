@@ -249,7 +249,7 @@ function constellationDiagram(top , left,constellationName){
       if (modTypeCode === 1) {
         if(sig.mcs <2){
           // PSK
-        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
+        constellationTargets = [{ x: 1.414, y: 0 },{ x: -1.414, y: 0 } ];
 
       } else if(sig.mcs >=2 && sig.mcs <4){
           // QPSK
@@ -284,7 +284,7 @@ function constellationDiagram(top , left,constellationName){
       //////////// GENERATE TARGETS FOR QAM MODULATION ////////////
         if(sig.mcs <2){
           // 2 QAM
-        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
+        constellationTargets = [{ x: 1.414, y: 0 },{ x: -1.414, y: 0 } ];
 
         distance = 2/2;
         // targetColor = "#e9a3c9";
@@ -299,7 +299,7 @@ function constellationDiagram(top , left,constellationName){
         // targetColor = "#f7f7f7";
       } else if (sig.mcs ==7 ){
         constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
-        distance = .666/2;
+        // constellationTargets = [ { x: -1, y: -1 }, { x: -1, y: -0.333 }, { x: -1, y: 0.333 }, { x: -1, y: 1 }, { x: -0.333, y: -1 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1 }, { x: 0.333, y: -1 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1 }, { x: 1, y: -1 }, { x: 1, y: -0.333 }, { x: 1, y: 0.333 }, { x: 1, y: 1 } ];
         // targetColor = "#fde0ef";
       }
 
@@ -323,9 +323,10 @@ function constellationDiagram(top , left,constellationName){
 
     function plotMessages(){
         let energyPerSymbol = 10**(sig.gn/10);
-        let noiseNormalization = Math.sqrt(energyPerSymbol*2)
-        // let noiseNormalization = 1;
-      
+        let noiseNormalization = Math.sqrt(energyPerSymbol)
+      if (sendingBits == 1){
+        noiseNormalization = Math.sqrt(energyPerSymbol/modulationOrder);
+      }
       // ------------- Modulation Specific Noise Normalization ---------//
 
   
@@ -341,8 +342,14 @@ function constellationDiagram(top , left,constellationName){
         }));
 
         for (let i = 0; i < constellationTargets.length; i++) {
-          BER_stats.sentMessages = (BER_stats.sentMessages + 1*(1-sendingBits) + sendingBits*modulationOrder); // if sending bits, each symbol is multiple bits
+          // if(sendingBits===1 && modulationType == 1){
+          if(sendingBits===1){
 
+            BER_stats.sentMessages = (BER_stats.sentMessages + modulationOrder); // if sending bits, each symbol is multiple bits
+            // console.log("sending bits" + modulationOrder);
+          } else{
+            BER_stats.sentMessages = BER_stats.sentMessages + 1; // else each symbol is one message
+          }
 
 
           distToTarget = ((constellationTargets[i].x - translatedTargets[i].x)**2 + (constellationTargets[i].y - translatedTargets[i].y)**2);
@@ -362,7 +369,21 @@ function constellationDiagram(top , left,constellationName){
             let tempErrorDist = ((target.x - translatedTargets[i].x)**2 + (target.y - translatedTargets[i].y)**2);
 
             if (target !== constellationTargets[i] && (tempErrorDist < distToTarget)) {
-              BER_stats.messageErrors++;
+              if(sendingBits===1){
+                // let addedErrors = Math.floor(Math.random() * modulationOrder)+1;
+                // let addedErrors = modulationOrder; // assume all bits in symbol are wrong for testing
+                let addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                if (addedErrors > modulationOrder){
+                  addedErrors = modulationOrder;
+                }
+                BER_stats.messageErrors += addedErrors;
+                // console.log("Added bit errors: " + addedErrors);
+                // BER_stats.messageErrors += modulationOrder;
+
+
+              }else{
+                BER_stats.messageErrors++;
+              }
               errorDetected = true;
               break;
             }
@@ -505,8 +526,8 @@ function constellationDiagram(top , left,constellationName){
       while(v === 0) v = Math.random();
       let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
       num = num / 10.0 + 0.5; // Translate to 0 -> 1
-      // if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
-       num = num - 0.5; // added to center around 0
+      if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
+      //  num = num - 0.5; // added to center around 0
       return num
     }
 

@@ -77,9 +77,9 @@ function BER_plot_baseband(){
         // }
         for (let i = 0; i <= 10; i++) {
           let linearEbno = 10**(i/10);
-          let inputQfunc = Math.sqrt( linearEbno);
+          let inputQfunc = Math.sqrt( 2*linearEbno);
           // let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
-          let ber = 0.5 * (1-erf_hastings(inputQfunc/Math.sqrt(2)));
+          let ber = qfunc(inputQfunc);
 
           points.push({ x: i, y: ber });
         }
@@ -114,8 +114,8 @@ function BER_plot_baseband(){
         
       d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
-        if(sig.differentialMode) ebno = ((sig.gn)**2/((noise.gn)**2));
-        if(!sig.differentialMode) ebno = (.5*sig.gn)**2/((noise.gn)**2);
+        if(sig.differentialMode) ebno = (((sig.gn**2)/((noise.gn**2))));
+        if(!sig.differentialMode) ebno = (sig.gn)**2/((2*noise.gn**2));
 
         ebnoDb = 10*Math.log10(ebno);
         // console.log(ebnoDb + " dB")
@@ -165,10 +165,11 @@ function BER_plot_baseband(){
         const points = [];
         for (let i = 0; i <= 10; i++) {
           let linearEbno = 10**(i/10);
-          let inputQfunc = Math.sqrt(linearEbno * (document.getElementById("differentialMode").checked ? 1 : 1));
+          let inputQfunc = Math.sqrt(linearEbno * (document.getElementById("differentialMode").checked ? 2 : 1));
+          // // let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
+          // let inputQfunc = Math.sqrt( 2*linearEbno);
           // let ber = 0.5 * (1 - erf_hastings(Math.sqrt(linearEbno)));
-          let ber = 0.5 * (1-erf_hastings(inputQfunc/Math.sqrt(2)));
-
+          let ber = qfunc(inputQfunc);
           points.push({ x: i, y: ber });
         }
 
@@ -198,4 +199,8 @@ function BER_plot_baseband(){
 
 }
   
+
+function qfunc(x) {
+    return 0.5 * (1 - erf_hastings(x / Math.sqrt(2)));
+}
   // helper functions
