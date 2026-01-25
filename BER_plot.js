@@ -32,13 +32,21 @@ function BER_plot(){
           
       // Add X axis
       var x = d3.scaleLinear()
-        .domain([0, 20])
+        .domain([0, 25])
         .range([ -.001, width ]);
       svg.append("g")
         // sends the line to the bottom
         .attr("transform", "translate(0," + height + ")")
         // make grid lines
-        .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
+        .call(d3.axisBottom(x).tickSize(-height*1).ticks(7));
+      
+      svg.append("text")
+        .attr("id", "waterfallXLabel")
+        .attr("x", width / 2)
+        .attr("y", height + margin.bottom)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#FFFFFF")
+        .text("Es/N0 (dB)");
 
       // Add Y axis
       var y = d3.scaleLog()
@@ -49,7 +57,16 @@ function BER_plot(){
         .call(d3.axisLeft(y).tickSize(-width*1).ticks(7))
         // stroke lines
         svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
-        svg.selectAll(".tick text").attr("fill", "#FFFFFF")           
+        svg.selectAll(".tick text").attr("fill", "#FFFFFF")   
+      // Y axis label
+        svg.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left)
+          .attr("x", 0 - (height / 2))
+          .attr("dy", "1em")
+          .attr("text-anchor", "middle")
+          .attr("fill", "#FFFFFF")
+          .text("Bit Error Rate");
 
           
   generatePSKSERCurve();
@@ -89,13 +106,14 @@ function BER_plot(){
           .attr("height", height);
 
         const points_4QAM = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
           // points_QPSK.push({ x: i, y: ber });
-          constellationTargets = [ { x: .707, y: .707 }, { x: .707, y: -.707 },{ x: -.707, y: .707 },{ x: -.707, y: -.707 }];
-          let symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets, linearEbno)
+          // constellationTargets = [ { x: .707, y: .707 }, { x: .707, y: -.707 },{ x: -.707, y: .707 },{ x: -.707, y: -.707 }];
+          // let symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets, linearEbno)
+          symbolErrorRate = getQAMSER(4, linearEbno)
           points_4QAM.push({ x: i, y: symbolErrorRate });
         }
 
@@ -115,7 +133,7 @@ function BER_plot(){
 
 ///////////////////// 8  QAM SER curve /////////////////////
         const points_8QAM = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
@@ -125,8 +143,10 @@ function BER_plot(){
           // let symbolErrorRate = 3 * qfunc((1/5)*Math.sqrt(linearEbno));
 
           // 8 QAM
-          constellationTargets8QAM = getConstellationTargets(5);
-          symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets8QAM, linearEbno)
+          symbolErrorRate = getQAMSER(8, linearEbno)
+
+          // constellationTargets8QAM = getConstellationTargets(5);
+          // symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets8QAM, linearEbno)
           points_8QAM.push({ x: i, y: symbolErrorRate });
         }
 
@@ -144,7 +164,7 @@ function BER_plot(){
           .attr("clip-path", "url(#clip)");
 //////////////////// /////// REPEAT FOR 16 QAM /////////////////////////
         const points_16QAM = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
@@ -154,8 +174,10 @@ function BER_plot(){
           // let symbolErrorRate = 3 * qfunc((1/5)*Math.sqrt(linearEbno));
 
           // 16 QAM
-          constellationTargets16QAM = getConstellationTargets(7);
-          symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets16QAM, linearEbno)
+          // constellationTargets16QAM = getConstellationTargets(7);
+          symbolErrorRate = getQAMSER(16, linearEbno)
+
+          // symbolErrorRate = getExpectedSymbolErrorRate(constellationTargets16QAM, linearEbno)
           // console.log("16 QAM SER at EbNo " + i + " dB: " + symbolErrorRate);
           points_16QAM.push({ x: i, y: symbolErrorRate });
         }
@@ -210,7 +232,7 @@ function BER_plot(){
           .attr("height", height);
 
         const points_4PSK = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // let ber = qfunc(Math.sqrt(linearEbno)) + qfunc(Math.sqrt(2*linearEbno));
@@ -238,7 +260,7 @@ function BER_plot(){
 
 ///////////////////// 8  QAM SER curve /////////////////////
         const points_8PSK = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // 8 QAM
@@ -272,7 +294,7 @@ function BER_plot(){
           .attr("clip-path", "url(#clip)");
 //////////////////// /////// REPEAT FOR 16 QAM /////////////////////////
         const points_16PSK = [];
-        for (let i = -5; i <= 20; i++) {
+        for (let i = -5; i <= 25; i++) {
           
           let linearEbno = 10**(i/10);
           // 16 QAM
@@ -339,8 +361,8 @@ function BER_plot(){
           
           let linearEbno = 10**(i/10);
 
-          // let bitErrorRate4QAM = getQAMBER(4, linearEbno)
-          let bitErrorRate4QAM = getExpectedBitErrorRate(constellationTargets4QAMBER, linearEbno, 2);
+          let bitErrorRate4QAM = getQAMBER(4, linearEbno)
+          // let bitErrorRate4QAM = getExpectedBitErrorRate(constellationTargets4QAMBER, linearEbno, 2);
 
           points_4QAM.push({ x: i, y: bitErrorRate4QAM });
         }
@@ -396,8 +418,8 @@ function BER_plot(){
           let linearEbno = 10**(energyPerBit/10);
           // 16 QAM
 
-          // let bitErrorRate16QAM = getQAMBER(16, linearEbno);
-          let bitErrorRate16QAM = getExpectedBitErrorRate(constellationTargets16QAM, linearEbno, 4);
+          let bitErrorRate16QAM = getQAMBER(16, linearEbno);
+          // let bitErrorRate16QAM = getExpectedBitErrorRate(constellationTargets16QAM, linearEbno, 4);
 
           points_16QAM.push({ x: i, y: bitErrorRate16QAM });
         }
@@ -409,7 +431,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_16QAM)
           .attr("fill", "none")
-          .attr("stroke", "#16e024ff")
+          .attr("stroke", "#fde0ef")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_16QAM)
@@ -533,28 +555,62 @@ function BER_plot(){
       // Remove all points and lines from the graph
       svg.selectAll("path").remove();
       svg.selectAll("circle").remove();
-
+      svg.selectAll("#waterfallXLabel").remove();
       // Regenerate the SER curves based on the new modulation type
       if (modTypeCode == 1){
+
         if (button.innerText === "show SER") {
           generatePSKBERCurve();
+            svg.append("text")
+              .attr("id", "waterfallXLabel")
+              .attr("x", width / 2)
+              .attr("y", height + margin.bottom)
+              .attr("text-anchor", "middle")
+              .attr("fill", "#FFFFFF")
+              .text("Eb/N0 (dB)");
         } else {
           generatePSKSERCurve();
+            svg.append("text")
+              .attr("id", "waterfallXLabel")
+              .attr("x", width / 2)
+              .attr("y", height + margin.bottom)
+              .attr("text-anchor", "middle")
+              .attr("fill", "#FFFFFF")
+              .text("Es/N0 (dB)");
         }
       } else if (modTypeCode == 2){
+
         if (button.innerText === "show SER") {
           generateQAMBERCurve();
+            svg.append("text")
+              .attr("id", "waterfallXLabel")
+              .attr("x", width / 2)
+              .attr("y", height + margin.bottom)
+              .attr("text-anchor", "middle")
+              .attr("fill", "#FFFFFF")
+              .text("Eb/N0 (dB)");
         } else {
           generateQAMSERCurve();
+            svg.append("text")
+              .attr("id", "waterfallXLabel")
+              .attr("x", width / 2)
+              .attr("y", height + margin.bottom)
+              .attr("text-anchor", "middle")
+              .attr("fill", "#FFFFFF")
+              .text("Es/N0 (dB)");
         }
       }
       updateBERTable();
 
     });
-        
-    document.getElementById("sendMessageButton").addEventListener("click", function() {
+
+
+    function plotWaterfallPoint(){
+
       d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
       // ebno = calculateEbno(sig.gn, noise.gn, modulationOrder, sendingBits);
+
+      
       if(sendingBits=== 0 ){ 
         ebno = sig.gn-noise.gn;
       }
@@ -646,11 +702,19 @@ function BER_plot(){
             break;
         } // end switch statement
 
-        updateBERTable();
-
-
-      }); // end send message button event listener
+    }
+        
+    document.getElementById("sendMessageButton").addEventListener("click", function() {
       
+      plotWaterfallPoint();
+      updateBERTable();
+
+
+    }); // end send message button event listener
+
+
+      
+    
 
 
       sig.onChange("mcs", clearErrorRate);
@@ -672,6 +736,7 @@ function BER_plot(){
         // Update BER table
         
         constellation_targets = getConstellationTargets(sig.mcs);
+        esno = sig.gn-noise.gn;
 
         let TheoErrorRate= 0;
         if (sendingBits === 1){
@@ -679,23 +744,25 @@ function BER_plot(){
           // ebno = sig.gn-noise.gn;
           if (modTypeCode === 2){
             ebno = sig.gn-noise.gn - 10*Math.log10(modulationOrder);
-            // TheoErrorRate = getQAMBER(2**modulationOrder, 10**(ebno/10));
-            TheoErrorRate= getExpectedBitErrorRate(constellation_targets, linearEbno, 4);
-            // console.log("Theoretical BER QAM: " + TheoErrorRate);
-          } else if (modTypeCode ===1){
+            TheoErrorRate= getQAMBER(2**modulationOrder, 10**(ebno/10));
+          } else if (modTypeCode === 1){
             ebno = sig.gn-noise.gn - 10*Math.log10(modulationOrder);
             TheoErrorRate = getPSKBER(2**modulationOrder, 10**(ebno/10));
           }
         } else {
-          ebno = sig.gn-noise.gn;
-          TheoErrorRate = getPSKSER(2**modulationOrder, 10**(ebno/10))
+          ebno = esno - 10*Math.log10(modulationOrder);
+          TheoErrorRate = getPSKSER(2**modulationOrder, 10**(esno/10))
           // TheoErrorRate = getExpectedSymbolErrorRate(constellation_targets, 10**(ebno/10));
         }
+        snr = esno;
+
 
 
         d3.select("#BERLabel").text(`${(isNaN(sig.BER) ? "No Data" : sig.BER.toFixed(8))}`);
         d3.select("#iterationsLabel").text(`${BER_stats.sentMessages}`);
+        d3.select("#esnoLabel").text(`${esno.toFixed(2)} dB`);
         d3.select("#ebnoLabel").text(`${ebno.toFixed(2)} dB`);
+        d3.select("#snrLabel").text(`${snr.toFixed(2)} dB`);
         d3.select("#tBERLabel").text(`${TheoErrorRate.toFixed(8)}`);
       }
 
@@ -749,6 +816,10 @@ function BER_plot(){
 }
   
   // helper functions
+
+
+
+
 function erf_hastings(x) {
   hastings_R1 = R([0, 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429])
   return Math.sign(x) * (1 - Math.exp(-x * x) * hastings_R1(1 / (1 + 0.3275911 * Math.abs(x))));
@@ -833,7 +904,7 @@ function getConstellationTargets(mcs){
   if (modTypeCode === 1) {
         if(mcs <2){
           // PSK
-        constellationTargets = [{ x: 1.414, y: 0 },{ x: -1.414, y: 0 } ];
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
       } else if(mcs >=2 && mcs <4){
           // QPSK
@@ -892,20 +963,54 @@ function getConstellationTargets(mcs){
 
   
   function getQAMBER(M, ebno){
+
+    if (M === 2){
+    // BPSK SER is the same as BER
+    pError = qfunc(Math.sqrt(2 * ebno));
+    }else{
+    // A. Grami digital communications eq. 7.16e
     pError = (4*(Math.sqrt(M)-1)/(Math.sqrt(M)*Math.log2(M))) * qfunc(Math.sqrt((3*ebno*Math.log2(M))/(M-1)));
+
+    }
 
     return pError;
   }
+  function getQAMSER(M, ebno){
+
+    if (M === 2){
+    // BPSK SER is the same as BER
+    pError = qfunc(Math.sqrt(2 * ebno));
+    }else{
+    // A. Grami digital communications eq. 7.16d
+    pError = 4*(1-1/Math.sqrt(M)) * qfunc(Math.sqrt((3*ebno)/(M-1)));
+    }
+    return pError;
+  }
+
 
     function getPSKBER(M, ebno){
-    pError = ((2)/(Math.log2(M))) * qfunc(Math.sqrt((2*ebno*Math.log2(M)))*Math.sin(Math.PI/M));
+
+    if (M === 2){
+    // BPSK SER is the same as BER
+    pError = qfunc(Math.sqrt(2 * ebno));
+    }else{
+      // A. Grami digital communications eq. 7.16f
+    pError = ((2)/(Math.log2(M))) * qfunc(Math.sqrt((2*ebno*Math.log2(M)))*Math.sin(Math.PI/M)); 
+
+    }
 
     return pError;
   }
 
 
 function getPSKSER(M, ebno){
-    pskSER = (2*(M-1)/M) * qfunc(Math.sqrt(6*ebno/(M**2-1)))
 
+  if (M === 2){
+    // BPSK SER is the same as BER
+    pskSER = qfunc(Math.sqrt(2 * ebno));
+  }else{
+    // A. Grami digital communications eq. 7.16e
+    pskSER = 2 * qfunc(Math.sqrt(2 * ebno) * Math.sin(Math.PI / M));
+  }
     return pskSER;
   }

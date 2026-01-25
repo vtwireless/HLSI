@@ -217,12 +217,10 @@ function constellationDiagram(top , left,constellationName){
 
         if(!frozenFlag){
 
-          plotMessages();
-        
-
+          document.getElementById("sendMessageButton").click();
       // console.log(ebno);
         counter = counter + 1;
-        if (counter == 24){
+        if (counter == 10){
           counter = 0;
           d3.select("#"+constellationName).selectAll("circle").remove();
           svg.append('g')
@@ -234,9 +232,16 @@ function constellationDiagram(top , left,constellationName){
             .attr("cy", function (d) { return y(d.y); } )
             .attr("r", 5)
             .style("fill",targetColor)
-          console.log("25 seconds has passed")
-        }
+          console.log("10 seconds has passed")
+
+
+
+        } // end of loop check
+
+
       } // end of frozen check
+
+
     }, refreshRate);
   
   
@@ -249,7 +254,7 @@ function constellationDiagram(top , left,constellationName){
       if (modTypeCode === 1) {
         if(sig.mcs <2){
           // PSK
-        constellationTargets = [{ x: 1.414, y: 0 },{ x: -1.414, y: 0 } ];
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
       } else if(sig.mcs >=2 && sig.mcs <4){
           // QPSK
@@ -258,7 +263,7 @@ function constellationDiagram(top , left,constellationName){
           { x: Math.cos(Math.PI / 2), y: Math.sin(Math.PI / 2) },
           { x: Math.cos(Math.PI), y: Math.sin(Math.PI) },
           { x: Math.cos((3 * Math.PI) / 2), y: Math.sin((3 * Math.PI) / 2) },
-        ];      
+        ];
       } else if (sig.mcs >=5 && sig.mcs <7 ){
           // 8 PSK
         constellationTargets = [
@@ -284,7 +289,7 @@ function constellationDiagram(top , left,constellationName){
       //////////// GENERATE TARGETS FOR QAM MODULATION ////////////
         if(sig.mcs <2){
           // 2 QAM
-        constellationTargets = [{ x: 1.414, y: 0 },{ x: -1.414, y: 0 } ];
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
         distance = 2/2;
         // targetColor = "#e9a3c9";
@@ -295,11 +300,15 @@ function constellationDiagram(top , left,constellationName){
         // targetColor = "#c51b7d";
       } else if (sig.mcs >=5 && sig.mcs <7 ){
           // 8 QAM
-        constellationTargets =  [ { x: 1.414, y: 1.414 }, { x: 1.414, y: -1.414 }, { x: -1.414, y: 1.414 }, { x: -1.414, y: -1.414 }, { x: -.586, y: -.586 }, { x: .586, y: -.586 }, { x: -.586, y: .586 }, { x: .586, y: .586 } ];
+        // constellationTargets =  [ { x: 1.414, y: 1.414 }, { x: 1.414, y: -1.414 }, { x: -1.414, y: 1.414 }, { x: -1.414, y: -1.414 }, { x: -.586, y: -.586 }, { x: .586, y: -.586 }, { x: -.586, y: .586 }, { x: .586, y: .586 } ];
+        constellationTargets =  [ { x: 1, y: 1 }, { x: 1, y: -1 }, { x: -1, y: 1 }, { x: -1, y: -1 }, { x: 0.447, y: 0.447 }, { x: 0.447, y: -0.447 }, { x: -0.447, y: 0.447 }, { x: -0.447, y: -0.447 } ];
+
         // targetColor = "#f7f7f7";
       } else if (sig.mcs ==7 ){
-        constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
+        // constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
         // constellationTargets = [ { x: -1, y: -1 }, { x: -1, y: -0.333 }, { x: -1, y: 0.333 }, { x: -1, y: 1 }, { x: -0.333, y: -1 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1 }, { x: 0.333, y: -1 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1 }, { x: 1, y: -1 }, { x: 1, y: -0.333 }, { x: 1, y: 0.333 }, { x: 1, y: 1 } ];
+        constellationTargets = [ { x: -0.949, y: -0.949 }, { x: -0.949, y: -0.316 }, { x: -0.949, y: 0.316 }, { x: -0.949, y: 0.949 }, { x: -0.316, y: -0.949 }, { x: -0.316, y: -0.316 }, { x: -0.316, y: 0.316 }, { x: -0.316, y: 0.949 }, { x: 0.316, y: -0.949 }, { x: 0.316, y: -0.316 }, { x: 0.316, y: 0.316 }, { x: 0.316, y: 0.949 }, { x: 0.949, y: -0.949 }, { x: 0.949, y: -0.316 }, { x: 0.949, y: 0.316 }, { x: 0.949, y: 0.949 } ];
+
         // targetColor = "#fde0ef";
       }
 
@@ -323,14 +332,14 @@ function constellationDiagram(top , left,constellationName){
 
     function plotMessages(){
         let energyPerSymbol = 10**(sig.gn/10);
-        let noiseNormalization = Math.sqrt(energyPerSymbol)
-      if (sendingBits == 1){
-        noiseNormalization = Math.sqrt(energyPerSymbol/modulationOrder);
-      }
+        let noiseNormalization = (energyPerSymbol)
+      // if (sendingBits == 1){
+      //   noiseNormalization = Math.sqrt(energyPerSymbol/modulationOrder);
+      // }
       // ------------- Modulation Specific Noise Normalization ---------//
 
   
-      const variance = (10**((noise.gn/2)/10)) / noiseNormalization;   
+      const variance = Math.sqrt((10**((noise.gn)/10))/(2*noiseNormalization));   
 
       messageRateSlider.value = messageRate
 
@@ -372,7 +381,13 @@ function constellationDiagram(top , left,constellationName){
               if(sendingBits===1){
                 // let addedErrors = Math.floor(Math.random() * modulationOrder)+1;
                 // let addedErrors = modulationOrder; // assume all bits in symbol are wrong for testing
-                let addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                // let addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                let addedErrors = 1;
+
+                // if(modulationOrder >=3 && modTypeCode === 2){
+                //   // BPSK or QPSK
+                //   addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                // }
                 if (addedErrors > modulationOrder){
                   addedErrors = modulationOrder;
                 }

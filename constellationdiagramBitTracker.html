@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src="https://d3js.org/d3.v4.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagram.js></script>
+<script src=constellationdiagramBitTracker.js></script>
+
+
+<body>
+<!-- <div id="inPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div> 
+<button onclick="changeIPhase()">Change Phase</button> -->
+
+<div id="quadPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+
+<div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
+
+
+</div> 
+<!-- <button onclick="changeQPhase()">Change Phase</button> -->
+
+<!-- <div class="slider">  <input type="range" min="-100" max="100" value="0" class="slider" id="xVal"> </div> -->
+
+<!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
+
+<div id="constellationParent" style="width: 100%; height: 100%;"></div>
+
+<div id="receivedBit" style="margin-left: 1%; margin-top: 2%; font-size: 18px; font-weight: bold;">
+  Received Bit: <span id="bitValue">-</span>
+</div>
+
+
+</body>
+
+<script>
+
+
+
+var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: 0, // dB
+    gn_min: -1, // dB
+    gn_max: 1, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1785.0e6
+  });
+  var sig2 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: 0, // dB
+    gn_min: -1, // dB
+    gn_max : 1, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1795.0e6
+    
+  });
+  // john callback is used because I couldn't figure out how to make a callback for phase
+  var johnCallback = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    bw_max: 38.0e6, // Hz
+    bw_min: 4.0e6,  // Hz
+    bw_init: 4.0e6, // Hz
+    gn_init: -10, // dB
+    gn_min: -40, // dB
+    mcs_init: 6, // array index int
+    freq_init: 1795.0e6
+    
+  });
+
+  var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: -10, // dB
+    gn_min: -60,
+    gn_max: 10,
+  });
+
+
+
+
+
+  quadPhase = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      quadPhase.type = "range";
+      quadPhase.min = sig2["gn" + "_min"]; // example: sig.freq_min
+      quadPhase.max = sig2["gn" + "_max"];
+      quadPhase.step = sig2["gn" + "_step"];
+      quadPhase.value = sig2["gn"];
+      let pQ = document.createElement("p");
+      pQ.appendChild(quadPhase);
+
+      document.getElementById("quadPhaseMag").appendChild(pQ);
+      
+      // below sets up the label on the left of the slider
+      let labelQ = document.createElement("label");
+      labelQ.setAttribute("for", quadPhase.id);
+      labelQ.style.marginRight = "2%"; // Add a gap between the label and the slider
+
+ 
+      labelQ.appendChild(document.createTextNode("Voltage"));
+      
+      quadPhase.parentNode.prepend(labelQ);
+  
+      // below sets up the output value on the right of the slider
+      let outputQ = document.createElement("output");
+      outputQ.setAttribute("for", quadPhase.id);
+      quadPhase._output = outputQ;
+      quadPhase.parentNode.append(outputQ);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      quadPhase.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      quadPhase.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        sig2["gn"] = parseValue(quadPhase.value);
+      };
+
+      var outputUnitsCallbackQ = function (sig, val) {
+        return d3.format(".2f")(val) + " V";
+      };
+  
+      sig2.onChange("gn", function (sig2, gn) {
+        quadPhase.value = gn;
+        outputQ.value = outputUnitsCallbackQ(sig2, gn);
+      });
+
+
+      
+noiseSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      noiseSlider.type = "range";
+      noiseSlider.min = noise["gn" + "_min"]; // example: sig.freq_min
+      noiseSlider.max = noise["gn" + "_max"];
+      noiseSlider.step = noise["gn" + "_step"];
+      noiseSlider.value = noise["gn"];
+      p = document.createElement("p");
+      p.appendChild(noiseSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("noiseSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      Noiselabel = document.createElement("label");
+      Noiselabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      Noiselabel.setAttribute("for", noiseSlider.id);
+      Noiselabel.appendChild(document.createTextNode('Noise PSD'));
+
+      noiseSlider.parentNode.prepend(Noiselabel);
+  
+      // below sets up the output value on the right of the slider
+      let NoiseOutput = document.createElement("output");
+      NoiseOutput.setAttribute("for", noiseSlider.id);
+      noiseSlider._output = NoiseOutput
+      noiseSlider.parentNode.append(NoiseOutput);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      noiseSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      noiseSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        noise["gn"] = parseValue(noiseSlider.value);
+      };
+      var outputUnitsCallbackNoise = function (noise, val) {
+         return d3.format(`.2f`)(val) + " W/Hz";
+      };
+
+  
+      noise.onChange("gn", function (noise, gn) {
+        noiseSlider.value = gn;
+        NoiseOutput.value = outputUnitsCallbackNoise(noise, gn);
+      });
+
+// Slider(sig2, 'gn', 'quadPhase', "quadPhaseMag");
+// function changeIPhase(){
+//       sig1.phase = sig1.phase * -1
+//       output.value = outputUnitsCallback(sig1, sig1.gn);
+//       // as soon as I figure out how to add the phase call back I'll change this
+//       johnCallback.bw = johnCallback.bw + 1
+//     };
+function changeQPhase(){
+      sig2.phase = sig2.phase * -1
+      johnCallback.bw = johnCallback.bw + 1
+      outputQ.value = outputUnitsCallbackQ(sig2, sig2.gn);
+    };
+
+
+constellationDiagramManualTargets()
+
+
+// }
+ // use the clear all circles button
+function buttonPressedClearPoints(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+
+}
+
+
+</script>
+
+</html>

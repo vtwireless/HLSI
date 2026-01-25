@@ -206,12 +206,20 @@
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="BERLabel">0.0</td>
         </tr>
         <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Theoretical BER</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="tBERLabel">0.0</td>
+        </tr>
+        <tr>
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Eb/No</td>
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
         </tr>
         <tr>
-          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Theoretical BER</td>
-          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="tBERLabel">0.0</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Es/No</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="esnoLabel">0 dB</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">SNR</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="snrLabel">0 dB</td>
         </tr>
       </tbody>
     </table>
@@ -227,14 +235,14 @@ let modulationOrder = 1; // default value
 
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: 0, // dB
-    gn_min: -100, 
-    gn_max: 100, 
+    gn_min: -60, 
+    gn_max: 60, 
     mcs_init: 0, // array index int
   });
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: -10, // dB
-    gn_min: -100,
-    gn_max: 0,
+    gn_min: -60,
+    gn_max: 20,
   });
 
   let BER_stats = new MessageStats();
