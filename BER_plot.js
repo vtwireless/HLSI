@@ -90,7 +90,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points2QAM)
           .attr("fill", "none")
-          .attr("stroke", "#c51b7d")
+          .attr("stroke", "#ffffcc")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line2QAM)
@@ -124,7 +124,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_4QAM)
           .attr("fill", "none")
-          .attr("stroke", "#e9a3c9")
+          .attr("stroke", "#a1dab4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_4QAM)
@@ -157,7 +157,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_8QAM)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#41b6c4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_8QAM)
@@ -189,7 +189,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_16QAM)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#225ea8")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_16QAM)
@@ -216,7 +216,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points2PSK)
           .attr("fill", "none")
-          .attr("stroke", "#c51b7d")
+          .attr("stroke", "#ffffcc")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line2PSK)
@@ -251,7 +251,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_4PSK)
           .attr("fill", "none")
-          .attr("stroke", "#e9a3c9")
+          .attr("stroke", "#a1dab4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_4PSK)
@@ -287,7 +287,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_8PSK)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#41b6c4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_8PSK)
@@ -314,7 +314,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_16PSK)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#225ea8")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_16PSK)
@@ -340,7 +340,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points2QAM)
           .attr("fill", "none")
-          .attr("stroke", "#c51b7d")
+          .attr("stroke", "#ffffcc")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line2QAM)
@@ -374,7 +374,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_4QAM)
           .attr("fill", "none")
-          .attr("stroke", "#e9a3c9")
+          .attr("stroke", "#a1dab4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_4QAM)
@@ -402,7 +402,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_8QAM)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#41b6c4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_8QAM)
@@ -431,7 +431,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_16QAM)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#225ea8")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_16QAM)
@@ -458,7 +458,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points2PSK)
           .attr("fill", "none")
-          .attr("stroke", "#c51b7d")
+          .attr("stroke", "#ffffcc")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line2PSK)
@@ -489,7 +489,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_4PSK)
           .attr("fill", "none")
-          .attr("stroke", "#e9a3c9")
+          .attr("stroke", "#a1dab4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_4PSK)
@@ -513,7 +513,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_8PSK)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#41b6c4")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_8PSK)
@@ -535,7 +535,7 @@ function BER_plot(){
         svg.append("path")
           .datum(points_16PSK)
           .attr("fill", "none")
-          .attr("stroke", "#fde0ef")
+          .attr("stroke", "#225ea8")
           .attr("stroke-width", 3)
           .attr("stroke-dasharray", "4 4") // Creates a dashed line
           .attr("d", line_16PSK)
@@ -632,7 +632,7 @@ function BER_plot(){
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 4)
-              .style("fill","#c51b7d")
+              .style("fill","#ffffcc")
             break;
           case 3:
           svg.append('g')
@@ -643,7 +643,7 @@ function BER_plot(){
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 4)
-              .style("fill","#e9a3c9")
+              .style("fill","#a1dab4")
             break;
           case 5:
           svg.append('g')
@@ -654,7 +654,7 @@ function BER_plot(){
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 4)
-              .style("fill","#fde0ef")
+              .style("fill","#41b6c4")
             break;
           case 7:
           svg.append('g')
@@ -665,7 +665,7 @@ function BER_plot(){
               .attr("cx", function (d) { return x(d.x); } )
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 4)
-              .style("fill","#f7f7f7")
+              .style("fill","#225ea8")
             break;
           case 8:
           svg.append('g')
@@ -942,11 +942,11 @@ function getConstellationTargets(mcs){
         constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
 
         distance = 2/2;
-        // targetColor = "#e9a3c9";
+        // targetColor = "#a1dab4";
       } else if(mcs >=2 && mcs <4){
           // 4 QAM
         constellationTargets = [ { x: .707, y: .707 }, { x: .707, y: -.707 },{ x: -.707, y: .707 },{ x: -.707, y: -.707 }];
-        // targetColor = "#c51b7d";
+        // targetColor = "#ffffcc";
       } else if (mcs >=5 && mcs <7 ){
           // 8 QAM
         constellationTargets =  [ { x: 1.414, y: 1.414 }, { x: 1.414, y: -1.414 }, { x: -1.414, y: 1.414 }, { x: -1.414, y: -1.414 }, { x: -.586, y: -.586 }, { x: .586, y: -.586 }, { x: -.586, y: .586 }, { x: .586, y: .586 } ];
@@ -954,7 +954,7 @@ function getConstellationTargets(mcs){
       } else if (mcs ==7 ){
         constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
         distance = .666/2;
-        // targetColor = "#fde0ef";
+        // targetColor = "#225ea8";
       }
     }
       return constellationTargets;
