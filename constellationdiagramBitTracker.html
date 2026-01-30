@@ -10,11 +10,72 @@
 <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
 <script src=constellationDiagram.js></script>
 <script src=constellationdiagramBitTracker.js></script>
-
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
+  <meta name="viewport" content="width=device-width"/>
 
 <body>
+
+<body style="margin:0;">
+
+  
+  <section class="banner" style="position: top; z-index: 11; background: rgba(0,0,0,0.85)">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html" class="selected"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+        <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR Calculations Programmable</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+
+    
+
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: -.5%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Special Exercise</span> Bit Tracker </div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
 <!-- <div id="inPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div> 
 <button onclick="changeIPhase()">Change Phase</button> -->
+  <div class="content-section" id="slider_1_parent" style="margin-left: 1%; margin-top:2%; width: 100%;">
 
 <div id="quadPhaseMag" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
 
@@ -30,9 +91,9 @@
 
 <div id="constellationParent" style="width: 100%; height: 100%;"></div>
 
-<div id="receivedBit" style="margin-left: 1%; margin-top: 2%; font-size: 18px; font-weight: bold;">
+<!-- <div id="receivedBit" style="margin-left: 1%; margin-top: 2%; font-size: 18px; font-weight: bold;">
   Received Bit: <span id="bitValue">-</span>
-</div>
+</div> -->
 
 
 </body>
@@ -75,9 +136,9 @@ var sig1 = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   });
 
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: -10, // dB
-    gn_min: -60,
-    gn_max: 10,
+    gn_init: 20, // dB
+    gn_min: -30,
+    gn_max: 40,
   });
 
 
@@ -176,7 +237,7 @@ noiseSlider = document.createElement("INPUT");
         noise["gn"] = parseValue(noiseSlider.value);
       };
       var outputUnitsCallbackNoise = function (noise, val) {
-         return d3.format(`.2f`)(val) + " W/Hz";
+         return d3.format(`.2f`)(val) + " dBm/Hz";
       };
 
   

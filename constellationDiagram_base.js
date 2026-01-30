@@ -71,10 +71,11 @@ function constellationDiagram(top , left,constellationName){
           svg.append("text")
             .attr("text-anchor", "middle")
             .attr("x", width/2)
-            .attr("y", height + margin.top + 15)
-            .text("In-Phase Normalized Energy per symbol")
-            .style("fill", "#FFFFFF");
-  
+            .attr("y", height + margin.top + 20)
+            .text("\u221AEs")
+            .style("fill", "#FFFFFF")
+            .style("font-size", "18px");
+
         // Add Y axis
         var y = d3.scaleLinear()
           .domain([-1.6, 1.6])
@@ -91,8 +92,9 @@ function constellationDiagram(top , left,constellationName){
           .attr("transform", `rotate(-90)`)
           .attr("x", -height / 2)
           .attr("y", -margin.left + 25)
-          .text("Quadrature-Phase Normalized Energy per symbol")
-          .style("fill", "#FFFFFF");
+          .text("\u221AEs")
+          .style("fill", "#FFFFFF")
+          .style("font-size", "18px");
   
           // to draw the initial targets, will be overwritten when signal scheme is changed
       svg.append('g')

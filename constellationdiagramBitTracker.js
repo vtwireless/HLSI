@@ -12,9 +12,9 @@ function constellationDiagramManualTargets(){
 
   
         // set the dimensions and margins of the graph
-        const margin = {top: 10, right: 30, bottom: 30, left: 60},
+        const margin = {top: 10, right: 50, bottom: 30, left: 40},
                 width = 460 - margin.left - margin.right,
-                height = 400 - margin.top - margin.bottom;
+                height = 240 - margin.top - margin.bottom;
   
         // append the svg object to the body of the page
         var svg = d3.select("#constellationParent")
@@ -38,13 +38,12 @@ function constellationDiagramManualTargets(){
         // Add X axis
         var x = d3.scaleLinear()
           .domain([-1.5, 1.5])
-          .range([ -.001, width * 1.01 ]);
+          .range([  6, width * .98  ]);
         svg.append("g")
           // sends the line to the bottom
           .attr("transform", "translate(0," + height + ")")
           // make grid lines
           .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
-          .selectAll(".tick text").remove()
   
         // Add Y axis
         var y = d3.scaleLinear()
@@ -53,10 +52,23 @@ function constellationDiagramManualTargets(){
           // .attr("color","#FFF")
         svg.append("g")
           // make grid lines
-          .call(d3.axisLeft(y).tickSize(-width*1).ticks(7))
+          .call(d3.axisLeft(y).tickSize(-width*1).ticks(3))
+          .selectAll(".tick text").remove()
           // stroke lines
           svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
           svg.selectAll(".tick text").attr("fill", "#FFFFFF")
+
+          svg.append("text")
+            .attr("id", "bitValue")
+            .attr("text-anchor", "middle")
+            .attr("x", width/2)
+            .attr("y", height + margin.top + 15)
+            .text("Received Bit: ")
+            .style("fill", "#FFFFFF")
+            .style("font-size", "20px");
+
+          
+
 
   
           // to draw the initial targets, will be overwritten when user changes targets is changed
@@ -73,14 +85,29 @@ function constellationDiagramManualTargets(){
       let counter = 0;
       setInterval(() => {
         counter += 1;
+        svg.selectAll("#bitValue").remove();
 
 
         update_constellation()
-        if(yTarget >= 0){
-          document.getElementById("bitValue").innerText = "1";
-        } else {
-          document.getElementById("bitValue").innerText = "0";
-        }
+        if(xTarget >= 0){
+          svg.append("text")
+            .attr("id", "bitValue")
+            .attr("text-anchor", "middle")
+            .attr("x", width/2)
+            .attr("y", height + margin.top + 20)
+            .text("Received Bit: 1")
+            .style("fill", "#FFFFFF")
+            .style("font-size", "20px");
+          } else {
+          svg.append("text")
+            .attr("id", "bitValue")
+            .attr("text-anchor", "middle")
+            .attr("x", width/2)
+            .attr("y", height + margin.top + 20)
+            .text("Received Bit: 0")
+            .style("fill", "#FFFFFF")
+            .style("font-size", "20px");
+           }
       }, 500);
   
     sig1.onChange("gn", update_constellation);
@@ -88,8 +115,11 @@ function constellationDiagramManualTargets(){
 
       function update_constellation(){
         console.log(sig1.gn)
-        xTarget = 0
-        yTarget =  generateNormalRandom(sig2.gn, 10**(noise.gn/10))
+        yTarget = 0
+        xTarget =  generateNormalRandom(sig2.gn, 10**((noise.gn-30)/10))
+        if (Math.abs(xTarget) > 1.55) {
+          xTarget = xTarget/Math.abs(xTarget) * 1.55
+        }
         constellationTargets = [
           { x: xTarget , y: yTarget  }
         ];
@@ -103,7 +133,7 @@ function constellationDiagramManualTargets(){
         .append("circle")
           .attr("cx", function (d) { return x(d.x); } )
           .attr("cy", function (d) { return y(d.y); } )
-          .attr("r", 3)
+          .attr("r", 6)
           .style("fill","#00FF00")
       }
 
