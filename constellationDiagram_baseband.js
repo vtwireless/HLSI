@@ -230,7 +230,7 @@ function constellationDiagram_Baseband(){
       let offset = 1;
       if(!sig.differentialMode) offset = .5;
       let rmsPower = (sig.gn*(1/Math.sqrt(2)))**2;
-      let ebno = (offset*(rmsPower )**2/((noise.gn**2)));
+      let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
       let ebnoDb = 10*Math.log10((ebno));
       d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
       d3.select("#snrLabel").text(`${ebnoDb.toFixed(2)} dB`);
