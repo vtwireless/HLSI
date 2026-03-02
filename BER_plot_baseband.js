@@ -112,7 +112,7 @@ function BER_plot_baseband(){
         d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
         
-      d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
+      // d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
         if(sig.differentialMode) ebno = (((sig.gn**2)/((noise.gn**2))));
         if(!sig.differentialMode) ebno = (sig.gn)**2/((2*noise.gn**2));
@@ -125,7 +125,7 @@ function BER_plot_baseband(){
       ebnoPoints = [
                   { x: ebnoDb, y: sig.BER },
                  ];
-      if ((ebnoPoints[0].x > 0)||(ebnoPoints[0].x > 10)) {
+      if ((ebnoPoints[0].x > 0)||(ebnoPoints[0].x < 10)) {
 
           svg.append('g')
             .selectAll("dot")
