@@ -1,11 +1,27 @@
 let voltageLimit = 7;
 let iterations = 1;
+let miniCircuitsFreq = 0;
+let miniCircuitsGain = 0;
+let miniCircuitsPhase = 0;
 
 function constellationDiagram_Baseband(){
 
-    document.getElementById("constellationParent").innerHTML = "";
+    document.getElementById("constellationParentBaseband").innerHTML = "";
   
-        
+            
+    fetch("minicircuitsLNA.json")
+      .then(response => response.json())
+      .then(data => {
+        miniCircuitsFreq = data.map(d => d.frequency_Hz);
+        miniCircuitsGain = data.map(d => d.gain_dB);
+        miniCircuitsPhase = data.map(d => d.phase);
+        // console.log(miniCircuitsFreq);
+        // console.log(miniCircuitsGain);
+        // console.log(miniCircuitsPhase);
+        // example analysis
+      })
+
+
     let positiveTarget = [
                       { x: -1, y: 0 },
                   ];
@@ -25,7 +41,7 @@ function constellationDiagram_Baseband(){
                 height = 240 - margin.top - margin.bottom;
   
         // append the svg object to the body of the page
-        var svg = d3.select("#constellationParent")
+        var svg = d3.select("#constellationParentBaseband")
             .append("svg")
             .attr("width", width + margin.left )
             .attr("height", height + margin.top + margin.bottom)
@@ -58,12 +74,12 @@ function constellationDiagram_Baseband(){
 
         
         var y = d3.scaleLinear()
-            .domain([1, 5])         // This is what is written on the Axis: from 0 to 100
+            .domain([-2, 2])         // This is what is written on the Axis: from 0 to 100
             .range([0, height]);       // This is where the axis is placed: from 100 px to 800px
         svg.append("g")
           // make grid lines
           .call(d3.axisLeft(y).tickSize(-width*1).ticks(5))
-          // stroke lines
+          .selectAll(".tick text").remove()
           svg.selectAll(".tick line").attr("stroke", "#484848")
         // Add Y axis label
         svg.append("text")
@@ -71,8 +87,9 @@ function constellationDiagram_Baseband(){
           .attr("transform", `rotate(-90)`)
           .attr("x", -height / 2)
           .attr("y", -margin.left + 25)
-          .text("Samples")
           .style("fill", "#FFFFFF");
+          // .text("Samples")
+
           // to draw the initial targets, will be overwritten when signal scheme is changed
           // the y value is defined by a position on the graph measured in pixels
           let yVal = height/2
@@ -110,28 +127,40 @@ function constellationDiagram_Baseband(){
   
       // START OF LOOPING CODE
       let counter = 0;
+      let yValCounter = (height/4)*(counter); // random y value within a band around center
+
       setInterval(() => {
 
       let variance = noise.gn/2;
+      if(document.getElementById("mode").value === "advanced"){
 
-      
+      }
       // console.log(ebno);
         if (counter == 5){
           counter = 0;
-          d3.select("#constellationParent").selectAll("circle").remove();
-          d3.select("#constellationParent").selectAll("path").remove();
+          d3.select("#constellationParentBaseband").selectAll("circle").remove();
+          d3.select("#constellationParentBaseband").selectAll("path").remove();
 
           updateBER(sig.BER);
 
           // console.log("10 seconds has passed")
 
         }
-
       for (let i = 0; i < messageRate; i++) {
 
-        BER_stats.sentMessages = BER_stats.sentMessages + 2; // two bits sent per iteration
-        let yValRand = (height/4)*(counter); // random y value within a band around center
 
+        BER_stats.sentMessages = BER_stats.sentMessages + 2; // two bits sent per iteration
+        if(document.getElementById("mode").value !== "advanced"){
+        yValCounter = (height/4)*(counter); //  
+        } else {
+          // do when in advanced mode
+          let freqIndex = miniCircuitsFreq.findIndex(miniCircuitsFreq => Math.abs(miniCircuitsFreq-frequency) <1 );
+          phaseShift = miniCircuitsPhase[freqIndex];
+
+
+
+        }
+        
         svg.append('g')
         .selectAll("dot")
         .data(positiveTarget)
@@ -139,13 +168,24 @@ function constellationDiagram_Baseband(){
         .append("circle")
           .attr("cx", function (d) { 
             let xVal = d.x + generateNormalRandom() * variance;
+            if(mode === "advanced"){
+              distOffset = xVal*Math.sin((phaseShift)*(Math.PI/180)); // in this case xVal starts as rho
+
+              yValCounter = distOffset;
+              xVal = xVal * Math.cos(phaseShift*(Math.PI/180))
+
+            } else{
+              yValCounter = counter-2; // random y value within a band around center
+            }
             if(xVal<thresholdTarget[0].x) {
               BER_stats.messageErrors += 1;
             }
             if(xVal<-voltageLimit) xVal = -voltageLimit
             
             return x(xVal); } )
-          .attr("cy", yValRand )
+          .attr("cy", function () { 
+            
+            return y(yValCounter);})
           .attr("r", 3)
           .style("fill", "none") // Makes the circle open
           .style("stroke", '#ef8a62') // Adds a border color
@@ -159,14 +199,22 @@ function constellationDiagram_Baseband(){
             .attr("d", d3.symbol().type(d3.symbolCross).size(30)) // Use a times symbol
             .attr("transform", function (d) { 
                 let xVal = d.x + variance* generateNormalRandom();
+            if(mode === "advanced"){
+              distOffset = xVal*Math.sin((phaseShift)*(Math.PI/180)); // in this case xVal starts as rho
 
-                let rotation = 45; // Rotation angle in degrees
+              yValCounter = distOffset;
+              xVal = xVal * Math.cos(phaseShift*(Math.PI/180))
+
+            } else{
+              yValCounter = counter -2; // random y value within a band around center
+            }
+
               if (xVal > thresholdTarget[0].x) {
                 BER_stats.messageErrors += 1;
               }
               if (xVal < -voltageLimit) xVal = -voltageLimit;
 
-              return `translate(${x(xVal)}, ${yValRand}) rotate(${rotation})`; 
+              return `translate(${x(xVal)}, ${y(yValCounter)}) rotate(${45})`; // turns the plus into a cross
             })
             .style("fill", '#67a9cf');
 
@@ -200,13 +248,14 @@ function constellationDiagram_Baseband(){
               .style("fill","#f7f7f7")
             }
         sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
-
+          
         // console.log("Errors: " + errors);
         // console.log("Total Bits: " + totalBits);
         // console.log("BER: " + sig.BER);
         // console.log(thresholdTarget[0].x)
         // value below is the loop time in miliseconds
         counter = counter + 1;
+
     }, 1000);
     
 
@@ -221,23 +270,46 @@ function constellationDiagram_Baseband(){
   
     sig.onChange("gn", update_constellation);
     noise.onChange("gn", update_constellation);
+    sigPower.onChange("gn", update_constellation);
+    noisePower.onChange("gn", update_constellation);
+    
+    document.getElementById("rateSlider").addEventListener("change", update_constellation);
 
+
+
+    document.getElementById("mode").addEventListener("change", update_constellation);
+    
     function update_constellation(){
-
+      let advancedMode = document.getElementById("mode").value === "advanced";
+      // console.log(advancedMode);
       // let ebno = ((sig.gn)/(noise.gn));
       // let ebnoDb = 10*Math.log10(ebno);
-
       let offset = 1;
-      if(!sig.differentialMode) offset = .5;
-      let rmsPower = (sig.gn*(1/Math.sqrt(2)))**2;
-      let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
-      let ebnoDb = 10*Math.log10((ebno));
-      d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
-      d3.select("#snrLabel").text(`${ebnoDb.toFixed(2)} dB`);
-      d3.select("#sigPower").text(`${(10*Math.log10((ebno))).toFixed(2)} dB`);
-      d3.select("#noisePower").text(`${(10*Math.log10(noise.gn**2)).toFixed(2)} dB`);
-      //  
-      console.log(ebno + " linear")
+
+
+      if(!advancedMode){
+        if(!sig.differentialMode) offset = .5;
+        let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
+        let ebnoDb = 10*Math.log10((ebno));
+        d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
+        d3.select("#snrLabel").text(`${ebnoDb.toFixed(2)} dB`);
+        d3.select("#sigPower").text(`${(10*Math.log10(offset*sig.gn**2)).toFixed(2)} dB`);
+        d3.select("#noisePower").text(`${(10*Math.log10(noise.gn**2)).toFixed(2)} dB`);
+      } else {
+        freqIndex = miniCircuitsFreq.findIndex(miniCircuitsFreq => Math.abs(miniCircuitsFreq-frequency) <1 );
+        phaseShift = miniCircuitsPhase[freqIndex];
+        offset = 1;
+        if(!sig.differentialMode) offset = .5;
+        let ebnodB = (sigPower.gn - noisePower.gn) +10*Math.log10(1/messageRate);
+        let snrdB = (sigPower.gn - noisePower.gn) ;
+ 
+        d3.select("#ebnoLabel").text(`${ebnodB.toFixed(2)} dB`);
+        d3.select("#snrLabel").text(`${snrdB.toFixed(2)} dB`);
+        d3.select("#sigPower").text(`${sigPower.gn.toFixed(2)} dB`);
+        d3.select("#noisePower").text(`${noisePower.gn.toFixed(2)} dB`);
+        d3.select("#LNAPhase").text(`${phaseShift.toFixed(2)} degrees`);
+      }
+      // console.log(ebno + " linear")
       let tBER = qfunc( Math.sqrt(2*offset*ebno) );
 
       d3.select("#tBERLabel").text(`${tBER.toFixed(6)}`);
@@ -266,8 +338,8 @@ function constellationDiagram_Baseband(){
       // ]
   
     // delete all dots
-    d3.select("#constellationParent").selectAll("circle").remove();
-    d3.select("#constellationParent").selectAll("path").remove();
+    d3.select("#constellationParentBaseband").selectAll("circle").remove();
+    d3.select("#constellationParentBaseband").selectAll("path").remove();
 
     svg.append('g')
       .selectAll("dot")

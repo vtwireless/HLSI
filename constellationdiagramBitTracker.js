@@ -19,7 +19,7 @@ function constellationDiagramManualTargets(){
         // append the svg object to the body of the page
         var svg = d3.select("#constellationParent")
             .append("svg")
-            .attr("width", width + margin.left )
+            .attr("width", width + margin.left + 800 )
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", `translate(${margin.left}, ${margin.top})`);
@@ -32,7 +32,8 @@ function constellationDiagramManualTargets(){
           
 
 
-
+        let textXPos = width+100;
+        let textYPos = height/2;
 
             
         // Add X axis
@@ -61,11 +62,11 @@ function constellationDiagramManualTargets(){
           svg.append("text")
             .attr("id", "bitValue")
             .attr("text-anchor", "middle")
-            .attr("x", width/2)
-            .attr("y", height + margin.top + 15)
+            .attr("x", textXPos)
+            .attr("y", textYPos )
             .text("Received Bit: ")
             .style("fill", "#FFFFFF")
-            .style("font-size", "20px");
+            .style("font-size", "24px");
 
           
 
@@ -93,20 +94,22 @@ function constellationDiagramManualTargets(){
           svg.append("text")
             .attr("id", "bitValue")
             .attr("text-anchor", "middle")
-            .attr("x", width/2)
-            .attr("y", height + margin.top + 20)
+            .attr("x", textXPos)
+            .attr("y", textYPos )
             .text("Received Bit: 1")
             .style("fill", "#FFFFFF")
-            .style("font-size", "20px");
+            .style("font-size", "24px");
           } else {
           svg.append("text")
             .attr("id", "bitValue")
             .attr("text-anchor", "middle")
-            .attr("x", width/2)
-            .attr("y", height + margin.top + 20)
+            .attr("x", textXPos)
+            .attr("y", textYPos)
             .text("Received Bit: 0")
             .style("fill", "#FFFFFF")
-            .style("font-size", "20px");
+            .style("font-size", "24px");
+
+          svg.selectAll("circle").attr("r", 6).style("fill","#ff0000")
            }
       }, 500);
   
@@ -118,7 +121,7 @@ function constellationDiagramManualTargets(){
         yTarget = 0
         xTarget =  generateNormalRandom(sig2.gn, 10**((noise.gn-30)/10))
         if (Math.abs(xTarget) > 1.55) {
-          xTarget = xTarget/Math.abs(xTarget) * 1.55
+          xTarget = xTarget/Math.abs(xTarget) * 1.5
         }
         constellationTargets = [
           { x: xTarget , y: yTarget  }
