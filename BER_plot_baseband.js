@@ -111,9 +111,8 @@ function BER_plot_baseband(){
       setInterval(() => {
         d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
-        
-      d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
+       
         if(sig.differentialMode) ebno = (((sig.gn**2)/((noise.gn**2))));
         if(!sig.differentialMode) ebno = (sig.gn)**2/((2*noise.gn**2));
 
@@ -122,6 +121,7 @@ function BER_plot_baseband(){
         if (sig.BER === 0) {
           sig.BER = 10**-6
         }
+      
       ebnoPoints = [
                   { x: ebnoDb, y: sig.BER },
                  ];
