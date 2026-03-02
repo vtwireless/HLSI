@@ -1,6 +1,8 @@
 // Declare global variables
 let bpskFlag = 0;
 let refreshRate = 1000;
+let targetColor = "#1b9e77"; // Define the color as a variable
+
 
 class MessageStats {
   constructor() {
@@ -14,7 +16,11 @@ class MessageStats {
   }
 }
 
-function constellationDiagram(top , left,constellationName, frozenFlag){
+let modTypeCode =  1; // default to PSK
+let sendingBits = 0; // 0 for symbols, 1 for bits
+
+
+function constellationDiagram(top , left,constellationName){
   
   setConstellationPosition(top, left, constellationName);
 
@@ -54,17 +60,25 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
             
         // Add X axis
         var x = d3.scaleLinear()
-          .domain([-1.5, 1.5])
-          .range([ -.001, width * 1.01 ]);
+          .domain([-1.6, 1.6])
+          .range([ -.001, width  ]);
         svg.append("g")
           // sends the line to the bottom
           .attr("transform", "translate(0," + height + ")")
           // make grid lines
           .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
-  
+          // Add X axis label
+          svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", width/2)
+            .attr("y", height + margin.top + 20)
+            .text("\u221AEs")
+            .style("fill", "#FFFFFF")
+            .style("font-size", "18px");
+
         // Add Y axis
         var y = d3.scaleLinear()
-          .domain([-1.5, 1.5])
+          .domain([-1.6, 1.6])
           .range([ height, 0]);
         svg.append("g")
           // make grid lines
@@ -72,7 +86,15 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           // stroke lines
           svg.selectAll(".tick line").attr("stroke", "#FFFFFF")
           svg.selectAll(".tick text").attr("fill", "#FFFFFF")          
-
+          // Add Y axis label
+        svg.append("text")
+          .attr("text-anchor", "middle")
+          .attr("transform", `rotate(-90)`)
+          .attr("x", -height / 2)
+          .attr("y", -margin.left + 25)
+          .text("\u221AEs")
+          .style("fill", "#FFFFFF")
+          .style("font-size", "18px");
   
           // to draw the initial targets, will be overwritten when signal scheme is changed
       svg.append('g')
@@ -83,22 +105,22 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           .attr("cx", function (d) { return x(d.x); } )
           .attr("cy", function (d) { return y(d.y); } )
           .attr("r", 1.5)
-          .style("fill","#1b9e77")
+          .style("fill","#91bfdb")
 
 
-          // Add a button to the SVG
-      svg.append("foreignObject")
-        .attr("x", width - 80) // Position the button near the top-right corner
-        .attr("y", 10)
-        .attr("width", 80)
-        .attr("height", 30)
-        .append("xhtml:button")
-        .text("freeze")
-        .style("font-size", "12px")
-        .style("padding", "5px")
-        .style("cursor", "pointer")
-        .style("width", "60px") // Add this line for fixed width
-        .on("click", freeze);
+      //     // Add a button to the SVG
+      // svg.append("foreignObject")
+      //   .attr("x", width - 80) // Position the button near the top-right corner
+      //   .attr("y", 10)
+      //   .attr("width", 80)
+      //   .attr("height", 30)
+      //   .append("xhtml:button")
+      //   .text("freeze")
+      //   .style("font-size", "12px")
+      //   .style("padding", "5px")
+      //   .style("cursor", "pointer")
+      //   .style("width", "60px") // Add this line for fixed width
+      //   .on("click", freeze);
 
 
       // let freezeBox = svg.append("foreignObject")
@@ -126,12 +148,7 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
 
         // console.log(sig)
 
-        // UNCOMMENT out to add a slider
-        // Slider(noise, 'gn', null, "noiseSlider");
-        // Label(sig, 'sinr', {
-        // prefix: "Signal-to-Noise Ratio: SNR = "
-        // }, "noiseSlider");
-      
+
 
 
         let messageRate = 50;
@@ -195,62 +212,18 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
   
       // START OF LOOPING CODE
       let counter = 0;
-      messageRateSlider.value = messageRate
+      // messageRateSlider.value = messageRate
 
       
       setInterval(() => {
 
         if(!frozenFlag){
-        if (sig.mcs == 0) {
-          bpskFlag = 0;
-        } else {
-          bpskFlag = 1;
-        }
 
-
-        let scaleFactor = 0
-        if(sig.mcs>1 && sig.mcs <5 ){
-          // 4 QAM
-          scaleFactor = 2
-      } else if(sig.mcs <2){
-          // BPSK
-        bpskFlag = true;
-        scaleFactor = 2
-      } else if (sig.mcs >=5 && sig.mcs <7 ){
-          // 16 QAM
-          scaleFactor = .707
-      } else if (sig.mcs == 7){
-          // 32 QAM
-          scaleFactor = .408
-      } else if(sig.mcs ==8){
-          // 64 QAM
-          scaleFactor = .353
-      } else if (sig.mcs == 9){
-          // 128 QAM
-          scaleFactor = .289
-      } else if(sig.mcs >9) {
-          // 256 QAM
-          scaleFactor = .25
-      }
-      // console.log("1 second has passed");
-      // const ebno = math.log10(math.abs(sig.sinr))
-      const ebno = (10 ** (sig.sinr/20)) 
-      const noisePower = 1/ebno
-      // const noisePower = .1
-      // console.log(ebno)
-  
-      const variance = scaleFactor* Math.sqrt(noisePower)
-      // console.log(variance)
-
-
-    
-        
-
+          document.getElementById("sendMessageButton").click();
       // console.log(ebno);
         counter = counter + 1;
-        if (counter == 9){
+        if (counter == 10){
           counter = 0;
-          // d3.select("#constellationParent").selectAll("circle").remove();
           d3.select("#"+constellationName).selectAll("circle").remove();
           svg.append('g')
           .selectAll("dot")
@@ -259,47 +232,183 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
           .append("circle")
             .attr("cx", function (d) { return x(d.x); } )
             .attr("cy", function (d) { return y(d.y); } )
-            .attr("r", 3)
-            .style("fill","#1b9e77")
+            .attr("r", 5)
+            .style("fill",targetColor)
           console.log("10 seconds has passed")
-        }
+
+
+
+        } // end of loop check
+
+
+      } // end of frozen check
+
+
+    }, refreshRate);
+  
+  
+    sig.onChange("mcs", update_constellation);
+  
+    function update_constellation(){
+      //////////// GENERATE TARGETS FOR PSK MODULATION ////////////
+      // console.log(sig.mcs)
+      // console.log("The modulation code has changed")
+      if (modTypeCode === 1) {
+        if(sig.mcs <2){
+          // PSK
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
+
+      } else if(sig.mcs >=2 && sig.mcs <4){
+          // QPSK
+        constellationTargets = [
+          { x: Math.cos(0), y: Math.sin(0) },
+          { x: Math.cos(Math.PI / 2), y: Math.sin(Math.PI / 2) },
+          { x: Math.cos(Math.PI), y: Math.sin(Math.PI) },
+          { x: Math.cos((3 * Math.PI) / 2), y: Math.sin((3 * Math.PI) / 2) },
+        ];
+      } else if (sig.mcs >=5 && sig.mcs <7 ){
+          // 8 PSK
+        constellationTargets = [
+          { x: Math.cos(0), y: Math.sin(0) },
+          { x: Math.cos(Math.PI / 4), y: Math.sin(Math.PI / 4) },
+          { x: Math.cos(Math.PI / 2), y: Math.sin(Math.PI / 2) },
+          { x: Math.cos((3 * Math.PI) / 4), y: Math.sin((3 * Math.PI) / 4) },
+          { x: Math.cos(Math.PI), y: Math.sin(Math.PI) },
+          { x: Math.cos((5 * Math.PI) / 4), y: Math.sin((5 * Math.PI) / 4) },
+          { x: Math.cos((3 * Math.PI) / 2), y: Math.sin((3 * Math.PI) / 2) },
+          { x: Math.cos((7 * Math.PI) / 4), y: Math.sin((7 * Math.PI) / 4) }
+        ];
+
+      } else if (sig.mcs == 7){
+          // 16 PSK
+      constellationTargets = Array.from({ length: 16 }, (_, i) => ({
+        x: Math.cos((2 * Math.PI * i) / 16),
+        y: Math.sin((2 * Math.PI * i) / 16),
+      }));
+
+      } 
+    } else if (modTypeCode == 2){
+      //////////// GENERATE TARGETS FOR QAM MODULATION ////////////
+        if(sig.mcs <2){
+          // 2 QAM
+        constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
+
+        distance = 2/2;
+        // targetColor = "#e9a3c9";
+      } else if(sig.mcs >=2 && sig.mcs <4){
+          // 4 QAM
+        constellationTargets = [ { x: .707, y: .707 }, { x: .707, y: -.707 },{ x: -.707, y: .707 },{ x: -.707, y: -.707 }];
+
+        // targetColor = "#c51b7d";
+      } else if (sig.mcs >=5 && sig.mcs <7 ){
+          // 8 QAM
+        // constellationTargets =  [ { x: 1.414, y: 1.414 }, { x: 1.414, y: -1.414 }, { x: -1.414, y: 1.414 }, { x: -1.414, y: -1.414 }, { x: -.586, y: -.586 }, { x: .586, y: -.586 }, { x: -.586, y: .586 }, { x: .586, y: .586 } ];
+        constellationTargets =  [ { x: 1, y: 1 }, { x: 1, y: -1 }, { x: -1, y: 1 }, { x: -1, y: -1 }, { x: 0.447, y: 0.447 }, { x: 0.447, y: -0.447 }, { x: -0.447, y: 0.447 }, { x: -0.447, y: -0.447 } ];
+
+        // targetColor = "#f7f7f7";
+      } else if (sig.mcs ==7 ){
+        // constellationTargets = [ { x: -1.5, y: -1.5 }, { x: -1.5, y: -0.5 }, { x: -1.5, y: 0.5 }, { x: -1.5, y: 1.5 }, { x: -0.5, y: -1.5 }, { x: -0.5, y: -0.5 }, { x: -0.5, y: 0.5 }, { x: -0.5, y: 1.5 }, { x: 0.5, y: -1.5 }, { x: 0.5, y: -0.5 }, { x: 0.5, y: 0.5 }, { x: 0.5, y: 1.5 }, { x: 1.5, y: -1.5 }, { x: 1.5, y: -0.5 }, { x: 1.5, y: 0.5 }, { x: 1.5, y: 1.5 } ];
+        // constellationTargets = [ { x: -1, y: -1 }, { x: -1, y: -0.333 }, { x: -1, y: 0.333 }, { x: -1, y: 1 }, { x: -0.333, y: -1 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1 }, { x: 0.333, y: -1 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1 }, { x: 1, y: -1 }, { x: 1, y: -0.333 }, { x: 1, y: 0.333 }, { x: 1, y: 1 } ];
+        constellationTargets = [ { x: -0.949, y: -0.949 }, { x: -0.949, y: -0.316 }, { x: -0.949, y: 0.316 }, { x: -0.949, y: 0.949 }, { x: -0.316, y: -0.949 }, { x: -0.316, y: -0.316 }, { x: -0.316, y: 0.316 }, { x: -0.316, y: 0.949 }, { x: 0.316, y: -0.949 }, { x: 0.316, y: -0.316 }, { x: 0.316, y: 0.316 }, { x: 0.316, y: 0.949 }, { x: 0.949, y: -0.949 }, { x: 0.949, y: -0.316 }, { x: 0.949, y: 0.316 }, { x: 0.949, y: 0.949 } ];
+
+        // targetColor = "#fde0ef";
+      }
+
+    }
+    targetColor = "#91bfdb";
+    // delete all dots
+    // d3.select("#"+constellationName).selectAll("circle").remove();
+    svg.append('g')
+      .selectAll("dot")
+      .data(constellationTargets)
+      .enter()
+      .append("circle")
+      .attr("cx", function (d) { return x(d.x); } )
+      .attr("cy", function (d) { return y(d.y); } )
+      .attr("r", 5)
+      .style("fill", targetColor)
+    }  // end of updateConstellationTargets function
+
+
+
+
+    function plotMessages(){
+        let energyPerSymbol = 10**(sig.gn/10);
+        let noiseNormalization = (energyPerSymbol)
+      // if (sendingBits == 1){
+      //   noiseNormalization = Math.sqrt(energyPerSymbol/modulationOrder);
+      // }
+      // ------------- Modulation Specific Noise Normalization ---------//
+
+  
+      const variance = Math.sqrt((10**((noise.gn)/10))/(2*noiseNormalization));   
+
+      messageRateSlider.value = messageRate
+
       for (let i = 0; i < messageRate; i++) {
         // creates a variable that can be edited if it goes out of bounds for x and y values
         let translatedTargets = constellationTargets.map(point => ({
-          x: point.x  +(2)*variance*randn_bm(),
-          y: point.y  +(2)*variance*randn_bm()
+          x: point.x  +variance*generateNormalRandom(),
+          y: point.y  +variance*generateNormalRandom()
         }));
+
         for (let i = 0; i < constellationTargets.length; i++) {
-          BER_stats.sentMessages = BER_stats.sentMessages + 1;
+          // if(sendingBits===1 && modulationType == 1){
+          if(sendingBits===1){
 
-          // console.log(translatedTargets[i])
-          // console.log(translatedTargets)
+            BER_stats.sentMessages = (BER_stats.sentMessages + modulationOrder); // if sending bits, each symbol is multiple bits
+            // console.log("sending bits" + modulationOrder);
+          } else{
+            BER_stats.sentMessages = BER_stats.sentMessages + 1; // else each symbol is one message
+          }
 
-          let xErrorDist = Math.abs(translatedTargets[i].x - constellationTargets[i].x); 
-          let yErrorDist = Math.abs(translatedTargets[i].y - constellationTargets[i].y); 
 
-          let freezeBoxX = .92;
-          let freezeBoxY = 1.18;
-          let freezeBoxWidth = .5;
-          let freezeBoxHeight = .25;
+          distToTarget = ((constellationTargets[i].x - translatedTargets[i].x)**2 + (constellationTargets[i].y - translatedTargets[i].y)**2);
+
+          // let freezeBoxX = .92;
+          // let freezeBoxY = 1.18;
+          // let freezeBoxWidth = .5;
+          // let freezeBoxHeight = .25;
+          let errorDetected = false;
 
           let = printObject = [translatedTargets[i]]
 
-          if ( (xErrorDist > distance) || (yErrorDist > distance) ){
-            BER_stats.messageErrors = BER_stats.messageErrors + 1;
+
+
+          
+          for (let target of constellationTargets) {
+            let tempErrorDist = ((target.x - translatedTargets[i].x)**2 + (target.y - translatedTargets[i].y)**2);
+
+            if (target !== constellationTargets[i] && (tempErrorDist < distToTarget)) {
+              if(sendingBits===1){
+                // let addedErrors = Math.floor(Math.random() * modulationOrder)+1;
+                // let addedErrors = modulationOrder; // assume all bits in symbol are wrong for testing
+                // let addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                let addedErrors = 1;
+
+                // if(modulationOrder >=3 && modTypeCode === 2){
+                //   // BPSK or QPSK
+                //   addedErrors = Math.ceil(Math.abs(generateNormalRandom(1,1)));
+                // }
+                if (addedErrors > modulationOrder){
+                  addedErrors = modulationOrder;
+                }
+                BER_stats.messageErrors += addedErrors;
+                // console.log("Added bit errors: " + addedErrors);
+                // BER_stats.messageErrors += modulationOrder;
+
+
+              }else{
+                BER_stats.messageErrors++;
+              }
+              errorDetected = true;
+              break;
+            }
           }
 
-          // console.log(printObject[0].x)
-          if (  !((printObject[0].x >= freezeBoxX &&
-                printObject[0].x <= freezeBoxX + freezeBoxWidth) &&
-                (printObject[0].y >= freezeBoxY &&
-                printObject[0].y <= freezeBoxY + freezeBoxHeight))){
-                  // console.log("Not in freeze box")
 
-
-
-
-            if ( (xErrorDist > distance) || (yErrorDist > distance) ){
+            if ( errorDetected ){
+              // console.log(printObject)
               // console.log("Error!!!")
               // messageErrors = messageErrors + 1;
               svg.append('g')
@@ -309,22 +418,22 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
               .append("circle")
                 .attr("cx", function (d) { 
                   let xVal = d.x
-                  if (xVal> 1.5){
-                    xVal = 1.5 
-                  } else if(xVal < -1.5){
-                    xVal = -1.5
+                  if (xVal> 1.6){
+                    xVal = 1.6 
+                  } else if(xVal < -1.6){
+                    xVal = -1.6
                   }
                   return x(xVal); } )
                 .attr("cy", function (d) {
                   let yVal = d.y      
-                  if (yVal> 1.5){
-                    yVal = 1.5
-                  } else if (yVal < -1.5){
-                    yVal = -1.5
+                  if (yVal> 1.6){
+                    yVal = 1.6
+                  } else if (yVal < -1.6){
+                    yVal = -1.6
                   }
                   return y(yVal); } )
                 .attr("r", 2)
-                .style("fill","#d95f02")
+                .style("fill","#fc8d59")
             } else {
               
               svg.append('g')
@@ -334,121 +443,97 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
               .append("circle")
               .attr("cx", function (d) { 
                 let xVal = d.x
-                if (xVal> 1.5){
-                  xVal = 1.5 
-                } else if(xVal < -1.5){
-                  xVal = -1.5
+                if (xVal> 1.6){
+                  xVal = 1.6
+                } else if(xVal < -1.6){
+                  xVal = -1.6
                 }
                 return x(xVal); } )
               .attr("cy", function (d) {
                 let yVal = d.y      
-                if (yVal> 1.5){
-                  yVal = 1.5
-                } else if (yVal < -1.5){
-                  yVal = -1.5
+                if (yVal> 1.6){
+                  yVal = 1.6
+                } else if (yVal < -1.6){
+                  yVal = -1.6
                 }
                 return y(yVal); } )
                 .attr("r", 2)
-                .style("fill","#7570b3")
-              }
-            }
-            else{
-              // console.log("In freeze box")
-              // console.log(printObject)
-            }
-            
-          }
-
-
-
-        // constellationTargets = [
-        //           { x: 6, y: .1 },
-
-        //       ];
-
-        svg.append('g')
-          .selectAll("dot")
-          .data(constellationTargets)
-          .enter()
-          .append("circle")
-            .attr("cx", function (d) { return x(d.x); } )
-            .attr("cy", function (d) { return y(d.y); } )
-            .attr("r", 1.5)
-            .style("fill","#1b9e77")
+                .style("fill",targetColor)
+              // }
             }
 
-
-        // value below is the loop time in miliseconds
+      } // end of constellation targets loop
+    } // end of message rate loop
+        // console.log(BER_stats);
         sig.BER = BER_stats.messageErrors/BER_stats.sentMessages;
+
+        if (BER_stats.messageErrors === 0) {
+          sig.BER = 10**-8;
+        }
+        
         // console.log("Bit Error Rate: " + sig.BER);
 
         // Update the BER display
-        berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(6)}`;
-          }
+        berDisplay.textContent = `Bit Error Rate: ${sig.BER.toFixed(8)}`;
+    //       }
+
+  }
 
 
-    }, refreshRate);
-  
-  
-    sig.onChange("mcs", update_constellation);
-  
-    function update_constellation(){
-      // console.log(sig.mcs)
-      // console.log("The modulation code has changed")
-      bpskFlag = false;
-      if(sig.mcs>1 && sig.mcs <5 ){
-        // 4 QAM
-      constellationTargets = [{ x: 1, y: 1 }, { x: 1, y: -1 },{ x: -1, y: 1 },{ x: -1, y: -1 },];
-      distance = 2/2;
-    } else if(sig.mcs <2){
-        // BPSK
-      bpskFlag = true;
-      constellationTargets = [{ x: 1, y: 0 },{ x: -1, y: 0 } ];
-      distance = 2/2;
-    } else if (sig.mcs >=5 && sig.mcs <7 ){
-        // 16 QAM
-      constellationTargets = [ { x: -1.000, y: -1.000 }, { x: -1.000, y: -0.333 }, { x: -1.000, y: 0.333 }, { x: -1.000, y: 1.000 }, { x: -0.333, y: -1.000 }, { x: -0.333, y: -0.333 }, { x: -0.333, y: 0.333 }, { x: -0.333, y: 1.000 }, { x: 0.333, y: -1.000 }, { x: 0.333, y: -0.333 }, { x: 0.333, y: 0.333 }, { x: 0.333, y: 1.000 }, { x: 1.000, y: -1.000 }, { x: 1.000, y: -0.333 }, { x: 1.000, y: 0.333 }, { x: 1.000, y: 1.000 } ];
-      distance = .666/2;
-    } else if (sig.mcs == 7){
-        // 32 QAM
-    constellationTargets = [ { x: -1,y: -0.6 },{ x: -1,y: -0.2 },{ x: -1,y: 0.2 },{ x: -1,y: 0.6 },{ x: -0.6,y: -1 },{ x: -0.6,y: -0.6 },{ x: -0.6,y: -0.2 },{ x: -0.6,y: 0.2 },{ x: -0.6,y: 0.6 },{ x: -0.6,y: 1 },{ x: -0.2,y: -1 },{ x: -0.2,y: -0.6 },{ x: -0.2,y: -0.2 },{ x: -0.2,y: 0.2 },{ x: -0.2,y: 0.6 },{ x: -0.2,y: 1 },{ x: 0.2,y: -1 },{ x: 0.2,y: -0.6 },{ x: 0.2,y: -0.2 },{ x: 0.2,y: 0.2 },{ x: 0.2,y: 0.6 },{ x: 0.2,y: 1 },{ x: 0.6,y: -1 },{ x: 0.6,y: -0.6 },{ x: 0.6,y: -0.2 },{ x: 0.6,y: 0.2 },{ x: 0.6,y: 0.6 },{ x: 0.6,y: 1 },{ x: 1,y: -0.6 },{ x: 1,y: -0.2 },{ x: 1,y: 0.2 },{ x: 1,y: 0.6 }]
-    distance = .4/2;
-    } else if(sig.mcs ==8){
-    constellationTargets = [{ x: -1,y: -1 },{ x: -1,y: -0.714 },{ x: -1,y: -0.429 },{ x: -1,y: -0.143 },{ x: -1,y: 0.143 },{ x: -1,y: 0.429 },{ x: -1,y: 0.714 },{ x: -1,y: 1 },{ x: -0.714,y: -1 },{ x: -0.714,y: -0.714 },{ x: -0.714,y: -0.429 },{ x: -0.714,y: -0.143 },{ x: -0.714,y: 0.143 },{ x: -0.714,y: 0.429 },{ x: -0.714,y: 0.714 },{ x: -0.714,y: 1 },{ x: -0.429,y: -1 },{ x: -0.429,y: -0.714 },{ x: -0.429,y: -0.429 },{ x: -0.429,y: -0.143 },{ x: -0.429,y: 0.143 },{ x: -0.429,y: 0.429 },{ x: -0.429,y: 0.714 },{ x: -0.429,y: 1 },{ x: -0.143,y: -1 },{ x: -0.143,y: -0.714 },{ x: -0.143,y: -0.429 },{ x: -0.143,y: -0.143 },{ x: -0.143,y: 0.143 },{ x: -0.143,y: 0.429 },{ x: -0.143,y: 0.714 },{ x: -0.143,y: 1 },{ x: 0.143,y: -1 },{ x: 0.143,y: -0.714 },{ x: 0.143,y: -0.429 },{ x: 0.143,y: -0.143 },{ x: 0.143,y: 0.143 },{ x: 0.143,y: 0.429 },{ x: 0.143,y: 0.714 },{ x: 0.143,y: 1 },{ x: 0.429,y: -1 },{ x: 0.429,y: -0.714 },{ x: 0.429,y: -0.429 },{ x: 0.429,y: -0.143 },{ x: 0.429,y: 0.143 },{ x: 0.429,y: 0.429 },{ x: 0.429,y: 0.714 },{ x: 0.429,y: 1 },{ x: 0.714,y: -1 },{ x: 0.714,y: -0.714 },{ x: 0.714,y: -0.429 },{ x: 0.714,y: -0.143 },{ x: 0.714,y: 0.143 },{ x: 0.714,y: 0.429 },{ x: 0.714,y: 0.714 },{ x: 0.714,y: 1 },{ x: 1,y: -1 },{ x: 1,y: -0.714 },{ x: 1,y: -0.429 },{ x: 1,y: -0.143 },{ x: 1,y: 0.143 },{ x: 1,y: 0.429 },{ x: 1,y: 0.714 },{ x: 1,y: 1 }]
-    distance = .286/2;  
-    } else if (sig.mcs == 9){
-    constellationTargets = [{ x: -1,y: -0.636 },{ x: -1,y: -0.455 },{ x: -1,y: -0.273 },{ x: -1,y: -0.091 },{ x: -1,y: 0.091 },{ x: -1,y: 0.273 },{ x: -1,y: 0.455 },{ x: -1,y: 0.636 },{ x: -0.818,y: -0.636 },{ x: -0.818,y: -0.455 },{ x: -0.818,y: -0.273 },{ x: -0.818,y: -0.091 },{ x: -0.818,y: 0.091 },{ x: -0.818,y: 0.273 },{ x: -0.818,y: 0.455 },{ x: -0.818,y: 0.636 },{ x: -0.636,y: -1 },{ x: -0.636,y: -0.818 },{ x: -0.636,y: -0.636 },{ x: -0.636,y: -0.455 },{ x: -0.636,y: -0.273 },{ x: -0.636,y: -0.091 },{ x: -0.636,y: 0.091 },{ x: -0.636,y: 0.273 },{ x: -0.636,y: 0.455 },{ x: -0.636,y: 0.636 },{ x: -0.636,y: 0.818 },{ x: -0.636,y: 1 },{ x: -0.455,y: -1 },{ x: -0.455,y: -0.818 },{ x: -0.455,y: -0.636 },{ x: -0.455,y: -0.455 },{ x: -0.455,y: -0.273 },{ x: -0.455,y: -0.091 },{ x: -0.455,y: 0.091 },{ x: -0.455,y: 0.273 },{ x: -0.455,y: 0.455 },{ x: -0.455,y: 0.636 },{ x: -0.455,y: 0.818 },{ x: -0.455,y: 1 },{ x: -0.273,y: -1 },{ x: -0.273,y: -0.818 },{ x: -0.273,y: -0.636 },{ x: -0.273,y: -0.455 },{ x: -0.273,y: -0.273 },{ x: -0.273,y: -0.091 },{ x: -0.273,y: 0.091 },{ x: -0.273,y: 0.273 },{ x: -0.273,y: 0.455 },{ x: -0.273,y: 0.636 },{ x: -0.273,y: 0.818 },{ x: -0.273,y: 1 },{ x: -0.091,y: -1 },{ x: -0.091,y: -0.818 },{ x: -0.091,y: -0.636 },{ x: -0.091,y: -0.455 },{ x: -0.091,y: -0.273 },{ x: -0.091,y: -0.091 },{ x: -0.091,y: 0.091 },{ x: -0.091,y: 0.273 },{ x: -0.091,y: 0.455 },{ x: -0.091,y: 0.636 },{ x: -0.091,y: 0.818 },{ x: -0.091,y: 1 },{ x: 0.091,y: -1 },{ x: 0.091,y: -0.818 },{ x: 0.091,y: -0.636 },{ x: 0.091,y: -0.455 },{ x: 0.091,y: -0.273 },{ x: 0.091,y: -0.091 },{ x: 0.091,y: 0.091 },{ x: 0.091,y: 0.273 },{ x: 0.091,y: 0.455 },{ x: 0.091,y: 0.636 },{ x: 0.091,y: 0.818 },{ x: 0.091,y: 1 },{ x: 0.273,y: -1 },{ x: 0.273,y: -0.818 },{ x: 0.273,y: -0.636 },{ x: 0.273,y: -0.455 },{ x: 0.273,y: -0.273 },{ x: 0.273,y: -0.091 },{ x: 0.273,y: 0.091 },{ x: 0.273,y: 0.273 },{ x: 0.273,y: 0.455 },{ x: 0.273,y: 0.636 },{ x: 0.273,y: 0.818 },{ x: 0.273,y: 1 },{ x: 0.455,y: -1 },{ x: 0.455,y: -0.818 },{ x: 0.455,y: -0.636 },{ x: 0.455,y: -0.455 },{ x: 0.455,y: -0.273 },{ x: 0.455,y: -0.091 },{ x: 0.455,y: 0.091 },{ x: 0.455,y: 0.273 },{ x: 0.455,y: 0.455 },{ x: 0.455,y: 0.636 },{ x: 0.455,y: 0.818 },{ x: 0.455,y: 1 },{ x: 0.636,y: -1 },{ x: 0.636,y: -0.818 },{ x: 0.636,y: -0.636 },{ x: 0.636,y: -0.455 },{ x: 0.636,y: -0.273 },{ x: 0.636,y: -0.091 },{ x: 0.636,y: 0.091 },{ x: 0.636,y: 0.273 },{ x: 0.636,y: 0.455 },{ x: 0.636,y: 0.636 },{ x: 0.636,y: 0.818 },{ x: 0.636,y: 1 },{ x: 0.818,y: -0.636 },{ x: 0.818,y: -0.455 },{ x: 0.818,y: -0.273 },{ x: 0.818,y: -0.091 },{ x: 0.818,y: 0.091 },{ x: 0.818,y: 0.273 },{ x: 0.818,y: 0.455 },{ x: 0.818,y: 0.636 },{ x: 1,y: -0.636 },{ x: 1,y: -0.455 },{ x: 1,y: -0.273 },{ x: 1,y: -0.091 },{ x: 1,y: 0.091 },{ x: 1,y: 0.273 },{ x: 1,y: 0.455 },{ x: 1,y: 0.636 }]       
-    distance = .181/2;  
-    } else if(sig.mcs >9) {
-    constellationTargets = [ { x: -1,y: -1 },{ x: -1,y: -0.867 },{ x: -1,y: -0.733 },{ x: -1,y: -0.6 },{ x: -1,y: -0.467 },{ x: -1,y: -0.333 },{ x: -1,y: -0.2 },{ x: -1,y: -0.067 },{ x: -1,y: 0.067 },{ x: -1,y: 0.2 },{ x: -1,y: 0.333 },{ x: -1,y: 0.467 },{ x: -1,y: 0.6 },{ x: -1,y: 0.733 },{ x: -1,y: 0.867 },{ x: -1,y: 1 },{ x: -0.867,y: -1 },{ x: -0.867,y: -0.867 },{ x: -0.867,y: -0.733 },{ x: -0.867,y: -0.6 },{ x: -0.867,y: -0.467 },{ x: -0.867,y: -0.333 },{ x: -0.867,y: -0.2 },{ x: -0.867,y: -0.067 },{ x: -0.867,y: 0.067 },{ x: -0.867,y: 0.2 },{ x: -0.867,y: 0.333 },{ x: -0.867,y: 0.467 },{ x: -0.867,y: 0.6 },{ x: -0.867,y: 0.733 },{ x: -0.867,y: 0.867 },{ x: -0.867,y: 1 },{ x: -0.733,y: -1 },{ x: -0.733,y: -0.867 },{ x: -0.733,y: -0.733 },{ x: -0.733,y: -0.6 },{ x: -0.733,y: -0.467 },{ x: -0.733,y: -0.333 },{ x: -0.733,y: -0.2 },{ x: -0.733,y: -0.067 },{ x: -0.733,y: 0.067 },{ x: -0.733,y: 0.2 },{ x: -0.733,y: 0.333 },{ x: -0.733,y: 0.467 },{ x: -0.733,y: 0.6 },{ x: -0.733,y: 0.733 },{ x: -0.733,y: 0.867 },{ x: -0.733,y: 1 },{ x: -0.6,y: -1 },{ x: -0.6,y: -0.867 },{ x: -0.6,y: -0.733 },{ x: -0.6,y: -0.6 },{ x: -0.6,y: -0.467 },{ x: -0.6,y: -0.333 },{ x: -0.6,y: -0.2 },{ x: -0.6,y: -0.067 },{ x: -0.6,y: 0.067 },{ x: -0.6,y: 0.2 },{ x: -0.6,y: 0.333 },{ x: -0.6,y: 0.467 },{ x: -0.6,y: 0.6 },{ x: -0.6,y: 0.733 },{ x: -0.6,y: 0.867 },{ x: -0.6,y: 1 },{ x: -0.467,y: -1 },{ x: -0.467,y: -0.867 },{ x: -0.467,y: -0.733 },{ x: -0.467,y: -0.6 },{ x: -0.467,y: -0.467 },{ x: -0.467,y: -0.333 },{ x: -0.467,y: -0.2 },{ x: -0.467,y: -0.067 },{ x: -0.467,y: 0.067 },{ x: -0.467,y: 0.2 },{ x: -0.467,y: 0.333 },{ x: -0.467,y: 0.467 },{ x: -0.467,y: 0.6 },{ x: -0.467,y: 0.733 },{ x: -0.467,y: 0.867 },{ x: -0.467,y: 1 },{ x: -0.333,y: -1 },{ x: -0.333,y: -0.867 },{ x: -0.333,y: -0.733 },{ x: -0.333,y: -0.6 },{ x: -0.333,y: -0.467 },{ x: -0.333,y: -0.333 },{ x: -0.333,y: -0.2 },{ x: -0.333,y: -0.067 },{ x: -0.333,y: 0.067 },{ x: -0.333,y: 0.2 },{ x: -0.333,y: 0.333 },{ x: -0.333,y: 0.467 },{ x: -0.333,y: 0.6 },{ x: -0.333,y: 0.733 },{ x: -0.333,y: 0.867 },{ x: -0.333,y: 1 },{ x: -0.2,y: -1 },{ x: -0.2,y: -0.867 },{ x: -0.2,y: -0.733 },{ x: -0.2,y: -0.6 },{ x: -0.2,y: -0.467 },{ x: -0.2,y: -0.333 },{ x: -0.2,y: -0.2 },{ x: -0.2,y: -0.067 },{ x: -0.2,y: 0.067 },{ x: -0.2,y: 0.2 },{ x: -0.2,y: 0.333 },{ x: -0.2,y: 0.467 },{ x: -0.2,y: 0.6 },{ x: -0.2,y: 0.733 },{ x: -0.2,y: 0.867 },{ x: -0.2,y: 1 },{ x: -0.067,y: -1 },{ x: -0.067,y: -0.867 },{ x: -0.067,y: -0.733 },{ x: -0.067,y: -0.6 },{ x: -0.067,y: -0.467 },{ x: -0.067,y: -0.333 },{ x: -0.067,y: -0.2 },{ x: -0.067,y: -0.067 },{ x: -0.067,y: 0.067 },{ x: -0.067,y: 0.2 },{ x: -0.067,y: 0.333 },{ x: -0.067,y: 0.467 },{ x: -0.067,y: 0.6 },{ x: -0.067,y: 0.733 },{ x: -0.067,y: 0.867 },{ x: -0.067,y: 1 },{ x: 0.067,y: -1 },{ x: 0.067,y: -0.867 },{ x: 0.067,y: -0.733 },{ x: 0.067,y: -0.6 },{ x: 0.067,y: -0.467 },{ x: 0.067,y: -0.333 },{ x: 0.067,y: -0.2 },{ x: 0.067,y: -0.067 },{ x: 0.067,y: 0.067 },{ x: 0.067,y: 0.2 },{ x: 0.067,y: 0.333 },{ x: 0.067,y: 0.467 },{ x: 0.067,y: 0.6 },{ x: 0.067,y: 0.733 },{ x: 0.067,y: 0.867 },{ x: 0.067,y: 1 },{ x: 0.2,y: -1 },{ x: 0.2,y: -0.867 },{ x: 0.2,y: -0.733 },{ x: 0.2,y: -0.6 },{ x: 0.2,y: -0.467 },{ x: 0.2,y: -0.333 },{ x: 0.2,y: -0.2 },{ x: 0.2,y: -0.067 },{ x: 0.2,y: 0.067 },{ x: 0.2,y: 0.2 },{ x: 0.2,y: 0.333 },{ x: 0.2,y: 0.467 },{ x: 0.2,y: 0.6 },{ x: 0.2,y: 0.733 },{ x: 0.2,y: 0.867 },{ x: 0.2,y: 1 },{ x: 0.333,y: -1 },{ x: 0.333,y: -0.867 },{ x: 0.333,y: -0.733 },{ x: 0.333,y: -0.6 },{ x: 0.333,y: -0.467 },{ x: 0.333,y: -0.333 },{ x: 0.333,y: -0.2 },{ x: 0.333,y: -0.067 },{ x: 0.333,y: 0.067 },{ x: 0.333,y: 0.2 },{ x: 0.333,y: 0.333 },{ x: 0.333,y: 0.467 },{ x: 0.333,y: 0.6 },{ x: 0.333,y: 0.733 },{ x: 0.333,y: 0.867 },{ x: 0.333,y: 1 },{ x: 0.467,y: -1 },{ x: 0.467,y: -0.867 },{ x: 0.467,y: -0.733 },{ x: 0.467,y: -0.6 },{ x: 0.467,y: -0.467 },{ x: 0.467,y: -0.333 },{ x: 0.467,y: -0.2 },{ x: 0.467,y: -0.067 },{ x: 0.467,y: 0.067 },{ x: 0.467,y: 0.2 },{ x: 0.467,y: 0.333 },{ x: 0.467,y: 0.467 },{ x: 0.467,y: 0.6 },{ x: 0.467,y: 0.733 },{ x: 0.467,y: 0.867 },{ x: 0.467,y: 1 },{ x: 0.6,y: -1 },{ x: 0.6,y: -0.867 },{ x: 0.6,y: -0.733 },{ x: 0.6,y: -0.6 },{ x: 0.6,y: -0.467 },{ x: 0.6,y: -0.333 },{ x: 0.6,y: -0.2 },{ x: 0.6,y: -0.067 },{ x: 0.6,y: 0.067 },{ x: 0.6,y: 0.2 },{ x: 0.6,y: 0.333 },{ x: 0.6,y: 0.467 },{ x: 0.6,y: 0.6 },{ x: 0.6,y: 0.733 },{ x: 0.6,y: 0.867 },{ x: 0.6,y: 1 },{ x: 0.733,y: -1 },{ x: 0.733,y: -0.867 },{ x: 0.733,y: -0.733 },{ x: 0.733,y: -0.6 },{ x: 0.733,y: -0.467 },{ x: 0.733,y: -0.333 },{ x: 0.733,y: -0.2 },{ x: 0.733,y: -0.067 },{ x: 0.733,y: 0.067 },{ x: 0.733,y: 0.2 },{ x: 0.733,y: 0.333 },{ x: 0.733,y: 0.467 },{ x: 0.733,y: 0.6 },{ x: 0.733,y: 0.733 },{ x: 0.733,y: 0.867 },{ x: 0.733,y: 1 },{ x: 0.867,y: -1 },{ x: 0.867,y: -0.867 },{ x: 0.867,y: -0.733 },{ x: 0.867,y: -0.6 },{ x: 0.867,y: -0.467 },{ x: 0.867,y: -0.333 },{ x: 0.867,y: -0.2 },{ x: 0.867,y: -0.067 },{ x: 0.867,y: 0.067 },{ x: 0.867,y: 0.2 },{ x: 0.867,y: 0.333 },{ x: 0.867,y: 0.467 },{ x: 0.867,y: 0.6 },{ x: 0.867,y: 0.733 },{ x: 0.867,y: 0.867 },{ x: 0.867,y: 1 },{ x: 1,y: -1 },{ x: 1,y: -0.867 },{ x: 1,y: -0.733 },{ x: 1,y: -0.6 },{ x: 1,y: -0.467 },{ x: 1,y: -0.333 },{ x: 1,y: -0.2 },{ x: 1,y: -0.067 },{ x: 1,y: 0.067 },{ x: 1,y: 0.2 },{ x: 1,y: 0.333 },{ x: 1,y: 0.467 },{ x: 1,y: 0.6 },{ x: 1,y: 0.733 },{ x: 1,y: 0.867 },{ x: 1,y: 1 }]
-    distance = .133/2;
-    }
-  
-    // delete all dots
-    // d3.select("#constellationParent").selectAll("circle").remove();
-    d3.select("#"+constellationName).selectAll("circle").remove();
-    svg.append('g')
-      .selectAll("dot")
-      .data(constellationTargets)
-      .enter()
-      .append("circle")
-        .attr("cx", function (d) { return x(d.x); } )
-        .attr("cy", function (d) { return y(d.y); } )
-        .attr("r", 1.5)
-        .style("fill","#1b9e77")
-    }
-    function freeze() {
-      frozenFlag = !frozenFlag;
-      console.log(frozenFlag);
-    
-      // Update the button text
-      const button = d3.select("#"+constellationName+" button");
-      button.text(frozenFlag ? "unfreeze" : "freeze");
-    }
 
-    
+    document.getElementById("sendMessageButton").addEventListener("click", function() {
+      plotMessages();
+      
+    });
+         // use the clear all circles button
+    document.getElementById("clearMessagesButton").addEventListener("click", function() {
+      // d3.select("#constellationParent").selectAll("circle").remove();
+      d3.select("#constellationParent").selectAll("circle").remove();
+
+      sig.BER = 0;
+      BER_stats.reset(); 
+      update_constellation();
+    });
+
+
+    /////////////// MODULATION ORDER SELECTOR ///////////////
+    // Add an event listener for the dropdown selector
+    document.getElementById("modulationOrder").addEventListener("change", function() {
+      d3.select("#constellationParent").selectAll("circle").style("fill", "#ffffbf");
+
+      // d3.select("#modulationType").selectAll("circle").remove();
+      // modulationOrder = parseInt(modulationOrder, 10);
+      // console.log("Selected Modulation Order:", modulationOrder);
+      switch(modulationOrder){
+        case 1:
+          sig.mcs = 0;
+        break;
+        case 2:
+          sig.mcs = 3; 
+        break;
+        case 3:
+          sig.mcs = 5;
+        break;
+        case 4:
+          sig.mcs = 7;
+        break;
+      }
+      // console.log(sig);
+
+    });
+
+    /////////////// MODULATION TYPE SELECTOR ///////////////
+    document.getElementById("modulationType").addEventListener("change", function() {
+      d3.select("#constellationParent").selectAll("circle").style("fill", "#ffffbf");
+
+      modTypeCode = parseInt(modulationType.value, 10);
+      // console.log("Selected Modulation Type:", modTypeCode);
+
+      update_constellation();
+    });
   }
   
+
   // helper functions
 
   // }
@@ -458,35 +543,33 @@ function constellationDiagram(top , left,constellationName, frozenFlag){
       while(v === 0) v = Math.random();
       let num = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
       num = num / 10.0 + 0.5; // Translate to 0 -> 1
-      // if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
-       num = num - 0.5; // added to center around 0
+      if (num > 1 || num < 0) return randn_bm() // resample between 0 and 1
+      //  num = num - 0.5; // added to center around 0
       return num
     }
 
+function generateNormalRandom(mean = 0, stdDev = 1) {
+      let u1 = Math.random();
+      let u2 = Math.random();
+      let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+      return z0 * stdDev + mean;
+  }
 
-     // use the clear all circles button
-function buttonPressedClearPoints(){
-  // d3.select("#constellationParent").selectAll("circle").remove();
-  d3.select("#constellationParent").selectAll("circle").remove();
-  d3.select("#constellationParent2").selectAll("circle").remove();
+function freeze() {
+      frozenFlag = !frozenFlag;
+      console.log(frozenFlag);
+    
+      // Update the button text
+      const button = d3.select("#freezeButton");
+      button.text(frozenFlag ? "Run Continuously" : "freeze");
+  }  // end of freeze function
+  
 
-  sig.BER = 0;
-  BER_stats.reset(); 
-
-}
-
-// function freeze() {
-//   frozenFlag = !frozenFlag;
-//   console.log(frozenFlag);
-
-//   // Update the button text
-//   const button = d3.select("#constellationParent button");
-//   button.text(frozen ? "unfreeze" : "freeze");
-// }
 
 function setConstellationPosition(top, left, parent) {
   const constellationParent = document.getElementById(parent);
   constellationParent.style.top = `${top}px`;
   constellationParent.style.left = `${left}px`;
 }
+
 

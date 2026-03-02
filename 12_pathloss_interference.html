@@ -97,7 +97,10 @@ text labels, and numeric values
 <script src="d3.v5.min.js"></script>
 <script src="fft.js"></script>
 <script src="support.js"></script>
+<script src="signal.js"></script>
+<script src="iqPlot.js"></script>
 <script>
+ 
 
 // 2. Use the margin convention practice
 var margin = {top: 10, right: 50, bottom: 50, left: 50}
@@ -117,6 +120,21 @@ generator.m = 80;  // set filter semi-length
 generator.beta = 2;
 
 var lambda = 299.792458e6 / (fc*fs + f0);   // wavelength in meters
+
+// create a signal object 
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: gn, // dB
+    bw_int: bw,
+    fc_int: fc,
+    mcs_init: 2, // array index int
+  });
+
+  // create IQ plot plot variable
+  const plot = {
+  width: 620,   // total svg width in px
+  height: 260,  // total svg height in px
+  margin: { top: 10, right: 30, bottom: 40, left: 60 }
+};
 
 // scale
 var xScale = d3.scaleLinear().domain([-xrange, xrange]).range([0, width]);
@@ -282,6 +300,9 @@ function update_display(freq) {
     var [scale_cap,units_cap] = scale_units(C,0.1);
     document.querySelector('#cap').value = d3.format(".1f")(C*scale_cap) + " " + units_cap + "bps";
 }
+
+
+// IQPlot(sig);
 
 </script>
 </html>

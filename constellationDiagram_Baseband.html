@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
+
+
   <title>Constellation Diagram</title>
-<script src="https://d3js.org/d3.v4.js"></script>
+  <script src=d3.v5.min.js></script>
 <link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
 <script src=signal.js></script>
 <script src=common.js></script>
@@ -14,17 +16,91 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
 
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width"/>
+  <link rel="stylesheet" type="text/css" media="all" href="base.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
 
 
-<body>
-  <!-- <a href="index.html" style="margin-left: 1%; margin-top: 1%; display: block;">Back to Index</a> -->
 
-<div id="voltageSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
-<div id="noiseSlider" style="margin-left: 1%; margin-top:2%; width: 100%;"></div>
+  <body style="margin:0; padding:0; overflow-x:hidden;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85);top: 0; left: 0; width: 100%; height: 60px; ">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html" class="selected"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+        <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR Calculations Programmable</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Special Exercise:</span> Baseband constellation diagram</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
+
+
+
+  <div style="height: 50px;"></div>
+    <div class="modes" style="margin-left: 1%; margin-top: 2rem;">
+      <div>
+        <p><label for="mode">Select mode:</label> &nbsp;
+          <select id="mode" onchange="onModeChange()">
+            <option id="beginner" value="beginner">Beginner</option>
+            <option id="advanced" value="advanced">Advanced</option>
+          </select>
+        </p>
+      </div>
+  </div>
+
+<div class="constent-section" 
+  id="voltageSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+  <div id = "freqSlider" style="display: none;"></div>
+  <div id="powerReceivedSlider" style="margin-left: 1%; margin-top:1%; width: 100%; display: none;"></div>
+<div id="noiseSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+<div id = "noisePowerSlider" style="margin-left: 1%; margin-top:1%; width: 100%; display: none"> </div>
+<div id="rateSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
 
 <!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
-
-<div style="display:flex; align-items:center; gap:8px;">
+<div style="display:flex; align-items:center; gap:8px; margin-left:1%;">
   <span style="font-size:16px;">Differential Mode</span>
   <label class="switch">
     <input id="differentialMode" type="checkbox" onclick="differentialMode();">
@@ -35,7 +111,8 @@
 
 
 <div style="display: flex; align-items: flex-start; gap: 16px; justify-content: flex-start;">
-  <div id="constellationParent" style="width: 70%; height: 100%;"></div>
+  <div id="constellationParentBaseband" style="width: 70%; height: 100%;"></div>
+
   <table style="width: 80%; border-collapse: collapse; border: 1px solid black; text-align: left;">
     <thead>
       <tr>
@@ -57,9 +134,26 @@
         <td style="border: 1px solid black; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
       </tr>
       <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">SNR</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="snrLabel">0 dB</td>
+      </tr>
+      <tr>
         <td style="border: 1px solid black; padding: 8px; text-align: left;">Theoretical BER</td>
         <td style="border: 1px solid black; padding: 8px; text-align: left;" id="tBERLabel">0%</td>
       </tr>
+            <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Signal gain dB</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="sigPower">0 dB</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Noise Power</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="noisePower">0 dB</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" >LNA Phase</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left " id="LNAPhase"> Advanced mode only</td>
+      </tr>
+
     </tbody>
   </table>
   <style>
@@ -70,14 +164,17 @@
     }
   </style>
 </div>
+
 <div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
+
 <!-- <div id="BERLabel" style="width: 100%; height: 100%;"></div> -->
 </body>
 
 <script>
-// katex.render("f(x)^2", document.getElementById("ebnoDescription"), { throwOnError: false });
+  let resistance = 1;
+  let frequency = 1e9;
   let BER_stats = new MessageStats();
-
+  let messageRate = 10; // messages per second
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
 var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_init: 1.5, // dB
@@ -85,19 +182,33 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_max: 5, // volts
     mcs_init: 1, // array index int
     differentialMode: false,
-
-
   });
 
+var sigPower = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: -120, // dB
+    gn_min: -150, // volts
+    gn_max: -100, // volts
+  });
+
+
   var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: 1, // dB
+    gn_init: 1, 
     gn_min: .001,
     gn_max: 10,
   });
+
+    var noisePower = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: -60, // dB
+    gn_min: -100,
+    gn_max: -40,
+  });
+
   noise.gn = 1.0;
 
-// Slider(sig, 'gn', null, "modCodeSlider");
-voltageSlider = document.createElement("INPUT");
+  
+
+///////////// VOLTAGE SLIDER /////////////
+  voltageSlider = document.createElement("INPUT");
       // doing this manually because I don't want to edit sliders.js
       // below generates p object inside the div for inPhaseMag which we can add stuff to
       voltageSlider.type = "range";
@@ -107,12 +218,13 @@ voltageSlider = document.createElement("INPUT");
       voltageSlider.value = sig["gn"];
       let p = document.createElement("p");
       p.appendChild(voltageSlider);
-      // I'm sure I could have made this better but I didn't 
       document.getElementById("voltageSlider").appendChild(p);
 
       // below sets up the label on the left of the slider
       let label = document.createElement("label");
-      label.setAttribute("for", voltageSlider.id);
+      label.style.marginRight = "2%"; // Add a gap between the label and the slider
+      // label.setAttribute("for", voltageSlider.id);
+      label.setAttribute("id", "voltageSliderLabel");
       label.appendChild(document.createTextNode("Voltage"));
 
       voltageSlider.parentNode.prepend(label);
@@ -137,13 +249,79 @@ voltageSlider = document.createElement("INPUT");
       var outputUnitsCallbackSig = function (sig, val) {
          return d3.format(".2f")(val) + " Volts";
       };
-
+      // var outputUnitsCallbackSigVoltageUpdate = function (sigPower, val) {
+      //   voltageSlider.value = 10**(sigPower.gn/20);
+      //    return d3.format(`.2f`)(10**(sigPower.gn/20)) + " Volts";
+      // };
   
       sig.onChange("gn", function (sig1, gn) {
         voltageSlider.value = gn;
         output.value = outputUnitsCallbackSig(sig1, gn);
       });
+      // sigPower.onChange("gn", function (sigPower, gn) {
+      //   output.value = outputUnitsCallbackSigVoltageUpdate(sigPower, gn);
+      // });
 
+RxPowerSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      RxPowerSlider.type = "range";
+      RxPowerSlider.min = sigPower["gn" + "_min"]; // example: sig.freq_min
+      RxPowerSlider.max = sigPower["gn" + "_max"];  
+      RxPowerSlider.step = .01;
+      RxPowerSlider.value = sigPower["gn"];
+      p = document.createElement("p");
+      p.appendChild(RxPowerSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("powerReceivedSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      RxPowerLabel = document.createElement("label");
+      RxPowerLabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      RxPowerLabel.setAttribute("for", RxPowerSlider.id);
+      RxPowerLabel.appendChild(document.createTextNode('Rx Power' ));
+
+      RxPowerSlider.parentNode.prepend(RxPowerLabel);
+  
+      // below sets up the output value on the right of the slider
+      let RxPowerOutput = document.createElement("output");
+      RxPowerOutput.setAttribute("for", RxPowerSlider.id);
+      RxPowerSlider._output = RxPowerOutput
+      RxPowerSlider.parentNode.append(RxPowerOutput);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      RxPowerSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      RxPowerSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        sigPower["gn"] = parseValue(RxPowerSlider.value);
+      };
+      var outputUnitsCallbackSigPower = function (sigPower, val) {
+         return d3.format(`.2f`)(val) + " dBm";
+      };
+
+      var outputUnitsCallbackSigPowerUpdate = function (sig, val) {
+        RxPowerSlider.value = 20*Math.log10(sig.gn / resistance) - 30;
+
+         return d3.format(`.2f`)( 20*Math.log10(sig.gn / resistance) - 30) + " dBm";
+      };
+
+      sigPower.onChange("gn", function (sigPower, gn) {
+        RxPowerSlider.value = sigPower.gn;
+        RxPowerOutput.value = outputUnitsCallbackSigPower(sigPower, gn);
+      });
+  
+      sig.onChange("gn", function (sig, gn) {
+
+        RxPowerOutput.value = outputUnitsCallbackSigPowerUpdate(sig, gn);
+      });
+
+
+      ///////// NOISE SLIDER //////////
 noiseSlider = document.createElement("INPUT");
       // doing this manually because I don't want to edit sliders.js
       // below generates p object inside the div for inPhaseMag which we can add stuff to
@@ -159,8 +337,9 @@ noiseSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       Noiselabel = document.createElement("label");
+      Noiselabel.style.marginRight = "1%"; // Add a gap between the label and the slider
       Noiselabel.setAttribute("for", noiseSlider.id);
-      Noiselabel.appendChild(document.createTextNode('Noise Power'));
+      Noiselabel.appendChild(document.createTextNode('Noise PSD'));
 
       noiseSlider.parentNode.prepend(Noiselabel);
   
@@ -181,32 +360,222 @@ noiseSlider = document.createElement("INPUT");
         // This calls the parameter setter.
         noise["gn"] = parseValue(noiseSlider.value);
       };
-      var outputUnitsCallback = function (noise, val) {
-         return d3.format(`.2f`)(val);
+      var outputUnitsCallbackNoise = function (noise, val) {
+         return d3.format(`.2f`)(val) + " W/Hz";
       };
 
   
       noise.onChange("gn", function (noise, gn) {
         noiseSlider.value = gn;
-        NoiseOutput.value = outputUnitsCallback(noise, gn);
+        NoiseOutput.value = outputUnitsCallbackNoise(noise, gn);
       });
 
+      
+      ///////// NOISE SLIDER //////////
+noisePowerSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      noisePowerSlider.type = "range";
+      noisePowerSlider.min = noisePower["gn" + "_min"]; // example: sig.freq_min
+      noisePowerSlider.max = noisePower["gn" + "_max"];
+      noisePowerSlider.step = noisePower["gn" + "_step"];
+      noisePowerSlider.value = noisePower["gn"];
+      p = document.createElement("p");
+      p.appendChild(noisePowerSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("noisePowerSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      NoisePowerlabel = document.createElement("label");
+      NoisePowerlabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      NoisePowerlabel.setAttribute("for", noiseSlider.id);
+      NoisePowerlabel.appendChild(document.createTextNode('Noise Power'));
+
+      noisePowerSlider.parentNode.prepend(NoisePowerlabel);
+  
+      // below sets up the output value on the right of the slider
+      let NoisePowerOutput = document.createElement("output");
+      NoisePowerOutput.setAttribute("for", noisePowerSlider.id);
+      noisePowerSlider._output = NoisePowerOutput
+      noisePowerSlider.parentNode.append(NoisePowerOutput);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      noisePowerSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      noisePowerSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        noisePower["gn"] = parseValue(noisePowerSlider.value);
+      };
+      var outputUnitsCallbackNoisePower = function (noisePower, val) {
+         return d3.format(`.2f`)(val) + " dB";
+      };
+
+  
+      noisePower.onChange("gn", function (noisePower, gn) {
+        noisePowerSlider.value = gn;
+        NoisePowerOutput.value = outputUnitsCallbackNoisePower(noisePower, gn);
+      });
+
+///////////// MESSAGE RATE SLIDER //////////
+      if (!(document.getElementById("rateSlider").hasChildNodes())) {
+        messageRateSlider = document.createElement("INPUT");
+        messageRateSlider.type = "range";
+        messageRateSlider.min = 1; 
+        messageRateSlider.max = 500;
+        messageRateSlider.step = 1;
+        messageRateSlider.value = 1;
+        messageRateSlider.id = "rateSlider"; // Assign an ID to the slider
+
+        let p = document.createElement("p");
+        p.appendChild(messageRateSlider);
+        document.getElementById("rateSlider").appendChild(p); // 
+
+        // below sets up the label on the left of the slider
+        let label = document.createElement("label");
+        label.setAttribute("for", messageRateSlider.id);
+        label.appendChild(document.createTextNode("Message Rate"));
+        messageRateSlider.parentNode.prepend(label);
+  
+        // below sets up the output value on the right of the slider
+        let output = document.createElement("output");
+        output.setAttribute("for", messageRateSlider.id);
+        messageRateSlider._output = output;
+        messageRateSlider.parentNode.append(output);
+      
+        // below tells CSS to make the slider look like the sliders we're used to
+        messageRateSlider.className = "slider_bw";
+  
+        // we will use floats on the output
+        var parseValue = parseFloat;
+  
+        messageRateSlider.oninput = function () {
+          // Set the varying parameter.  For example: sig.freq
+          // This calls the parameter setter.
+          messageRate = parseValue(messageRateSlider.value);
+        };
+        var outputUnitsCallback = function (val) {
+          return d3.format("d")(val) + " messages/sec";
+        };
+
+  
+        messageRateSlider.addEventListener("input", function () {
+          messageRate = messageRateSlider.value;
+          output.textContent = outputUnitsCallback(messageRate);
+        })
+
+        output.value = outputUnitsCallback(messageRate);
+      }
+
+///////////// FREQ slider RATE SLIDER //////////
+      if (!(document.getElementById("freqSlider").hasChildNodes())) {
+        freqSlider = document.createElement("INPUT");
+        freqSlider.type = "range";
+        freqSlider.min = 100e6; 
+        freqSlider.max = 1e10;  // 100 MHz to 10 GHz
+        freqSlider.step = 100e6; // 100 MHz steps
+        freqSlider.value = 1e9; // Default to 1 GHz
+
+        let p = document.createElement("p");
+        p.appendChild(freqSlider);
+        document.getElementById("freqSlider").appendChild(p); // 
+
+        // below sets up the label on the left of the slider
+        let label = document.createElement("label");
+        label.setAttribute("for", messageRateSlider.id);
+        label.appendChild(document.createTextNode("Frequency"));
+        freqSlider.parentNode.prepend(label);
+  
+        // below sets up the output value on the right of the slider
+        let freqOutput = document.createElement("output");
+        freqOutput.setAttribute("for", freqSlider.id);
+        freqSlider._output = freqOutput;
+        freqSlider.parentNode.append(freqOutput);
+      
+        // below tells CSS to make the slider look like the sliders we're used to
+        freqSlider.className = "slider_bw";
+  
+        // we will use floats on the output
+        var parseValue = parseFloat;
+  
+        freqSlider.oninput = function () {
+          // Set the varying parameter.  For example: sig.freq
+          // This calls the parameter setter.
+          frequency = parseValue(freqSlider.value);
+        };
+        var outputUnitsCallbackFreq = function (val) {
+          if (val >= 1e9) {
+            return d3.format(".1f")(val/1e9) + " GHz";
+          } else if (val >= 1e6) {
+            return d3.format(".2f")(val/1e6) + " MHz";
+        }
+      };
+
+  
+        freqSlider.addEventListener("input", function () {
+          frequency = freqSlider.value;
+          freqOutput.textContent = outputUnitsCallbackFreq(frequency);
+        })
+
+        freqOutput.value = outputUnitsCallbackFreq(frequency);
+      }
+
+
+      
 // Slider(noise, 'gn', null, "noiseSlider");
 
+mode = document.getElementById("mode").value;
+
 constellationDiagram_Baseband()
+
+let frozenFlag = true;
+
 
 BER_plot_baseband()
 
 
 
+  function onModeChange() {
+    mode = document.getElementById("mode").value;
 
+    // beginner mode
+    if (mode === 'beginner') {
+      document.getElementById("powerReceivedSlider").style.display = "none";
+      document.getElementById("voltageSlider").style.display = "block";
+      document.getElementById("noiseSlider").style.display = "block";
+      document.getElementById("rateSlider").style.display = "block";
+      document.getElementById("noisePowerSlider").style.display = "none";
+      document.getElementById("voltageSliderLabel").textContent = "Voltage";
+      document.getElementById("freqSlider").style.display = "none";
+      document.getElementById("LNAPhase").style.display = "none";
+      // document.getElementById("LNAPhaseTitle").style.display = "none";
+
+
+    } else if (mode === 'advanced') {
+      document.getElementById("powerReceivedSlider").style.display = "block";
+      document.getElementById("voltageSlider").style.display = "block";
+      document.getElementById("noiseSlider").style.display = "none";
+      document.getElementById("rateSlider").style.display = "block";
+      document.getElementById("noisePowerSlider").style.display = "block";
+      document.getElementById("voltageSliderLabel").textContent = "Equalizer Output Voltage";
+      document.getElementById("freqSlider").style.display = "block";
+      document.getElementById("LNAPhase").style.display = "block";
+      // document.getElementById("LNAPhaseTitle").style.display = "block";
+
+
+
+    }
+  }
 
 
 
 // }
  // use the clear all circles button
 function buttonPressedClearPoints(){
-  d3.select("#constellationParent").selectAll("circle").remove();
+  d3.select("#constellationParentBaseband").selectAll("circle").remove();
 
 
 }
