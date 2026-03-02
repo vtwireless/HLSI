@@ -22,7 +22,6 @@ and numeric values
     <script src=spectralEfficiencyPlot.js></script>
     <script src=label.js></script>
     <script src=capacityBanner.js></script>
-    <script src=constellationDiagram.js></script>
 </head>
 
 
@@ -96,8 +95,10 @@ and numeric values
 
   <p id=capacityBanner>
   </p>
-  <div id="constellationParent" style="width: 100%; height: 100%;"></div>
-
+  <!-- <div id="constellationParent" style="width: 100%; height: 100%;"></div> -->
+    <div class="grid-item">
+      <div id="spectral_efficiency_parent"></div>
+    </div>
 </div>
 
 
@@ -133,7 +134,7 @@ CapacityBanner(sig, '#capacityBanner');
 PowerSpectrumPlot();
 SpectralEfficiencyPlot(sig);
 
-constellationDiagram();
+// constellationDiagram();
 
 // sig.onChange("mcs", );
 
