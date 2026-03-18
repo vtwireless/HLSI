@@ -111,22 +111,27 @@ function BER_plot_baseband(){
       setInterval(() => {
         d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
-
+        mode = document.getElementById("mode").value;
        
         if(sig.differentialMode) ebno = (((sig.gn**2)/((noise.gn**2))));
         if(!sig.differentialMode) ebno = (sig.gn)**2/((2*noise.gn**2));
 
-        ebnoDb = 10*Math.log10(ebno);
+        ebnoBeginner = 10*Math.log10(ebno);
         // console.log(ebnoDb + " dB")
         if (sig.BER === 0) {
           sig.BER = 10**-6
         }
-      
-      ebnoPoints = [
-                  { x: ebnoDb, y: sig.BER },
-                 ];
-      if ((ebnoPoints[0].x > 0)||(ebnoPoints[0].x < 10)) {
+      if (mode === 'beginner'){
+        ebnoPoints = [
+                    { x: ebnoBeginner, y: sig.BER },
+                  ];
+      } else {
+        let ebnoAdvanced = (sigPower.gn - noisePower.gn) +10*Math.log10(1/messageRate) + LNAGain;
 
+        ebnoPoints = [{x: ebnoAdvanced, y: sig.BER },
+                  ];
+      }
+      if ((ebnoPoints[0].x > 0)&&(ebnoPoints[0].x < 10)) {
           svg.append('g')
             .selectAll("dot")
             .data(ebnoPoints)
@@ -136,6 +141,8 @@ function BER_plot_baseband(){
               .attr("cy", function (d) { return y(d.y); } )
               .attr("r", 4)
               .style("fill","#d01c8b")
+
+          
       }
               // console.log(BER_stats);
       }, 5000);

@@ -25,7 +25,7 @@
 
   <body style="margin:0; padding:0; overflow-x:hidden;">
   <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85);top: 0; left: 0; width: 100%; height: 60px; ">
-    <label for="menu-control" class="hamburger">
+    <label for="menu-control" class="hamburger" style = "margin-top: .4%;">
       <i class="hamburger__icon"></i>
       <i class="hamburger__icon"></i>
       <i class="hamburger__icon"></i>
@@ -68,7 +68,7 @@
       
     </aside>
     
-    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Special Exercise:</span> Baseband constellation diagram</div>
+    <div style="margin-left: 4%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Special Exercise:</span> Baseband constellation diagram</div>
     <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
       <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
       <div style="width: 20%;">
@@ -93,7 +93,9 @@
 
 <div class="constent-section" 
   id="voltageSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
-  <div id = "freqSlider" style="display: none;"></div>
+<div id = "freqSlider" style="display: none; margin-left: 1%;"></div>
+<div id = "phaseSlider" style="display: none; margin-left: 1%;"></div>
+
   <div id="powerReceivedSlider" style="margin-left: 1%; margin-top:1%; width: 100%; display: none;"></div>
 <div id="noiseSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
 <div id = "noisePowerSlider" style="margin-left: 1%; margin-top:1%; width: 100%; display: none"> </div>
@@ -153,6 +155,10 @@
         <td style="border: 1px solid black; padding: 8px; text-align: left;" >LNA Phase</td>
         <td style="border: 1px solid black; padding: 8px; text-align: left " id="LNAPhase"> Advanced mode only</td>
       </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" >LNA Gain</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left " id="LNAGain"> Advanced mode only</td>
+      </tr>
 
     </tbody>
   </table>
@@ -173,6 +179,7 @@
 <script>
   let resistance = 1;
   let frequency = 1e9;
+  let correlatorPhase = 0;
   let BER_stats = new MessageStats();
   let messageRate = 10; // messages per second
 // var sig = Signal(conf.sigIC_05, "", { bw_min: 4.0e6 });
@@ -185,7 +192,7 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   });
 
 var sigPower = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
-    gn_init: -120, // dB
+    gn_init: -100, // dB
     gn_min: -150, // volts
     gn_max: -100, // volts
   });
@@ -222,7 +229,7 @@ var sigPower = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
 
       // below sets up the label on the left of the slider
       let label = document.createElement("label");
-      label.style.marginRight = "2%"; // Add a gap between the label and the slider
+      // label.style.marginRight = "2%"; // Add a gap between the label and the slider
       // label.setAttribute("for", voltageSlider.id);
       label.setAttribute("id", "voltageSliderLabel");
       label.appendChild(document.createTextNode("Voltage"));
@@ -277,7 +284,7 @@ RxPowerSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       RxPowerLabel = document.createElement("label");
-      RxPowerLabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      // RxPowerLabel.style.marginRight = "1%"; // Add a gap between the label and the slider
       RxPowerLabel.setAttribute("for", RxPowerSlider.id);
       RxPowerLabel.appendChild(document.createTextNode('Rx Power' ));
 
@@ -305,9 +312,9 @@ RxPowerSlider = document.createElement("INPUT");
       };
 
       var outputUnitsCallbackSigPowerUpdate = function (sig, val) {
-        RxPowerSlider.value = 20*Math.log10(sig.gn / resistance) - 30;
+        RxPowerSlider.value = sigPower.gn - 30;
 
-         return d3.format(`.2f`)( 20*Math.log10(sig.gn / resistance) - 30) + " dBm";
+         return d3.format(`.2f`)( sigPower.gn - 30) + " dBm";
       };
 
       sigPower.onChange("gn", function (sigPower, gn) {
@@ -337,7 +344,7 @@ noiseSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       Noiselabel = document.createElement("label");
-      Noiselabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      // Noiselabel.style.marginRight = "1%"; // Add a gap between the label and the slider
       Noiselabel.setAttribute("for", noiseSlider.id);
       Noiselabel.appendChild(document.createTextNode('Noise PSD'));
 
@@ -387,7 +394,7 @@ noisePowerSlider = document.createElement("INPUT");
 
       // below sets up the label on the left of the slider
       NoisePowerlabel = document.createElement("label");
-      NoisePowerlabel.style.marginRight = "1%"; // Add a gap between the label and the slider
+      // NoisePowerlabel.style.marginRight = "1%"; // Add a gap between the label and the slider
       NoisePowerlabel.setAttribute("for", noiseSlider.id);
       NoisePowerlabel.appendChild(document.createTextNode('Noise Power'));
 
@@ -485,7 +492,7 @@ noisePowerSlider = document.createElement("INPUT");
 
         // below sets up the label on the left of the slider
         let label = document.createElement("label");
-        label.setAttribute("for", messageRateSlider.id);
+        label.setAttribute("for", freqSlider.id);
         label.appendChild(document.createTextNode("Frequency"));
         freqSlider.parentNode.prepend(label);
   
@@ -524,6 +531,56 @@ noisePowerSlider = document.createElement("INPUT");
       }
 
 
+///////////// PHASE slider  //////////
+      if (!(document.getElementById("phaseSlider").hasChildNodes())) {
+        phaseSlider = document.createElement("INPUT");
+        phaseSlider.type = "range";
+        phaseSlider.min = 0; 
+        phaseSlider.max = 360;  // 100 MHz to 10 GHz
+        phaseSlider.step = 1; // 100 MHz steps
+        phaseSlider.value = 0; // Default to 1 GHz
+
+        let p = document.createElement("p");
+        p.appendChild(phaseSlider);
+        document.getElementById("phaseSlider").appendChild(p); // 
+
+        // below sets up the label on the left of the slider
+        let label = document.createElement("label");
+        label.setAttribute("for", phaseSlider.id);
+        label.appendChild(document.createTextNode("correlator phase"));
+        phaseSlider.parentNode.prepend(label);
+  
+        // below sets up the output value on the right of the slider
+        let phaseOutput = document.createElement("output");
+        phaseOutput.setAttribute("for", phaseSlider.id);
+        phaseSlider._output = phaseOutput;
+        phaseSlider.parentNode.append(phaseOutput);
+      
+        // below tells CSS to make the slider look like the sliders we're used to
+        phaseSlider.className = "slider_bw";
+  
+        // we will use floats on the output
+        var parseValue = parseFloat;
+  
+        phaseSlider.oninput = function () {
+          // Set the varying parameter.  For example: sig.freq
+          // This calls the parameter setter.
+          correlatorPhase = parseValue(phaseSlider.value);
+        };
+      var outputUnitsCallbackPhase = function (val) {
+          return d3.format("d")(val) + " degrees";
+
+      };
+
+  
+        phaseSlider.addEventListener("input", function () {
+          correlatorPhase = phaseSlider.value;
+          phaseOutput.textContent = outputUnitsCallbackPhase(correlatorPhase);
+        })
+
+        phaseOutput.value = outputUnitsCallbackPhase(correlatorPhase);
+      }
+
       
 // Slider(noise, 'gn', null, "noiseSlider");
 
@@ -537,6 +594,15 @@ let frozenFlag = true;
 BER_plot_baseband()
 
 
+let labels = document.querySelectorAll("label");
+
+labels.forEach(label => {
+   if (label.htmlFor !== "mode" && !label.classList.contains("switch") && label.htmlFor !== "menu-control" ) {
+      label.style.display = "inline-block";
+      label.style.width = "100px";
+   }
+});
+
 
   function onModeChange() {
     mode = document.getElementById("mode").value;
@@ -544,27 +610,40 @@ BER_plot_baseband()
     // beginner mode
     if (mode === 'beginner') {
       document.getElementById("powerReceivedSlider").style.display = "none";
-      document.getElementById("voltageSlider").style.display = "block";
       document.getElementById("noiseSlider").style.display = "block";
       document.getElementById("rateSlider").style.display = "block";
       document.getElementById("noisePowerSlider").style.display = "none";
       document.getElementById("voltageSliderLabel").textContent = "Voltage";
       document.getElementById("freqSlider").style.display = "none";
-      document.getElementById("LNAPhase").style.display = "none";
-      // document.getElementById("LNAPhaseTitle").style.display = "none";
+      document.getElementById("phaseSlider").style.display = "none";
+      document.getElementById("voltageSliderLabel").sytle.marginRight = "1px";
 
+      let labels = document.querySelectorAll("label");
+
+      labels.forEach(label => {
+        if (label.htmlFor !== "mode" && !label.classList.contains("switch") && label.htmlFor !== "menu-control" ) {
+            label.style.display = "inline-block";
+            label.style.width = "100px";
+        }
+      });
 
     } else if (mode === 'advanced') {
       document.getElementById("powerReceivedSlider").style.display = "block";
-      document.getElementById("voltageSlider").style.display = "block";
       document.getElementById("noiseSlider").style.display = "none";
       document.getElementById("rateSlider").style.display = "block";
       document.getElementById("noisePowerSlider").style.display = "block";
-      document.getElementById("voltageSliderLabel").textContent = "Equalizer Output Voltage";
+      document.getElementById("voltageSliderLabel").textContent = "Equalizer Voltage";
       document.getElementById("freqSlider").style.display = "block";
-      document.getElementById("LNAPhase").style.display = "block";
-      // document.getElementById("LNAPhaseTitle").style.display = "block";
+      document.getElementById("phaseSlider").style.display = "block";
 
+      let labels = document.querySelectorAll("label");
+
+      labels.forEach(label => {
+        if (label.htmlFor !== "mode" && !label.classList.contains("switch") && label.htmlFor !== "menu-control" ) {
+            label.style.display = "inline-block";
+            label.style.width = "130px";
+        }
+      });
 
 
     }

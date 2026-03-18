@@ -66,10 +66,11 @@ function constellationDiagram_Baseband(){
           .call(d3.axisBottom(x).tickSize(-height*1).ticks(7))
         // Add X axis label
         svg.append("text")
+          .attr("id", "xAxisLabel")
           .attr("text-anchor", "middle")
           .attr("x", width/2)
-          .attr("y", height + margin.top + 15)
-          .text("Voltage (V)")
+          .attr("y", height + margin.top + 16)
+          .text("Voltage (Vrms)")
           .style("fill", "#FFFFFF");
 
         
@@ -79,16 +80,19 @@ function constellationDiagram_Baseband(){
         svg.append("g")
           // make grid lines
           .call(d3.axisLeft(y).tickSize(-width*1).ticks(5))
+          // .call(d3.axisLeft(y).tickValues([1, 2, 3, 4, 5]));
           .selectAll(".tick text").remove()
           svg.selectAll(".tick line").attr("stroke", "#484848")
         // Add Y axis label
-        svg.append("text")
-          .attr("text-anchor", "middle")
-          .attr("transform", `rotate(-90)`)
-          .attr("x", -height / 2)
-          .attr("y", -margin.left + 25)
-          .style("fill", "#FFFFFF");
-          // .text("Samples")
+
+          svg.append("text")
+            .attr("id", "yAxisLabel")
+            .attr("text-anchor", "middle")
+            .attr("transform", `rotate(-90)`)
+            .attr("x", -height / 2)
+            .attr("y", -margin.left + 40)
+            .text("tests")
+            .style("fill", "#FFFFFF");
 
           // to draw the initial targets, will be overwritten when signal scheme is changed
           // the y value is defined by a position on the graph measured in pixels
@@ -129,10 +133,21 @@ function constellationDiagram_Baseband(){
       let counter = 0;
       let yValCounter = (height/4)*(counter); // random y value within a band around center
 
+
+      svg.select("#yAxisLabel")
+        .style("font-size", "16px");
+      svg.select("#xAxisLabel")
+        .style("font-size", "16px");
+
       setInterval(() => {
 
       let variance = noise.gn/2;
       if(document.getElementById("mode").value === "advanced"){
+
+        let noisePSD = ((10**(noisePower.gn/10))/2)*(messageRate); // noise PSD
+        let physicsVariance = noisePSD /(10**((sigPower.gn + LNAGain)/10)); 
+        variance = physicsVariance/positiveTarget[0].x; 
+
 
       }
       // console.log(ebno);
@@ -156,7 +171,7 @@ function constellationDiagram_Baseband(){
           // do when in advanced mode
           let freqIndex = miniCircuitsFreq.findIndex(miniCircuitsFreq => Math.abs(miniCircuitsFreq-frequency) <1 );
           phaseShift = miniCircuitsPhase[freqIndex];
-
+          LNAGain = miniCircuitsGain[freqIndex];
 
 
         }
@@ -169,10 +184,9 @@ function constellationDiagram_Baseband(){
           .attr("cx", function (d) { 
             let xVal = d.x + generateNormalRandom() * variance;
             if(mode === "advanced"){
-              distOffset = xVal*Math.sin((phaseShift)*(Math.PI/180)); // in this case xVal starts as rho
 
-              yValCounter = distOffset;
-              xVal = xVal * Math.cos(phaseShift*(Math.PI/180))
+              xVal =  d.x*Math.cos(( phaseShift + correlatorPhase*1)*(Math.PI/180)) + variance* generateNormalRandom();
+              yValCounter = d.x*Math.sin(( phaseShift + correlatorPhase*1)*(Math.PI/180)) + variance* generateNormalRandom();
 
             } else{
               yValCounter = counter-2; // random y value within a band around center
@@ -180,8 +194,11 @@ function constellationDiagram_Baseband(){
             if(xVal<thresholdTarget[0].x) {
               BER_stats.messageErrors += 1;
             }
-            if(xVal<-voltageLimit) xVal = -voltageLimit
-            
+
+              if (!(Math.abs(xVal) < voltageLimit)) xVal = 2*(xVal/Math.abs(xVal)); 
+
+              if (!(Math.abs(yValCounter) < 2)) yValCounter = 2*(yValCounter/Math.abs(yValCounter)); 
+
             return x(xVal); } )
           .attr("cy", function () { 
             
@@ -200,19 +217,24 @@ function constellationDiagram_Baseband(){
             .attr("transform", function (d) { 
                 let xVal = d.x + variance* generateNormalRandom();
             if(mode === "advanced"){
-              distOffset = xVal*Math.sin((phaseShift)*(Math.PI/180)); // in this case xVal starts as rho
+              
 
-              yValCounter = distOffset;
-              xVal = xVal * Math.cos(phaseShift*(Math.PI/180))
-
+              // yValCounter = distOffset;
+              // xVal = xVal * Math.cos(phaseShift*(Math.PI/180))
+              xVal =  d.x*Math.cos((phaseShift+correlatorPhase*1)*(Math.PI/180)) + variance* generateNormalRandom();
+              yValCounter = d.x*Math.sin((phaseShift + correlatorPhase*1)*(Math.PI/180)) + variance* generateNormalRandom();
+            
             } else{
-              yValCounter = counter -2; // random y value within a band around center
+              yValCounter = counter -2; 
             }
 
               if (xVal > thresholdTarget[0].x) {
                 BER_stats.messageErrors += 1;
               }
-              if (xVal < -voltageLimit) xVal = -voltageLimit;
+
+              if (!(Math.abs(xVal) < voltageLimit)) xVal = 2*(xVal/Math.abs(xVal)); 
+
+              if (!(Math.abs(yValCounter) < 2)) yValCounter = 2*(yValCounter/Math.abs(yValCounter)); 
 
               return `translate(${x(xVal)}, ${y(yValCounter)}) rotate(${45})`; // turns the plus into a cross
             })
@@ -275,39 +297,43 @@ function constellationDiagram_Baseband(){
     
     document.getElementById("rateSlider").addEventListener("change", update_constellation);
 
-
-
     document.getElementById("mode").addEventListener("change", update_constellation);
     
     function update_constellation(){
       let advancedMode = document.getElementById("mode").value === "advanced";
-      // console.log(advancedMode);
-      // let ebno = ((sig.gn)/(noise.gn));
-      // let ebnoDb = 10*Math.log10(ebno);
       let offset = 1;
 
-
+      let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
       if(!advancedMode){
         if(!sig.differentialMode) offset = .5;
-        let ebno = (offset*(sig.gn )**2/((noise.gn**2)));
+        ebno = (offset*(sig.gn )**2/((noise.gn**2)));
         let ebnoDb = 10*Math.log10((ebno));
+        d3.select("#yAxisLabel").text(`tests`);
+        d3.select("#xAxisLabel").text(`Voltage (Vrms)`);
+
+
         d3.select("#ebnoLabel").text(`${ebnoDb.toFixed(2)} dB`);
         d3.select("#snrLabel").text(`${ebnoDb.toFixed(2)} dB`);
         d3.select("#sigPower").text(`${(10*Math.log10(offset*sig.gn**2)).toFixed(2)} dB`);
         d3.select("#noisePower").text(`${(10*Math.log10(noise.gn**2)).toFixed(2)} dB`);
+
       } else {
         freqIndex = miniCircuitsFreq.findIndex(miniCircuitsFreq => Math.abs(miniCircuitsFreq-frequency) <1 );
         phaseShift = miniCircuitsPhase[freqIndex];
         offset = 1;
         if(!sig.differentialMode) offset = .5;
-        let ebnodB = (sigPower.gn - noisePower.gn) +10*Math.log10(1/messageRate);
+        let ebnodB = (sigPower.gn - noisePower.gn) +10*Math.log10(1/messageRate) + LNAGain;
         let snrdB = (sigPower.gn - noisePower.gn) ;
- 
+        d3.select("#yAxisLabel").text(`Quadrature Voltage (Vrms)`);
+        d3.select("#xAxisLabel").text(`In Phase Voltage (Vrms)`);
+
         d3.select("#ebnoLabel").text(`${ebnodB.toFixed(2)} dB`);
         d3.select("#snrLabel").text(`${snrdB.toFixed(2)} dB`);
         d3.select("#sigPower").text(`${sigPower.gn.toFixed(2)} dB`);
         d3.select("#noisePower").text(`${noisePower.gn.toFixed(2)} dB`);
         d3.select("#LNAPhase").text(`${phaseShift.toFixed(2)} degrees`);
+        d3.select("#LNAGain").text(`${LNAGain.toFixed(2)} dBm`);
+
       }
       // console.log(ebno + " linear")
       let tBER = qfunc( Math.sqrt(2*offset*ebno) );
