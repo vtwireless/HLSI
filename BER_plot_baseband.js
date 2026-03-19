@@ -126,7 +126,7 @@ function BER_plot_baseband(){
                     { x: ebnoBeginner, y: sig.BER },
                   ];
       } else {
-        let ebnoAdvanced = (sigPower.gn - noisePower.gn) +10*Math.log10(1/messageRate) + LNAGain;
+        let ebnoAdvanced = sigPower.gn - (noisePower.gn + 10*Math.log10(1/messageRate));
 
         ebnoPoints = [{x: ebnoAdvanced, y: sig.BER },
                   ];
