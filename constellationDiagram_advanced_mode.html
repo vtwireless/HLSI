@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+  <title>Constellation Diagram</title>
+<script src=d3.v5.min.js></script>
+<link rel="stylesheet" type="text/css" media="all" href="hlsi.css">
+<script src=signal.js></script>
+<script src=common.js></script>
+<script src=label.js></script>
+<script src=sliders.js></script>
+<script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
+<script src=constellationDiagram_base.js></script>
+<script src=BER_plot.js></script>
+
+
+ <link rel="stylesheet" type="text/css" media="all" href="base.css">
+  <link rel=stylesheet type=text/css href=sidebar.css />
+
+
+
+  <body style="margin:0; padding:0; overflow-x:hidden;">
+  <section class="banner" style="position: fixed; z-index: 11; background: rgba(0,0,0,0.85);top: 0; left: 0; width: 100%; height: 60px; ">
+    <label for="menu-control" class="hamburger">
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+      <i class="hamburger__icon"></i>
+    </label>
+    
+    <input type="checkbox" id="menu-control" class="menu-control">
+    
+    <aside class="sidebar" style="z-index: 10;">
+      
+      <nav class="sidebar__menu">
+        <a href="01_bw.html"><b>1</b> Bandwidth</a>
+        <a href="02_freq.html"><b>2</b> Frequency</a>
+        <a href="03_gn.html"><b>3</b> Gain</a>
+        <a href="04_freq_bw_gn.html"><b>4</b> Frequency, Bandwidth, and Gain</a>
+        <a href="05_capacity.html"><b>5</b> Information Capacity</a>
+        <a href="06_interference.html"><b>6</b> Interference and Information Capacity</a>
+        <a href="07_capacity.html"><b>7</b> Information Capacity</a>
+        <a href="08_capacity.html"><b>8</b> Information Capacity</a>
+        <a href="09_capacity.html"><b>9</b> Information Capacity</a>
+        <a href="10_capacity.html"><b>10</b> Information Capacity</a>
+        <a href="11_pathloss.html"><b>11</b> Path Loss</a>
+        <a href="12_pathloss_interference.html" class="selected"><b>12</b> Path Loss with Interference</a>
+        <a href="13_manual_avoidance.html"><b>13</b> Manual Interferer Avoidance</a>
+        <a href="" onclick="alert('Exercise 14: reserved for future use')"><b>14</b> SAS (Spectrum Access System)</a>
+        <a href="15_rule_based_avoidance.html"><b>15</b> Rule Based Interferer Avoidance</a>
+        <a href="16_programmable_avoidance.html"><b>16</b> Programmable Interferer Avoidance</a>
+        <a href="17_machine_learning_avoidance.html"><b>17</b> Machine Learning Interferer Avoidance</a>
+        <a href="18_machine_learning_time_based_avoidance.html"><b>18</b> Machine Learning With Periodic Interferer Avoidance</a>
+        <a href="19_rf_front_end_spectrum_sharing.html"><b>19</b> RF Front End Spectrum Sharing</a>
+        <a href="20_rf_front_end_spectrum_sharing.html"><b>20</b> Programmable RF Front End Spectrum Sharing</a>
+        <a href="21_rf_front_end_spectrum_sharing_with_interferer.html"><b>21</b> RF Front End Spectrum Sharing with Interferer</a>
+        <a href="22_rf_front_end_spectrum_sharing_with_interferer.html"><b>22</b> Programmable Spectrum Sharing with Interferer</a>
+        <a href="23_rf_front_end_spectrum_sharing_sliders_programmable.html"><b>23</b> RFFE Spectrum Sharing - Manual and Programmable</a>
+        <a href="25_rf_front_end_spectrum_sharing_menu.html"><b>25</b> RFFE Spectrum Sharing - Calculate SINR options menu</a>
+        <a href="26_rf_front_end_spectrum_sharing_ programmable.html"><b>26</b> RFFE Spectrum Sharing -- SINR Calculations Programmable</a>
+      </nav>
+      
+      <label for="menu-control" class="sidebar__close"></label>
+      
+      
+    </aside>
+    
+    <div style="margin-left: 6%; font-size: 1.3rem; margin-top: 0.3%; font-family: sans-serif; order: 1; width: inherit;"><span style="color: #ddd;">Special Exercise:</span> M-ary constellation diagram</div>
+    <div style="order: 2; margin-left: auto; margin-right: 2%; display: flex;">
+      <span style="font-size: 250%; font-family: monospace; letter-spacing: 2px; margin-left: auto; margin-right: 5px; color: #e6d9ba;"></span>
+      <div style="width: 20%;">
+        <img style="width: 100%;" src="images/wireless-logo.png">
+      </div>
+    </div>   
+  </section>
+<body>
+    <div style="height: 50px;"></div>
+
+  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="300">
+    <rect width="100" height="100" fill="#f06"></rect>
+  </svg>
+
+  <div style="margin-left: 1%; margin-top: 1%;">
+  <label for="modulationType">Select Modulation Type:</label>
+  <select id="modulationType" >
+    <option value=1>PSK</option>
+    <option value=2>QAM</option>
+  </select>
+</div>
+<div id="modulationOrder" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+
+<button id="sendMessageButton">Send Message</button>
+<button id = "clearMessagesButton">clear message</button> 
+<button id="freezeButton" onclick="freeze()">Run Continously</button>
+<button id="toggleBER_SERButton">Show BER</button>
+
+
+
+<div class="container">
+  <style>
+    .container {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: left;
+      gap: 1rem; /* Adjust the gap to bring the graphs closer */
+      margin: 1rem;
+      align-items: flex-start;
+    }
+    #constellationParent, #BER_plotParent {
+      flex: 1;
+      text-align: center;
+      margin: 0%;
+      padding: 0%;
+      width: auto;
+      padding: 0.5rem; /* Reduce padding */
+      /* margin: 0; Remove margin    */
+      width: 1%; /* Adjust width to make them closer */
+    }
+    .modulation-table {
+        width: 10%;
+        border-collapse: collapse;
+        margin: 1rem auto;
+        font-family: Arial, sans-serif;
+        text-align: left;
+        border: 1px solid #ccc;
+    }
+
+    .modulation-table th, .modulation-table td {
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+    }
+
+    .modulation-table th {
+        background-color: #747272;
+        font-weight: bold;
+    }
+
+    .color-box {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #000;
+        display: inline-block;
+    }
+
+    .BERStats {
+      margin: 1rem 0;
+      height: 10rem;
+      width: 10%;
+    }
+
+    </style>
+
+    <div id="constellationParent"></div>
+    <div id="BER_plotParent"></div>
+
+
+  </table>
+      <table class="BERStats"style="border-collapse: collapse; border: 1px solid #ccc; text-align: left;">
+      <thead>
+        <tr>
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Parameter</th>
+          <th style="border: 1px solid #ccc; padding: 8px; text-align: left;">Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Iterations</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="iterationsLabel">0</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Measured BER</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="BERLabel">0.0</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Theoretical BER</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="tBERLabel">0.0</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Eb/No</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="ebnoLabel">0 dB</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Es/No</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="esnoLabel">0 dB</td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">SNR</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="snrLabel">0 dB</td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+<div class="slider-container" id="rateSlider" ></div>
+
+
+</body>
+
+<script>
+
+let modulationOrder = 1; // default value
+
+var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: 0, // dB
+    gn_min: -60, 
+    gn_max: 60, 
+    mcs_init: 0, // array index int
+  });
+  var noise = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
+    gn_init: -10, // dB
+    gn_min: -60,
+    gn_max: 20,
+  });
+
+  let BER_stats = new MessageStats();
+  
+
+
+// Slider(sig, 'mcs_simple', null, "modCodeSlider");
+
+// Slider(sig, 'gn', null, "gainSlider", "Energy per Symbol (dB)");
+// Slider(noise, 'gn', null, "gainSlider", "Noise Power Spectral Density (dB)");
+
+modulationOrderSlider = document.createElement("INPUT");
+      // doing this manually because I don't want to edit sliders.js
+      // below generates p object inside the div for inPhaseMag which we can add stuff to
+      modulationOrderSlider.type = "range";
+      modulationOrderSlider.min = 1; // example: sig.freq_min
+      modulationOrderSlider.max = 4;
+      modulationOrderSlider.step = 1
+      modulationOrderSlider.value = 1;
+      let p = document.createElement("p");
+      p.appendChild(modulationOrderSlider);
+      // I'm sure I could have made this better but I didn't 
+      document.getElementById("modulationOrder").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      let label = document.createElement("label");
+      label.setAttribute("for", modulationOrderSlider.id);
+      label.appendChild(document.createTextNode("Modulation Order"));
+
+      modulationOrderSlider.parentNode.prepend(label);
+  
+      // below sets up the output value on the right of the slider
+      let output = document.createElement("output");
+      output.setAttribute("for", modulationOrderSlider.id);
+      modulationOrderSlider._output = output;
+      modulationOrderSlider.parentNode.append(output);
+      output.value = modulationOrderSlider.value;
+      // below tells css to make the slider look like the sliders were use to 
+      modulationOrderSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      modulationOrderSlider.oninput = function () {
+        // This calls the parameter setter.
+        modulationOrder = parseValue(modulationOrderSlider.value);
+      };
+      var outputUnitsCallbackSig = function (modulationOrder, val) {
+         return d3.format("d")(val);
+      };
+
+  modulationOrderSlider.addEventListener("input", function () {
+    console.log("Modulation Order changed to:", modulationOrder);
+    // Add any additional logic here to handle the change in modulation order
+    output.value = outputUnitsCallbackSig(modulationOrder, modulationOrderSlider.value);
+  });
+
+
+
+let frozenFlag = true;
+constellationDiagram(300, 25,"constellationParent");
+BER_plot()
+
+
+
+
+
+
+
+// }
+ // use the clear all circles button
+function buttonPressedClearPoints(){
+  d3.select("#constellationParent").selectAll("circle").remove();
+
+
+}
+
+
+</script>
+
+</html>
