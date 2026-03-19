@@ -78,7 +78,9 @@
   </section>
 
 
-
+<div id="underConstructionLabel" style="display: none; margin-top: 5%; padding: 1%; background-color: #ffcc00; border: 3px solid #ff6600; font-size: 24px; font-weight: bold; text-align: center; color: #cc0000;">
+  ⚠️ UNDER CONSTRUCTION! ⚠️
+</div>
   <div style="height: 50px;"></div>
     <div class="modes" style="margin-left: 1%; margin-top: 2rem;">
       <div>
@@ -162,7 +164,10 @@
 
 <div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
 
-<!-- <div id="BERLabel" style="width: 100%; height: 100%;"></div> -->
+
+
+
+
 </body>
 
 <script>
@@ -428,8 +433,11 @@ labels.forEach(label => {
             label.style.width = "130px";
         }
       });
+      document.getElementById("underConstructionLabel").style.display = "none";
 
     } else if (mode === 'advanced') {
+      document.getElementById("underConstructionLabel").style.display = "block";
+
       document.getElementById("noiseLabel").textContent = "Noise PSD (W/Hz)";
 
       noiseSlider.min = -12; 
