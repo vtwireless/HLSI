@@ -8,9 +8,9 @@
 <script src=label.js></script>
 <script src=sliders.js></script>
 <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/3.3.0/math.min.js></script>
-<script src=constellationDiagram_base.js></script>
+<script src=constellationDiagram_advanced_mode.js></script>
 <script src=BER_plot.js></script>
-
+<script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
 
  <link rel="stylesheet" type="text/css" media="all" href="base.css">
   <link rel=stylesheet type=text/css href=sidebar.css />
@@ -73,11 +73,9 @@
 <body>
     <div style="height: 50px;"></div>
 
-  <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="300" height="300">
-    <rect width="100" height="100" fill="#f06"></rect>
-  </svg>
+<svg id="svgContainer" width="500" height="300"></svg>
 
-  <div style="margin-left: 1%; margin-top: 1%;">
+  <div style="margin-left: 1%; margin-top: 5%;">
   <label for="modulationType">Select Modulation Type:</label>
   <select id="modulationType" >
     <option value=1>PSK</option>

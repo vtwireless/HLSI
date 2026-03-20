@@ -270,7 +270,7 @@ modulationOrderSlider = document.createElement("INPUT");
       // below sets up the label on the left of the slider
       let label = document.createElement("label");
       label.setAttribute("for", modulationOrderSlider.id);
-      label.appendChild(document.createTextNode("Modulation Order"));
+      label.appendChild(document.createTextNode("bits per symbol (m)"));
 
       modulationOrderSlider.parentNode.prepend(label);
   
@@ -320,6 +320,14 @@ function buttonPressedClearPoints(){
 
 }
 
+  let labels = document.querySelectorAll("label");
+
+  labels.forEach(label => {
+    if (label.htmlFor !== "mode" && !label.classList.contains("switch") && label.htmlFor !== "menu-control" ) {
+        label.style.display = "inline-block";
+        label.style.width = "150px";
+    }
+  });
 
 </script>
 
