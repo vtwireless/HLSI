@@ -112,7 +112,7 @@ function BER_plot_baseband(){
         d3.select("#BER_plotParent").selectAll("circle").style("fill", "#a3a3a3");
 
         mode = document.getElementById("mode").value;
-       
+        let offset = 1;
         if(sig.differentialMode) ebno = (((sig.gn**2)/((noise.gn**2))));
         if(!sig.differentialMode) ebno = (sig.gn)**2/((2*noise.gn**2));
 
@@ -126,8 +126,11 @@ function BER_plot_baseband(){
                     { x: ebnoBeginner, y: sig.BER },
                   ];
       } else {
-        let ebnoAdvanced = sigPower.gn - (noisePower.gn + 10*Math.log10(1/messageRate));
-
+        if(!sig.differentialMode) {
+          offset = 2;
+        }
+        let ebnoAdvanced = (10*Math.log10(sig.gn**2) - (10*Math.log10(noise.gn)+ 10*Math.log10(offset*advancedModeMessageRate)));
+        // console.log(ebnoAdvanced);
         ebnoPoints = [{x: ebnoAdvanced, y: sig.BER },
                   ];
       }

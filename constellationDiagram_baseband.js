@@ -142,14 +142,13 @@ function constellationDiagram_Baseband(){
       setInterval(() => {
 
       let variance = noise.gn/2;
-      // if(document.getElementById("mode").value === "advanced"){
-
-      //   let noisePSD = ((10**(noisePower.gn/10))/2)*(messageRate); // noise PSD
-      //   let physicsVariance = noisePSD /(10**((sigPower.gn + LNAGain)/10)); 
-      //   variance = physicsVariance/positiveTarget[0].x; 
+      if(document.getElementById("mode").value === "advanced"){
 
 
-      // }
+        // variance = ((noise.gn/2) / (sig.gn**2 /(2*Math.sqrt(advancedModeMessageRate))));
+        variance = Math.sqrt(advancedModeMessageRate*noise.gn)/2;
+        // variance = noise.gn/2;
+      }
       // console.log(ebno);
         if (counter == 5){
           counter = 0;
@@ -294,6 +293,7 @@ function constellationDiagram_Baseband(){
     noise.onChange("gn", update_constellation);
     
     document.getElementById("rateSlider").addEventListener("change", update_constellation);
+    document.getElementById("bandwidthSlider").addEventListener("change", update_constellation);
 
     document.getElementById("mode").addEventListener("change", update_constellation);
     
@@ -322,10 +322,11 @@ function constellationDiagram_Baseband(){
         messageRate = 250;
         offset = 1;
         if(!sig.differentialMode) offset = .5;
-        let ebnodB = (20*Math.log10(sig.gn**2) - 10*Math.log10(noise.gn)) ;
-        let snrdB = ebnodB;
+        let ebnodB = (10*Math.log10((offset*sig.gn**2)/advancedModeMessageRate) - (10*Math.log10(noise.gn))); ;
+        let snrdB = (10*Math.log10(sig.gn**2) - (10*Math.log10(noise.gn) + 10*Math.log10(bandwidth)));
         let signalGaindB = 10*Math.log10(sig.gn**2);
-        let noiseGaindB = 10*Math.log10(noise.gn**2);
+        let noiseGaindB = 10*Math.log10(noise.gn*bandwidth) ;
+        let energyPerBitdB = 10*Math.log10((sig.gn**2)/advancedModeMessageRate);
         // d3.select("#yAxisLabel").text(`Quadrature Voltage (Vrms)`);
         d3.select("#xAxisLabel").text(`Voltage (Vrms)`);
 
@@ -333,7 +334,10 @@ function constellationDiagram_Baseband(){
         d3.select("#snrLabel").text(`${snrdB.toFixed(2)} dB`);
         d3.select("#sigPower").text(`${signalGaindB.toFixed(2)} dB`);
         d3.select("#noisePower").text(`${noiseGaindB.toFixed(2)} dB`);
+        d3.select("#energyPerBit").text(`${energyPerBitdB.toFixed(2)} dB`);
+        d3.select("#NoiseKTB").text(`${(noise.gn/2).toFixed(2)} dB`);
 
+        NoiseKTB
       }
       // console.log(ebno + " linear")
       let tBER = qfunc( Math.sqrt(2*offset*ebno) );
