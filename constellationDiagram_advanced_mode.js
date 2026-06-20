@@ -54,7 +54,7 @@ function connectBoxes(draw, boxA, boxB) {
     .move(x + 10, y + 20)
     .fill('#fff');
 
-  group.data('connections', []);
+  rect.data('connections', []);
 
   group.click(function () {
     console.log('Box clicked:', labelText);

@@ -78,9 +78,7 @@
   </section>
 
 
-<div id="underConstructionLabel" style="display: none; margin-top: 5%; padding: 1%; background-color: #ffcc00; border: 3px solid #ff6600; font-size: 24px; font-weight: bold; text-align: center; color: #cc0000;">
-  ⚠️ UNDER CONSTRUCTION! ⚠️
-</div>
+
   <div style="height: 50px;"></div>
     <div class="modes" style="margin-left: 1%; margin-top: 2rem;">
       <div>
@@ -94,10 +92,15 @@
   </div>
 
 <div class="constent-section" 
-  id="voltageSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+  id="voltageSlider" style="margin-left: 1%; margin-top:1%; width: 10%;"></div>
+<div id="rxPowerSlider" style="margin-left: 1%; margin-top:1%; width: 10%; display: none"></div>
 
 <div id="noiseSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
-<div id="rateSlider" style="margin-left: 1%; margin-top:1%; width: 100%;"></div>
+<div id="rateSlider" style="margin-left: 1%; margin-top:1%; width: 10%;"></div>
+
+<div id="bandwidthSlider" style="margin-left: 1%; margin-top:1%; width: 100%; display: none;"></div>
+
+
 
 <!-- <button onclick="buttonPressedClearPoints()">clear message</button>  -->
 <div style="display:flex; align-items:center; gap:8px; margin-left:1%;">
@@ -110,14 +113,14 @@
 
 
 
-<div style="display: flex; align-items: flex-start; gap: 16px; justify-content: flex-start;">
-  <div id="constellationParentBaseband" style="width: 70%; height: 100%;"></div>
+<!-- <div style="display: flex; border-collapse: collapse; align-items: left; gap: 16px; justify-content: flex-start;"> -->
+  <div id="constellationParentBaseband" style="width: 30%; height: 45%;"></div>
 
-  <table style="width: 80%; border-collapse: collapse; border: 1px solid black; text-align: left;">
+  <table style="width: 20%; border-collapse: collapse; border: 1px solid black; text-align: left;">
     <thead>
       <tr>
-        <th style="border: 1px solid black; padding: 8px; text-align: left;">Parameter</th>
-        <th style="border: 1px solid black; padding: 8px; text-align: left;">Value</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left; width: 15%;">Parameter</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left; width: 15%;">Value</th>
       </tr>
     </thead>
     <tbody>
@@ -150,17 +153,41 @@
         <td style="border: 1px solid black; padding: 8px; text-align: left;" id="noisePower">0 dB</td>
       </tr>
 
+    </tbody>
+
+
+  <style>
+    table {
+      /* margin-top: 1%; */
+      /* margin-bottom: auto; */
+      margin-left: 6%;
+    }
+  </style>
+
+
+
+  <table id="advancedModeParametersTable" style=" text-align: left; display: block; width: 50%; border-collapse: collapse; border: 1px solid #484848; display: none;">
+    <thead>
+      <tr>
+        <th style="border: 1px solid black; padding: 8px; text-align: left; width: 15%;">Parameter</th>
+        <th style="border: 1px solid black; padding: 8px; text-align: left; width: 15%;">Value</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Eb </td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="energyPerBit">0 dB</td>
+      </tr>
+      <tr>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;">Noise Power (dB)</td>
+        <td style="border: 1px solid black; padding: 8px; text-align: left;" id="NoiseKTB">0</td>
+      </tr>
 
     </tbody>
   </table>
-  <style>
-    table {
-      margin-top: 1%;
-      margin-bottom: auto;
-      margin-right: 10%;
-    }
-  </style>
-</div>
+<!-- </div> -->
+
 
 <div id="BER_plotParent" style="width: 100%; height: 100%;"></div>
 
@@ -192,7 +219,9 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
     gn_step: 10**-12,
   });
 
-
+  let bandwidth = 1000; // Hz
+  let rxPower = 0; // dBW
+  let advancedModeMessageRate = 1000; // bps
 
   noise.gn = 1.0;
 
@@ -221,10 +250,10 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
       voltageSlider.parentNode.prepend(voltageLabel);
   
       // below sets up the output value on the right of the slider
-      let output = document.createElement("output");
-      output.setAttribute("for", voltageSlider.id);
-      voltageSlider._output = output;
-      voltageSlider.parentNode.append(output);
+      let outputSig = document.createElement("output");
+      outputSig.setAttribute("for", voltageSlider.id);
+      voltageSlider._output = outputSig;
+      voltageSlider.parentNode.append(outputSig);
       
       // below tells css to make the slider look like the sliders were use to 
       voltageSlider.className = "slider_bw";
@@ -236,6 +265,10 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
         // Set the varying parameter.  For example: sig.freq
         // This calls the parameter setter.
         sig["gn"] = parseValue(voltageSlider.value);
+
+        rxPower = 10 * Math.log10(sig.gn**2);
+        outputRxPower.value = outputUnitsCallbackRxPower(rxPower);
+        rxPowerSlider.value = rxPower;
       };
       var outputUnitsCallbackSig = function (sig, val) {
          return d3.format(".2f")(val) + " Volts";
@@ -247,11 +280,9 @@ var sig = Signal(JSON.parse(JSON.stringify(conf.signal_multi)), '', {
   
       sig.onChange("gn", function (sig1, gn) {
         voltageSlider.value = gn;
-        output.value = outputUnitsCallbackSig(sig1, gn);
+        outputSig.value = outputUnitsCallbackSig(sig1, gn);
       });
-      // sigPower.onChange("gn", function (sigPower, gn) {
-      //   output.value = outputUnitsCallbackSigVoltageUpdate(sigPower, gn);
-      // });
+
 
 
 
@@ -337,7 +368,7 @@ noiseSlider = document.createElement("INPUT");
         messageRateSlider.value = 1;
         messageRateSlider.id = "rateSlider"; // Assign an ID to the slider
 
-        let p = document.createElement("p");
+        p = document.createElement("p");
         p.appendChild(messageRateSlider);
         document.getElementById("rateSlider").appendChild(p); // 
 
@@ -349,10 +380,10 @@ noiseSlider = document.createElement("INPUT");
         messageRateSlider.parentNode.prepend(rateLabel);
   
         // below sets up the output value on the right of the slider
-        let output = document.createElement("output");
-        output.setAttribute("for", messageRateSlider.id);
-        messageRateSlider._output = output;
-        messageRateSlider.parentNode.append(output);
+        let messageRateOutput = document.createElement("output");
+        messageRateOutput.setAttribute("for", messageRateSlider.id);
+        messageRateSlider._output = messageRateOutput;
+        messageRateSlider.parentNode.append(messageRateOutput);
       
         // below tells CSS to make the slider look like the sliders we're used to
         messageRateSlider.className = "slider_bw";
@@ -360,13 +391,17 @@ noiseSlider = document.createElement("INPUT");
         // we will use floats on the output
         var parseValue = parseFloat;
   
-        messageRateSlider.oninput = function () {
-          // Set the varying parameter.  For example: sig.freq
-          // This calls the parameter setter.
-          messageRate = parseValue(messageRateSlider.value);
-        };
+        // messageRateSlider.oninput = function () {
+        //   // Set the varying parameter.  For example: sig.freq
+        //   // This calls the parameter setter.
+        //   messageRate = parseValue(messageRateSlider.value);
+        // };
         var outputUnitsCallback = function (val) {
-          return d3.format("d")(val) + " messages/sec";
+          if(document.getElementById("mode").value === 'advanced') {
+            return d3.format(".2f")(val) + " bps";
+          } else {
+            return d3.format("d")(val) + " messages/sec";
+          }
         };
 
   
@@ -375,19 +410,137 @@ noiseSlider = document.createElement("INPUT");
           if(mode === 'advanced') {
             // messageRate = parseValue(messageRateSlider.value);
             messageRate = 250;
-            let displayMessageRate = messageRateSlider.value;
-            output.textContent = outputUnitsCallback(displayMessageRate);
+            advancedModeMessageRate = messageRateSlider.value;
+            messageRateOutput.textContent = outputUnitsCallback(advancedModeMessageRate);
+            if(advancedModeMessageRate > bandwidth){
+              outputBandwidth.textContent = outputUnitsCallbackBandwidth(advancedModeMessageRate);
+              bandwidthSlider.value = advancedModeMessageRate;
+              bandwidth = advancedModeMessageRate;
+            }
           } else {
             messageRate = messageRateSlider.value;
-            output.textContent = outputUnitsCallback(messageRate);
+            messageRateOutput.textContent = outputUnitsCallback(messageRate);
           }
           // // messageRate = messageRateSlider.value;
           // output.textContent = outputUnitsCallback(messageRate);
         })
 
-        output.value = outputUnitsCallback(messageRate);
+        messageRateOutput.value = outputUnitsCallback(messageRate);
       }
 
+///////////// BANDWIDTH SLIDER /////////////
+  let bandwidthSlider = document.createElement("INPUT");
+
+      bandwidthSlider.type = "range";
+      bandwidthSlider.min = 1000; // example: sig.freq_min
+      bandwidthSlider.max = 500000;
+      bandwidthSlider.step = 1000;
+      bandwidthSlider.value = 1000;
+
+      p = document.createElement("p");
+      p.appendChild(bandwidthSlider);
+      document.getElementById("bandwidthSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      let bandwidthSliderLabel = document.createElement("label");
+      // label.style.marginRight = "2%"; // Add a gap between the label and the slider
+      // label.setAttribute("for", voltageSlider.id);
+      bandwidthSliderLabel.setAttribute("id", "bandwidthSliderLabel");
+      bandwidthSliderLabel.appendChild(document.createTextNode("Bandwidth (Hz)"));
+
+      bandwidthSlider.parentNode.prepend(bandwidthSliderLabel);
+  
+      // below sets up the output value on the right of the slider
+      let outputBandwidth = document.createElement("output");
+      outputBandwidth.setAttribute("for", bandwidthSlider.id);
+      bandwidthSlider._output = outputBandwidth;
+      bandwidthSlider.parentNode.append(outputBandwidth);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      bandwidthSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      bandwidthSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        bandwidth = parseValue(bandwidthSlider.value);
+      };
+      var outputUnitsCallbackBandwidth = function ( val) {
+         return d3.format(".2f")(val) + "  Hz";
+      };
+
+  
+        bandwidthSlider.addEventListener("input", function () {
+            let bandwidth = bandwidthSlider.value;
+            outputBandwidth.textContent = outputUnitsCallbackBandwidth(bandwidth);
+            if(bandwidth < advancedModeMessageRate){
+              
+              advancedModeMessageRate = bandwidth;
+              messageRateSlider.value = advancedModeMessageRate;
+              messageRateSlider.dispatchEvent(new Event("input"));
+            }
+        })
+
+        outputBandwidth.value = outputUnitsCallbackBandwidth(bandwidth);
+
+
+///////////// RX POWER SLIDER /////////////
+  let rxPowerSlider = document.createElement("INPUT");
+
+      rxPowerSlider.type = "range";
+      rxPowerSlider.min = -20; // example: sig.freq_min
+      rxPowerSlider.max = 13;
+      rxPowerSlider.step = 1;
+      rxPowerSlider.value = 0;
+      p = document.createElement("p");
+      p.appendChild(rxPowerSlider);
+      document.getElementById("rxPowerSlider").appendChild(p);
+
+      // below sets up the label on the left of the slider
+      let rxPowerSliderLabel = document.createElement("label");
+      // label.style.marginRight = "2%"; // Add a gap between the label and the slider
+      // label.setAttribute("for", voltageSlider.id);
+      rxPowerSliderLabel.setAttribute("id", "rxPowerSliderLabel");
+      rxPowerSliderLabel.appendChild(document.createTextNode("Receieved Power (dBW)"));
+
+      rxPowerSlider.parentNode.prepend(rxPowerSliderLabel);
+  
+      // below sets up the output value on the right of the slider
+      let outputRxPower = document.createElement("output");
+      outputRxPower.setAttribute("for", rxPowerSlider.id);
+      rxPowerSlider._output = outputRxPower;
+      rxPowerSlider.parentNode.append(outputRxPower);
+      
+      // below tells css to make the slider look like the sliders were use to 
+      rxPowerSlider.className = "slider_bw";
+  
+      // we will use floats on the output
+      var parseValue = parseFloat;
+  
+      rxPowerSlider.oninput = function () {
+        // Set the varying parameter.  For example: sig.freq
+        // This calls the parameter setter.
+        rxPower = parseValue(rxPowerSlider.value);
+      };
+      var outputUnitsCallbackRxPower = function ( val) {
+        let linearPower = 10**(val/10);
+        sig.gn = Math.sqrt(linearPower);
+
+         return d3.format("d")(val) + "  dBW";
+
+      };
+
+  
+        rxPowerSlider.addEventListener("input", function () {
+            let rxPower = rxPowerSlider.value;
+            outputRxPower.textContent = outputUnitsCallbackRxPower(rxPower);
+
+
+        })
+
+        outputRxPower.value = outputUnitsCallbackRxPower(rxPower);
 
 
       
@@ -433,10 +586,15 @@ labels.forEach(label => {
             label.style.width = "130px";
         }
       });
-      document.getElementById("underConstructionLabel").style.display = "none";
+      document.getElementById("bandwidthSlider").style.display = "none";
+      document.getElementById("rxPowerSlider").style.display = "none";
+      document.getElementById("advancedModeParametersTable").style.display = "none";
 
     } else if (mode === 'advanced') {
-      document.getElementById("underConstructionLabel").style.display = "block";
+      document.getElementById("advancedModeParametersTable").style.display = "block";
+      document.getElementById("bandwidthSlider").style.display = "block";
+      document.getElementById("rxPowerSlider").style.display = "block";
+
 
       document.getElementById("noiseLabel").textContent = "Noise PSD (W/Hz)";
 
@@ -454,6 +612,8 @@ labels.forEach(label => {
       messageRateSlider.dispatchEvent(new Event("input"));
 
       let labels = document.querySelectorAll("label");
+
+
 
       labels.forEach(label => {
         if (label.htmlFor !== "mode" && !label.classList.contains("switch") && label.htmlFor !== "menu-control" ) {
