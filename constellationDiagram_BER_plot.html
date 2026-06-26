@@ -73,7 +73,7 @@
 <body>
     <div style="height: 50px;"></div>
 
-<!-- <div id="modCodeSlider" style="margin-left: 1%; margin-top:3%; width: 100%;"></div> -->
+<div id="modCodeSlider" style="margin-left: 1%; margin-top:3%; width: 100%;"></div>
 <div style="margin-left: 1%; margin-top: 1%;">
   <label for="modulationType">Select Modulation Type:</label>
   <select id="modulationType" >
@@ -81,9 +81,9 @@
     <option value=2>QAM</option>
   </select>
 </div>
-<div id="modulationOrder" style="margin-left: 1%; margin-top:1%; width: 10%;"></div>
+<div id="modulationOrder" style="margin-left: 1%; margin-top:1%; width: 80%;"></div>
 
-<div id="gainSlider" style="margin-left: 1%; margin-top:1%; width: 10%;"></div>
+<div id="gainSlider" style="margin-left: 1%; margin-top:1%; width: 80%;"></div>
 <button id="sendMessageButton">Send Message</button>
 
 <button id = "clearMessagesButton">clear message</button> 
@@ -92,7 +92,7 @@
 
 
 
-<!-- <div class="container"> -->
+<div class="container">
   <style>
     .container {
       display: flex;
@@ -202,11 +202,11 @@
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="iterationsLabel">0</td>
         </tr>
         <tr>
-          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Measured BER</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Measured Error Rate</td>
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="BERLabel">0.0</td>
         </tr>
         <tr>
-          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Theoretical BER</td>
+          <td style="border: 1px solid #ccc; padding: 8px; text-align: left;">Theoretical Error Rate</td>
           <td style="border: 1px solid #ccc; padding: 8px; text-align: left;" id="tBERLabel">0.0</td>
         </tr>
         <tr>
@@ -223,7 +223,7 @@
         </tr>
       </tbody>
     </table>
-<!-- </div> -->
+</div>
 <div class="slider-container" id="rateSlider" ></div>
 
 
